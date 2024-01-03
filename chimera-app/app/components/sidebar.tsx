@@ -7,6 +7,7 @@ import {
   RxPencil2,
 } from 'react-icons/rx'
 import { Button } from '~/components/ui/button'
+import { UserMenu } from '~/components/user-menu'
 
 export function Sidebar() {
   return (
@@ -45,6 +46,9 @@ export function Sidebar() {
             Reminder
           </NavLink>
         </Button>
+      </div>
+      <div className="px-4 mt-16">
+        <UserMenu />
       </div>
     </div>
   )
