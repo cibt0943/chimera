@@ -3,7 +3,7 @@ services:
   app:
     container_name: chimera-app
     build:
-      context: .
+      context: ./chimera-app
     volumes:
       - ./chimera-app:/chimera-app
     ports:

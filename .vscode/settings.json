@@ -31,5 +31,6 @@
   "files.trimTrailingWhitespace": true,
   "css.validate": false,
   "scss.validate": false,
-  "stylelint.validate": ["css", "scss"]
+  "stylelint.validate": ["css", "scss"],
+  "eslint.workingDirectories": ["./chimera-app"]
 }
