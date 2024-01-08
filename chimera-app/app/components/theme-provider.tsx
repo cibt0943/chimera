@@ -1,80 +1,89 @@
-import { createContext, useState } from 'react'
+import { createContext, useState, useContext } from 'react'
 import { useIsomorphicLayoutEffect } from '~/lib/useIsomorphicLayoutEffect'
+import { useFetcher } from '@remix-run/react'
 
-type Theme = 'dark' | 'light' | 'system'
+export enum Theme {
+  SYSTEM = 'system',
+  DARK = 'dark',
+  LIGHT = 'light',
+}
 
-type ThemeProviderState = {
+type ThemeContextState = {
   theme: Theme
-  upateTheme: (newTheme: Theme) => void
+  setTheme: (theme: Theme) => void
 }
 
-const initialState: ThemeProviderState = {
-  theme: 'system',
-  upateTheme: () => null,
+const initialState: ThemeContextState = {
+  theme: Theme.SYSTEM,
+  setTheme: () => null,
 }
 
-export const ThemeContext = createContext<ThemeProviderState>(initialState)
+const ThemeContext = createContext<ThemeContextState>(initialState)
+
+export function useTheme() {
+  const context = useContext(ThemeContext)
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider')
+  }
+  return context
+}
 
 type ThemeProviderProps = {
   children: React.ReactNode
+  defaultTheme: Theme
 }
 
-export function ThemeProvider({ children }: ThemeProviderProps) {
+export function ThemeProvider({
+  children,
+  defaultTheme = Theme.SYSTEM,
+}: ThemeProviderProps) {
   const isomorphicLayoutEffect = useIsomorphicLayoutEffect()
-  const [theme, setTheme] = useState<Theme>('system')
-
+  const [theme, setTheme] = useState<Theme>(defaultTheme)
   const prefersLightMQ = '(prefers-color-scheme: dark)'
+  const fetcher = useFetcher()
 
-  isomorphicLayoutEffect(() => {
-    console.log('a')
-    const savedTheme = window.localStorage.getItem('theme')
-    console.log(savedTheme)
-    setTheme((savedTheme || 'system') as Theme)
-  }, [])
-
-  isomorphicLayoutEffect(() => {
-    console.log('b')
-    console.log(theme)
+  const updateClassName = () => {
     const root = window.document.documentElement
-    root.classList.remove('light', 'dark')
-    if (theme === 'system') {
+    root.classList.remove(Theme.LIGHT, Theme.DARK)
+    if (theme === Theme.SYSTEM) {
       const systemTheme = window.matchMedia(prefersLightMQ).matches
-        ? 'dark'
-        : 'light'
+        ? Theme.DARK
+        : Theme.LIGHT
       root.classList.add(systemTheme)
       return
     }
     root.classList.add(theme)
-  }, [theme])
-
-  // const mediaQueryLlistener = (e: MediaQueryListEvent) => {
-  //   if (theme === 'system') {
-  //     if (e.matches) {
-  //       document.documentElement.classList.add('dark')
-  //     } else {
-  //       document.documentElement.classList.remove('dark')
-  //     }
-  //   }
-  // }
-
-  // window.matchMedia(prefersLightMQ).addEventListener('change', mediaQueryLlistener)
-
-  // useEffect(() => {
-  //   const mediaQuery = window.matchMedia(prefersLightMQ);
-  //   const handleChange = () => {
-  //     setTheme(mediaQuery.matches ? Theme.LIGHT : Theme.DARK);
-  //   };
-  //   mediaQuery.addEventListener('change', handleChange);
-  //   return () => mediaQuery.removeEventListener('change', handleChange);
-  // }, []);
-
-  const upateTheme = (newTheme: Theme) => {
-    window.localStorage.setItem('theme', newTheme)
-    setTheme(newTheme)
   }
 
+  // OSのモード変更に対するイベント付与
+  isomorphicLayoutEffect(() => {
+    const mediaQuery = window.matchMedia(prefersLightMQ)
+    const handleChange = () => {
+      updateClassName()
+    }
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [theme])
+
+  // サービスのモード変更に対する処理
+  isomorphicLayoutEffect(() => {
+    // クッキーの値を更新
+    fetcher.submit(
+      { theme },
+      {
+        method: 'post',
+        encType: 'application/json',
+        action: '/action/set-theme',
+      },
+    )
+  }, [theme])
+
+  isomorphicLayoutEffect(() => {
+    updateClassName()
+  })
+
   return (
-    <ThemeContext.Provider value={{ theme, upateTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   )

@@ -1,4 +1,3 @@
-import { useContext } from 'react'
 import { NavLink } from '@remix-run/react'
 // import { useRouter } from 'next/navigation'
 import { RxSun, RxMoon, RxGear, RxPerson, RxExit } from 'react-icons/rx'
@@ -23,12 +22,12 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 
-import { ThemeContext } from '~/components/theme-provider'
+import { useTheme, Theme } from '~/components/theme-provider'
 
 export function UserMenu() {
+  const { theme, setTheme } = useTheme()
   // const router = useRouter()
   // const { user, isLoading } = useUser()
-  const { theme, upateTheme } = useContext(ThemeContext)
 
   // if (isLoading) return ''
 
@@ -39,6 +38,10 @@ export function UserMenu() {
   //     </Button>
   //   )
   // }
+
+  const handleValueChange = (theme: string) => {
+    setTheme(theme as Theme)
+  }
 
   return (
     <div>
@@ -72,7 +75,7 @@ export function UserMenu() {
                 <DropdownMenuSubContent hideWhenDetached={true}>
                   <DropdownMenuRadioGroup
                     value={theme}
-                    onValueChange={upateTheme}
+                    onValueChange={handleValueChange}
                   >
                     <DropdownMenuRadioItem value="light">
                       <RxSun className="mr-2 h-4 w-4" />
