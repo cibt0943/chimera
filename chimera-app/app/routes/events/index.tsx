@@ -10,15 +10,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return {}
 }
 
-export default function Todos() {
+export default function Events() {
   return (
     <div>
-      <h1 className="mb-2 text-xl font-bold">Todo機能</h1>
+      <h1 className="mb-2 text-xl font-bold">カレンダー機能</h1>
       <ul>
-        <li>Todoには状態を保つ</li>
-        <li>Todoには期限日を持つ</li>
-        <li>期限日でカレンダーに表示</li>
-        <li>一覧の表示順は自由に変更可能</li>
+        <li>カレンダーにTodoを表示</li>
+        <li>カレンダーにMemoを表示</li>
+        <li>カレンダーからTodoを作成</li>
       </ul>
     </div>
   )

@@ -1,8 +1,6 @@
-import { NavLink } from '@remix-run/react'
-// import { useRouter } from 'next/navigation'
+import { useNavigate, Form, useFetcher } from '@remix-run/react'
 import { RxSun, RxMoon, RxGear, RxPerson, RxExit } from 'react-icons/rx'
 import { MdBrightness4 } from 'react-icons/md'
-// import { useUser } from '@auth0/nextjs-auth0/client'
 
 import { Button } from '~/components/ui/button'
 import {
@@ -23,24 +21,37 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 
 import { useTheme, Theme } from '~/components/theme-provider'
+import { useUser } from '~/components/user-provider'
 
 export function UserMenu() {
-  const { theme, setTheme } = useTheme()
-  // const router = useRouter()
+  const navigate = useNavigate()
+  const { theme, updateTheme } = useTheme()
   // const { user, isLoading } = useUser()
+  const { user } = useUser()
+  const fetcher = useFetcher()
 
   // if (isLoading) return ''
 
-  // if (!user) {
-  //   return (
-  //     <Button asChild>
-  //       <NavLink to="/api/auth/login">Log in</NavLink>
-  //     </Button>
-  //   )
-  // }
+  if (!user) {
+    return (
+      <Form action="/auth/auth0" method="post">
+        <Button variant="destructive">Log in</Button>
+      </Form>
+    )
+  }
 
   const handleValueChange = (theme: string) => {
-    setTheme(theme as Theme)
+    updateTheme(theme as Theme)
+  }
+
+  const handleLogoutClick = () => {
+    fetcher.submit(
+      {},
+      {
+        action: '/auth/logout',
+        method: 'post',
+      },
+    )
   }
 
   return (
@@ -49,20 +60,23 @@ export function UserMenu() {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
             <Avatar className="h-9 w-9">
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              {/* <AvatarImage src={user.picture || ''} />
-              <AvatarFallback>{user.name}</AvatarFallback> */}
+              <AvatarImage src={user.picture}></AvatarImage>
+              <AvatarFallback>{user.name}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
-          {/* <DropdownMenuLabel>{user.name}</DropdownMenuLabel> */}
+        <DropdownMenuContent className="w-52">
+          <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            {/* <DropdownMenuItem onClick={() => router.push('/profile')}>
+            <DropdownMenuItem
+              onClick={() => {
+                navigate('/profile')
+              }}
+            >
               <RxPerson className="mr-2 h-4 w-4" />
               Profile
-            </DropdownMenuItem> */}
+            </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
@@ -95,10 +109,10 @@ export function UserMenu() {
             </DropdownMenuSub>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          {/* <DropdownMenuItem onClick={() => router.push('/api/auth/logout')}>
+          <DropdownMenuItem onClick={handleLogoutClick}>
             <RxExit className="mr-2 h-4 w-4" />
             Log out
-          </DropdownMenuItem> */}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

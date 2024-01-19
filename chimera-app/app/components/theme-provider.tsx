@@ -10,12 +10,12 @@ export enum Theme {
 
 type ThemeContextState = {
   theme: Theme
-  setTheme: (theme: Theme) => void
+  updateTheme: (theme: Theme) => void
 }
 
 const initialState: ThemeContextState = {
   theme: Theme.SYSTEM,
-  setTheme: () => null,
+  updateTheme: () => null,
 }
 
 const ThemeContext = createContext<ThemeContextState>(initialState)
@@ -42,7 +42,7 @@ export function ThemeProvider({
   const prefersLightMQ = '(prefers-color-scheme: dark)'
   const fetcher = useFetcher()
 
-  const updateClassName = () => {
+  function updateClassName() {
     const root = window.document.documentElement
     root.classList.remove(Theme.LIGHT, Theme.DARK)
     if (theme === Theme.SYSTEM) {
@@ -55,6 +55,21 @@ export function ThemeProvider({
     root.classList.add(theme)
   }
 
+  // サービスのモード変更に対する処理
+  function updateTheme(theme: Theme) {
+    setTheme(theme)
+
+    // クッキーの値を更新
+    fetcher.submit(
+      { theme },
+      {
+        method: 'post',
+        encType: 'application/json',
+        action: '/action/set-theme',
+      },
+    )
+  }
+
   // OSのモード変更に対するイベント付与
   isomorphicLayoutEffect(() => {
     const mediaQuery = window.matchMedia(prefersLightMQ)
@@ -65,25 +80,12 @@ export function ThemeProvider({
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme])
 
-  // サービスのモード変更に対する処理
-  isomorphicLayoutEffect(() => {
-    // クッキーの値を更新
-    fetcher.submit(
-      { theme },
-      {
-        method: 'post',
-        encType: 'application/json',
-        action: '/action/set-theme',
-      },
-    )
-  }, [theme])
-
   isomorphicLayoutEffect(() => {
     updateClassName()
   })
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, updateTheme }}>
       {children}
     </ThemeContext.Provider>
   )

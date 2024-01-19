@@ -10,15 +10,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return {}
 }
 
-export default function Todos() {
+export default function Memos() {
   return (
     <div>
-      <h1 className="mb-2 text-xl font-bold">Todo機能</h1>
+      <h1 className="mb-2 text-xl font-bold">メモ機能</h1>
       <ul>
-        <li>Todoには状態を保つ</li>
-        <li>Todoには期限日を持つ</li>
-        <li>期限日でカレンダーに表示</li>
-        <li>一覧の表示順は自由に変更可能</li>
+        <li>メモには日付情報を持つ。デフォルトは作成日で変更可能</li>
+        <li>日付情報で、カレンダーに表示</li>
       </ul>
     </div>
   )

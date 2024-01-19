@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
+import { json } from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -12,7 +13,9 @@ import {
 } from '@remix-run/react'
 
 import styles from '~/tailwind.css'
-import { getTheme } from '~/utils/cookies'
+import { getUser } from '~/lib/auth.server'
+import { themeCookie } from '~/lib/cookies'
+import { UserProvider } from '~/components/user-provider'
 import { ThemeProvider } from '~/components/theme-provider'
 import { Sidebar } from '~/components/sidebar'
 
@@ -23,11 +26,14 @@ export const links: LinksFunction = () => [
 
 export async function loader({ request }: LoaderFunctionArgs) {
   // クッキーからカラーモードを取得
-  return await getTheme(request)
+  const cookieHeader = request.headers.get('Cookie')
+  const cookie = (await themeCookie.parse(cookieHeader)) || {}
+  const user = await getUser(request)
+  return json({ theme: cookie.theme, user })
 }
 
 export default function App() {
-  const { theme } = useLoaderData<typeof loader>()
+  const { theme, user } = useLoaderData<typeof loader>()
 
   return (
     <html lang="en" className={clsx(theme)}>
@@ -38,18 +44,20 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <ThemeProvider defaultTheme={theme}>
-          <div className="flex">
-            <aside className="flex-none w-48">
-              <div className="sticky top-0">
-                <Sidebar />
-              </div>
-            </aside>
-            <main className="grow py-4">
-              <Outlet />
-            </main>
-          </div>
-        </ThemeProvider>
+        <UserProvider user={user}>
+          <ThemeProvider defaultTheme={theme}>
+            <div className="flex">
+              <aside className="flex-none w-48">
+                <div className="sticky top-0">
+                  <Sidebar />
+                </div>
+              </aside>
+              <main className="grow py-4">
+                <Outlet />
+              </main>
+            </div>
+          </ThemeProvider>
+        </UserProvider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
