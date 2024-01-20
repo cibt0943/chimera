@@ -52,7 +52,7 @@ export default function App() {
                   <Sidebar />
                 </div>
               </aside>
-              <main className="grow py-4">
+              <main className="grow">
                 <Outlet />
               </main>
             </div>

@@ -1,6 +1,10 @@
-import type { LoaderFunctionArgs } from '@remix-run/node'
+import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { authenticator } from '~/lib/auth.server'
+
+export const meta: MetaFunction = () => {
+  return [{ title: 'profile | Kobushi' }]
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await authenticator.authenticate('auth0', request)

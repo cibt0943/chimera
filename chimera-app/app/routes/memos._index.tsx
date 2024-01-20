@@ -1,5 +1,9 @@
-import type { LoaderFunctionArgs } from '@remix-run/node'
+import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/node'
 import { authenticator } from '~/lib/auth.server'
+
+export const meta: MetaFunction = () => {
+  return [{ title: 'memos | Kobushi' }]
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await authenticator.authenticate('auth0', request)
@@ -10,7 +14,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return {}
 }
 
-export default function Memos() {
+export default function Index() {
   return (
     <div>
       <h1 className="mb-2 text-xl font-bold">メモ機能</h1>
