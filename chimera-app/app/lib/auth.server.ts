@@ -17,7 +17,6 @@ const auth0Strategy = new Auth0Strategy<User>(
   async ({ profile }) => {
     const auth0Profile = profile._json as Auth0User
 
-    // Get the user data from your DB or API using the tokens and profile
     const user = await getOrInsertUser({ sub: auth0Profile.sub })
 
     return {
@@ -32,11 +31,3 @@ const auth0Strategy = new Auth0Strategy<User>(
 )
 
 authenticator.use(auth0Strategy)
-
-export async function getUser(request: Request) {
-  // ログインしてなければAuth0のログイン画面へリダイレクト
-  // return await authenticator.authenticate('auth0', request)
-
-  // ログインしてなければnullを返す
-  return await authenticator.isAuthenticated(request)
-}

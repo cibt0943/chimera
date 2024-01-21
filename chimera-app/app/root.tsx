@@ -13,7 +13,7 @@ import {
 } from '@remix-run/react'
 
 import styles from '~/tailwind.css'
-import { getUser } from '~/lib/auth.server'
+import { authenticator } from '~/lib/auth.server'
 import { themeCookie } from '~/lib/cookies'
 import { UserProvider } from '~/components/user-provider'
 import { ThemeProvider } from '~/components/theme-provider'
@@ -28,7 +28,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // クッキーからカラーモードを取得
   const cookieHeader = request.headers.get('Cookie')
   const cookie = (await themeCookie.parse(cookieHeader)) || {}
-  const user = await getUser(request)
+  const user = await authenticator.isAuthenticated(request)
   return json({ theme: cookie.theme, user })
 }
 

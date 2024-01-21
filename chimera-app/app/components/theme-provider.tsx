@@ -4,8 +4,8 @@ import { useFetcher } from '@remix-run/react'
 
 export enum Theme {
   SYSTEM = 'system',
-  DARK = 'dark',
   LIGHT = 'light',
+  DARK = 'dark',
 }
 
 type ThemeContextState = {
@@ -44,7 +44,7 @@ export function ThemeProvider({
 
   function updateClassName() {
     const root = window.document.documentElement
-    root.classList.remove(Theme.LIGHT, Theme.DARK)
+    root.classList.remove(Theme.SYSTEM, Theme.LIGHT, Theme.DARK)
     if (theme === Theme.SYSTEM) {
       const systemTheme = window.matchMedia(prefersLightMQ).matches
         ? Theme.DARK

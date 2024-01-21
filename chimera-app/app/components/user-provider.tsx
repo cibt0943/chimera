@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import { User } from '~/lib/auth.server'
+import { User } from '~/types/users'
 
 type UserContextState = {
   user: User | null
