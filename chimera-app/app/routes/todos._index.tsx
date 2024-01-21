@@ -1,29 +1,33 @@
 import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/node'
+import { json } from '@remix-run/node'
+import { useLoaderData } from '@remix-run/react'
 import { authenticator } from '~/lib/auth.server'
+import { Task, Tasks, TaskStatus } from '~/types/tasks'
+import { getTasks } from '~/models/task.server'
+import { TodoContainer } from '~/components/todo/todo-container'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'todos | Kobushi' }]
+  return [{ title: 'Todos | Kobushi' }]
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await authenticator.authenticate('auth0', request)
-  // const user = await authenticator.isAuthenticated(request, {
-  //   failureRedirect: '/login',
-  // })
+  const taskModels = await getTasks(user.id)
+  const tasks = taskModels.map<Task>((value) => {
+    return {
+      id: value.id,
+      title: value.title,
+      memo: value.memo,
+      status: value.status as TaskStatus,
+      dueDate: value.dueDate,
+    }
+  })
 
-  return {}
+  return json({ tasks })
 }
 
 export default function Index() {
-  return (
-    <div>
-      <h1 className="mb-2 text-xl font-bold">Todo機能</h1>
-      <ul>
-        <li>Todoには状態を保つ</li>
-        <li>Todoには期限日を持つ</li>
-        <li>期限日でカレンダーに表示</li>
-        <li>一覧の表示順は自由に変更可能</li>
-      </ul>
-    </div>
-  )
+  const { tasks } = useLoaderData<typeof loader>() as { tasks: Tasks }
+
+  return <TodoContainer tasks={tasks} />
 }

@@ -1,19 +1,12 @@
 import { Authenticator } from 'remix-auth'
 import { Auth0Strategy } from 'remix-auth-auth0'
 import { sessionStorage } from '~/lib/session.server'
-
-export type User = {
-  id?: string
-  sub?: string
-  name?: string
-  email?: string
-  picture?: string
-  updated_at?: string
-}
+import { getOrInsertUser } from '~/models/user.server'
+import { User, Auth0User } from '~/types/users'
 
 export const authenticator = new Authenticator<User>(sessionStorage)
 
-const auth0Strategy = new Auth0Strategy(
+const auth0Strategy = new Auth0Strategy<User>(
   {
     callbackURL: process.env.AUTH0_CALLBACK_URL!,
     clientID: process.env.AUTH0_CLIENT_ID!,
@@ -22,24 +15,18 @@ const auth0Strategy = new Auth0Strategy(
   },
   // async ({ accessToken, refreshToken, extraParams, profile }) => {
   async ({ profile }) => {
-    const auth0Profile = profile._json
+    const auth0Profile = profile._json as Auth0User
+
     // Get the user data from your DB or API using the tokens and profile
-    // return prisma.user.upsert({
-    //   where: {
-    //     email
-    //   },
-    //   create: {
-    //     email,
-    //     name: profile.displayName
-    //   },
-    //   update: {}
-    // })
+    const user = await getOrInsertUser({ sub: auth0Profile.sub })
+
     return {
-      sub: auth0Profile?.sub,
-      name: auth0Profile?.name,
-      email: auth0Profile?.email,
-      picture: auth0Profile?.picture,
-      update_at: auth0Profile?.updated_at,
+      id: user.id,
+      sub: user.sub,
+      name: auth0Profile.name,
+      email: auth0Profile.email,
+      picture: auth0Profile.picture,
+      updated_at: auth0Profile.updated_at,
     }
   },
 )

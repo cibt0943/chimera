@@ -7,7 +7,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: 'todo ' + data?.id + ' | Kobushi' }]
+  return [{ title: 'Todo ' + data?.id + ' | Kobushi' }]
 }
 
 export default function Todo() {

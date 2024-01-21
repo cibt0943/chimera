@@ -3,12 +3,11 @@ import { useLoaderData } from '@remix-run/react'
 import { authenticator } from '~/lib/auth.server'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'profile | Kobushi' }]
+  return [{ title: 'Profile | Kobushi' }]
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await authenticator.authenticate('auth0', request)
-
   return { user }
 }
 
