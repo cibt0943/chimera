@@ -10,6 +10,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useNavigation,
 } from '@remix-run/react'
 
 import styles from '~/tailwind.css'
@@ -35,6 +36,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function App() {
   const { theme, user } = useLoaderData<typeof loader>()
 
+  const navigation = useNavigation()
+  const loadingCss = navigation.state === 'loading' ? 'opacity-20' : ''
+
   return (
     <html lang="en" className={clsx(theme)}>
       <head>
@@ -53,7 +57,9 @@ export default function App() {
                 </div>
               </aside>
               <main className="grow">
-                <Outlet />
+                <div className={loadingCss}>
+                  <Outlet />
+                </div>
               </main>
             </div>
           </ThemeProvider>

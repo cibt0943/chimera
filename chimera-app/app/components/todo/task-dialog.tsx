@@ -11,31 +11,31 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog'
 
-import { Task, TaskSchema, TaskSchemaType } from '~/types/tasks'
+import { TaskFormObj, TaskSchema, TaskSchemaType } from '~/types/tasks'
 import { TaskForm } from './task-form'
 
 interface TaskDialogProps {
-  task: Task
+  taskFormObj: TaskFormObj
   openDialog: boolean
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function TaskDialog({
-  task,
+  taskFormObj,
   openDialog,
   setOpenDialog,
 }: TaskDialogProps) {
   const form = useForm<TaskSchemaType>({
     resolver: zodResolver(TaskSchema),
-    defaultValues: task,
+    defaultValues: taskFormObj,
   })
 
   // taskが変更されたらフォームに値をセット
   React.useEffect(() => {
     if (openDialog) {
-      form.reset(task) // resetを使用してデフォルト値をセット
+      form.reset(taskFormObj) // resetを使用してデフォルト値をセット
     }
-  }, [task, form, openDialog])
+  }, [taskFormObj, form, openDialog])
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>

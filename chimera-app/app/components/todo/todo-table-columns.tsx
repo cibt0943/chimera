@@ -51,7 +51,9 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => {
       return (
         <div className="">
-          <span className="truncate font-medium">{row.getValue('title')}</span>
+          <span className="truncate font-medium">
+            {row.getValue<string>('title')}
+          </span>
         </div>
       )
     },
@@ -67,7 +69,7 @@ export const columns: ColumnDef<Task>[] = [
         (status) => status.value === row.getValue('status'),
       )
 
-      if (!status) return null
+      if (!status) return ''
 
       return (
         <div className="items-center">
@@ -86,7 +88,7 @@ export const columns: ColumnDef<Task>[] = [
       <TodoTableColumnHeader column={column} title="期限" />
     ),
     cell: ({ row }) => {
-      const dateStr: string = row.getValue('dueDate')
+      const dateStr = row.getValue<string>('dueDate')
       if (!dateStr) return ''
 
       return (
@@ -94,9 +96,6 @@ export const columns: ColumnDef<Task>[] = [
           {format(dateStr, 'yyyy/MM/dd HH:mm')}
         </div>
       )
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
     },
   },
   {

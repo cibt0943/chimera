@@ -1,16 +1,5 @@
 import * as z from 'zod'
 
-export type TaskModel = {
-  id: number
-  title: string
-  memo: string
-  status: number
-  dueDate: Date | null
-  user_id: number
-  created_at: Date
-  updated_at: Date
-}
-
 export const TaskStatus = {
   NEW: 0,
   DONE: 1,
@@ -35,26 +24,43 @@ export type Task = {
   title: string
   memo: string
   status: TaskStatus
-  dueDate: Date | null
+  dueDate: string | null
+  updated_at: string
 }
 
 export type Tasks = Task[]
 
-export type TaskFormData = {
-  id?: number
-  title?: string
-  memo?: string
-  status?: TaskStatus
-  dueDate?: Date | null
+export type TaskFormObj = {
+  id: number
+  title: string
+  memo: string
+  status: TaskStatus
+  dueDate: Date | null
 }
 
-export const createTask = (task?: Task): Task => ({
-  id: task?.id || -1,
-  title: task?.title || '',
-  memo: task?.memo || '',
-  dueDate: task?.dueDate || null,
-  status: task?.status || TaskStatus.NEW,
-})
+export type TaskModel = {
+  id: number
+  title: string
+  memo: string
+  status: number
+  due_date: string | null
+  user_id: number
+  created_at: string
+  updated_at: string
+}
+
+export type TaskModels = TaskModel[]
+
+export function TaskModel2Task(taskModel: TaskModel): Task {
+  return {
+    id: taskModel.id,
+    title: taskModel.title,
+    memo: taskModel.memo,
+    status: taskModel.status as TaskStatus,
+    dueDate: taskModel.due_date,
+    updated_at: taskModel.updated_at,
+  }
+}
 
 export const TaskSchema = z.object({
   title: z.string().min(1, { message: '必須項目です' }).max(255, {

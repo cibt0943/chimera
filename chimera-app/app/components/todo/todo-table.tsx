@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { RxPlus } from 'react-icons/rx'
-import { parseISO } from 'date-fns'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -17,7 +16,7 @@ import {
   RowData,
 } from '@tanstack/react-table'
 import { useHotkeys } from 'react-hotkeys-hook'
-
+import { toDate } from 'date-fns'
 import {
   Table,
   TableBody,
@@ -28,9 +27,9 @@ import {
 } from '~/components/ui/table'
 import { Button } from '~/components/ui/button'
 
-import { Task, Tasks, createTask } from '~/types/tasks'
-import { TodoTableToolbar } from './todo-table-toolbar'
-import { TaskDialog } from './task-dialog'
+import { Task, Tasks, TaskFormObj, TaskStatus } from '~/types/tasks'
+import { TodoTableToolbar } from '~/components/todo/todo-table-toolbar'
+import { TaskDialog } from '~/components/todo/task-dialog'
 
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
@@ -54,21 +53,26 @@ export function TodoTable({ columns, data }: TodoTableProps) {
 
   //taskDialog関連
   const [openDialog, setOpenDialog] = React.useState(false)
-  const [formTask, setFormTask] = React.useState<Task>(createTask())
+  const [taskFormObj, setTaskFormObj] =
+    React.useState<TaskFormObj>(createTaskFormObj())
 
-  function openTaskDialog(task: Task) {
-    setFormTask(() => ({
-      ...task,
-      dueDate:
-        task.dueDate && typeof task.dueDate === 'string'
-          ? parseISO(task.dueDate)
-          : task.dueDate,
-    }))
+  function createTaskFormObj(task?: Task): TaskFormObj {
+    return {
+      id: task?.id || -1,
+      title: task?.title || '',
+      memo: task?.memo || '',
+      status: task?.status || TaskStatus.NEW,
+      dueDate: task?.dueDate ? toDate(task?.dueDate) : null,
+    }
+  }
+
+  function openTaskDialog(taskFormObj: TaskFormObj) {
+    setTaskFormObj(taskFormObj)
     setOpenDialog(true)
   }
 
   function openAddTaskDialog() {
-    openTaskDialog(createTask())
+    openTaskDialog(createTaskFormObj())
   }
 
   const table = useReactTable({
@@ -98,7 +102,7 @@ export function TodoTable({ columns, data }: TodoTableProps) {
     },
     meta: {
       openEditDialog: (task: Task) => {
-        openTaskDialog(task)
+        openTaskDialog(createTaskFormObj(task))
       },
     },
   })
@@ -204,7 +208,7 @@ export function TodoTable({ columns, data }: TodoTableProps) {
         </Button>
       </div>
       <TaskDialog
-        task={formTask}
+        taskFormObj={taskFormObj}
         openDialog={openDialog}
         setOpenDialog={setOpenDialog}
       />
