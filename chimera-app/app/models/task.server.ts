@@ -8,7 +8,15 @@ export async function getTasks(user_id: number): Promise<TaskModels> {
 }
 
 // タスク情報の追加
-export async function insertTask(task: TaskModel): Promise<TaskModel> {
+interface insertTaskProps {
+  title: string
+  memo: string
+  status: number
+  due_date: Date | null
+  user_id: number
+}
+
+export async function insertTask(task: insertTaskProps): Promise<TaskModel> {
   const { data } = await supabase.from('tasks').insert(task).select().single()
   if (!data) throw new Error('erorr')
   return data

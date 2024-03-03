@@ -1,4 +1,6 @@
-import * as z from 'zod'
+import * as zod from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toDate } from 'date-fns'
 
 export const TaskStatus = {
   NEW: 0,
@@ -24,8 +26,8 @@ export type Task = {
   title: string
   memo: string
   status: TaskStatus
-  dueDate: string | null
-  updated_at: string
+  dueDate: Date | null
+  updated_at: Date
 }
 
 export type Tasks = Task[]
@@ -57,19 +59,21 @@ export function TaskModel2Task(taskModel: TaskModel): Task {
     title: taskModel.title,
     memo: taskModel.memo,
     status: taskModel.status as TaskStatus,
-    dueDate: taskModel.due_date,
-    updated_at: taskModel.updated_at,
+    dueDate: taskModel.due_date ? toDate(taskModel.due_date) : null,
+    updated_at: toDate(taskModel.updated_at),
   }
 }
 
-export const TaskSchema = z.object({
-  title: z.string().min(1, { message: '必須項目です' }).max(255, {
+export const TaskSchema = zod.object({
+  title: zod.string().min(1, { message: '必須項目です' }).max(255, {
     message: '255文字以内で入力してください',
   }),
-  memo: z.string().max(10000, {
+  memo: zod.string().max(10000, {
     message: '10000文字以内で入力してください',
   }),
-  dueDate: z.date().nullable(),
+  dueDate: zod.coerce.date().nullable(),
 })
 
-export type TaskSchemaType = z.infer<typeof TaskSchema>
+export const taskResolver = zodResolver(TaskSchema)
+
+export type TaskSchemaType = zod.infer<typeof TaskSchema>

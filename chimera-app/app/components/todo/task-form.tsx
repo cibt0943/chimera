@@ -2,7 +2,6 @@ import * as React from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { RxCalendar } from 'react-icons/rx'
 import { format } from 'date-fns'
-
 import { cn } from '~/lib/utils'
 import {
   Form,
@@ -23,27 +22,22 @@ import {
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
-
-// import { addTask } from '@/lib/actions/task'
 import { TaskSchemaType } from '~/types/tasks'
 
 export function TaskForm({
   children,
   form,
+  onSubmit,
 }: {
   children: React.ReactNode
   form: UseFormReturn<TaskSchemaType>
+  onSubmit: React.FormEventHandler<HTMLFormElement>
 }) {
-  async function onSubmit(values: TaskSchemaType) {
-    // await addTask(values)
-    return {}
-  }
-
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={onSubmit} className="space-y-8">
         <FormField
           control={form.control}
           name="title"

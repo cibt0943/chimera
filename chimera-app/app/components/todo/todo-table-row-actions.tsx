@@ -35,14 +35,18 @@ export function TodoTableRowActions<TData>({
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem
           onClick={() => {
-            table.options.meta?.openEditDialog(task)
+            table.options.meta?.editTask(task)
           }}
         >
           <RxPencil1 className="mr-2 h-4 w-4" />
           編集
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            table.options.meta?.deleteTask(task)
+          }}
+        >
           <RxTrash className="mr-2 h-4 w-4" />
           削除
         </DropdownMenuItem>

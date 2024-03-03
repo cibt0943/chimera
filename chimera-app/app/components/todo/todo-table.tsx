@@ -16,7 +16,6 @@ import {
   RowData,
 } from '@tanstack/react-table'
 import { useHotkeys } from 'react-hotkeys-hook'
-import { toDate } from 'date-fns'
 import {
   Table,
   TableBody,
@@ -27,13 +26,15 @@ import {
 } from '~/components/ui/table'
 import { Button } from '~/components/ui/button'
 
+import { DeleteTaskConfirmDialog } from '~/components/todo/delete-task-confirm-dialog'
 import { Task, Tasks, TaskFormObj, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from '~/components/todo/todo-table-toolbar'
 import { TaskDialog } from '~/components/todo/task-dialog'
 
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
-    openEditDialog: (task: TData) => void
+    editTask: (task: TData) => void
+    deleteTask: (task: TData) => void
   }
 }
 interface TodoTableProps {
@@ -51,8 +52,9 @@ export function TodoTable({ columns, data }: TodoTableProps) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
 
-  //taskDialog関連
-  const [openDialog, setOpenDialog] = React.useState(false)
+  const [isOpenUpsertDialog, setIsOpenUpsertDialog] = React.useState(false)
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
+  const [task, setTask] = React.useState<Task>()
   const [taskFormObj, setTaskFormObj] =
     React.useState<TaskFormObj>(createTaskFormObj())
 
@@ -62,18 +64,50 @@ export function TodoTable({ columns, data }: TodoTableProps) {
       title: task?.title || '',
       memo: task?.memo || '',
       status: task?.status || TaskStatus.NEW,
-      dueDate: task?.dueDate ? toDate(task?.dueDate) : null,
+      dueDate: task?.dueDate || null,
     }
   }
 
-  function openTaskDialog(taskFormObj: TaskFormObj) {
-    setTaskFormObj(taskFormObj)
-    setOpenDialog(true)
+  function openAddTaskDialog() {
+    // setTask(undefined)
+    setTaskFormObj(createTaskFormObj())
+    setIsOpenUpsertDialog(true)
   }
 
-  function openAddTaskDialog() {
-    openTaskDialog(createTaskFormObj())
+  function openEditTaskDialog(task: Task) {
+    // setTask(task)
+    setTaskFormObj(createTaskFormObj(task))
+    setIsOpenUpsertDialog(true)
   }
+
+  function openDeleteTaskDialog(task: Task) {
+    setTask(task)
+    setIsOpenDeleteDialog(true)
+  }
+
+  function DeleteConfirmDialog() {
+    if (!task) return
+
+    return (
+      <DeleteTaskConfirmDialog
+        task={task}
+        isOpenDialog={isOpenDeleteDialog}
+        setIsOpenDialog={setIsOpenDeleteDialog}
+      />
+    )
+  }
+
+  // function UpsertTaskDialog() {
+  //   // const taskFormObj = createTaskFormObj(task)
+  //   console.log('aa')
+  //   return (
+  //     <TaskDialog
+  //       taskFormObj={taskFormObj}
+  //       isOpenDialog={isOpenUpsertDialog}
+  //       setIsOpenDialog={setIsOpenUpsertDialog}
+  //     />
+  //   )
+  // }
 
   const table = useReactTable({
     data,
@@ -101,8 +135,11 @@ export function TodoTable({ columns, data }: TodoTableProps) {
       },
     },
     meta: {
-      openEditDialog: (task: Task) => {
-        openTaskDialog(createTaskFormObj(task))
+      editTask: (task: Task) => {
+        openEditTaskDialog(task)
+      },
+      deleteTask: (task: Task) => {
+        openDeleteTaskDialog(task)
       },
     },
   })
@@ -209,9 +246,11 @@ export function TodoTable({ columns, data }: TodoTableProps) {
       </div>
       <TaskDialog
         taskFormObj={taskFormObj}
-        openDialog={openDialog}
-        setOpenDialog={setOpenDialog}
+        isOpenDialog={isOpenUpsertDialog}
+        setIsOpenDialog={setIsOpenUpsertDialog}
       />
+      {/* <UpsertTaskDialog /> */}
+      <DeleteConfirmDialog />
     </div>
   )
 }
