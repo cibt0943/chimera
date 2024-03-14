@@ -4,7 +4,7 @@ import {
   AlertDialogCancel,
 } from '~/components/ui/alert-dialog'
 import { buttonVariants } from '~/components/ui/button'
-import { DeleteConfirmDialog } from '~/components/delete-confirm-dialog'
+import { DeleteConfirmDialog } from '~/components/lib/delete-confirm-dialog'
 import { Task } from '~/types/tasks'
 
 interface DeleteTaskConfirmDialogProps {
@@ -13,7 +13,7 @@ interface DeleteTaskConfirmDialogProps {
   setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export function DeleteTaskConfirmDialog({
+export function TaskDeleteConfirmDialog({
   task,
   isOpenDialog,
   setIsOpenDialog,
@@ -25,23 +25,21 @@ export function DeleteTaskConfirmDialog({
       isOpenDialog={isOpenDialog}
       setIsOpenDialog={setIsOpenDialog}
     >
-      <>
-        <AlertDialogCancel
-          onClick={() => {
-            setIsOpenDialog(false)
-          }}
-        >
-          キャンセル
-        </AlertDialogCancel>
-        <AlertDialogAction
-          className={buttonVariants({ variant: 'destructive' })}
-          onClick={() => {
-            setIsOpenDialog(false)
-          }}
-        >
-          削除
-        </AlertDialogAction>
-      </>
+      <AlertDialogCancel
+        onClick={() => {
+          setIsOpenDialog(false)
+        }}
+      >
+        キャンセル
+      </AlertDialogCancel>
+      <AlertDialogAction
+        className={buttonVariants({ variant: 'destructive' })}
+        onClick={() => {
+          setIsOpenDialog(false)
+        }}
+      >
+        削除
+      </AlertDialogAction>
     </DeleteConfirmDialog>
   )
 }

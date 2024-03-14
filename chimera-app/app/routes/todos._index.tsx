@@ -3,16 +3,15 @@ import type {
   LoaderFunctionArgs,
   ActionFunctionArgs,
 } from '@remix-run/node'
-import { json } from '@remix-run/node'
+import { json, redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
-import { getValidatedFormData } from 'remix-hook-form'
+import { parseWithZod } from '@conform-to/zod'
 import { authenticator } from '~/lib/auth.server'
 import {
   Task,
   Tasks,
   TaskModel2Task,
-  TaskSchemaType,
-  taskResolver,
+  TaskSchema,
   TaskStatus,
 } from '~/types/tasks'
 import { getTasks, insertTask } from '~/models/task.server'
@@ -23,15 +22,18 @@ export const meta: MetaFunction = () => {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const {
-    errors,
-    data,
-    receivedValues: defaultValues,
-  } = await getValidatedFormData<TaskSchemaType>(request, taskResolver)
   const user = await authenticator.authenticate('auth0', request)
-  if (errors) {
-    return json({ errors, defaultValues })
+
+  const formData = await request.formData()
+  const submission = parseWithZod(formData, { schema: TaskSchema })
+  // submission が成功しなかった場合、クライアントに送信結果を報告します。
+  if (submission.status !== 'success') {
+    return json({ result: submission.reply(), shouldConfirm: false })
+    // return json({ success: false, message: "error!", submission });
+    // return submission.reply()
   }
+
+  const data = submission.value
 
   const insertModel = {
     title: data.title,
@@ -40,9 +42,9 @@ export async function action({ request }: ActionFunctionArgs) {
     due_date: data.dueDate,
     user_id: user.id,
   }
-
   insertTask(insertModel)
-  return json(data)
+  // return json(data)
+  return redirect('/todos')
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -53,7 +55,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Index() {
   const { taskModels } = useLoaderData<typeof loader>()
-
   const tasks: Tasks = taskModels.map<Task>((value) => {
     return TaskModel2Task(value)
   })
