@@ -1,9 +1,10 @@
 import * as React from 'react'
+import { Form } from '@remix-run/react'
 import {
   AlertDialogAction,
   AlertDialogCancel,
 } from '~/components/ui/alert-dialog'
-import { buttonVariants } from '~/components/ui/button'
+import { buttonVariants, Button } from '~/components/ui/button'
 import { DeleteConfirmDialog } from '~/components/lib/delete-confirm-dialog'
 import { Task } from '~/types/tasks'
 
@@ -25,21 +26,18 @@ export function TaskDeleteConfirmDialog({
       isOpenDialog={isOpenDialog}
       setIsOpenDialog={setIsOpenDialog}
     >
-      <AlertDialogCancel
-        onClick={() => {
+      <AlertDialogCancel>キャンセル</AlertDialogCancel>
+      <Form
+        action={`${task.id}/delete`}
+        method="post"
+        onSubmit={() => {
           setIsOpenDialog(false)
         }}
       >
-        キャンセル
-      </AlertDialogCancel>
-      <AlertDialogAction
-        className={buttonVariants({ variant: 'destructive' })}
-        onClick={() => {
-          setIsOpenDialog(false)
-        }}
-      >
-        削除
-      </AlertDialogAction>
+        <Button type="submit" variant="destructive">
+          削除
+        </Button>
+      </Form>
     </DeleteConfirmDialog>
   )
 }

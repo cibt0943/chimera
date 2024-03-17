@@ -91,7 +91,6 @@ export function TodoTable({ columns, data }: TodoTableProps) {
   }
 
   function DeleteConfirmDialog() {
-    if (!task) return
     return (
       <TaskDeleteConfirmDialog
         task={task}

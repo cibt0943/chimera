@@ -21,3 +21,18 @@ export async function insertTask(task: insertTaskProps): Promise<TaskModel> {
   if (!data) throw new Error('erorr')
   return data
 }
+
+export async function getTask(taskId: number): Promise<TaskModel> {
+  const { data } = await supabase
+    .from('tasks')
+    .select()
+    .eq('id', taskId)
+    .single()
+  if (!data) throw new Error('erorr')
+  return data
+}
+
+export async function deleteTask(taskId: number): Promise<void> {
+  const { error } = await supabase.from('tasks').delete().eq('id', taskId)
+  if (error) throw new Error('erorr')
+}
