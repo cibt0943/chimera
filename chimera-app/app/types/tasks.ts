@@ -26,6 +26,7 @@ export type Task = {
   memo: string
   status: TaskStatus
   dueDate: Date | null
+  user_id: number
   updated_at: Date
 }
 
@@ -51,6 +52,7 @@ export function TaskModel2Task(taskModel: TaskModel): Task {
     memo: taskModel.memo,
     status: taskModel.status as TaskStatus,
     dueDate: taskModel.due_date ? toDate(taskModel.due_date) : null,
+    user_id: taskModel.user_id,
     updated_at: toDate(taskModel.updated_at),
   }
 }
@@ -60,7 +62,8 @@ export const TaskSchema = zod.object({
     .string({ required_error: '必須項目です' })
     .max(255, { message: '255文字以内で入力してください' }),
   memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
-  status: zod.nativeEnum(TaskStatus),
+  // status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
+  status: zod.coerce.number(),
   dueDate: zod.coerce.date().optional().nullable(),
 })
 

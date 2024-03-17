@@ -11,7 +11,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     throw new Error('erorr')
   }
 
-  await deleteTask(Number(params.todoId))
+  await deleteTask(task.id)
 
   return redirect('/todos')
 }

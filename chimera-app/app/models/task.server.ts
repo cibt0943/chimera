@@ -7,12 +7,23 @@ export async function getTasks(user_id: number): Promise<TaskModels> {
   return data || []
 }
 
+// タスクを取得
+export async function getTask(taskId: number): Promise<TaskModel> {
+  const { data } = await supabase
+    .from('tasks')
+    .select()
+    .eq('id', taskId)
+    .single()
+  if (!data) throw new Error('erorr')
+  return data
+}
+
 // タスク情報の追加
 interface insertTaskProps {
   title: string
   memo: string
   status: number
-  due_date: Date | null
+  due_date: string | null
   user_id: number
 }
 
@@ -22,12 +33,18 @@ export async function insertTask(task: insertTaskProps): Promise<TaskModel> {
   return data
 }
 
-export async function getTask(taskId: number): Promise<TaskModel> {
+interface updateTaskProps extends insertTaskProps {
+  id: number
+}
+
+export async function updateTask(task: updateTaskProps): Promise<TaskModel> {
   const { data } = await supabase
     .from('tasks')
+    .update(task)
+    .eq('id', task.id)
     .select()
-    .eq('id', taskId)
     .single()
+
   if (!data) throw new Error('erorr')
   return data
 }

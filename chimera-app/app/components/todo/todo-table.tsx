@@ -26,7 +26,7 @@ import {
 } from '~/components/ui/table'
 import { Button } from '~/components/ui/button'
 
-import { Task, Tasks, TaskStatus } from '~/types/tasks'
+import { Task, Tasks } from '~/types/tasks'
 import { TodoTableToolbar } from '~/components/todo/todo-table-toolbar'
 import { TaskUpsertFormDialog } from '~/components/todo/task-upsert-form-dialog'
 import { TaskDeleteConfirmDialog } from '~/components/todo/task-delete-confirm-dialog'
@@ -52,21 +52,12 @@ export function TodoTable({ columns, data }: TodoTableProps) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
 
-  const newTask: Task = {
-    id: -1,
-    title: '',
-    memo: '',
-    status: TaskStatus.NEW,
-    dueDate: null,
-    updated_at: new Date(),
-  }
-
   const [isOpenUpsertDialog, setIsOpenUpsertDialog] = React.useState(false)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
-  const [task, setTask] = React.useState<Task>(newTask)
+  const [task, setTask] = React.useState<Task>()
 
   function openAddTaskDialog() {
-    setTask(newTask)
+    setTask(undefined)
     setIsOpenUpsertDialog(true)
   }
 
@@ -91,6 +82,8 @@ export function TodoTable({ columns, data }: TodoTableProps) {
   }
 
   function DeleteConfirmDialog() {
+    if (!task) return
+
     return (
       <TaskDeleteConfirmDialog
         task={task}

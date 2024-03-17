@@ -5,8 +5,10 @@ import {
   getFormProps,
   getInputProps,
   getTextareaProps,
+  getSelectProps,
 } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
+// import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import {
   Dialog,
@@ -19,16 +21,23 @@ import {
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
 import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '~/components/ui/select'
+import {
   FormItem,
   FormLabel,
   FormMessage,
   FormDescription,
 } from '~/components/lib/form'
 import { DatePicker } from '../lib/date-picker'
-import { Task, TaskSchema } from '~/types/tasks'
+import { Task, TaskStatus, TaskSchema, TaskStatusList } from '~/types/tasks'
 
 interface TaskDialogProps {
-  task: Task
+  task: Task | undefined
   isOpenDialog: boolean
   setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -38,32 +47,54 @@ export function TaskUpsertFormDialog({
   isOpenDialog,
   setIsOpenDialog,
 }: TaskDialogProps) {
+  const title = task ? 'タスク編集' : 'タスク追加'
+  const description = task
+    ? 'タスクの情報を変更してください。'
+    : '新規に追加するタスクの情報を設定してください。'
+  const action = task ? `${task.id}` : ''
+
+  const defaultValue = task || {
+    title: '',
+    memo: '',
+    status: TaskStatus.NEW,
+    dueDate: null,
+  }
+
   const [form, fields] = useForm({
     id: 'task-from',
-    defaultValue: task,
+    defaultValue: defaultValue,
     constraint: getZodConstraint(TaskSchema),
-    onValidate: ({ formData }) =>
-      parseWithZod(formData, { schema: TaskSchema }),
-    // shouldValidate: 'onBlur',
-    // shouldRevalidate: 'onInput',
+    onValidate: ({ formData }) => {
+      return parseWithZod(formData, { schema: TaskSchema })
+    },
+    onSubmit: () => {
+      setIsOpenDialog(false)
+    },
   })
-  // const navigation = useNavigation()
-  // const { revalidate } = useRevalidator()
 
-  function SubmitButton() {
-    return <Button type="submit">保存</Button>
+  function SelectItems() {
+    return TaskStatusList.map((status) => {
+      return (
+        <SelectItem value={status.value.toString()} key={status.value}>
+          {status.label}
+        </SelectItem>
+      )
+    })
   }
 
   return (
     <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>タスク追加</DialogTitle>
-          <DialogDescription>
-            新規に追加するタスクの情報を設定してください。
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <Form method="post" className="space-y-8" {...getFormProps(form)}>
+        <Form
+          method="post"
+          className="space-y-8"
+          {...getFormProps(form)}
+          action={action}
+        >
           <FormItem>
             <FormLabel>
               タイトル<span className="text-red-500">*</span>
@@ -89,7 +120,25 @@ export function TaskUpsertFormDialog({
             </FormDescription>
             <FormMessage message={fields.dueDate.errors} />
           </FormItem>
-          <DialogFooter>{SubmitButton()}</DialogFooter>
+          <FormItem>
+            <FormLabel>状態</FormLabel>
+            <Select
+              {...getSelectProps(fields.status)}
+              defaultValue={fields.status.value}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a verified email to display" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItems />
+              </SelectContent>
+            </Select>
+            <FormDescription>タスクの状態を選んでください</FormDescription>
+            <FormMessage message={fields.status.errors} />
+          </FormItem>
+          <DialogFooter>
+            <Button type="submit">保存</Button>
+          </DialogFooter>
         </Form>
       </DialogContent>
     </Dialog>

@@ -1,10 +1,7 @@
 import * as React from 'react'
 import { Form } from '@remix-run/react'
-import {
-  AlertDialogAction,
-  AlertDialogCancel,
-} from '~/components/ui/alert-dialog'
-import { buttonVariants, Button } from '~/components/ui/button'
+import { AlertDialogCancel } from '~/components/ui/alert-dialog'
+import { Button } from '~/components/ui/button'
 import { DeleteConfirmDialog } from '~/components/lib/delete-confirm-dialog'
 import { Task } from '~/types/tasks'
 

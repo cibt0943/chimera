@@ -10,9 +10,9 @@ import { authenticator } from '~/lib/auth.server'
 import {
   Task,
   Tasks,
+  TaskStatus,
   TaskModel2Task,
   TaskSchema,
-  TaskStatus,
 } from '~/types/tasks'
 import { getTasks, insertTask } from '~/models/task.server'
 import { TodoContainer } from '~/components/todo/todo-container'
@@ -35,15 +35,14 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const data = submission.value
 
-  const insertModel = {
+  await insertTask({
     title: data.title,
-    memo: data.memo,
-    status: TaskStatus.NEW,
-    due_date: data.dueDate,
+    memo: data.memo || '',
+    status: data.status,
+    due_date: data.dueDate?.toISOString() || null,
     user_id: user.id,
-  }
-  insertTask(insertModel)
-  // return json(data)
+  })
+
   return redirect('/todos')
 }
 
