@@ -3,7 +3,11 @@ import { supabase } from '~/lib/supabaseClient.server'
 
 // タスク一覧を取得
 export async function getTasks(user_id: number): Promise<TaskModels> {
-  const { data } = await supabase.from('tasks').select().eq('user_id', user_id)
+  const { data } = await supabase
+    .from('tasks')
+    .select()
+    .eq('user_id', user_id)
+    .order('id')
   return data || []
 }
 
@@ -14,6 +18,7 @@ export async function getTask(taskId: number): Promise<TaskModel> {
     .select()
     .eq('id', taskId)
     .single()
+
   if (!data) throw new Error('erorr')
   return data
 }
