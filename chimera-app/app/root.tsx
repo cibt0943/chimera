@@ -37,7 +37,9 @@ export default function App() {
   const { theme, user } = useLoaderData<typeof loader>()
 
   const navigation = useNavigation()
-  const loadingCss = navigation.state === 'loading' ? 'opacity-20' : ''
+  const loadingCss = ['loading', 'submitting'].includes(navigation.state)
+    ? 'opacity-20'
+    : ''
 
   return (
     <html lang="en" className={clsx(theme)}>
