@@ -7,13 +7,7 @@ import { json, redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
 import { authenticator } from '~/lib/auth.server'
-import {
-  Task,
-  Tasks,
-  TaskStatus,
-  TaskModel2Task,
-  TaskSchema,
-} from '~/types/tasks'
+import { Task, Tasks, TaskModel2Task, TaskSchema } from '~/types/tasks'
 import { getTasks, insertTask } from '~/models/task.server'
 import { TodoContainer } from '~/components/todo/todo-container'
 

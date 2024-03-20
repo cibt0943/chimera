@@ -12,13 +12,11 @@ export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
 
 export const TaskStatusList = [
   { value: TaskStatus.NEW, label: 'new' },
-  { value: TaskStatus.DONE, label: 'done' },
   { value: TaskStatus.DOING, label: 'doing' },
+  { value: TaskStatus.DONE, label: 'done' },
   { value: TaskStatus.CANCELED, label: 'canceled' },
   { value: TaskStatus.PENDING, label: 'pending' },
 ]
-
-export type TaskStatuses = TaskStatus[]
 
 export type Task = {
   id: number
@@ -62,11 +60,9 @@ export const TaskSchema = zod.object({
     .string({ required_error: '必須項目です' })
     .max(255, { message: '255文字以内で入力してください' }),
   memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
-  // status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
-  status: zod.coerce.number(),
+  status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
+  // status: zod.nativeEnum(TaskStatus),
   dueDate: zod.coerce.date().optional().nullable(),
 })
 
 export type TaskSchemaType = zod.infer<typeof TaskSchema>
-
-// const a: TaskSchemaType = {}

@@ -34,12 +34,30 @@ import {
   FormDescription,
 } from '~/components/lib/form'
 import { DatePicker } from '../lib/date-picker'
-import { Task, TaskStatus, TaskSchema, TaskStatusList } from '~/types/tasks'
+import {
+  Task,
+  TaskStatus,
+  TaskSchema,
+  TaskSchemaType,
+  TaskStatusList,
+} from '~/types/tasks'
 
 interface TaskDialogProps {
   task: Task | undefined
   isOpenDialog: boolean
   setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+function SelectItems() {
+  return (
+    <>
+      {TaskStatusList.map((status) => (
+        <SelectItem key={status.value} value={status.value.toString()}>
+          {status.label}
+        </SelectItem>
+      ))}
+    </>
+  )
 }
 
 export function TaskUpsertFormDialog({
@@ -60,7 +78,7 @@ export function TaskUpsertFormDialog({
     dueDate: null,
   }
 
-  const [form, fields] = useForm({
+  const [form, fields] = useForm<TaskSchemaType>({
     id: 'task-from',
     defaultValue: defaultValue,
     constraint: getZodConstraint(TaskSchema),
@@ -71,16 +89,6 @@ export function TaskUpsertFormDialog({
       setIsOpenDialog(false)
     },
   })
-
-  function SelectItems() {
-    return TaskStatusList.map((status) => {
-      return (
-        <SelectItem value={status.value.toString()} key={status.value}>
-          {status.label}
-        </SelectItem>
-      )
-    })
-  }
 
   return (
     <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
