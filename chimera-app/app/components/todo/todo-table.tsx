@@ -37,12 +37,12 @@ declare module '@tanstack/table-core' {
     deleteTask: (task: TData) => void
   }
 }
-interface TodoTableProps {
-  columns: ColumnDef<Task>[]
-  data: Tasks
+interface TodoTableProps<TData extends RowData, TValue> {
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
 }
 
-export function TodoTable({ columns, data }: TodoTableProps) {
+export function TodoTable({ columns, data }: TodoTableProps<Task, Tasks>) {
   // tanstack/react-table
   const [rowSelection, setRowSelection] = React.useState({})
   const [sorting, setSorting] = React.useState<SortingState>([])
