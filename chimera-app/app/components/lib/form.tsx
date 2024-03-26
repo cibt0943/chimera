@@ -16,11 +16,10 @@ export function FormItem({ children, className, ...props }: FormItemProps) {
   )
 }
 
-interface FormLabelProps {
+interface FormLabelProps extends React.ComponentProps<'label'> {
   children?: React.ReactNode
   error?: object
   className?: string
-  props?: React.ComponentProps<'label'>
 }
 
 export function FormLabel({

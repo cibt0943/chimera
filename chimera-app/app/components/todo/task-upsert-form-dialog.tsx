@@ -33,7 +33,7 @@ import {
   FormMessage,
   FormDescription,
 } from '~/components/lib/form'
-import { DatePicker } from '../lib/date-picker'
+import { DateTimePicker } from '~/components/lib/date-time-picker'
 import {
   Task,
   TaskStatus,
@@ -120,12 +120,7 @@ export function TaskUpsertFormDialog({
           </FormItem>
           <FormItem className="flex flex-col">
             <FormLabel>期限</FormLabel>
-            <DatePicker meta={fields.dueDate} />
-            <FormDescription>
-              {fields.dueDate.value
-                ? 'クリアする際は設定している日付を再度クリックします'
-                : ''}
-            </FormDescription>
+            <DateTimePicker meta={fields.dueDate} />
             <FormMessage message={fields.dueDate.errors} />
           </FormItem>
           <FormItem>
