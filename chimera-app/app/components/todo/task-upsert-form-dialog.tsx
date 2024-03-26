@@ -33,6 +33,7 @@ import {
   FormMessage,
   FormDescription,
 } from '~/components/lib/form'
+import { Required } from '~/components/lib/required'
 import { DateTimePicker } from '~/components/lib/date-time-picker'
 import {
   Task,
@@ -66,9 +67,7 @@ export function TaskUpsertFormDialog({
   setIsOpenDialog,
 }: TaskDialogProps) {
   const title = task ? 'タスク編集' : 'タスク追加'
-  const description = task
-    ? 'タスクの情報を変更してください。'
-    : '新規に追加するタスクの情報を設定してください。'
+  const description = 'タスクの情報を設定してください。'
   const action = task ? `${task.id}` : ''
 
   const defaultValue = task || {
@@ -105,7 +104,8 @@ export function TaskUpsertFormDialog({
         >
           <FormItem>
             <FormLabel>
-              タイトル<span className="text-red-500">*</span>
+              タイトル
+              <Required />
             </FormLabel>
             <Input {...getInputProps(fields.title, { type: 'text' })} />
             <FormMessage message={fields.title.errors} />
@@ -124,7 +124,10 @@ export function TaskUpsertFormDialog({
             <FormMessage message={fields.dueDate.errors} />
           </FormItem>
           <FormItem>
-            <FormLabel>状態</FormLabel>
+            <FormLabel>
+              状態
+              <Required />
+            </FormLabel>
             <Select
               {...getSelectProps(fields.status)}
               defaultValue={fields.status.value}
