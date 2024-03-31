@@ -1,60 +1,75 @@
 import { format } from 'date-fns'
 import { ColumnDef } from '@tanstack/react-table'
-
+import { useSortable } from '@dnd-kit/sortable'
 import { Badge } from '~/components/ui/badge'
-import { Checkbox } from '~/components/ui/checkbox'
+// import { Checkbox } from '~/components/ui/checkbox'
 
 import { Task, TaskStatusList } from '~/types/tasks'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
 
+// Cell Component
+const RowDragHandleCell = ({ rowId }: { rowId: number }) => {
+  const { attributes, listeners } = useSortable({
+    id: rowId,
+  })
+  return (
+    // Alternatively, you could set these attributes on the rows themselves
+    <button {...attributes} {...listeners}>
+      🟰
+    </button>
+  )
+}
+
 export const columns: ColumnDef<Task>[] = [
   {
-    id: 'select',
-    size: 50,
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
+    id: 'drag-handle',
+    header: '',
+    cell: ({ row }) => <RowDragHandleCell rowId={row.getValue('id')} />,
+    size: 40,
   },
+  // {
+  //   id: 'select',
+  //   size: 50,
+  //   header: ({ table }) => (
+  //     <Checkbox
+  //       checked={
+  //         table.getIsAllPageRowsSelected() ||
+  //         (table.getIsSomePageRowsSelected() && 'indeterminate')
+  //       }
+  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+  //       aria-label="Select all"
+  //       className="translate-y-[2px]"
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label="Select row"
+  //       className="translate-y-[2px]"
+  //     />
+  //   ),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
     accessorKey: 'id',
-    size: 80,
+    size: 65,
     header: ({ column }) => (
       <TodoTableColumnHeader column={column} title="ID" />
     ),
-    // cell: ({ row }) => <div className="w-[80px]">{row.getValue('id')}</div>,
-    cell: ({ row }) => <div className="">{row.getValue('id')}</div>,
+    cell: ({ row }) => <span className="">{row.getValue('id')}</span>,
   },
   {
     accessorKey: 'title',
+    size: undefined,
     header: ({ column }) => (
       <TodoTableColumnHeader column={column} title="タイトル" />
     ),
     cell: ({ row }) => {
       return (
-        <div className="">
-          <span className="truncate font-medium">
-            {row.getValue<string>('title')}
-          </span>
-        </div>
+        <span className="truncate font-medium">{row.getValue('title')}</span>
       )
     },
   },
@@ -66,41 +81,28 @@ export const columns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }) => {
       const status = TaskStatusList.find(
-        (status) => status.value === row.getValue('status'),
+        (e) => e.value === row.getValue('status'),
       )
-
-      if (!status) return ''
-
-      return (
-        <div className="items-center">
-          <Badge>{status.label}</Badge>
-        </div>
-      )
+      return status ? <Badge>{status.label}</Badge> : ''
     },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      return value.includes(row.getValue(id)) //id="status"
     },
   },
   {
     accessorKey: 'dueDate',
-    size: 220,
+    size: 150,
     header: ({ column }) => (
       <TodoTableColumnHeader column={column} title="期限" />
     ),
     cell: ({ row }) => {
       const dateStr = row.getValue<string>('dueDate')
-      if (!dateStr) return ''
-
-      return (
-        <div className="items-center">
-          {format(dateStr, 'yyyy/MM/dd HH:mm')}
-        </div>
-      )
+      return dateStr ? <span>{format(dateStr, 'yyyy/MM/dd HH:mm')}</span> : ''
     },
   },
   {
     id: 'actions',
-    size: 50,
+    size: 80,
     cell: ({ row, table }) => <TodoTableRowActions row={row} table={table} />,
   },
 ]
