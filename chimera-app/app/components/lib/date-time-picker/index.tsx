@@ -34,7 +34,7 @@ export function DateTimePicker({ meta }: DateTimePickerProps) {
     >
       <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
         <PopoverTrigger asChild>
-          <Button variant={'ghost'} className="border-r">
+          <Button variant={'ghost'} className="border-r" id={meta.id}>
             <RxCalendar className="h-5 w-5 opacity-50" />
           </Button>
         </PopoverTrigger>

@@ -5,11 +5,8 @@ import { getTask, deleteTask } from '~/models/task.server'
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const user = await authenticator.authenticate('auth0', request)
-
   const task = await getTask(Number(params.todoId))
-  if (task.user_id !== user.id) {
-    throw new Error('erorr')
-  }
+  if (task.user_id !== user.id) throw new Error('erorr')
 
   await deleteTask(task.id)
 

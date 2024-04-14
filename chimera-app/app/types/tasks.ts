@@ -24,6 +24,7 @@ export type Task = {
   memo: string
   status: TaskStatus
   dueDate: Date | null
+  position: number
   user_id: number
   updated_at: Date
 }
@@ -36,6 +37,7 @@ export type TaskModel = {
   memo: string
   status: number
   due_date: string | null
+  position: number
   user_id: number
   created_at: string
   updated_at: string
@@ -50,6 +52,7 @@ export function TaskModel2Task(taskModel: TaskModel): Task {
     memo: taskModel.memo,
     status: taskModel.status as TaskStatus,
     dueDate: taskModel.due_date ? toDate(taskModel.due_date) : null,
+    position: taskModel.position,
     user_id: taskModel.user_id,
     updated_at: toDate(taskModel.updated_at),
   }

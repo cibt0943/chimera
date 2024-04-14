@@ -103,7 +103,7 @@ export function TaskUpsertFormDialog({
           action={action}
         >
           <FormItem>
-            <FormLabel>
+            <FormLabel htmlFor={fields.title.id}>
               タイトル
               <Required />
             </FormLabel>
@@ -111,7 +111,7 @@ export function TaskUpsertFormDialog({
             <FormMessage message={fields.title.errors} />
           </FormItem>
           <FormItem>
-            <FormLabel>メモ</FormLabel>
+            <FormLabel htmlFor={fields.memo.id}>メモ</FormLabel>
             <Textarea
               {...getTextareaProps(fields.memo)}
               className="resize-none"
@@ -119,12 +119,12 @@ export function TaskUpsertFormDialog({
             <FormMessage message={fields.memo.errors} />
           </FormItem>
           <FormItem className="flex flex-col">
-            <FormLabel>期限</FormLabel>
+            <FormLabel htmlFor={fields.dueDate.id}>期限</FormLabel>
             <DateTimePicker meta={fields.dueDate} />
             <FormMessage message={fields.dueDate.errors} />
           </FormItem>
           <FormItem>
-            <FormLabel>
+            <FormLabel htmlFor={fields.status.id}>
               状態
               <Required />
             </FormLabel>
@@ -132,7 +132,7 @@ export function TaskUpsertFormDialog({
               {...getSelectProps(fields.status)}
               defaultValue={fields.status.value}
             >
-              <SelectTrigger>
+              <SelectTrigger id={fields.status.id}>
                 <SelectValue placeholder="Select a verified email to display" />
               </SelectTrigger>
               <SelectContent>

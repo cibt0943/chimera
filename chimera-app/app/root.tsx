@@ -19,6 +19,7 @@ import { themeCookie } from '~/lib/cookies'
 import { UserProvider } from '~/components/user-provider'
 import { ThemeProvider } from '~/components/theme-provider'
 import { Sidebar } from '~/components/sidebar'
+import { Toaster } from '~/components/ui/toaster'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -63,6 +64,7 @@ export default function App() {
                   <Outlet />
                 </div>
               </main>
+              <Toaster />
             </div>
           </ThemeProvider>
         </UserProvider>

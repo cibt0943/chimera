@@ -25,7 +25,7 @@ export const columns: ColumnDef<Task>[] = [
   {
     id: 'drag-handle',
     header: '',
-    cell: ({ row }) => <RowDragHandleCell rowId={row.getValue('id')} />,
+    cell: ({ row }) => <RowDragHandleCell rowId={row.original.id} />,
     size: 40,
   },
   // {
@@ -59,7 +59,7 @@ export const columns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <TodoTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => <span className="">{row.getValue('id')}</span>,
+    cell: ({ row }) => <span className="">{row.original.id}</span>,
   },
   {
     accessorKey: 'title',
@@ -68,9 +68,7 @@ export const columns: ColumnDef<Task>[] = [
       <TodoTableColumnHeader column={column} title="タイトル" />
     ),
     cell: ({ row }) => {
-      return (
-        <span className="truncate font-medium">{row.getValue('title')}</span>
-      )
+      return <span className="truncate font-medium">{row.original.title}</span>
     },
   },
   {
@@ -80,13 +78,11 @@ export const columns: ColumnDef<Task>[] = [
       <TodoTableColumnHeader column={column} title="状態" />
     ),
     cell: ({ row }) => {
-      const status = TaskStatusList.find(
-        (e) => e.value === row.getValue('status'),
-      )
+      const status = TaskStatusList.find((e) => e.value === row.original.status)
       return status ? <Badge>{status.label}</Badge> : ''
     },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id)) //id="status"
+      return value.includes(row.original.status) //id="status"
     },
   },
   {
@@ -96,7 +92,7 @@ export const columns: ColumnDef<Task>[] = [
       <TodoTableColumnHeader column={column} title="期限" />
     ),
     cell: ({ row }) => {
-      const dateStr = row.getValue<string>('dueDate')
+      const dateStr = row.original.dueDate
       return dateStr ? <span>{format(dateStr, 'yyyy/MM/dd HH:mm')}</span> : ''
     },
   },

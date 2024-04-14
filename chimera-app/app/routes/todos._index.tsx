@@ -22,9 +22,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const submission = parseWithZod(formData, { schema: TaskSchema })
   // submission が成功しなかった場合、クライアントに送信結果を報告します。
   if (submission.status !== 'success') {
-    return json({ result: submission.reply(), shouldConfirm: false })
-    // return json({ success: false, message: "error!", submission });
-    // return submission.reply()
+    throw new Error('Invalid submission data.')
+    // return json({ result: submission.reply() }, { status: 422 })
   }
 
   const data = submission.value
@@ -48,6 +47,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Index() {
   const { taskModels } = useLoaderData<typeof loader>()
+
   const tasks: Tasks = taskModels.map<Task>((value) => {
     return TaskModel2Task(value)
   })

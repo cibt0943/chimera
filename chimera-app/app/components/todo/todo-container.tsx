@@ -6,7 +6,7 @@ import { Tasks } from '~/types/tasks'
 export function TodoContainer({ tasks }: { tasks: Tasks }) {
   return (
     <ClientOnly>
-      {() => <TodoTable columns={columns} data={tasks} />}
+      {() => <TodoTable columns={columns} tasks={tasks} />}
     </ClientOnly>
   )
   // return <TodoTable columns={columns} data={tasks} />

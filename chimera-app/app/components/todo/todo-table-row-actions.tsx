@@ -46,6 +46,7 @@ export function TodoTableRowActions<TData>({
           onClick={() => {
             table.options.meta?.deleteTask(task)
           }}
+          className="text-red-600 focus:text-red-600"
         >
           <RxTrash className="mr-2 h-4 w-4" />
           削除

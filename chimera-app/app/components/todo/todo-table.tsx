@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useNavigate } from '@remix-run/react'
 import { RxPlus } from 'react-icons/rx'
 import {
   ColumnDef,
@@ -24,13 +25,13 @@ import {
   TouchSensor,
   closestCenter,
   type DragEndEvent,
-  type UniqueIdentifier,
+  // type UniqueIdentifier,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import {
-  // arrayMove,
+  arrayMove,
   SortableContext,
   verticalListSortingStrategy,
   useSortable,
@@ -46,6 +47,8 @@ import {
   TableRow,
 } from '~/components/ui/table'
 import { Button } from '~/components/ui/button'
+import { ToastAction } from '~/components/ui/toast'
+import { useToast } from '~/components/ui/use-toast'
 
 import { Task, Tasks } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
@@ -59,15 +62,47 @@ declare module '@tanstack/table-core' {
   }
 }
 
+// Custom hook for managing state
+function useTodoTableState() {
+  // tanstack/react-table
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  )
+  // const [rowSelection, setRowSelection] = React.useState({})
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({})
+
+  const [isOpenUpsertDialog, setIsOpenUpsertDialog] = React.useState(false)
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
+  const [task, setTask] = React.useState<Task>()
+
+  return {
+    sorting,
+    setSorting,
+    columnFilters,
+    setColumnFilters,
+    columnVisibility,
+    setColumnVisibility,
+    // rowSelection, setRowSelection,
+    isOpenUpsertDialog,
+    setIsOpenUpsertDialog,
+    isOpenDeleteDialog,
+    setIsOpenDeleteDialog,
+    task,
+    setTask,
+  }
+}
 // Row Component
 function DraggableRow({ row }: { row: Row<Task> }) {
-  const { transform, transition, setNodeRef, isDragging } = useSortable({
+  // const { transform, transition, setNodeRef, isDragging } = useSortable({
+  const { transform, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   })
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    // transition: transition,
     opacity: isDragging ? 0.8 : 1,
     zIndex: isDragging ? 1 : 0,
     position: 'relative',
@@ -91,34 +126,43 @@ function DraggableRow({ row }: { row: Row<Task> }) {
 
 interface TodoTableProps<TData extends RowData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  tasks: TData[]
 }
 
 // Table Component
-export function TodoTable({ columns, data }: TodoTableProps<Task, Tasks>) {
-  const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map(({ id }) => id),
-    [data],
-  )
+export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
+  const navigate = useNavigate()
+  const memoColumns = React.useMemo(() => columns, [columns])
+  const [data, setData] = React.useState(tasks)
+  // const dataIds = React.useMemo<UniqueIdentifier[]>(
+  //   () => data?.map(({ id }) => id),
+  //   [data],
+  // )
 
-  // tanstack/react-table
-  // const [rowSelection, setRowSelection] = React.useState({})
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [isOpenUpsertDialog, setIsOpenUpsertDialog] = React.useState(false)
-  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
-  const [task, setTask] = React.useState<Task>()
+  React.useEffect(() => {
+    setData(tasks)
+  }, [tasks])
 
-  function openAddTaskDialog() {
-    setTask(undefined)
-    setIsOpenUpsertDialog(true)
-  }
+  const { toast } = useToast()
 
-  function openEditTaskDialog(task: Task) {
+  const {
+    sorting,
+    setSorting,
+    columnFilters,
+    setColumnFilters,
+    columnVisibility,
+    setColumnVisibility,
+    // rowSelection,
+    // setRowSelection,
+    isOpenUpsertDialog,
+    setIsOpenUpsertDialog,
+    isOpenDeleteDialog,
+    setIsOpenDeleteDialog,
+    task,
+    setTask,
+  } = useTodoTableState()
+
+  function openTaskDialog(task: Task | undefined = undefined) {
     setTask(task)
     setIsOpenUpsertDialog(true)
   }
@@ -151,8 +195,8 @@ export function TodoTable({ columns, data }: TodoTableProps<Task, Tasks>) {
   }
 
   const table = useReactTable({
-    data,
-    columns,
+    data: data,
+    columns: memoColumns,
     state: {
       // rowSelection,
       sorting,
@@ -178,7 +222,7 @@ export function TodoTable({ columns, data }: TodoTableProps<Task, Tasks>) {
     },
     meta: {
       editTask: (task: Task) => {
-        openEditTaskDialog(task)
+        openTaskDialog(task)
       },
       deleteTask: (task: Task) => {
         openDeleteTaskDialog(task)
@@ -186,17 +230,84 @@ export function TodoTable({ columns, data }: TodoTableProps<Task, Tasks>) {
     },
   })
 
+  function clearSortToast() {
+    toast({
+      duration: 8000,
+      variant: 'destructive',
+      description: (
+        <div className="">
+          ソート中は並び順を変更することはできません。
+          <br />
+          ソートをクリアしますか？
+        </div>
+      ),
+      action: (
+        <ToastAction
+          altText="ソートをクリアする"
+          onClick={() => {
+            table.resetSorting()
+          }}
+        >
+          クリア
+        </ToastAction>
+      ),
+    })
+  }
+
+  function clearFilterToast() {
+    toast({
+      duration: 8000,
+      variant: 'destructive',
+      description: (
+        <div className="">
+          フィルタ中は並び順を変更することはできません。
+          <br />
+          フィルタをクリアしますか？
+        </div>
+      ),
+      action: (
+        <ToastAction
+          altText="フィルタをクリアする"
+          onClick={() => {
+            table.resetColumnFilters()
+          }}
+        >
+          クリア
+        </ToastAction>
+      ),
+    })
+  }
+
   // reorder rows after drag & drop
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
-    console.log('active', active)
-    console.log('over', over)
+    if (sorting.length > 0) {
+      clearSortToast()
+      return
+    }
+
+    if (columnFilters.length > 0) {
+      clearFilterToast()
+      return
+    }
+
     if (active && over && active.id !== over.id) {
-      // setData(data => {
-      //   const oldIndex = dataIds.indexOf(active.id)
-      //   const newIndex = dataIds.indexOf(over.id)
-      //   return arrayMove(data, oldIndex, newIndex) //this is just a splice util
-      // })
+      const oldIndex = data.findIndex((row) => row.id === active.id)
+      const newIndex = data.findIndex((row) => row.id === over.id)
+
+      setData((data) => {
+        return arrayMove(data, oldIndex, newIndex) //this is just a splice util
+      })
+
+      fetch(`/todos/${active.id}/position`, {
+        method: 'POST',
+        body: JSON.stringify({ position: data[newIndex].position }),
+      }).then((response) => {
+        if (!response.ok) {
+          alert('Failed to update position')
+          navigate('.', { replace: true })
+        }
+      })
     }
   }
 
@@ -207,7 +318,7 @@ export function TodoTable({ columns, data }: TodoTableProps<Task, Tasks>) {
   )
 
   useHotkeys('mod+i', () => {
-    openAddTaskDialog()
+    openTaskDialog()
   })
 
   return (
@@ -222,7 +333,7 @@ export function TodoTable({ columns, data }: TodoTableProps<Task, Tasks>) {
           <Button
             variant="secondary"
             className="h-8 px-2 lg:px-3"
-            onClick={openAddTaskDialog}
+            onClick={() => openTaskDialog()}
           >
             <RxPlus className="mr-2" />
             追加
@@ -262,7 +373,8 @@ export function TodoTable({ columns, data }: TodoTableProps<Task, Tasks>) {
             </TableHeader>
             <TableBody>
               <SortableContext
-                items={dataIds}
+                // items={dataIds}
+                items={data}
                 strategy={verticalListSortingStrategy}
               >
                 {table.getRowModel().rows?.length ? (
