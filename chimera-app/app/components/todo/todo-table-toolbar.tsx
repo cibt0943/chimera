@@ -27,6 +27,7 @@ export function TodoTableToolbar<TData>({
             table.getColumn('title')?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
+          id="tasks-title-filter"
         />
         {table.getColumn('status') && (
           <TodoTableFacetedFilter

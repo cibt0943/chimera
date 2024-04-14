@@ -1,13 +1,42 @@
-import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/node'
-import { json } from '@remix-run/node'
+import type {
+  MetaFunction,
+  LoaderFunctionArgs,
+  ActionFunctionArgs,
+} from '@remix-run/node'
+import { json, redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
+import { parseWithZod } from '@conform-to/zod'
 import { authenticator } from '~/lib/auth.server'
-import { Task, Tasks, TaskModel2Task } from '~/types/tasks'
-import { getTasks } from '~/models/task.server'
+import { Task, Tasks, TaskModel2Task, TaskSchema } from '~/types/tasks'
+import { getTasks, insertTask } from '~/models/task.server'
 import { TodoContainer } from '~/components/todo/todo-container'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Todos | Kobushi' }]
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const user = await authenticator.authenticate('auth0', request)
+
+  const formData = await request.formData()
+  const submission = parseWithZod(formData, { schema: TaskSchema })
+  // submission が成功しなかった場合、クライアントに送信結果を報告します。
+  if (submission.status !== 'success') {
+    throw new Error('Invalid submission data.')
+    // return json({ result: submission.reply() }, { status: 422 })
+  }
+
+  const data = submission.value
+
+  await insertTask({
+    title: data.title,
+    memo: data.memo || '',
+    status: data.status,
+    due_date: data.dueDate?.toISOString() || null,
+    user_id: user.id,
+  })
+
+  return redirect('/todos')
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {

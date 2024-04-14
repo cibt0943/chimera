@@ -1,0 +1,8 @@
+
+/.cache
+/build
+/node_modules
+/public/build
+/supabase
+
+/app/components/ui/*.tsx

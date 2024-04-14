@@ -92,6 +92,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
                 return (
                   <CommandItem
                     key={option.value}
+                    value={option.value.toString()}
                     onSelect={() => {
                       if (isSelected) {
                         selectedValues.delete(option.value)
