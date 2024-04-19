@@ -36,6 +36,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     status: data.status,
     due_date: data.dueDate?.toISOString() || null,
     user_id: user.id,
+    updated_at: new Date().toISOString(),
   })
 
   return redirect('/todos')

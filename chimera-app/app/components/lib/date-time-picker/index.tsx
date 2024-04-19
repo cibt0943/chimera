@@ -22,7 +22,7 @@ export function DateTimePicker({ meta }: DateTimePickerProps) {
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
 
   const setDate = (date: Date | undefined) => {
-    control.change(date?.toISOString() ?? '')
+    control.change(date?.toISOString() || '')
   }
 
   return (
@@ -55,7 +55,7 @@ export function DateTimePicker({ meta }: DateTimePickerProps) {
               if (value) {
                 value.setHours(9, 0, 0, 0)
               }
-              control.change(value?.toISOString() ?? '')
+              control.change(value?.toISOString() || '')
               // setIsCalendarOpen(false)
             }}
             defaultMonth={control.value ? toDate(control.value) : undefined}

@@ -34,20 +34,20 @@ interface insertTaskProps {
 }
 
 export async function insertTask(task: insertTaskProps): Promise<TaskModel> {
-  const { data: maxPosition, error } = await supabase
+  const { data: maxTask, error } = await supabase
     .from('tasks')
-    .select('position', { count: 'exact' })
+    .select()
     .eq('user_id', task.user_id)
     .order('position', { ascending: false })
-    .single()
+    .limit(1)
 
   if (error) throw error
 
-  const nextPosition = (maxPosition ? maxPosition.position : 0) + 1
+  const position = maxTask ? maxTask[0].position + 1 : 1
 
   const { data: newTask } = await supabase
     .from('tasks')
-    .insert({ ...task, position: nextPosition })
+    .insert({ ...task, position })
     .select()
     .single()
 
@@ -55,20 +55,27 @@ export async function insertTask(task: insertTaskProps): Promise<TaskModel> {
   return newTask
 }
 
-interface updateTaskProps extends insertTaskProps {
+interface updateTaskProps {
   id: number
+  position?: number
+  title?: string
+  memo?: string
+  status?: number
+  due_date?: string | null
+  user_id?: number
+  updated_at?: string
 }
 
 export async function updateTask(task: updateTaskProps): Promise<TaskModel> {
-  const { data } = await supabase
+  const { data: updateTask } = await supabase
     .from('tasks')
     .update(task)
     .eq('id', task.id)
     .select()
     .single()
 
-  if (!data) throw new Error('erorr')
-  return data
+  if (!updateTask) throw new Error('erorr')
+  return updateTask
 }
 
 export async function deleteTask(taskId: number): Promise<void> {
@@ -86,19 +93,28 @@ export async function changeTaskPosition(
   const fromTask = await getTask(taskId)
 
   const isUp = fromTask.position < position
-  const from = isUp ? 'gt' : 'lt' // lt: より小さい, gt: より大きい
-  const to = isUp ? 'lte' : 'gte' // lte: 以下, gte: 以上zx
+  const [fromOperator, toOperator] = isUp ? ['gt', 'lte'] : ['lt', 'gte']
 
-  const { data: tasksToUpdate } = await supabase
+  const { data: tasksToUpdate, error } = await supabase
     .from('tasks')
-    .select('id, position, title, user_id')
-    .filter('position', from, fromTask.position)
-    .filter('position', to, position)
+    .select()
+    .filter('position', fromOperator, fromTask.position)
+    .filter('position', toOperator, position)
     .order('position')
 
-  if (!tasksToUpdate) throw new Error('erorr')
+  if (error) throw error
 
   // 間のタスクの位置を変更
+  await updateTasksPosition(tasksToUpdate, isUp)
+  // 移動するタスクの位置を変更
+  return await updateTask({
+    id: fromTask.id,
+    position,
+    updated_at: new Date().toISOString(),
+  })
+}
+
+async function updateTasksPosition(tasksToUpdate: TaskModel[], isUp: boolean) {
   const updatedTasks = tasksToUpdate.map((task) => ({
     ...task,
     position: isUp ? task.position - 1 : task.position + 1,
@@ -109,16 +125,4 @@ export async function changeTaskPosition(
     .upsert(updatedTasks, { onConflict: 'id' })
 
   if (updateError) throw updateError
-
-  // 移動するタスクの位置を変更
-  const { data: updatedTask } = await supabase
-    .from('tasks')
-    .update({ position })
-    .eq('id', fromTask.id)
-    .select()
-    .single()
-
-  if (!updatedTask) throw new Error('Failed to update task position')
-
-  return updatedTask
 }
