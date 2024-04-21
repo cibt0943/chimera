@@ -2,25 +2,27 @@ import { TaskModel, TaskModels } from '~/types/tasks'
 import { supabase } from '~/lib/supabaseClient.server'
 
 // タスク一覧を取得
-export async function getTasks(user_id: number): Promise<TaskModels> {
-  const { data } = await supabase
+export async function getTasks(account_id: number): Promise<TaskModels> {
+  const { data, error } = await supabase
     .from('tasks')
     .select()
-    .eq('user_id', user_id)
+    .eq('account_id', account_id)
     .order('position', { ascending: false })
     .order('id')
+  if (error) throw error
+
   return data || []
 }
 
 // タスクを取得
 export async function getTask(taskId: number): Promise<TaskModel> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('tasks')
     .select()
     .eq('id', taskId)
     .single()
+  if (error || !data) throw error || new Error('erorr')
 
-  if (!data) throw new Error('erorr')
   return data
 }
 
@@ -30,28 +32,27 @@ interface insertTaskProps {
   memo: string
   status: number
   due_date: string | null
-  user_id: number
+  account_id: number
 }
 
 export async function insertTask(task: insertTaskProps): Promise<TaskModel> {
-  const { data: maxTask, error } = await supabase
+  const { data: maxTask, error: errorMaxTask } = await supabase
     .from('tasks')
     .select()
-    .eq('user_id', task.user_id)
+    .eq('account_id', task.account_id)
     .order('position', { ascending: false })
     .limit(1)
+  if (errorMaxTask) throw errorMaxTask
 
-  if (error) throw error
+  const position = maxTask.length > 0 ? maxTask[0].position + 1 : 1
 
-  const position = maxTask ? maxTask[0].position + 1 : 1
-
-  const { data: newTask } = await supabase
+  const { data: newTask, error: errorNewTask } = await supabase
     .from('tasks')
     .insert({ ...task, position })
     .select()
     .single()
+  if (errorNewTask || !newTask) throw errorNewTask || new Error('erorr')
 
-  if (!newTask) throw new Error('erorr')
   return newTask
 }
 
@@ -62,25 +63,25 @@ interface updateTaskProps {
   memo?: string
   status?: number
   due_date?: string | null
-  user_id?: number
+  account_id?: number
   updated_at?: string
 }
 
 export async function updateTask(task: updateTaskProps): Promise<TaskModel> {
-  const { data: updateTask } = await supabase
+  const { data, error } = await supabase
     .from('tasks')
     .update(task)
     .eq('id', task.id)
     .select()
     .single()
+  if (error || !data) throw error || new Error('erorr')
 
-  if (!updateTask) throw new Error('erorr')
-  return updateTask
+  return data
 }
 
 export async function deleteTask(taskId: number): Promise<void> {
   const { error } = await supabase.from('tasks').delete().eq('id', taskId)
-  if (error) throw new Error('erorr')
+  if (error) throw error
 }
 
 // タスクの位置を変更
@@ -95,14 +96,13 @@ export async function changeTaskPosition(
   const isUp = fromTask.position < position
   const [fromOperator, toOperator] = isUp ? ['gt', 'lte'] : ['lt', 'gte']
 
-  const { data: tasksToUpdate, error } = await supabase
+  const { data: tasksToUpdate, error: errorTasksToUpdate } = await supabase
     .from('tasks')
     .select()
     .filter('position', fromOperator, fromTask.position)
     .filter('position', toOperator, position)
     .order('position')
-
-  if (error) throw error
+  if (errorTasksToUpdate) throw errorTasksToUpdate
 
   // 間のタスクの位置を変更
   await updateTasksPosition(tasksToUpdate, isUp)
@@ -120,9 +120,8 @@ async function updateTasksPosition(tasksToUpdate: TaskModel[], isUp: boolean) {
     position: isUp ? task.position - 1 : task.position + 1,
   }))
 
-  const { error: updateError } = await supabase
+  const { error } = await supabase
     .from('tasks')
     .upsert(updatedTasks, { onConflict: 'id' })
-
-  if (updateError) throw updateError
+  if (error) throw error
 }

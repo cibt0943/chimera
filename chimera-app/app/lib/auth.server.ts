@@ -1,12 +1,12 @@
 import { Authenticator } from 'remix-auth'
 import { Auth0Strategy } from 'remix-auth-auth0'
 import { sessionStorage } from '~/lib/session.server'
-import { getOrInsertUser } from '~/models/user.server'
-import { User, Auth0User } from '~/types/users'
+import { getOrInsertAccount } from '~/models/account.server'
+import { Account, Auth0Profile } from '~/types/accounts'
 
-export const authenticator = new Authenticator<User>(sessionStorage)
+export const authenticator = new Authenticator<Account>(sessionStorage)
 
-const auth0Strategy = new Auth0Strategy<User>(
+const auth0Strategy = new Auth0Strategy<Account>(
   {
     callbackURL: process.env.AUTH0_CALLBACK_URL!,
     clientID: process.env.AUTH0_CLIENT_ID!,
@@ -15,17 +15,16 @@ const auth0Strategy = new Auth0Strategy<User>(
   },
   // async ({ accessToken, refreshToken, extraParams, profile }) => {
   async ({ profile }) => {
-    const auth0Profile = profile._json as Auth0User
-
-    const user = await getOrInsertUser({ sub: auth0Profile.sub })
-
+    const auth0Profile = profile._json as Auth0Profile
+    const account = await getOrInsertAccount({ sub: auth0Profile.sub })
     return {
-      id: user.id,
-      sub: user.sub,
+      id: account.id,
+      sub: account.sub,
       name: auth0Profile.name,
       email: auth0Profile.email,
       picture: auth0Profile.picture,
-      updated_at: auth0Profile.updated_at,
+      created_at: account.created_at,
+      updated_at: account.updated_at,
     }
   },
 )

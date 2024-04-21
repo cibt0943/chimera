@@ -4,7 +4,7 @@ import { authenticator } from '~/lib/auth.server'
 import { getTask, changeTaskPosition } from '~/models/task.server'
 
 export async function action({ params, request }: ActionFunctionArgs) {
-  const user = await authenticator.authenticate('auth0', request)
+  const account = await authenticator.authenticate('auth0', request)
   const data = await request.json()
   const position = Number(data.position)
   // const data = await request.formData()
@@ -15,7 +15,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
   }
 
   const task = await getTask(Number(params.todoId))
-  if (task.user_id !== user.id) throw new Error('erorr')
+  if (task.account_id !== account.id) throw new Error('erorr')
 
   const updatedTask = await changeTaskPosition(task.id, position)
 

@@ -23,9 +23,10 @@ export type Task = {
   title: string
   memo: string
   status: TaskStatus
-  dueDate: Date | null
+  due_date: Date | null
   position: number
-  user_id: number
+  account_id: number
+  created_at: Date
   updated_at: Date
 }
 
@@ -38,7 +39,7 @@ export type TaskModel = {
   status: number
   due_date: string | null
   position: number
-  user_id: number
+  account_id: number
   created_at: string
   updated_at: string
 }
@@ -51,9 +52,10 @@ export function TaskModel2Task(taskModel: TaskModel): Task {
     title: taskModel.title,
     memo: taskModel.memo,
     status: taskModel.status as TaskStatus,
-    dueDate: taskModel.due_date ? toDate(taskModel.due_date) : null,
+    due_date: taskModel.due_date ? toDate(taskModel.due_date) : null,
     position: taskModel.position,
-    user_id: taskModel.user_id,
+    account_id: taskModel.account_id,
+    created_at: toDate(taskModel.created_at),
     updated_at: toDate(taskModel.updated_at),
   }
 }
@@ -65,7 +67,7 @@ export const TaskSchema = zod.object({
   memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
   status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
   // status: zod.nativeEnum(TaskStatus),
-  dueDate: zod.coerce.date().optional().nullable(),
+  due_date: zod.coerce.date().optional().nullable(),
 })
 
 export type TaskSchemaType = zod.infer<typeof TaskSchema>

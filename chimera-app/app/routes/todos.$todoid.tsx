@@ -11,13 +11,13 @@ import { TaskSchema } from '~/types/tasks'
 import { getTask, updateTask } from '~/models/task.server'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: 'Todo ' + data?.task.id + ' | Kobushi' }]
+  return [{ title: 'Todo ' + data?.task.id + ' Show | Kobushi' }]
 }
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
-  const user = await authenticator.authenticate('auth0', request)
+  const account = await authenticator.authenticate('auth0', request)
   const task = await getTask(Number(params.todoId))
-  if (task.user_id !== user.id) throw new Error('erorr')
+  if (task.account_id !== account.id) throw new Error('erorr')
 
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: TaskSchema })
@@ -34,8 +34,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     title: data.title,
     memo: data.memo || '',
     status: data.status,
-    due_date: data.dueDate?.toISOString() || null,
-    user_id: user.id,
+    due_date: data.due_date?.toISOString() || null,
+    account_id: account.id,
     updated_at: new Date().toISOString(),
   })
 
@@ -43,9 +43,9 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 }
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-  const user = await authenticator.authenticate('auth0', request)
+  const account = await authenticator.authenticate('auth0', request)
   const task = await getTask(Number(params.todoId))
-  if (task.user_id !== user.id) throw new Error('erorr')
+  if (task.account_id !== account.id) throw new Error('erorr')
 
   return json({ task })
 }

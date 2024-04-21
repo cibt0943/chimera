@@ -1,4 +1,5 @@
-import type { MetaFunction } from '@remix-run/node'
+import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/node'
+import { redirect } from '@remix-run/node'
 
 export const meta: MetaFunction = () => {
   return [
@@ -7,10 +8,6 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export default function Home() {
-  return (
-    <div>
-      <h1>5つの機能を持つようにしようと思っています。</h1>
-    </div>
-  )
+export async function loader({ request }: LoaderFunctionArgs) {
+  return redirect('/dashboard')
 }

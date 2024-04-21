@@ -16,7 +16,7 @@ export const meta: MetaFunction = () => {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const user = await authenticator.authenticate('auth0', request)
+  const account = await authenticator.authenticate('auth0', request)
 
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: TaskSchema })
@@ -32,16 +32,16 @@ export async function action({ request }: ActionFunctionArgs) {
     title: data.title,
     memo: data.memo || '',
     status: data.status,
-    due_date: data.dueDate?.toISOString() || null,
-    user_id: user.id,
+    due_date: data.due_date?.toISOString() || null,
+    account_id: account.id,
   })
 
   return redirect('/todos')
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const user = await authenticator.authenticate('auth0', request)
-  const taskModels = await getTasks(user.id)
+  const account = await authenticator.authenticate('auth0', request)
+  const taskModels = await getTasks(account.id)
   return json({ taskModels })
 }
 

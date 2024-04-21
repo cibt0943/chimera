@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import { NavLink } from '@remix-run/react'
+import { PiHandFistBold } from 'react-icons/pi'
 import {
   RxCheck,
   RxCalendar,
@@ -9,7 +10,7 @@ import {
 } from 'react-icons/rx'
 import { cn } from '~/lib/utils'
 import { buttonVariants } from '~/components/ui/button'
-import { UserMenu } from '~/components/user-menu'
+import { AccountMenu } from '~/components/account-menu'
 
 type NavLinkClassNameProps = {
   isActive: boolean
@@ -22,7 +23,7 @@ export function Sidebar() {
     return cn(
       buttonVariants({
         variant: isActive ? 'secondary' : 'ghost',
-        className: clsx('w-full justify-start', className),
+        className: clsx('w-full justify-start mb-1', className),
       }),
     )
   }
@@ -30,9 +31,12 @@ export function Sidebar() {
   return (
     <div className="px-2 py-4">
       <h1 className="mb-2 px-4 text-2xl font-bold tracking-tight">
-        <NavLink to="/">kobushi</NavLink>
+        <NavLink to="/" className="inline-flex items-center">
+          kobushi
+          <PiHandFistBold className="ml-2" />
+        </NavLink>
       </h1>
-      <div className="">
+      <div className="mb-8">
         <NavLink to="/todos" className={navLinkClassName}>
           <RxCheck className="mr-2 h-4 w-4" />
           Todo
@@ -54,8 +58,8 @@ export function Sidebar() {
           Reminder
         </NavLink>
       </div>
-      <div className="px-4 mt-16">
-        <UserMenu />
+      <div className="mb-2">
+        <AccountMenu />
       </div>
     </div>
   )

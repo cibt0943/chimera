@@ -74,7 +74,7 @@ export function TaskUpsertFormDialog({
     title: '',
     memo: '',
     status: TaskStatus.NEW,
-    dueDate: null,
+    due_date: null,
   }
 
   const [form, fields] = useForm<TaskSchemaType>({
@@ -119,9 +119,9 @@ export function TaskUpsertFormDialog({
             <FormMessage message={fields.memo.errors} />
           </FormItem>
           <FormItem className="flex flex-col">
-            <FormLabel htmlFor={fields.dueDate.id}>期限</FormLabel>
-            <DateTimePicker meta={fields.dueDate} />
-            <FormMessage message={fields.dueDate.errors} />
+            <FormLabel htmlFor={fields.due_date.id}>期限</FormLabel>
+            <DateTimePicker meta={fields.due_date} />
+            <FormMessage message={fields.due_date.errors} />
           </FormItem>
           <FormItem>
             <FormLabel htmlFor={fields.status.id}>

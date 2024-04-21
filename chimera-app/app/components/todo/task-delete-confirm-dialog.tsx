@@ -25,8 +25,8 @@ export function TaskDeleteConfirmDialog({
     >
       <AlertDialogCancel>キャンセル</AlertDialogCancel>
       <Form
-        action={`${task.id}/delete`}
-        method="post"
+        action={`/todos/${task.id}/delete`}
+        method="delete"
         onSubmit={() => {
           setIsOpenDialog(false)
         }}

@@ -1,3 +1,7 @@
 export default function Login() {
-  return <div>ログインしてください</div>
+  return (
+    <div className="p-4">
+      <div>ログインしてください</div>
+    </div>
+  )
 }

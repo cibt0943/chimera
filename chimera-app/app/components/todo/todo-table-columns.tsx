@@ -86,13 +86,13 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    accessorKey: 'dueDate',
+    accessorKey: 'due_date',
     size: 150,
     header: ({ column }) => (
       <TodoTableColumnHeader column={column} title="期限" />
     ),
     cell: ({ row }) => {
-      const dateStr = row.original.dueDate
+      const dateStr = row.original.due_date
       return dateStr ? <span>{format(dateStr, 'yyyy/MM/dd HH:mm')}</span> : ''
     },
   },
