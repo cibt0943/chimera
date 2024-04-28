@@ -1,26 +1,30 @@
-import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/node'
+import type { MetaFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { useLoaderData, Form } from '@remix-run/react'
 import { Button } from '~/components/ui/button'
-import { authenticator } from '~/lib/auth.server'
+import { withAuthentication } from '~/lib/auth-middleware'
+import { Account } from '~/types/accounts'
 import { getAccountBySub } from '~/models/account.server'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Profile | Kobushi' }]
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const self = await authenticator.authenticate('auth0', request)
-  const account = await getAccountBySub(self.sub)
-  if (!account) {
+export const loader = withAuthentication(async ({ account: self }) => {
+  const accountModel = await getAccountBySub(self.sub)
+  if (!accountModel) {
     throw new Error('Error: Account not found.')
   }
 
   return json({ self })
+})
+
+type LoaderData = {
+  self: Account
 }
 
 export default function Profile() {
-  const { self } = useLoaderData<typeof loader>()
+  const { self } = useLoaderData<LoaderData>()
 
   return (
     <div>
@@ -30,7 +34,7 @@ export default function Profile() {
         <li>email: {self.email}</li>
       </ul>
       <div className="mt-8">
-        <Form action={`/accounts/delete`} method="delete">
+        <Form action={`/account/delete`} method="delete">
           <Button type="submit" variant="destructive">
             アカウントを削除する
           </Button>

@@ -24,7 +24,10 @@ const auth0Strategy = new Auth0Strategy<Account>(
       email: auth0Profile.email,
       picture: auth0Profile.picture,
       created_at: account.created_at,
-      updated_at: account.updated_at,
+      updated_at:
+        account.updated_at > auth0Profile.updated_at
+          ? account.updated_at
+          : auth0Profile.updated_at,
     }
   },
 )

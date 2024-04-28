@@ -1,14 +1,13 @@
-import type { ActionFunctionArgs } from '@remix-run/node'
 import { json } from '@remix-run/node'
-
-import { themeCookie } from '~/lib/cookies'
+import { withAuthentication } from '~/lib/auth-middleware'
+import { themeCookie } from '~/lib/cookies.server'
 
 function addYear(date: Date, year: number) {
   date.setFullYear(date.getFullYear() + year)
   return date
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export const action = withAuthentication(async ({ request }) => {
   const cookieHeader = request.headers.get('Cookie')
   const cookie = (await themeCookie.parse(cookieHeader)) || {}
   const { theme } = await request.json()
@@ -21,4 +20,4 @@ export async function action({ request }: ActionFunctionArgs) {
       }),
     },
   })
-}
+})

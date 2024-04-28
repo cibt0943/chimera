@@ -1,17 +1,14 @@
-import type { ActionFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
-import { authenticator } from '~/lib/auth.server'
+import { withAuthentication } from '~/lib/auth-middleware'
 import { getAccountBySub, deleteAccount } from '~/models/account.server'
 
-export async function action({ request }: ActionFunctionArgs) {
-  const self = await authenticator.authenticate('auth0', request)
-
-  const account = getAccountBySub(self.sub)
-  if (!account) {
+export const action = withAuthentication(async ({ account: self }) => {
+  const accountModel = await getAccountBySub(self.sub)
+  if (!accountModel) {
     throw new Error('Error: Account not found.')
   }
 
   await deleteAccount(self.id)
 
   return redirect('/')
-}
+})

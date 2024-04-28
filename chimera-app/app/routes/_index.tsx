@@ -1,4 +1,4 @@
-import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/node'
+import type { MetaFunction } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 
 export const meta: MetaFunction = () => {
@@ -8,6 +8,6 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader() {
   return redirect('/dashboard')
 }

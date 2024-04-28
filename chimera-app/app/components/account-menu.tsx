@@ -1,4 +1,4 @@
-import { useNavigate, Form, useFetcher } from '@remix-run/react'
+import { useNavigate, useFetcher } from '@remix-run/react'
 import { RxSun, RxMoon, RxGear, RxPerson, RxExit } from 'react-icons/rx'
 import { MdBrightness4 } from 'react-icons/md'
 
@@ -30,17 +30,7 @@ export function AccountMenu() {
   const { account } = useAccount()
   const fetcher = useFetcher()
 
-  // if (isLoading) return ''
-
-  if (!account) {
-    return (
-      <div className="mx-4">
-        <Form action="/auth/auth0" method="post">
-          <Button variant="destructive">Log in</Button>
-        </Form>
-      </div>
-    )
-  }
+  if (!account) return null
 
   const handleValueChange = (theme: string) => {
     updateTheme(theme as Theme)

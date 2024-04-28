@@ -15,7 +15,7 @@ import {
 
 import styles from '~/tailwind.css'
 import { authenticator } from '~/lib/auth.server'
-import { themeCookie } from '~/lib/cookies'
+import { themeCookie } from '~/lib/cookies.server'
 import { AccountProvider } from '~/components/account-provider'
 import { ThemeProvider } from '~/components/theme-provider'
 import { Sidebar } from '~/components/sidebar'
