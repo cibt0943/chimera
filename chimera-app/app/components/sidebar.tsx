@@ -29,36 +29,40 @@ export function Sidebar() {
   }
 
   return (
-    <div className="px-2 py-4">
-      <h1 className="mb-2 px-4 text-2xl font-bold tracking-tight">
-        <NavLink to="/" className="inline-flex items-center">
-          kobushi
-          <PiHandFistBold className="ml-2" />
-        </NavLink>
-      </h1>
-      <div className="mb-8">
-        <NavLink to="/todos" className={navLinkClassName}>
-          <RxCheck className="mr-2 h-5 w-5" />
-          Todo
-        </NavLink>
-        <NavLink to="/memos" className={navLinkClassName}>
-          <RxPencil2 className="mr-2 h-5 w-5" />
-          Memo
-        </NavLink>
-        <NavLink to="/events" className={navLinkClassName}>
-          <RxCalendar className="mr-2 h-5 w-5" />
-          Event
-        </NavLink>
-        <NavLink to="/files" className={navLinkClassName}>
-          <RxFile className="mr-2 h-5 w-5" />
-          File
-        </NavLink>
-        <NavLink to="/reminders" className={navLinkClassName}>
-          <RxPaperPlane className="mr-2 h-5 w-5" />
-          Reminder
-        </NavLink>
+    <div className="px-2 flex flex-col justify-between h-screen">
+      <div className="overflow-auto">
+        <div className="bg-background sticky top-0">
+          <h1 className="p-4 text-2xl font-bold tracking-tight">
+            <NavLink to="/" className="inline-flex items-center">
+              kobushi
+              <PiHandFistBold className="ml-2" />
+            </NavLink>
+          </h1>
+        </div>
+        <div>
+          <NavLink to="/todos" className={navLinkClassName}>
+            <RxCheck className="mr-2 h-5 w-5" />
+            Todo
+          </NavLink>
+          <NavLink to="/memos" className={navLinkClassName}>
+            <RxPencil2 className="mr-2 h-5 w-5" />
+            Memo
+          </NavLink>
+          <NavLink to="/events" className={navLinkClassName}>
+            <RxCalendar className="mr-2 h-5 w-5" />
+            Event
+          </NavLink>
+          <NavLink to="/files" className={navLinkClassName}>
+            <RxFile className="mr-2 h-5 w-5" />
+            File
+          </NavLink>
+          <NavLink to="/reminders" className={navLinkClassName}>
+            <RxPaperPlane className="mr-2 h-5 w-5" />
+            Reminder
+          </NavLink>
+        </div>
       </div>
-      <div className="mb-2">
+      <div className="bg-background pb-2">
         <AccountMenu />
       </div>
     </div>

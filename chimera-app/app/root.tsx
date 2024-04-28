@@ -54,12 +54,10 @@ export default function App() {
         <AccountProvider account={account}>
           <ThemeProvider defaultTheme={theme}>
             <div className="flex">
-              <aside className="flex-none w-48">
-                <div className="sticky top-0">
-                  <Sidebar />
-                </div>
+              <aside className="w-48">
+                <Sidebar />
               </aside>
-              <main className="grow">
+              <main className="grow h-screen overflow-auto">
                 <div className={loadingCss}>
                   <Outlet />
                 </div>
