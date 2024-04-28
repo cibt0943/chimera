@@ -79,7 +79,11 @@ export const columns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }) => {
       const status = TaskStatusList.find((e) => e.value === row.original.status)
-      return status ? <Badge>{status.label}</Badge> : ''
+      return status ? (
+        <Badge className={status.color}>{status.label}</Badge>
+      ) : (
+        ''
+      )
     },
     filterFn: (row, id, value) => {
       return value.includes(row.original.status) //id="status"
