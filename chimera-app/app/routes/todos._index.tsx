@@ -1,13 +1,9 @@
-import type {
-  MetaFunction,
-  LoaderFunctionArgs,
-  ActionFunctionArgs,
-} from '@remix-run/node'
+import type { MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
-import { authenticator } from '~/lib/auth.server'
-import { Task, Tasks, TaskModel2Task, TaskSchema } from '~/types/tasks'
+import { withAuthentication } from '~/lib/auth-middleware'
+import { Task, TaskModels, TaskModel2Task, TaskSchema } from '~/types/tasks'
 import { getTasks, insertTask } from '~/models/task.server'
 import { TodoContainer } from '~/components/todo/todo-container'
 
@@ -15,9 +11,7 @@ export const meta: MetaFunction = () => {
   return [{ title: 'Todos | Kobushi' }]
 }
 
-export async function action({ request }: ActionFunctionArgs) {
-  const user = await authenticator.authenticate('auth0', request)
-
+export const action = withAuthentication(async ({ request, account }) => {
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: TaskSchema })
   // submission が成功しなかった場合、クライアントに送信結果を報告します。
@@ -32,23 +26,25 @@ export async function action({ request }: ActionFunctionArgs) {
     title: data.title,
     memo: data.memo || '',
     status: data.status,
-    due_date: data.dueDate?.toISOString() || null,
-    user_id: user.id,
+    due_date: data.due_date?.toISOString() || null,
+    account_id: account.id,
   })
 
   return redirect('/todos')
+})
+
+type LoaderData = {
+  taskModels: TaskModels
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const user = await authenticator.authenticate('auth0', request)
-  const taskModels = await getTasks(user.id)
+export const loader = withAuthentication(async ({ account }) => {
+  const taskModels = await getTasks(account.id)
   return json({ taskModels })
-}
+})
 
 export default function Index() {
-  const { taskModels } = useLoaderData<typeof loader>()
-
-  const tasks: Tasks = taskModels.map<Task>((value) => {
+  const { taskModels } = useLoaderData<LoaderData>()
+  const tasks = taskModels.map<Task>((value) => {
     return TaskModel2Task(value)
   })
 

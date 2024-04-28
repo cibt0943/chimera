@@ -79,20 +79,24 @@ export const columns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }) => {
       const status = TaskStatusList.find((e) => e.value === row.original.status)
-      return status ? <Badge>{status.label}</Badge> : ''
+      return status ? (
+        <Badge className={status.color}>{status.label}</Badge>
+      ) : (
+        ''
+      )
     },
     filterFn: (row, id, value) => {
       return value.includes(row.original.status) //id="status"
     },
   },
   {
-    accessorKey: 'dueDate',
+    accessorKey: 'due_date',
     size: 150,
     header: ({ column }) => (
       <TodoTableColumnHeader column={column} title="期限" />
     ),
     cell: ({ row }) => {
-      const dateStr = row.original.dueDate
+      const dateStr = row.original.due_date
       return dateStr ? <span>{format(dateStr, 'yyyy/MM/dd HH:mm')}</span> : ''
     },
   },

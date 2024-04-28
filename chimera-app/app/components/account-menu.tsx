@@ -1,4 +1,4 @@
-import { useNavigate, Form, useFetcher } from '@remix-run/react'
+import { useNavigate, useFetcher } from '@remix-run/react'
 import { RxSun, RxMoon, RxGear, RxPerson, RxExit } from 'react-icons/rx'
 import { MdBrightness4 } from 'react-icons/md'
 
@@ -21,24 +21,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 
 import { useTheme, Theme } from '~/components/theme-provider'
-import { useUser } from '~/components/user-provider'
+import { useAccount } from '~/components/account-provider'
 
-export function UserMenu() {
+export function AccountMenu() {
   const navigate = useNavigate()
   const { theme, updateTheme } = useTheme()
-  // const { user, isLoading } = useUser()
-  const { user } = useUser()
+  // const { account, isLoading } = useAccount()
+  const { account } = useAccount()
   const fetcher = useFetcher()
 
-  // if (isLoading) return ''
-
-  if (!user) {
-    return (
-      <Form action="/auth/auth0" method="post">
-        <Button variant="destructive">Log in</Button>
-      </Form>
-    )
-  }
+  if (!account) return null
 
   const handleValueChange = (theme: string) => {
     updateTheme(theme as Theme)
@@ -58,20 +50,24 @@ export function UserMenu() {
     <div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-            <Avatar className="h-9 w-9">
-              <AvatarImage src={user.picture}></AvatarImage>
-              <AvatarFallback>{user.name}</AvatarFallback>
+          <Button
+            variant="ghost"
+            className="rounded-full py-6 w-full justify-normal"
+          >
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={account.picture}></AvatarImage>
+              <AvatarFallback>{account.name}</AvatarFallback>
             </Avatar>
+            <span className="pl-2 truncate">{account.name}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-52">
-          <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
+          <DropdownMenuLabel>{account.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem
               onClick={() => {
-                navigate('/profile')
+                navigate(`/account/profile`)
               }}
             >
               <RxPerson className="mr-2 h-4 w-4" />

@@ -3,18 +3,17 @@ import { json } from '@remix-run/node'
 import { withAuthentication } from '~/lib/auth-middleware'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Files | Kobushi' }]
+  return [{ title: 'Dashboard | Kobushi' }]
 }
 
 export const loader = withAuthentication(async ({ account }) => {
   return json({ account })
 })
 
-export default function Index() {
+export default function Dashboard() {
   return (
-    <div>
-      <h1 className="mb-2 text-xl font-bold">ファイル機能</h1>
-      何作るか決めてない
+    <div className="p-4">
+      <h1>ダッシュボード機能を実装する予定</h1>
     </div>
   )
 }

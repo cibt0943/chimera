@@ -15,8 +15,8 @@ import {
 
 import styles from '~/tailwind.css'
 import { authenticator } from '~/lib/auth.server'
-import { themeCookie } from '~/lib/cookies'
-import { UserProvider } from '~/components/user-provider'
+import { themeCookie } from '~/lib/cookies.server'
+import { AccountProvider } from '~/components/account-provider'
 import { ThemeProvider } from '~/components/theme-provider'
 import { Sidebar } from '~/components/sidebar'
 import { Toaster } from '~/components/ui/toaster'
@@ -30,12 +30,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // クッキーからカラーモードを取得
   const cookieHeader = request.headers.get('Cookie')
   const cookie = (await themeCookie.parse(cookieHeader)) || {}
-  const user = await authenticator.isAuthenticated(request)
-  return json({ theme: cookie.theme, user })
+  const account = await authenticator.isAuthenticated(request)
+  return json({ theme: cookie.theme, account })
 }
 
 export default function App() {
-  const { theme, user } = useLoaderData<typeof loader>()
+  const { theme, account } = useLoaderData<typeof loader>()
 
   const navigation = useNavigation()
   const loadingCss = ['loading', 'submitting'].includes(navigation.state)
@@ -51,15 +51,13 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <UserProvider user={user}>
+        <AccountProvider account={account}>
           <ThemeProvider defaultTheme={theme}>
             <div className="flex">
-              <aside className="flex-none w-48">
-                <div className="sticky top-0">
-                  <Sidebar />
-                </div>
+              <aside className="w-48">
+                <Sidebar />
               </aside>
-              <main className="grow">
+              <main className="grow h-screen overflow-auto">
                 <div className={loadingCss}>
                   <Outlet />
                 </div>
@@ -67,7 +65,7 @@ export default function App() {
               <Toaster />
             </div>
           </ThemeProvider>
-        </UserProvider>
+        </AccountProvider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
