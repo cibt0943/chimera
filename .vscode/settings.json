@@ -26,6 +26,9 @@
   //     "editor.formatOnSave": true
   //   },
   // "eslint.packageManager": "yarn",
+  "[markdown]": {
+    "files.trimTrailingWhitespace": false
+  },
   "editor.tabSize": 2,
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
