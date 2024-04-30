@@ -51,12 +51,12 @@ export default function Todo() {
 
   return (
     <div>
-      <div>{task.id}</div>
-      <div>{task.title}</div>
-      <div>{task.memo}</div>
-      <div>{task.due_date}</div>
-      <div>{task.status}</div>
-      <div>{task.position}</div>
+      <div>id: {task.id}</div>
+      <div>title: {task.title}</div>
+      <div>memo: {task.memo}</div>
+      <div>due_date: {task.due_date}</div>
+      <div>status: {task.status}</div>
+      <div>position: {task.position}</div>
     </div>
   )
 }
