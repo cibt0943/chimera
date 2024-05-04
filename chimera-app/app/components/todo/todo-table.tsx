@@ -38,7 +38,6 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-
 import {
   Table,
   TableBody,
@@ -51,6 +50,7 @@ import { Button } from '~/components/ui/button'
 import { ToastAction } from '~/components/ui/toast'
 import { useToast } from '~/components/ui/use-toast'
 
+import { useDebounce, useQueue } from '~/lib/utils'
 import { Task, Tasks } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
 import { TaskUpsertFormDialog } from './task-upsert-form-dialog'
@@ -68,11 +68,46 @@ interface TodoTableProps<TData extends RowData, TValue> {
   tasks: TData[]
 }
 
+// Row Component
+function DraggableRow({ row }: { row: Row<Task> }) {
+  // const { transform, setNodeRef, isDragging } = useSortable({
+  const { transform, transition, setNodeRef, isDragging } = useSortable({
+    id: row.original.id,
+  })
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition: transition,
+    opacity: isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 1 : 0,
+    position: 'relative',
+  }
+
+  return (
+    <TableRow
+      key={row.id}
+      data-state={row.getIsSelected() && 'selected'}
+      ref={setNodeRef}
+      style={style}
+      onClick={() => {
+        row.toggleSelected(true)
+      }}
+    >
+      {row.getVisibleCells().map((cell) => (
+        <TableCell key={cell.id}>
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </TableCell>
+      ))}
+    </TableRow>
+  )
+}
+
 // Table Component
 export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   const navigate = useNavigate()
   const memoColumns = React.useMemo(() => columns, [columns])
   const { toast } = useToast()
+  const { enqueue } = useQueue()
 
   // tanstack/react-table
   const [tableData, setTableData] = React.useState<Tasks>(tasks)
@@ -112,7 +147,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     )
   }
 
-  function DeleteConfirmDialog() {
+  function DeleteConfirmTaskDialog() {
     if (!formTask) return null
 
     return (
@@ -145,7 +180,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    // getRowId: (row) => row.id.toString(), //required because row indexes
+    getRowId: (row) => row.id.toString(), //required because row indexes
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
@@ -209,40 +244,6 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     })
   }
 
-  // Row Component
-  function DraggableRow({ row }: { row: Row<Task> }) {
-    // const { transform, setNodeRef, isDragging } = useSortable({
-    const { transform, transition, setNodeRef, isDragging } = useSortable({
-      id: row.original.id,
-    })
-
-    const style: React.CSSProperties = {
-      transform: CSS.Transform.toString(transform),
-      transition: transition,
-      opacity: isDragging ? 0.8 : 1,
-      zIndex: isDragging ? 1 : 0,
-      position: 'relative',
-    }
-
-    return (
-      <TableRow
-        key={row.id}
-        data-state={row.getIsSelected() && 'selected'}
-        ref={setNodeRef}
-        style={style}
-        onClick={() => {
-          row.toggleSelected()
-        }}
-      >
-        {row.getVisibleCells().map((cell) => (
-          <TableCell key={cell.id}>
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-          </TableCell>
-        ))}
-      </TableRow>
-    )
-  }
-
   // reorder rows after drag & drop
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -257,13 +258,18 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     }
 
     if (active && over && active.id !== over.id) {
-      const oldIndex = tableData.findIndex((row) => row.id === active.id)
-      const newIndex = tableData.findIndex((row) => row.id === over.id)
-      updatePosition(oldIndex, newIndex)
+      const fromIndex = tableData.findIndex((data) => data.id === active.id)
+      const toIndex = tableData.findIndex((data) => data.id === over.id)
+      updateTaskPosition(fromIndex, toIndex)
     }
   }
 
-  function updatePosition(fromIndex: number, toIndex: number) {
+  const updateTaskPositionApiDebounce = useDebounce((fromTask, toTask) => {
+    enqueue(() => updateTaskPositionApi(fromTask, toTask))
+  }, 500)
+
+  // タスクの表示順を更新
+  function updateTaskPosition(fromIndex: number, toIndex: number) {
     try {
       const fromTask = tableData[fromIndex]
       const toTask = tableData[toIndex]
@@ -275,14 +281,10 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
         return arrayMove(tableData, fromIndex, toIndex) //this is just a splice util
       })
 
-      fetch(`/todos/${fromTask.id}/position`, {
-        method: 'POST',
-        body: JSON.stringify({ position: toTask.position }),
-      }).then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to update position')
-        }
-      })
+      setRowSelection({ [fromTask.id]: true })
+
+      // タスクの表示順を更新API
+      updateTaskPositionApiDebounce(fromTask, toTask)
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error'
       alert(msg)
@@ -291,28 +293,45 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     }
   }
 
-  const sensors = useSensors(
-    useSensor(MouseSensor, {}),
-    useSensor(TouchSensor, {}),
-    useSensor(KeyboardSensor, {}),
-  )
+  async function updateTaskPositionApi(fromTask: Task, toTask: Task) {
+    await fetch(`/todos/${fromTask.id}/position`, {
+      method: 'POST',
+      body: JSON.stringify({ toTaskId: toTask.id }),
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to update position api')
+      }
+    })
+  }
 
+  // タスク追加ダイアログを開く
   useHotkeys('mod+i', () => {
     openTaskDialog()
   })
 
+  // 選択行を上下に移動
   useHotkeys(['up', 'down'], (_, handler) => {
-    if (!handler.keys) return
+    const isUp = !handler.keys ? false : handler.keys.includes('up')
+    const nowSelectedRow = table.getSelectedRowModel().rows[0]
+    const nextSelectIndex = !nowSelectedRow
+      ? 0
+      : isUp
+        ? nowSelectedRow.index - 1
+        : nowSelectedRow.index + 1
+    const nextSelectedRow = table.getRowModel().rows[nextSelectIndex]
+    if (!nextSelectedRow) return
+    nextSelectedRow.toggleSelected(true)
+  })
 
-    const selectedRows = table.getSelectedRowModel().rows[0]
-    let nextIndex = 0
-    if (selectedRows) {
-      const nowIndex = selectedRows.index
-      nextIndex = handler.keys[0] === 'up' ? nowIndex - 1 : nowIndex + 1
-    }
-    const row = table.getRowModel().rows[nextIndex]
-    if (!row) return
-    table.setRowSelection({ [row.id]: true })
+  // 選択行の表示順を上下に移動
+  useHotkeys(['alt+up', 'alt+down'], (_, handler) => {
+    const isUp = !handler.keys ? false : handler.keys.includes('up')
+    const targetRow = table.getSelectedRowModel().rows[0]
+    if (!targetRow) return
+    const toIndex = isUp ? targetRow.index - 1 : targetRow.index + 1
+    const toRow = table.getRowModel().rows[toIndex]
+    if (!toRow) return
+    updateTaskPosition(targetRow.index, toRow.index)
   })
 
   return (
@@ -320,7 +339,11 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       collisionDetection={closestCenter}
       modifiers={[restrictToVerticalAxis]}
       onDragEnd={handleDragEnd}
-      sensors={sensors}
+      sensors={useSensors(
+        useSensor(MouseSensor, {}),
+        useSensor(TouchSensor, {}),
+        useSensor(KeyboardSensor, {}),
+      )}
     >
       <div className="space-y-4">
         <div className="flex items-center space-x-2">
@@ -408,7 +431,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
           </Button>
         </div>
         <UpsertTaskDialog />
-        <DeleteConfirmDialog />
+        <DeleteConfirmTaskDialog />
       </div>
     </DndContext>
   )
