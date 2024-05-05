@@ -127,38 +127,6 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     setTableData(tasks)
   }, [tasks])
 
-  function openTaskDialog(task: Task | undefined = undefined) {
-    setFormTask(task)
-    setIsOpenUpsertDialog(true)
-  }
-
-  function openDeleteTaskDialog(task: Task) {
-    setFormTask(task)
-    setIsOpenDeleteDialog(true)
-  }
-
-  function UpsertTaskDialog() {
-    return (
-      <TaskUpsertFormDialog
-        task={formTask}
-        isOpenDialog={isOpenUpsertDialog}
-        setIsOpenDialog={setIsOpenUpsertDialog}
-      />
-    )
-  }
-
-  function DeleteConfirmTaskDialog() {
-    if (!formTask) return null
-
-    return (
-      <TaskDeleteConfirmDialog
-        task={formTask}
-        isOpenDialog={isOpenDeleteDialog}
-        setIsOpenDialog={setIsOpenDeleteDialog}
-      />
-    )
-  }
-
   const table = useReactTable({
     data: tableData,
     columns: memoColumns,
@@ -195,6 +163,38 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       },
     },
   })
+
+  function openTaskDialog(task: Task | undefined = undefined) {
+    setFormTask(task)
+    setIsOpenUpsertDialog(true)
+  }
+
+  function openDeleteTaskDialog(task: Task) {
+    setFormTask(task)
+    setIsOpenDeleteDialog(true)
+  }
+
+  function UpsertTaskDialog() {
+    return (
+      <TaskUpsertFormDialog
+        task={formTask}
+        isOpenDialog={isOpenUpsertDialog}
+        setIsOpenDialog={setIsOpenUpsertDialog}
+      />
+    )
+  }
+
+  function DeleteConfirmTaskDialog() {
+    if (!formTask) return null
+
+    return (
+      <TaskDeleteConfirmDialog
+        task={formTask}
+        isOpenDialog={isOpenDeleteDialog}
+        setIsOpenDialog={setIsOpenDeleteDialog}
+      />
+    )
+  }
 
   function clearSortToast() {
     toast({
@@ -244,19 +244,22 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     })
   }
 
-  // reorder rows after drag & drop
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
+  function canPositonChange(showToast = true) {
     if (sorting.length > 0) {
-      clearSortToast()
-      return
+      if (showToast) clearSortToast()
+      return false
     }
 
     if (columnFilters.length > 0) {
-      clearFilterToast()
-      return
+      if (showToast) clearFilterToast()
+      return false
     }
+    return true
+  }
 
+  // reorder rows after drag & drop
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
     if (active && over && active.id !== over.id) {
       const fromIndex = tableData.findIndex((data) => data.id === active.id)
       const toIndex = tableData.findIndex((data) => data.id === over.id)
@@ -267,6 +270,17 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   const updateTaskPositionApiDebounce = useDebounce((fromTask, toTask) => {
     enqueue(() => updateTaskPositionApi(fromTask, toTask))
   }, 500)
+
+  async function updateTaskPositionApi(fromTask: Task, toTask: Task) {
+    await fetch(`/todos/${fromTask.id}/position`, {
+      method: 'POST',
+      body: JSON.stringify({ toTaskId: toTask.id }),
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to update position api')
+      }
+    })
+  }
 
   // タスクの表示順を更新
   function updateTaskPosition(fromIndex: number, toIndex: number) {
@@ -293,17 +307,6 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     }
   }
 
-  async function updateTaskPositionApi(fromTask: Task, toTask: Task) {
-    await fetch(`/todos/${fromTask.id}/position`, {
-      method: 'POST',
-      body: JSON.stringify({ toTaskId: toTask.id }),
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to update position api')
-      }
-    })
-  }
-
   // タスク追加ダイアログを開く
   useHotkeys('mod+i', () => {
     openTaskDialog()
@@ -313,18 +316,29 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   useHotkeys(['up', 'down'], (_, handler) => {
     const isUp = !handler.keys ? false : handler.keys.includes('up')
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
-    const nextSelectIndex = !nowSelectedRow
-      ? 0
-      : isUp
-        ? nowSelectedRow.index - 1
-        : nowSelectedRow.index + 1
-    const nextSelectedRow = table.getRowModel().rows[nextSelectIndex]
+
+    // ソート後の順番で行情報を取得
+    const viewRows = table.getRowModel().rows
+
+    let nextSelectIndex = 0
+    if (nowSelectedRow) {
+      // 表示順に並んでいるviewRowsの中から選択行のindexを取得
+      // nowSelectedRow.indexの値は、ソート前のデータのindex
+      const viewIndex = viewRows.findIndex(
+        (data) => data.id === nowSelectedRow.id,
+      )
+      nextSelectIndex = isUp ? viewIndex - 1 : viewIndex + 1
+    }
+
+    const nextSelectedRow = viewRows[nextSelectIndex]
     if (!nextSelectedRow) return
     nextSelectedRow.toggleSelected(true)
   })
 
   // 選択行の表示順を上下に移動
   useHotkeys(['alt+up', 'alt+down'], (_, handler) => {
+    if (!canPositonChange(false)) return
+
     const isUp = !handler.keys ? false : handler.keys.includes('up')
     const targetRow = table.getSelectedRowModel().rows[0]
     if (!targetRow) return
@@ -334,16 +348,21 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     updateTaskPosition(targetRow.index, toRow.index)
   })
 
+  const sensors = useSensors(
+    useSensor(MouseSensor, {}),
+    useSensor(TouchSensor, {}),
+    useSensor(KeyboardSensor, {}),
+  )
+
   return (
     <DndContext
       collisionDetection={closestCenter}
       modifiers={[restrictToVerticalAxis]}
+      cancelDrop={() => {
+        return !canPositonChange()
+      }}
       onDragEnd={handleDragEnd}
-      sensors={useSensors(
-        useSensor(MouseSensor, {}),
-        useSensor(TouchSensor, {}),
-        useSensor(KeyboardSensor, {}),
-      )}
+      sensors={sensors}
     >
       <div className="space-y-4">
         <div className="flex items-center space-x-2">
@@ -390,7 +409,6 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
             </TableHeader>
             <TableBody>
               <SortableContext
-                // items={dataIds}
                 items={tableData}
                 strategy={verticalListSortingStrategy}
               >
