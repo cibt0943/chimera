@@ -121,7 +121,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
 
   const [isOpenUpsertDialog, setIsOpenUpsertDialog] = React.useState(false)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
-  const [formTask, setFormTask] = React.useState<Task>() // 編集・削除するタスク
+  const [selectedTask, setSelectedTask] = React.useState<Task>() // 編集・削除するタスク
 
   React.useEffect(() => {
     setTableData(tasks)
@@ -165,19 +165,19 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   })
 
   function openTaskDialog(task: Task | undefined = undefined) {
-    setFormTask(task)
+    setSelectedTask(task)
     setIsOpenUpsertDialog(true)
   }
 
   function openDeleteTaskDialog(task: Task) {
-    setFormTask(task)
+    setSelectedTask(task)
     setIsOpenDeleteDialog(true)
   }
 
   function UpsertTaskDialog() {
     return (
       <TaskUpsertFormDialog
-        task={formTask}
+        task={selectedTask}
         isOpenDialog={isOpenUpsertDialog}
         setIsOpenDialog={setIsOpenUpsertDialog}
       />
@@ -185,11 +185,11 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   }
 
   function DeleteConfirmTaskDialog() {
-    if (!formTask) return null
+    if (!selectedTask) return null
 
     return (
       <TaskDeleteConfirmDialog
-        task={formTask}
+        task={selectedTask}
         isOpenDialog={isOpenDeleteDialog}
         setIsOpenDialog={setIsOpenDeleteDialog}
       />
@@ -269,7 +269,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
 
   const updateTaskPositionApiDebounce = useDebounce((fromTask, toTask) => {
     enqueue(() => updateTaskPositionApi(fromTask, toTask))
-  }, 500)
+  }, 300)
 
   async function updateTaskPositionApi(fromTask: Task, toTask: Task) {
     await fetch(`/todos/${fromTask.id}/position`, {
@@ -308,7 +308,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   }
 
   // タスク追加ダイアログを開く
-  useHotkeys('mod+i', () => {
+  useHotkeys(['mod+i', 'alt+i'], () => {
     openTaskDialog()
   })
 
@@ -335,8 +335,30 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     nextSelectedRow.toggleSelected(true)
   })
 
+  // 選択行を削除
+  useHotkeys(
+    ['Enter'],
+    () => {
+      const nowSelectedRow = table.getSelectedRowModel().rows[0]
+      if (!nowSelectedRow) return
+      openTaskDialog(nowSelectedRow.original)
+    },
+    { preventDefault: true },
+  )
+
+  // 選択行を削除
+  useHotkeys(
+    ['Delete', 'Backspace'],
+    () => {
+      const nowSelectedRow = table.getSelectedRowModel().rows[0]
+      if (!nowSelectedRow) return
+      openDeleteTaskDialog(nowSelectedRow.original)
+    },
+    { preventDefault: true },
+  )
+
   // 選択行の表示順を上下に移動
-  useHotkeys(['alt+up', 'alt+down'], (_, handler) => {
+  useHotkeys(['mod+up', 'mod+down', 'alt+up', 'alt+down'], (_, handler) => {
     if (!canPositonChange(false)) return
 
     const isUp = !handler.keys ? false : handler.keys.includes('up')
