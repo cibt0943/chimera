@@ -4,19 +4,16 @@ import { getTask, changeTaskPosition } from '~/models/task.server'
 
 export const action = withAuthentication(
   async ({ params, request, account }) => {
+    const fromTask = await getTask(Number(params.todoId))
+    if (!fromTask || fromTask.account_id !== account.id)
+      throw new Error('erorr')
+
     const data = await request.json()
-    const position = Number(data.position)
-    // const data = await request.formData()
-    // const position = Number(data.get('position'))
+    const toTaskId = Number(data.toTaskId)
+    const toTask = await getTask(toTaskId)
+    if (!toTask || toTask.account_id !== account.id) throw new Error('erorr')
 
-    if (!position) {
-      return json({ error: 'position is required' }, { status: 422 })
-    }
-
-    const task = await getTask(Number(params.todoId))
-    if (task.account_id !== account.id) throw new Error('erorr')
-
-    const updatedTask = await changeTaskPosition(task.id, position)
+    const updatedTask = await changeTaskPosition(fromTask.id, toTask.position)
 
     return json({ success: true, task: updatedTask })
   },

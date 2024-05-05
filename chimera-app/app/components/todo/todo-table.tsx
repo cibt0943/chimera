@@ -16,6 +16,7 @@ import {
   useReactTable,
   RowData,
   Row,
+  RowSelectionState,
 } from '@tanstack/react-table'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
@@ -37,7 +38,6 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-
 import {
   Table,
   TableBody,
@@ -50,6 +50,7 @@ import { Button } from '~/components/ui/button'
 import { ToastAction } from '~/components/ui/toast'
 import { useToast } from '~/components/ui/use-toast'
 
+import { useDebounce, useQueue } from '~/lib/utils'
 import { Task, Tasks } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
 import { TaskUpsertFormDialog } from './task-upsert-form-dialog'
@@ -62,47 +63,21 @@ declare module '@tanstack/table-core' {
   }
 }
 
-// Custom hook for managing state
-function useTodoTableState() {
-  // tanstack/react-table
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  )
-  // const [rowSelection, setRowSelection] = React.useState({})
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-
-  const [isOpenUpsertDialog, setIsOpenUpsertDialog] = React.useState(false)
-  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
-  const [task, setTask] = React.useState<Task>()
-
-  return {
-    sorting,
-    setSorting,
-    columnFilters,
-    setColumnFilters,
-    columnVisibility,
-    setColumnVisibility,
-    // rowSelection, setRowSelection,
-    isOpenUpsertDialog,
-    setIsOpenUpsertDialog,
-    isOpenDeleteDialog,
-    setIsOpenDeleteDialog,
-    task,
-    setTask,
-  }
+interface TodoTableProps<TData extends RowData, TValue> {
+  columns: ColumnDef<TData, TValue>[]
+  tasks: TData[]
 }
+
 // Row Component
 function DraggableRow({ row }: { row: Row<Task> }) {
-  // const { transform, transition, setNodeRef, isDragging } = useSortable({
-  const { transform, setNodeRef, isDragging } = useSortable({
+  // const { transform, setNodeRef, isDragging } = useSortable({
+  const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   })
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
-    // transition: transition,
+    transition: transition,
     opacity: isDragging ? 0.8 : 1,
     zIndex: isDragging ? 1 : 0,
     position: 'relative',
@@ -114,6 +89,9 @@ function DraggableRow({ row }: { row: Row<Task> }) {
       data-state={row.getIsSelected() && 'selected'}
       ref={setNodeRef}
       style={style}
+      onClick={() => {
+        row.toggleSelected(true)
+      }}
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>
@@ -124,102 +102,58 @@ function DraggableRow({ row }: { row: Row<Task> }) {
   )
 }
 
-interface TodoTableProps<TData extends RowData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  tasks: TData[]
-}
-
 // Table Component
 export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   const navigate = useNavigate()
   const memoColumns = React.useMemo(() => columns, [columns])
-  const [data, setData] = React.useState(tasks)
-  // const dataIds = React.useMemo<UniqueIdentifier[]>(
-  //   () => data?.map(({ id }) => id),
-  //   [data],
-  // )
+  const { toast } = useToast()
+  const { enqueue } = useQueue()
+
+  // tanstack/react-table
+  const [tableData, setTableData] = React.useState<Tasks>(tasks)
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  )
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({})
+
+  const [isOpenUpsertDialog, setIsOpenUpsertDialog] = React.useState(false)
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
+  const [selectedTask, setSelectedTask] = React.useState<Task>() // 編集・削除するタスク
 
   React.useEffect(() => {
-    setData(tasks)
+    setTableData(tasks)
   }, [tasks])
 
-  const { toast } = useToast()
-
-  const {
-    sorting,
-    setSorting,
-    columnFilters,
-    setColumnFilters,
-    columnVisibility,
-    setColumnVisibility,
-    // rowSelection,
-    // setRowSelection,
-    isOpenUpsertDialog,
-    setIsOpenUpsertDialog,
-    isOpenDeleteDialog,
-    setIsOpenDeleteDialog,
-    task,
-    setTask,
-  } = useTodoTableState()
-
-  function openTaskDialog(task: Task | undefined = undefined) {
-    setTask(task)
-    setIsOpenUpsertDialog(true)
-  }
-
-  function openDeleteTaskDialog(task: Task) {
-    setTask(task)
-    setIsOpenDeleteDialog(true)
-  }
-
-  function UpsertTaskDialog() {
-    return (
-      <TaskUpsertFormDialog
-        task={task}
-        isOpenDialog={isOpenUpsertDialog}
-        setIsOpenDialog={setIsOpenUpsertDialog}
-      />
-    )
-  }
-
-  function DeleteConfirmDialog() {
-    if (!task) return null
-
-    return (
-      <TaskDeleteConfirmDialog
-        task={task}
-        isOpenDialog={isOpenDeleteDialog}
-        setIsOpenDialog={setIsOpenDeleteDialog}
-      />
-    )
-  }
-
   const table = useReactTable({
-    data: data,
+    data: tableData,
     columns: memoColumns,
     state: {
-      // rowSelection,
+      rowSelection,
       sorting,
       columnFilters,
       columnVisibility,
     },
-    // enableRowSelection: true,
-    // onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    getCoreRowModel: getCoreRowModel(),
-    // getRowId: (row) => row.id.toString(), //required because row indexes
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getPaginationRowModel: getPaginationRowModel(),
     initialState: {
       pagination: {
         pageSize: 20,
       },
     },
+    enableRowSelection: true,
+    enableMultiRowSelection: false,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id.toString(), //required because row indexes
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+    getPaginationRowModel: getPaginationRowModel(),
     meta: {
       editTask: (task: Task) => {
         openTaskDialog(task)
@@ -229,6 +163,38 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       },
     },
   })
+
+  function openTaskDialog(task: Task | undefined = undefined) {
+    setSelectedTask(task)
+    setIsOpenUpsertDialog(true)
+  }
+
+  function openDeleteTaskDialog(task: Task) {
+    setSelectedTask(task)
+    setIsOpenDeleteDialog(true)
+  }
+
+  function UpsertTaskDialog() {
+    return (
+      <TaskUpsertFormDialog
+        task={selectedTask}
+        isOpenDialog={isOpenUpsertDialog}
+        setIsOpenDialog={setIsOpenUpsertDialog}
+      />
+    )
+  }
+
+  function DeleteConfirmTaskDialog() {
+    if (!selectedTask) return null
+
+    return (
+      <TaskDeleteConfirmDialog
+        task={selectedTask}
+        isOpenDialog={isOpenDeleteDialog}
+        setIsOpenDialog={setIsOpenDeleteDialog}
+      />
+    )
+  }
 
   function clearSortToast() {
     toast({
@@ -278,38 +244,131 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     })
   }
 
-  // reorder rows after drag & drop
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
+  function canPositonChange(showToast = true) {
     if (sorting.length > 0) {
-      clearSortToast()
-      return
+      if (showToast) clearSortToast()
+      return false
     }
 
     if (columnFilters.length > 0) {
-      clearFilterToast()
-      return
+      if (showToast) clearFilterToast()
+      return false
     }
+    return true
+  }
 
+  // reorder rows after drag & drop
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
     if (active && over && active.id !== over.id) {
-      const oldIndex = data.findIndex((row) => row.id === active.id)
-      const newIndex = data.findIndex((row) => row.id === over.id)
-
-      setData((data) => {
-        return arrayMove(data, oldIndex, newIndex) //this is just a splice util
-      })
-
-      fetch(`/todos/${active.id}/position`, {
-        method: 'POST',
-        body: JSON.stringify({ position: data[newIndex].position }),
-      }).then((response) => {
-        if (!response.ok) {
-          alert('Failed to update position')
-          navigate('.', { replace: true })
-        }
-      })
+      const fromIndex = tableData.findIndex((data) => data.id === active.id)
+      const toIndex = tableData.findIndex((data) => data.id === over.id)
+      updateTaskPosition(fromIndex, toIndex)
     }
   }
+
+  const updateTaskPositionApiDebounce = useDebounce((fromTask, toTask) => {
+    enqueue(() => updateTaskPositionApi(fromTask, toTask))
+  }, 300)
+
+  async function updateTaskPositionApi(fromTask: Task, toTask: Task) {
+    await fetch(`/todos/${fromTask.id}/position`, {
+      method: 'POST',
+      body: JSON.stringify({ toTaskId: toTask.id }),
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to update position api')
+      }
+    })
+  }
+
+  // タスクの表示順を更新
+  function updateTaskPosition(fromIndex: number, toIndex: number) {
+    try {
+      const fromTask = tableData[fromIndex]
+      const toTask = tableData[toIndex]
+      if (!fromTask || !toTask) {
+        throw new Error('Failed to update position')
+      }
+
+      setTableData((tableData) => {
+        return arrayMove(tableData, fromIndex, toIndex) //this is just a splice util
+      })
+
+      setRowSelection({ [fromTask.id]: true })
+
+      // タスクの表示順を更新API
+      updateTaskPositionApiDebounce(fromTask, toTask)
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Error'
+      alert(msg)
+      navigate('.', { replace: true })
+      return
+    }
+  }
+
+  // タスク追加ダイアログを開く
+  useHotkeys(['mod+i', 'alt+i'], () => {
+    openTaskDialog()
+  })
+
+  // 選択行を上下に移動
+  useHotkeys(['up', 'down'], (_, handler) => {
+    const isUp = !handler.keys ? false : handler.keys.includes('up')
+    const nowSelectedRow = table.getSelectedRowModel().rows[0]
+
+    // ソート後の順番で行情報を取得
+    const viewRows = table.getRowModel().rows
+
+    let nextSelectIndex = 0
+    if (nowSelectedRow) {
+      // 表示順に並んでいるviewRowsの中から選択行のindexを取得
+      // nowSelectedRow.indexの値は、ソート前のデータのindex
+      const viewIndex = viewRows.findIndex(
+        (data) => data.id === nowSelectedRow.id,
+      )
+      nextSelectIndex = isUp ? viewIndex - 1 : viewIndex + 1
+    }
+
+    const nextSelectedRow = viewRows[nextSelectIndex]
+    if (!nextSelectedRow) return
+    nextSelectedRow.toggleSelected(true)
+  })
+
+  // 選択行を削除
+  useHotkeys(
+    ['Enter'],
+    () => {
+      const nowSelectedRow = table.getSelectedRowModel().rows[0]
+      if (!nowSelectedRow) return
+      openTaskDialog(nowSelectedRow.original)
+    },
+    { preventDefault: true },
+  )
+
+  // 選択行を削除
+  useHotkeys(
+    ['Delete', 'Backspace'],
+    () => {
+      const nowSelectedRow = table.getSelectedRowModel().rows[0]
+      if (!nowSelectedRow) return
+      openDeleteTaskDialog(nowSelectedRow.original)
+    },
+    { preventDefault: true },
+  )
+
+  // 選択行の表示順を上下に移動
+  useHotkeys(['mod+up', 'mod+down', 'alt+up', 'alt+down'], (_, handler) => {
+    if (!canPositonChange(false)) return
+
+    const isUp = !handler.keys ? false : handler.keys.includes('up')
+    const targetRow = table.getSelectedRowModel().rows[0]
+    if (!targetRow) return
+    const toIndex = isUp ? targetRow.index - 1 : targetRow.index + 1
+    const toRow = table.getRowModel().rows[toIndex]
+    if (!toRow) return
+    updateTaskPosition(targetRow.index, toRow.index)
+  })
 
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
@@ -317,14 +376,13 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     useSensor(KeyboardSensor, {}),
   )
 
-  useHotkeys('mod+i', () => {
-    openTaskDialog()
-  })
-
   return (
     <DndContext
       collisionDetection={closestCenter}
       modifiers={[restrictToVerticalAxis]}
+      cancelDrop={() => {
+        return !canPositonChange()
+      }}
       onDragEnd={handleDragEnd}
       sensors={sensors}
     >
@@ -373,8 +431,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
             </TableHeader>
             <TableBody>
               <SortableContext
-                // items={dataIds}
-                items={data}
+                items={tableData}
                 strategy={verticalListSortingStrategy}
               >
                 {table.getRowModel().rows?.length ? (
@@ -414,7 +471,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
           </Button>
         </div>
         <UpsertTaskDialog />
-        <DeleteConfirmDialog />
+        <DeleteConfirmTaskDialog />
       </div>
     </DndContext>
   )

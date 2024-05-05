@@ -55,7 +55,7 @@ export function AccountMenu() {
             className="rounded-full py-6 w-full justify-normal"
           >
             <Avatar className="h-8 w-8">
-              <AvatarImage src={account.picture}></AvatarImage>
+              <AvatarImage src={account.picture} />
               <AvatarFallback>{account.name}</AvatarFallback>
             </Avatar>
             <span className="pl-2 truncate">{account.name}</span>

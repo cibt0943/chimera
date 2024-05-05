@@ -11,5 +11,13 @@ export const loader = withAuthentication(async ({ account }) => {
 })
 
 export default function Index() {
-  return <h1 className="mb-2 text-xl font-bold">携帯にPush通知</h1>
+  return (
+    <div>
+      <h1 className="mb-2 text-xl font-bold">リマインダー機能</h1>
+      <ul>
+        <li>携帯にPush通知</li>
+        <li></li>
+      </ul>
+    </div>
+  )
 }
