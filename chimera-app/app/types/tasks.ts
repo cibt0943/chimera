@@ -10,13 +10,39 @@ export const TaskStatus = {
 } as const
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
 
+// タスクの全状態の値順リスト
 export const TaskStatusList = [
-  { value: TaskStatus.NEW, label: 'new', color: '' },
-  { value: TaskStatus.DOING, label: 'doing', color: 'bg-indigo-800' }, //bg-violet-600
-  { value: TaskStatus.DONE, label: 'done', color: 'bg-violet-600' }, //bg-emerald-600
-  { value: TaskStatus.CANCELED, label: 'canceled', color: 'bg-gray-500' },
-  { value: TaskStatus.PENDING, label: 'pending', color: 'bg-orange-500' },
+  { value: TaskStatus.NEW, label: 'new', disp_order: 0, color: '' },
+  {
+    value: TaskStatus.DONE,
+    label: 'done',
+    disp_order: 2,
+    color: 'bg-violet-600',
+  }, //bg-emerald-600
+  {
+    value: TaskStatus.DOING,
+    label: 'doing',
+    disp_order: 1,
+    color: 'bg-indigo-800',
+  }, //bg-violet-600
+  {
+    value: TaskStatus.CANCELED,
+    label: 'canceled',
+    disp_order: 3,
+    color: 'bg-gray-500',
+  },
+  {
+    value: TaskStatus.PENDING,
+    label: 'pending',
+    disp_order: 4,
+    color: 'bg-orange-500',
+  },
 ]
+
+// タスクの全状態の表示順リスト
+export const TaskStatusListByDispOrder = TaskStatusList.slice().sort(
+  (a, b) => a.disp_order - b.disp_order,
+)
 
 export type Task = {
   id: number

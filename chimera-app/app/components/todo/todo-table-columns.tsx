@@ -28,31 +28,6 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => <RowDragHandleCell rowId={row.original.id} />,
     size: 40,
   },
-  // {
-  //   id: 'select',
-  //   size: 50,
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && 'indeterminate')
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //       className="translate-y-[2px]"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //       className="translate-y-[2px]"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
   {
     accessorKey: 'id',
     size: 65,
@@ -78,7 +53,7 @@ export const columns: ColumnDef<Task>[] = [
       <TodoTableColumnHeader column={column} title="状態" />
     ),
     cell: ({ row }) => {
-      const status = TaskStatusList.find((e) => e.value === row.original.status)
+      const status = TaskStatusList[row.original.status]
       return status ? (
         <Badge className={status.color}>{status.label}</Badge>
       ) : (

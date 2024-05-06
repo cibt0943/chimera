@@ -70,7 +70,6 @@ interface TodoTableProps<TData extends RowData, TValue> {
 
 // Row Component
 function DraggableRow({ row }: { row: Row<Task> }) {
-  // const { transform, setNodeRef, isDragging } = useSortable({
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   })
@@ -112,9 +111,9 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   // tanstack/react-table
   const [tableData, setTableData] = React.useState<Tasks>(tasks)
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  )
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
+    { id: 'status', value: [0, 2] },
+  ])
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -164,16 +163,19 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     },
   })
 
+  // タスク追加・編集ダイアログを開く
   function openTaskDialog(task: Task | undefined = undefined) {
     setSelectedTask(task)
     setIsOpenUpsertDialog(true)
   }
 
+  // タスク削除ダイアログを開く
   function openDeleteTaskDialog(task: Task) {
     setSelectedTask(task)
     setIsOpenDeleteDialog(true)
   }
 
+  // タスク追加・編集ダイアログ
   function UpsertTaskDialog() {
     return (
       <TaskUpsertFormDialog
@@ -220,41 +222,9 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     })
   }
 
-  function clearFilterToast() {
-    toast({
-      duration: 8000,
-      variant: 'destructive',
-      description: (
-        <div className="">
-          フィルタ中は並び順を変更することはできません。
-          <br />
-          フィルタをクリアしますか？
-        </div>
-      ),
-      action: (
-        <ToastAction
-          altText="フィルタをクリアする"
-          onClick={() => {
-            table.resetColumnFilters()
-          }}
-        >
-          クリア
-        </ToastAction>
-      ),
-    })
-  }
-
-  function canPositonChange(showToast = true) {
-    if (sorting.length > 0) {
-      if (showToast) clearSortToast()
-      return false
-    }
-
-    if (columnFilters.length > 0) {
-      if (showToast) clearFilterToast()
-      return false
-    }
-    return true
+  // ソート中は並び順を変更できない
+  function canPositonChange() {
+    return sorting.length == 0
   }
 
   // reorder rows after drag & drop
@@ -307,17 +277,23 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     }
   }
 
+  function canUseHotkey() {
+    return !(isOpenUpsertDialog || isOpenDeleteDialog)
+  }
+
   // タスク追加ダイアログを開く
   useHotkeys(['mod+i', 'alt+i'], () => {
+    if (!canUseHotkey()) return
     openTaskDialog()
   })
 
   // 選択行を上下に移動
   useHotkeys(['up', 'down'], (_, handler) => {
+    if (!canUseHotkey()) return
     const isUp = !handler.keys ? false : handler.keys.includes('up')
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
 
-    // ソート後の順番で行情報を取得
+    // ソートやフィルタが実施された後の現在表示されている行情報を取得
     const viewRows = table.getRowModel().rows
 
     let nextSelectIndex = 0
@@ -335,10 +311,11 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     nextSelectedRow.toggleSelected(true)
   })
 
-  // 選択行を削除
+  // 選択行を編集
   useHotkeys(
-    ['Enter'],
+    ['mod+Enter', 'alt+Enter'],
     () => {
+      if (!canUseHotkey()) return
       const nowSelectedRow = table.getSelectedRowModel().rows[0]
       if (!nowSelectedRow) return
       openTaskDialog(nowSelectedRow.original)
@@ -348,8 +325,9 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
 
   // 選択行を削除
   useHotkeys(
-    ['Delete', 'Backspace'],
+    ['mod+Delete', 'mod+Backspace', 'alt+Delete', 'alt+Backspace'],
     () => {
+      if (!canUseHotkey()) return
       const nowSelectedRow = table.getSelectedRowModel().rows[0]
       if (!nowSelectedRow) return
       openDeleteTaskDialog(nowSelectedRow.original)
@@ -359,12 +337,19 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
 
   // 選択行の表示順を上下に移動
   useHotkeys(['mod+up', 'mod+down', 'alt+up', 'alt+down'], (_, handler) => {
-    if (!canPositonChange(false)) return
-
+    if (!canUseHotkey()) return
+    if (!canPositonChange()) return
     const isUp = !handler.keys ? false : handler.keys.includes('up')
     const targetRow = table.getSelectedRowModel().rows[0]
     if (!targetRow) return
-    const toIndex = isUp ? targetRow.index - 1 : targetRow.index + 1
+
+    // ソートやフィルタが実施された後の現在表示されている行情報を取得
+    const viewRows = table.getRowModel().rows
+
+    // 表示順に並んでいるviewRowsの中から選択行のindexを取得
+    // nowSelectedRow.indexの値は、ソート前のデータのindex
+    const targetIndex = viewRows.findIndex((data) => data.id === targetRow.id)
+    const toIndex = isUp ? targetIndex - 1 : targetIndex + 1
     const toRow = table.getRowModel().rows[toIndex]
     if (!toRow) return
     updateTaskPosition(targetRow.index, toRow.index)
@@ -384,6 +369,9 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
         return !canPositonChange()
       }}
       onDragEnd={handleDragEnd}
+      onDragCancel={() => {
+        clearSortToast()
+      }}
       sensors={sensors}
     >
       <div className="space-y-4">
