@@ -21,6 +21,7 @@ export function TodoTableToolbar<TData>({
     <div className="flex flex-1 items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
+          type="search"
           placeholder="Filter tasks..."
           value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
