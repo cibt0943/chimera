@@ -53,7 +53,7 @@ export const columns: ColumnDef<Task>[] = [
       <TodoTableColumnHeader column={column} title="状態" />
     ),
     cell: ({ row }) => {
-      const status = TaskStatusList.find((e) => e.value === row.original.status)
+      const status = TaskStatusList[row.original.status]
       return status ? (
         <Badge className={status.color}>{status.label}</Badge>
       ) : (
