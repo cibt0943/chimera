@@ -163,16 +163,19 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     },
   })
 
+  // タスク追加・編集ダイアログを開く
   function openTaskDialog(task: Task | undefined = undefined) {
     setSelectedTask(task)
     setIsOpenUpsertDialog(true)
   }
 
+  // タスク削除ダイアログを開く
   function openDeleteTaskDialog(task: Task) {
     setSelectedTask(task)
     setIsOpenDeleteDialog(true)
   }
 
+  // タスク追加・編集ダイアログ
   function UpsertTaskDialog() {
     return (
       <TaskUpsertFormDialog
@@ -274,13 +277,19 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     }
   }
 
+  function canUseHotkey() {
+    return !(isOpenUpsertDialog || isOpenDeleteDialog)
+  }
+
   // タスク追加ダイアログを開く
   useHotkeys(['mod+i', 'alt+i'], () => {
+    if (!canUseHotkey()) return
     openTaskDialog()
   })
 
   // 選択行を上下に移動
   useHotkeys(['up', 'down'], (_, handler) => {
+    if (!canUseHotkey()) return
     const isUp = !handler.keys ? false : handler.keys.includes('up')
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
 
@@ -302,10 +311,11 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     nextSelectedRow.toggleSelected(true)
   })
 
-  // 選択行を削除
+  // 選択行を編集
   useHotkeys(
-    ['Enter'],
+    ['mod+Enter', 'alt+Enter'],
     () => {
+      if (!canUseHotkey()) return
       const nowSelectedRow = table.getSelectedRowModel().rows[0]
       if (!nowSelectedRow) return
       openTaskDialog(nowSelectedRow.original)
@@ -315,8 +325,9 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
 
   // 選択行を削除
   useHotkeys(
-    ['Delete', 'Backspace'],
+    ['mod+Delete', 'mod+Backspace', 'alt+Delete', 'alt+Backspace'],
     () => {
+      if (!canUseHotkey()) return
       const nowSelectedRow = table.getSelectedRowModel().rows[0]
       if (!nowSelectedRow) return
       openDeleteTaskDialog(nowSelectedRow.original)
@@ -326,8 +337,8 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
 
   // 選択行の表示順を上下に移動
   useHotkeys(['mod+up', 'mod+down', 'alt+up', 'alt+down'], (_, handler) => {
+    if (!canUseHotkey()) return
     if (!canPositonChange()) return
-
     const isUp = !handler.keys ? false : handler.keys.includes('up')
     const targetRow = table.getSelectedRowModel().rows[0]
     if (!targetRow) return
