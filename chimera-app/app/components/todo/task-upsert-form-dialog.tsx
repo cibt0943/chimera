@@ -40,7 +40,7 @@ import {
   TaskStatus,
   TaskSchema,
   TaskSchemaType,
-  TaskStatusList,
+  TaskStatusListByDispOrder,
 } from '~/types/tasks'
 
 interface TaskDialogProps {
@@ -52,7 +52,7 @@ interface TaskDialogProps {
 function SelectItems() {
   return (
     <>
-      {TaskStatusList.map((status) => (
+      {TaskStatusListByDispOrder.map((status) => (
         <SelectItem key={status.value} value={status.value.toString()}>
           {status.label}
         </SelectItem>

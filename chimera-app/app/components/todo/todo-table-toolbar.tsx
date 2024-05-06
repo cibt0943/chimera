@@ -4,7 +4,7 @@ import { Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 
-import { TaskStatusList } from '~/types/tasks'
+import { TaskStatusListByDispOrder } from '~/types/tasks'
 import { TodoTableViewOptions } from './todo-table-view-options'
 import { TodoTableFacetedFilter } from './todo-table-faceted-filter'
 
@@ -34,7 +34,7 @@ export function TodoTableToolbar<TData>({
           <TodoTableFacetedFilter
             column={table.getColumn('status')}
             title="Status"
-            options={TaskStatusList}
+            options={TaskStatusListByDispOrder}
           />
         )}
         {isFiltered && (
@@ -44,7 +44,7 @@ export function TodoTableToolbar<TData>({
             className="h-8 px-2 lg:px-3"
           >
             Reset
-            <RxCross2 className="ml-2 h-4 w-4" />
+            <RxCross2 className="ml-2 h-3 w-3" />
           </Button>
         )}
       </div>
