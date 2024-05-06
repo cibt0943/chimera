@@ -111,9 +111,9 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   // tanstack/react-table
   const [tableData, setTableData] = React.useState<Tasks>(tasks)
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  )
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
+    { id: 'status', value: [0, 2] },
+  ])
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -284,7 +284,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     const isUp = !handler.keys ? false : handler.keys.includes('up')
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
 
-    // ソート後の順番で行情報を取得
+    // ソートやフィルタが実施された後の現在表示されている行情報を取得
     const viewRows = table.getRowModel().rows
 
     let nextSelectIndex = 0
@@ -331,7 +331,14 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     const isUp = !handler.keys ? false : handler.keys.includes('up')
     const targetRow = table.getSelectedRowModel().rows[0]
     if (!targetRow) return
-    const toIndex = isUp ? targetRow.index - 1 : targetRow.index + 1
+
+    // ソートやフィルタが実施された後の現在表示されている行情報を取得
+    const viewRows = table.getRowModel().rows
+
+    // 表示順に並んでいるviewRowsの中から選択行のindexを取得
+    // nowSelectedRow.indexの値は、ソート前のデータのindex
+    const targetIndex = viewRows.findIndex((data) => data.id === targetRow.id)
+    const toIndex = isUp ? targetIndex - 1 : targetIndex + 1
     const toRow = table.getRowModel().rows[toIndex]
     if (!toRow) return
     updateTaskPosition(targetRow.index, toRow.index)
