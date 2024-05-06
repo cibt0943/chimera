@@ -70,7 +70,6 @@ interface TodoTableProps<TData extends RowData, TValue> {
 
 // Row Component
 function DraggableRow({ row }: { row: Row<Task> }) {
-  // const { transform, setNodeRef, isDragging } = useSortable({
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   })
@@ -220,41 +219,9 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     })
   }
 
-  function clearFilterToast() {
-    toast({
-      duration: 8000,
-      variant: 'destructive',
-      description: (
-        <div className="">
-          フィルタ中は並び順を変更することはできません。
-          <br />
-          フィルタをクリアしますか？
-        </div>
-      ),
-      action: (
-        <ToastAction
-          altText="フィルタをクリアする"
-          onClick={() => {
-            table.resetColumnFilters()
-          }}
-        >
-          クリア
-        </ToastAction>
-      ),
-    })
-  }
-
-  function canPositonChange(showToast = true) {
-    if (sorting.length > 0) {
-      if (showToast) clearSortToast()
-      return false
-    }
-
-    if (columnFilters.length > 0) {
-      if (showToast) clearFilterToast()
-      return false
-    }
-    return true
+  // ソート中は並び順を変更できない
+  function canPositonChange() {
+    return sorting.length == 0
   }
 
   // reorder rows after drag & drop
@@ -359,7 +326,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
 
   // 選択行の表示順を上下に移動
   useHotkeys(['mod+up', 'mod+down', 'alt+up', 'alt+down'], (_, handler) => {
-    if (!canPositonChange(false)) return
+    if (!canPositonChange()) return
 
     const isUp = !handler.keys ? false : handler.keys.includes('up')
     const targetRow = table.getSelectedRowModel().rows[0]
@@ -384,6 +351,9 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
         return !canPositonChange()
       }}
       onDragEnd={handleDragEnd}
+      onDragCancel={() => {
+        clearSortToast()
+      }}
       sensors={sensors}
     >
       <div className="space-y-4">
