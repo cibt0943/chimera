@@ -1,4 +1,5 @@
-import { RxArrowUp, RxArrowDown, RxCaretSort, RxEyeNone } from 'react-icons/rx'
+import { RxCaretSort } from 'react-icons/rx'
+import { RiSortAsc, RiSortDesc } from 'react-icons/ri'
 import { Column } from '@tanstack/react-table'
 
 import { cn } from '~/lib/utils'
@@ -37,28 +38,36 @@ export function TodoTableColumnHeader<TData, TValue>({
           >
             <span>{title}</span>
             {column.getIsSorted() === 'desc' ? (
-              <RxArrowDown className="ml-2 h-4 w-4" />
+              <RiSortDesc className="ml-2 h-4 w-4" />
             ) : column.getIsSorted() === 'asc' ? (
-              <RxArrowUp className="ml-2 h-4 w-4" />
+              <RiSortAsc className="ml-2 h-4 w-4" />
             ) : (
               <RxCaretSort className="ml-2 h-4 w-4" />
             )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-            <RxArrowUp className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            Asc
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-            <RxArrowDown className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            Desc
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-            <RxEyeNone className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            Hide
-          </DropdownMenuItem>
+          {(column.getIsSorted() === 'desc' || !column.getIsSorted()) && (
+            <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
+              <RiSortAsc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+              Asc
+            </DropdownMenuItem>
+          )}
+          {(column.getIsSorted() === 'asc' || !column.getIsSorted()) && (
+            <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
+              <RiSortDesc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+              Desc
+            </DropdownMenuItem>
+          )}
+          {column.getIsSorted() && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => column.clearSorting()}>
+                <RxCaretSort className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                Clear
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
