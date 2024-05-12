@@ -1,5 +1,5 @@
 import { createContext, useState, useContext } from 'react'
-import { useIsomorphicLayoutEffect } from '~/lib/useIsomorphicLayoutEffect'
+import { useIsomorphicLayoutEffect } from '~/lib/useIsomorphic-layout-effect'
 import { useFetcher } from '@remix-run/react'
 
 export enum Theme {

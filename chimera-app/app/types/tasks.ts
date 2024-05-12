@@ -5,7 +5,6 @@ export const TaskStatus = {
   NEW: 0,
   DONE: 1,
   DOING: 2,
-  CANCELED: 3,
   PENDING: 4,
 } as const
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
@@ -18,7 +17,7 @@ export const TaskStatusList = [
     label: 'done',
     disp_order: 2,
     color: 'bg-violet-600',
-  }, //bg-emerald-600
+  }, //bg-orange-500
   {
     value: TaskStatus.DOING,
     label: 'doing',
@@ -26,16 +25,10 @@ export const TaskStatusList = [
     color: 'bg-indigo-800',
   }, //bg-violet-600
   {
-    value: TaskStatus.CANCELED,
-    label: 'canceled',
-    disp_order: 3,
-    color: 'bg-gray-500',
-  },
-  {
     value: TaskStatus.PENDING,
     label: 'pending',
     disp_order: 4,
-    color: 'bg-orange-500',
+    color: 'bg-gray-500',
   },
 ]
 

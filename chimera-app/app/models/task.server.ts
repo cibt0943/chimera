@@ -1,5 +1,5 @@
 import { TaskModel, TaskModels } from '~/types/tasks'
-import { supabase } from '~/lib/supabaseClient.server'
+import { supabase } from '~/lib/supabase-client.server'
 
 // タスク一覧を取得
 export async function getTasks(account_id: number): Promise<TaskModels> {
