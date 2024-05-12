@@ -386,7 +386,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   React.useEffect(() => {
     if (isOpenUpsertDialog || isOpenDeleteDialog) return
     hotkeysRef.current?.focus({ preventScroll: true })
-  }, [hotkeysRef, isOpenUpsertDialog, isOpenDeleteDialog])
+  }, [isOpenUpsertDialog, isOpenDeleteDialog, hotkeysRef])
 
   // タスクデータが変更されたらテーブルデータを更新
   React.useEffect(() => {
@@ -398,7 +398,8 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
     if (!nowSelectedRow) return
     hotkeysRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus()
-  }, [hotkeysRef, rowSelection, table])
+    // hotkeysRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
+  }, [rowSelection, hotkeysRef, table])
 
   return (
     <DndContext

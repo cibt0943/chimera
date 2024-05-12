@@ -1,5 +1,5 @@
 import { AccountModel } from '~/types/accounts'
-import { supabase } from '~/lib/supabaseClient.server'
+import { supabase } from '~/lib/supabase-client.server'
 
 // idからアカウント情報を取得
 export async function getAccount(account_id: number): Promise<AccountModel> {
