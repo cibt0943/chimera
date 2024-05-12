@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { useNavigation } from '@remix-run/react'
 
 type ReturnVoidFunctionType = (...args: any[]) => void
 type ReturnPromiseVoidFunctionType = (...args: any[]) => Promise<void>
@@ -57,4 +58,9 @@ export function useQueue() {
   }
 
   return { enqueue }
+}
+
+export function useIsLoading() {
+  const navigation = useNavigation()
+  return ['loading', 'submitting'].includes(navigation.state)
 }

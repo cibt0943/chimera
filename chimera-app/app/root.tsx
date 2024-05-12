@@ -10,7 +10,6 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  useNavigation,
 } from '@remix-run/react'
 
 import styles from '~/tailwind.css'
@@ -20,6 +19,7 @@ import { AccountProvider } from '~/components/account-provider'
 import { ThemeProvider } from '~/components/theme-provider'
 import { Sidebar } from '~/components/sidebar'
 import { Toaster } from '~/components/ui/toaster'
+import { useIsLoading } from '~/lib/utils'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -36,11 +36,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function App() {
   const { theme, account } = useLoaderData<typeof loader>()
-
-  const navigation = useNavigation()
-  const loadingCss = ['loading', 'submitting'].includes(navigation.state)
-    ? 'opacity-20'
-    : ''
+  const loadingCss = useIsLoading() ? 'opacity-20' : ''
 
   return (
     <html lang="en" className={clsx(theme)}>
