@@ -9,7 +9,7 @@ import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
 
 // Cell Component
-const RowDragHandleCell = ({ rowId }: { rowId: number }) => {
+function RowDragHandleCell({ rowId }: { rowId: number }) {
   const { attributes, listeners } = useSortable({
     id: rowId,
   })
@@ -21,7 +21,7 @@ const RowDragHandleCell = ({ rowId }: { rowId: number }) => {
   )
 }
 
-export const columns: ColumnDef<Task>[] = [
+export const TodoTableColumns: ColumnDef<Task>[] = [
   {
     id: 'drag-handle',
     header: '',
