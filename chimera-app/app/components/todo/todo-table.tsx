@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useNavigate } from '@remix-run/react'
+import { useNavigate, useFetcher } from '@remix-run/react'
 import { RxPlus } from 'react-icons/rx'
 import {
   ColumnDef,
@@ -17,6 +17,7 @@ import {
   RowData,
   Row,
   RowSelectionState,
+  TableState,
 } from '@tanstack/react-table'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
@@ -51,13 +52,15 @@ import { ToastAction } from '~/components/ui/toast'
 import { useToast } from '~/components/ui/use-toast'
 
 import { useDebounce, useQueue, useIsLoading } from '~/lib/utils'
-import { Task, Tasks } from '~/types/tasks'
+import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
 import { TaskUpsertFormDialog } from './task-upsert-form-dialog'
 import { TaskDeleteConfirmDialog } from './task-delete-confirm-dialog'
 
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
+    updateTaskPosition: (task: TData, isUp: boolean) => void
+    updateTaskStatus: (task: TData, status: TaskStatus) => void
     editTask: (task: TData) => void
     deleteTask: (task: TData) => void
   }
@@ -126,6 +129,8 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
   const [selectedTask, setSelectedTask] = React.useState<Task>() // 編集・削除するタスク
 
+  const fetcher = useFetcher()
+
   const table = useReactTable({
     data: tableData,
     columns: memoColumns,
@@ -154,6 +159,30 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getPaginationRowModel: getPaginationRowModel(),
     meta: {
+      updateTaskPosition: (task: Task, isUp: boolean) => {
+        // ソートやフィルタが実施された後の現在表示されている行情報を取得
+        const viewRows = table.getRowModel().rows
+        // 表示順に並んでいるviewRowsの中から選択行のindexを取得
+        const targetIndex = viewRows.findIndex(
+          (data) => data.id === task.id.toString(),
+        )
+        const toIndex = isUp ? targetIndex - 1 : targetIndex + 1
+        const toRow = table.getRowModel().rows[toIndex]
+        if (!toRow) return
+        const targetRow = table.getRowModel().rows[targetIndex]
+        // タスクの表示順を更新
+        updateTaskPosition(targetRow.index, toRow.index)
+      },
+      updateTaskStatus: (task: Task, status: TaskStatus) => {
+        // タスクのステータスを変更API
+        fetcher.submit(
+          { status: status },
+          {
+            action: `/todos/${task.id}/status`,
+            method: 'post',
+          },
+        )
+      },
       editTask: (task: Task) => {
         openTaskDialog(task)
       },
@@ -222,12 +251,13 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     })
   }
 
-  // ソート中は並び順を変更できない
+  // 並び順を変更できるか否か
   function canPositonChange() {
+    // ソート中は並び順を変更できない
     return sorting.length == 0
   }
 
-  // reorder rows after drag & drop
+  // 行のドラッグ&ドロップによるタスクの表示順変更
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     if (active && over && active.id !== over.id) {
@@ -242,7 +272,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     enqueue(() => updateTaskPositionApi(fromTask, toTask))
   }, 300)
 
-  // タスクの表示順を更新API
+  // タスクの表示順更新APIの呼び出し
   async function updateTaskPositionApi(fromTask: Task, toTask: Task) {
     await fetch(`/todos/${fromTask.id}/position`, {
       method: 'POST',
@@ -309,14 +339,25 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
 
     // ソートやフィルタが実施された後の現在表示されている行情報を取得
     const viewRows = table.getRowModel().rows
-
     // 表示順に並んでいるviewRowsの中から選択行のindexを取得
     // nowSelectedRow.indexの値は、ソート前のデータのindex
     const targetIndex = viewRows.findIndex((data) => data.id === targetRow.id)
     const toIndex = isUp ? targetIndex - 1 : targetIndex + 1
     const toRow = table.getRowModel().rows[toIndex]
     if (!toRow) return
+
+    // タスクの表示順を更新
     updateTaskPosition(targetRow.index, toRow.index)
+  }
+
+  // 選択行を完了させる
+  function hotkeysModD() {
+    const nowSelectedRow = table.getSelectedRowModel().rows[0]
+    if (!nowSelectedRow) return
+    table.options.meta?.updateTaskStatus(
+      nowSelectedRow.original,
+      TaskStatus.DONE,
+    )
   }
 
   // 選択行を編集
@@ -341,22 +382,27 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       'mod+down',
       'alt+up',
       'alt+down',
+      'mod+d',
+      'alt+d',
+      'enter',
       'mod+enter',
       'alt+enter',
       'mod+delete',
-      'mod+backspace',
       'alt+delete',
+      'mod+backspace',
       'alt+backspace',
     ],
     (_, handler) => {
       if (isLoading) return // ローディング中は何もしない
-
       switch (handler.keys?.join('')) {
         case 'up':
         case 'down':
           handler.mod || handler.alt
             ? hotkeysModUpDown(handler.keys)
             : hotkeysUpDown(handler.keys)
+          break
+        case 'd':
+          hotkeysModD()
           break
         case 'enter':
           hotkeysModEnter()
@@ -367,12 +413,22 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
           break
       }
     },
-    { preventDefault: true },
+    {
+      preventDefault: true,
+      ignoreEventWhen: (e) => {
+        // 押されたkeyが'enter'以外はテーブルにフォーカスがあれば有効
+        if (!['enter'].includes(e.key.toLowerCase())) return false
+        // 押されたkeyが'enter', 'backspace','delete'の場合はTRタグにフォーカスがあれば有効
+        return e.target?.tagName.toLowerCase() !== 'tr'
+      },
+    },
   )
 
   // タスク追加ダイアログを開く
   useHotkeys(['mod+i', 'alt+i'], () => {
-    if (isLoading || isOpenUpsertDialog || isOpenDeleteDialog) return // ローディング中、ダイアログが開いている場合は何もしない
+    // ローディング中、ダイアログが開いている場合は何もしない
+    if (isLoading || isOpenUpsertDialog || isOpenDeleteDialog) return
+
     openTaskDialog()
   })
 
@@ -382,24 +438,22 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     useSensor(KeyboardSensor, {}),
   )
 
-  // モーダルを閉じた時にテーブルにフォーカスを移動
-  React.useEffect(() => {
-    if (isOpenUpsertDialog || isOpenDeleteDialog) return
-    hotkeysRef.current?.focus({ preventScroll: true })
-  }, [isOpenUpsertDialog, isOpenDeleteDialog, hotkeysRef])
-
   // タスクデータが変更されたらテーブルデータを更新
   React.useEffect(() => {
     setTableData(tasks)
   }, [tasks])
 
-  // 選択行が変更されたらフォーカスを移動
+  // 選択行が変更された時とモーダルを閉じた時にテーブルにフォーカスを移動
   React.useEffect(() => {
+    if (isOpenUpsertDialog || isOpenDeleteDialog) return
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
-    if (!nowSelectedRow) return
+    if (!nowSelectedRow) {
+      hotkeysRef.current?.focus()
+      return
+    }
     hotkeysRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus()
     // hotkeysRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
-  }, [rowSelection, hotkeysRef, table])
+  }, [hotkeysRef, table, rowSelection, isOpenUpsertDialog, isOpenDeleteDialog])
 
   return (
     <DndContext
@@ -432,7 +486,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
           <TodoTableToolbar table={table} />
         </div>
         <div className="rounded-md border">
-          <Table ref={hotkeysRef} tabIndex={0} className="focus:outline-none">
+          <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -457,7 +511,11 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody>
+            <TableBody
+              ref={hotkeysRef}
+              tabIndex={0}
+              className="focus:outline-none"
+            >
               <SortableContext
                 items={tableData}
                 strategy={verticalListSortingStrategy}
