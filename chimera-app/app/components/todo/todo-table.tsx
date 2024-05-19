@@ -17,7 +17,6 @@ import {
   RowData,
   Row,
   RowSelectionState,
-  TableState,
 } from '@tanstack/react-table'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
@@ -91,12 +90,15 @@ function DraggableRow({ row }: { row: Row<Task> }) {
       data-state={row.getIsSelected() && 'selected'}
       ref={setNodeRef}
       style={style}
+      onFocus={() => {
+        row.toggleSelected(true)
+      }}
       onClick={() => {
         row.toggleSelected(true)
       }}
       tabIndex={0}
       id={`row-${row.id}`}
-      className="focus:outline-none"
+      className="outline-none"
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>
@@ -128,6 +130,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   const [isOpenUpsertDialog, setIsOpenUpsertDialog] = React.useState(false)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
   const [selectedTask, setSelectedTask] = React.useState<Task>() // 編集・削除するタスク
+  const useTBodyRef = React.useRef<HTMLTableElement>(null)
 
   const fetcher = useFetcher()
 
@@ -310,7 +313,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   }
 
   // 選択行を上下に移動
-  function hotkeysUpDown(keys: readonly string[]) {
+  function keyUpDownSelectedRow(keys: readonly string[]) {
     const isUp = keys.includes('up')
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
     const viewRows = table.getRowModel().rows // ソートやフィルタが実施された後の現在表示されている行情報を取得
@@ -331,12 +334,12 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   }
 
   // 選択行の表示順を上下に移動
-  function hotkeysModUpDown(keys: readonly string[]) {
+  function keyUpDownTaskPosition(keys: readonly string[]) {
     if (!canPositonChange()) return
-    const isUp = keys.includes('up')
     const targetRow = table.getSelectedRowModel().rows[0]
     if (!targetRow) return
 
+    const isUp = keys.includes('up')
     // ソートやフィルタが実施された後の現在表示されている行情報を取得
     const viewRows = table.getRowModel().rows
     // 表示順に並んでいるviewRowsの中から選択行のindexを取得
@@ -351,30 +354,30 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   }
 
   // 選択行を完了させる
-  function hotkeysModD() {
+  function keyUpdateTaskStatus(status: TaskStatus) {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
     if (!nowSelectedRow) return
-    table.options.meta?.updateTaskStatus(
-      nowSelectedRow.original,
-      TaskStatus.DONE,
-    )
+
+    table.options.meta?.updateTaskStatus(nowSelectedRow.original, status)
   }
 
   // 選択行を編集
-  function hotkeysModEnter() {
+  function keyEditTask() {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
     if (!nowSelectedRow) return
+
     openTaskDialog(nowSelectedRow.original)
   }
 
   // 選択行を削除
-  function hotkeysModDelete() {
+  function keyDeleteTask() {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
     if (!nowSelectedRow) return
+
     openDeleteTaskDialog(nowSelectedRow.original)
   }
 
-  const hotkeysRef = useHotkeys<HTMLTableElement>(
+  useHotkeys<HTMLTableElement>(
     [
       'up',
       'down',
@@ -382,8 +385,8 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       'mod+down',
       'alt+up',
       'alt+down',
-      'mod+d',
-      'alt+d',
+      'mod+c',
+      'alt+c',
       'enter',
       'mod+enter',
       'alt+enter',
@@ -398,28 +401,36 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
         case 'up':
         case 'down':
           handler.mod || handler.alt
-            ? hotkeysModUpDown(handler.keys)
-            : hotkeysUpDown(handler.keys)
+            ? keyUpDownTaskPosition(handler.keys)
+            : keyUpDownSelectedRow(handler.keys)
           break
-        case 'd':
-          hotkeysModD()
+        case 'c':
+          keyUpdateTaskStatus(TaskStatus.DONE)
           break
         case 'enter':
-          hotkeysModEnter()
+          keyEditTask()
           break
         case 'delete':
         case 'backspace':
-          hotkeysModDelete()
+          keyDeleteTask()
           break
       }
     },
     {
       preventDefault: true,
       ignoreEventWhen: (e) => {
-        // 押されたkeyが'enter'以外はテーブルにフォーカスがあれば有効
-        if (!['enter'].includes(e.key.toLowerCase())) return false
-        // 押されたkeyが'enter', 'backspace','delete'の場合はTRタグにフォーカスがあれば有効
-        return e.target?.tagName.toLowerCase() !== 'tr'
+        const pressedKeys = e.key.toLowerCase()
+        switch (pressedKeys) {
+          case 'enter':
+            return !['tr', 'body'].includes(e.target?.tagName.toLowerCase())
+          case 'arrowup':
+          case 'arrowdown':
+            return !['tr', 'tbody', 'body'].includes(
+              e.target?.tagName.toLowerCase(),
+            )
+          default:
+            return false
+        }
       },
     },
   )
@@ -428,7 +439,6 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   useHotkeys(['mod+i', 'alt+i'], () => {
     // ローディング中、ダイアログが開いている場合は何もしない
     if (isLoading || isOpenUpsertDialog || isOpenDeleteDialog) return
-
     openTaskDialog()
   })
 
@@ -441,19 +451,19 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   // タスクデータが変更されたらテーブルデータを更新
   React.useEffect(() => {
     setTableData(tasks)
-  }, [tasks])
+  }, [tasks, table])
 
   // 選択行が変更された時とモーダルを閉じた時にテーブルにフォーカスを移動
   React.useEffect(() => {
-    if (isOpenUpsertDialog || isOpenDeleteDialog) return
+    if (isOpenDeleteDialog || isOpenUpsertDialog) return
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
     if (!nowSelectedRow) {
-      hotkeysRef.current?.focus()
+      useTBodyRef.current?.focus()
       return
     }
-    hotkeysRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus()
-    // hotkeysRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
-  }, [hotkeysRef, table, rowSelection, isOpenUpsertDialog, isOpenDeleteDialog])
+    useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus()
+    // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
+  }, [useTBodyRef, table, rowSelection, isOpenUpsertDialog, isOpenDeleteDialog])
 
   return (
     <DndContext
@@ -512,9 +522,9 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
               ))}
             </TableHeader>
             <TableBody
-              ref={hotkeysRef}
-              tabIndex={0}
-              className="focus:outline-none"
+              ref={useTBodyRef}
+              // tabIndex={0}
+              // className="focus:outline-none"
             >
               <SortableContext
                 items={tableData}

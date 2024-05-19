@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { ColumnDef } from '@tanstack/react-table'
 import { useSortable } from '@dnd-kit/sortable'
 import { Badge } from '~/components/ui/badge'
-// import { Checkbox } from '~/components/ui/checkbox'
+import { Button } from '~/components/ui/button'
 
 import { Task, TaskStatusList } from '~/types/tasks'
 import { TodoTableColumnHeader } from './todo-table-column-header'
@@ -15,9 +15,9 @@ function RowDragHandleCell({ rowId }: { rowId: number }) {
   })
   return (
     // Alternatively, you could set these attributes on the rows themselves
-    <button {...attributes} {...listeners}>
+    <Button variant="ghost" {...attributes} {...listeners} className=" h-8 w-8">
       🟰
-    </button>
+    </Button>
   )
 }
 
