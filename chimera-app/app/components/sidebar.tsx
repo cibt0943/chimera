@@ -23,7 +23,7 @@ export function Sidebar() {
     return cn(
       buttonVariants({
         variant: isActive ? 'secondary' : 'ghost',
-        className: clsx('w-full justify-start mb-1', className),
+        className: clsx('justify-start', className),
       }),
     )
   }
@@ -39,12 +39,12 @@ export function Sidebar() {
             </NavLink>
           </h1>
         </div>
-        <div>
-          <NavLink to="/todos" className={navLinkClassName}>
+        <div className="grid gap-1 p-px">
+          <NavLink to="/todos" className={navLinkClassName} reloadDocument>
             <RxCheck className="mr-2 h-5 w-5" />
             Todo
           </NavLink>
-          <NavLink to="/memos" className={navLinkClassName}>
+          <NavLink to="/memos" className={navLinkClassName} reloadDocument>
             <RxPencil2 className="mr-2 h-5 w-5" />
             Memo
           </NavLink>
@@ -52,17 +52,17 @@ export function Sidebar() {
             <RxCalendar className="mr-2 h-5 w-5" />
             Event
           </NavLink>
-          <NavLink to="/files" className={navLinkClassName}>
+          <NavLink to="/files" className={navLinkClassName} reloadDocument>
             <RxFile className="mr-2 h-5 w-5" />
             File
           </NavLink>
-          <NavLink to="/reminders" className={navLinkClassName}>
+          <NavLink to="/reminders" className={navLinkClassName} reloadDocument>
             <RxPaperPlane className="mr-2 h-5 w-5" />
             Reminder
           </NavLink>
         </div>
       </div>
-      <div className="bg-background pb-2">
+      <div className="px-px mb-2">
         <AccountMenu />
       </div>
     </div>

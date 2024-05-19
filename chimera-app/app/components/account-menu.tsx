@@ -47,70 +47,68 @@ export function AccountMenu() {
   }
 
   return (
-    <div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="rounded-full py-6 w-full justify-normal"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="rounded-full py-6 w-full justify-normal"
+        >
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={account.picture} />
+            <AvatarFallback>{account.name}</AvatarFallback>
+          </Avatar>
+          <span className="pl-2 truncate">{account.name}</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-52">
+        <DropdownMenuLabel>{account.name}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            onClick={() => {
+              navigate(`/account/profile`)
+            }}
           >
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={account.picture} />
-              <AvatarFallback>{account.name}</AvatarFallback>
-            </Avatar>
-            <span className="pl-2 truncate">{account.name}</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-52">
-          <DropdownMenuLabel>{account.name}</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={() => {
-                navigate(`/account/profile`)
-              }}
-            >
-              <RxPerson className="mr-2 h-4 w-4" />
-              Profile
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <MdBrightness4 className="mr-2 h-4 w-4" />
-                Mode
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent hideWhenDetached={true}>
-                  <DropdownMenuRadioGroup
-                    value={theme}
-                    onValueChange={handleValueChange}
-                  >
-                    <DropdownMenuRadioItem value="light">
-                      <RxSun className="mr-2 h-4 w-4" />
-                      <span>Light</span>
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="dark">
-                      <RxMoon className="mr-2 h-4 w-4" />
-                      <span>Dark</span>
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="system">
-                      <RxGear className="mr-2 h-4 w-4" />
-                      <span>System</span>
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogoutClick}>
-            <RxExit className="mr-2 h-4 w-4" />
-            Log out
+            <RxPerson className="mr-2 h-4 w-4" />
+            Profile
           </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <MdBrightness4 className="mr-2 h-4 w-4" />
+              Mode
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent hideWhenDetached={true}>
+                <DropdownMenuRadioGroup
+                  value={theme}
+                  onValueChange={handleValueChange}
+                >
+                  <DropdownMenuRadioItem value="light">
+                    <RxSun className="mr-2 h-4 w-4" />
+                    <span>Light</span>
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="dark">
+                    <RxMoon className="mr-2 h-4 w-4" />
+                    <span>Dark</span>
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="system">
+                    <RxGear className="mr-2 h-4 w-4" />
+                    <span>System</span>
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleLogoutClick}>
+          <RxExit className="mr-2 h-4 w-4" />
+          Log out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

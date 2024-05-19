@@ -1,5 +1,13 @@
 import { Row, Table } from '@tanstack/react-table'
-import { RxDotsHorizontal, RxPencil1, RxTrash } from 'react-icons/rx'
+import {
+  RxDotsHorizontal,
+  RxArrowUp,
+  RxArrowDown,
+  RxCheckCircled,
+  RxPencil1,
+  RxTrash,
+} from 'react-icons/rx'
+import { RiDeleteBack2Line, RiCornerDownLeftLine } from 'react-icons/ri'
 
 import { Button } from '~/components/ui/button'
 import {
@@ -8,7 +16,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
+import { TaskStatus } from '~/types/tasks'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
@@ -32,7 +42,36 @@ export function TodoTableRowActions<TData>({
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuItem
+          onClick={() => {
+            table.options.meta?.updateTaskPosition(task, true)
+          }}
+        >
+          <RxArrowUp className="mr-2 h-4 w-4" />
+          一つ上に移動
+          <DropdownMenuShortcut>⌘↑</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            table.options.meta?.updateTaskPosition(task, false)
+          }}
+        >
+          <RxArrowDown className="mr-2 h-4 w-4" />
+          一つ下に移動
+          <DropdownMenuShortcut>⌘↓</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => {
+            table.options.meta?.updateTaskStatus(task, TaskStatus.DONE)
+          }}
+        >
+          <RxCheckCircled className="mr-2 h-4 w-4" />
+          完了する
+          <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
             table.options.meta?.editTask(task)
@@ -40,6 +79,10 @@ export function TodoTableRowActions<TData>({
         >
           <RxPencil1 className="mr-2 h-4 w-4" />
           編集
+          <DropdownMenuShortcut>
+            ⌘
+            <RiCornerDownLeftLine className="h-3 w-3 inline" />
+          </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -50,6 +93,9 @@ export function TodoTableRowActions<TData>({
         >
           <RxTrash className="mr-2 h-4 w-4" />
           削除
+          <DropdownMenuShortcut>
+            ⌘<RiDeleteBack2Line className="h-3 w-3 inline" />
+          </DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

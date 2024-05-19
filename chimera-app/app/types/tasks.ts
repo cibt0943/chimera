@@ -5,7 +5,7 @@ export const TaskStatus = {
   NEW: 0,
   DONE: 1,
   DOING: 2,
-  PENDING: 4,
+  PENDING: 3,
 } as const
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
 

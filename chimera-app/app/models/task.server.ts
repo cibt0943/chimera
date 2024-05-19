@@ -87,7 +87,7 @@ export async function deleteTask(taskId: number): Promise<void> {
 // タスクの位置を変更
 // taskIdにて指定されたタスクの位置をpositionに変更します。
 // この変更による他のタスクの位置の変更もあわせて行います。
-export async function changeTaskPosition(
+export async function updateTaskPosition(
   taskId: number,
   position: number,
 ): Promise<TaskModel> {
