@@ -1,11 +1,14 @@
 import { Form } from '@remix-run/react'
 import { Button } from '~/components/ui/button'
 import { RxEnter } from 'react-icons/rx'
+import { useTranslation } from 'react-i18next'
 
 export default function Login() {
+  const { t } = useTranslation()
+
   return (
     <div className="p-10">
-      <div>この機能を利用するにはログインする必要があります。</div>
+      <div>{t('login.msg.need_login')}</div>
       <div className="mt-4">
         <Form action="/auth/auth0" method="post">
           <Button>

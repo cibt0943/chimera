@@ -1,6 +1,8 @@
 export type AccountModel = {
   id: number
   sub: string
+  language: string
+  timezone: string
   created_at: string
   updated_at: string
 }
@@ -11,6 +13,8 @@ export type Account = {
   name: string
   email: string
   picture: string
+  language: string
+  timezone: string
   created_at: string
   updated_at: string
 }
