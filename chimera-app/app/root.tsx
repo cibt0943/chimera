@@ -38,7 +38,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const account = await authenticator.isAuthenticated(request)
 
   // 言語を変更
-  i18n.changeLanguage(account?.language || i18n.language)
+  if (account && account.language !== 'auto') {
+    console.log('account.language:', account.language)
+    i18n.changeLanguage(account.language)
+  }
 
   return json({ theme: cookie.theme, account })
 }
@@ -49,7 +52,11 @@ export default function App() {
 
   // クライアントサイドでの言語設定
   React.useEffect(() => {
-    i18n.changeLanguage(account?.language || i18n.language)
+    if (account && account.language !== 'auto') {
+      console.log('account.language:', account.language)
+
+      i18n.changeLanguage(account?.language)
+    }
   }, [account])
 
   return (

@@ -16,6 +16,7 @@ import { getAccountBySub, updateAccount } from '~/models/account.server'
 import { useTranslation } from 'react-i18next'
 import { authenticator } from '~/lib/auth.server'
 import { getSession, commitSession } from '~/lib/session.server'
+import { se } from 'date-fns/locale'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Profile | Kobushi' }]
@@ -65,7 +66,7 @@ type LoaderData = {
 
 export default function Profile() {
   const { self } = useLoaderData<LoaderData>()
-  const { i18n } = useTranslation()
+  const { t } = useTranslation()
   const fetcher = useFetcher()
 
   const handleLanguageChange = (value: string) => {
@@ -80,16 +81,17 @@ export default function Profile() {
         <li>name: {self.name}</li>
         <li>email: {self.email}</li>
       </ul>
+      <div>{t('login.msg.need_login')}</div>
       <div>
         <Select
           onValueChange={handleLanguageChange}
-          // defaultValue={self.language}
-          defaultValue={i18n.language}
+          defaultValue={self.language}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select language" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="auto">自動検出</SelectItem>
             <SelectItem value="en">English</SelectItem>
             <SelectItem value="ja">日本語</SelectItem>
           </SelectContent>
