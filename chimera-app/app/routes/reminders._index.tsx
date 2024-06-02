@@ -13,7 +13,10 @@ export const loader = withAuthentication(async ({ account }) => {
 export default function Index() {
   return (
     <div>
-      <h1 className="mb-2 text-xl font-bold">リマインダー機能</h1>
+      <h1 className="mb-4 text-xl font-bold">Reminder</h1>
+      <div className="mb-8 text-l font-bold">
+        This feature is under development. Please check back later.
+      </div>
       <ul>
         <li>携帯にPush通知</li>
         <li></li>

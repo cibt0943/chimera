@@ -1,0 +1,91 @@
+{
+  "common": {
+    "format": {
+      "date-format": "yyyy/MM/dd/",
+      "time-format": "HH:mm:ss",
+      "datetime-format": "yyyy/MM/dd HH:mm:ss",
+      "datetime-short-format": "yyyy/MM/dd HH:mm",
+      "hour": "時間",
+      "o'clock": "時",
+      "minute": "分",
+      "second": "秒"
+    },
+    "message": {
+      "ok": "OK",
+      "cancel": "キャンセル",
+      "close": "閉じる",
+      "save": "保存",
+      "delete": "削除",
+      "edit": "編集",
+      "add": "追加",
+      "back": "戻る",
+      "next": "次へ",
+      "prev": "前へ",
+      "submit": "送信",
+      "search": "検索",
+      "reset": "リセット",
+      "clear": "クリア",
+      "confirm": "確認",
+      "required": "必須",
+      "optional": "任意",
+      "error": "エラー",
+      "warning": "警告",
+      "info": "情報",
+      "success": "成功",
+      "loading": "読み込み中...",
+      "no-data": "データがありません",
+      "no-result": "結果がありません",
+      "no-match": "一致するものがありません",
+      "no-select": "選択されていません",
+      "no-choose": "選択してください",
+      "no-input": "入力してください",
+      "no-change": "変更されていません",
+      "no-permission": "権限がありません",
+      "no-support": "サポートされていません",
+      "confirm-deletion": "を削除します。よろしいですか？",
+      "sort-asc": "昇順",
+      "sort-desc": "降順",
+      "order-cannot-changed-sorting": "ソート中は並び順を変更することはできません。",
+      "clear-sort?": "ソートをクリアしますか？",
+      "clear-sorting": "ソートをクリアする",
+      "clear-filters?": "フィルタをクリアしますか？",
+      "clear-filters": "フィルタをクリア",
+      "position-up": "一つ上に移動",
+      "position-down": "一つ下に移動"
+    }
+  },
+  "account": {
+    "model": {
+      "email": "メールアドレス",
+      "name": "名前",
+      "birthday": "生年月日"
+    },
+    "message": {
+      "need-login": "この機能を利用するにはログインする必要があります。",
+      "login": "ログイン",
+      "logout": "ログアウト"
+    }
+  },
+  "todo": {
+    "model": {
+      "id": "ID",
+      "title": "タイトル",
+      "memo": "メモ",
+      "status": "状態",
+      "due-date": "期限",
+      "position": "表示位置"
+    },
+    "message": {
+      "task-creation": "タスクの作成",
+      "task-editing": "タスクの編集",
+      "task-deletion": "タスクの削除",
+      "set-task-info": "タスクの情報を設定してください。",
+      "select-task-status": "タスクの状態を選んでください。",
+      "title-filter": "タイトルを検索",
+      "status-filter": "状態",
+      "to-complete": "完了する",
+      "view-settings": "表示設定",
+      "select-columns": "表示項目"
+    }
+  }
+}

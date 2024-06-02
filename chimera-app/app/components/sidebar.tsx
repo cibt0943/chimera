@@ -62,7 +62,7 @@ export function Sidebar() {
           </NavLink>
         </div>
       </div>
-      <div className="px-px mb-2">
+      <div className="px-px mb-4">
         <AccountMenu />
       </div>
     </div>

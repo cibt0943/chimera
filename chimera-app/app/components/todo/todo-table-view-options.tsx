@@ -1,7 +1,7 @@
-import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
 import { RxMixerHorizontal } from 'react-icons/rx'
+import { useTranslation } from 'react-i18next'
+import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
 import { Table } from '@tanstack/react-table'
-
 import { Button } from '~/components/ui/button'
 
 import {
@@ -19,6 +19,7 @@ interface TodoTableViewOptionsProps<TData> {
 export function TodoTableViewOptions<TData>({
   table,
 }: TodoTableViewOptionsProps<TData>) {
+  const { t } = useTranslation()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,11 +29,13 @@ export function TodoTableViewOptions<TData>({
           className="ml-auto hidden h-8 lg:flex"
         >
           <RxMixerHorizontal className="mr-2 h-4 w-4" />
-          View
+          {t('todo.message.view-settings')}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[150px]">
-        <DropdownMenuLabel>表示項目</DropdownMenuLabel>
+        <DropdownMenuLabel>
+          {t('todo.message.select-columns')}
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
           .getAllColumns()
@@ -48,7 +51,7 @@ export function TodoTableViewOptions<TData>({
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
               >
-                {column.id}
+                {t(column.columnDef.meta?.title)}
               </DropdownMenuCheckboxItem>
             )
           })}

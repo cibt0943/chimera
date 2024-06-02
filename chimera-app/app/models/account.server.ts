@@ -44,6 +44,21 @@ export async function getOrInsertAccount({
   return data
 }
 
+// アカウント情報の更新
+export async function updateAccount(
+  account: AccountModel,
+): Promise<AccountModel> {
+  const { data, error } = await supabase
+    .from('accounts')
+    .update(account)
+    .eq('id', account.id)
+    .select()
+    .single()
+  if (error || !data) throw error || new Error('erorr')
+
+  return data
+}
+
 // アカウント情報の削除
 export async function deleteAccount(account_id: number): Promise<void> {
   const { error } = await supabase

@@ -9,5 +9,5 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader() {
-  return redirect('/dashboard')
+  return redirect('/todos')
 }

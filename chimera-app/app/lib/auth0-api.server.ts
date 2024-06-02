@@ -8,6 +8,13 @@ interface TokenResponse {
   scope: string
 }
 
+interface UpdateAuth0User {
+  sub: string
+  email?: string
+  name?: string
+}
+
+// Auth0へのアクセストークンを取得
 export async function getAuth0Token(): Promise<TokenResponse> {
   try {
     const response = await fetch(`${apiDomain}/oauth/token`, {
@@ -35,7 +42,37 @@ export async function getAuth0Token(): Promise<TokenResponse> {
   }
 }
 
-// ユーザーを削除する関数
+// Auth0ユーザーを更新
+export async function updateAuth0User(auth0User: UpdateAuth0User) {
+  try {
+    // アクセストークンを取得
+    const tokenData = await getAuth0Token()
+
+    // ユーザーのPATCHリクエストを送信
+    const { sub, ...userWithoutSub } = auth0User // subを取り除いたuserWithoutSubを作成
+    const response = await fetch(`${apiBaseUrl}/users/${sub}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${tokenData.access_token}`,
+      },
+      body: JSON.stringify(userWithoutSub),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error('Error response from Auth0:', errorData)
+      throw new Error(errorData.message || 'Failed to update user')
+    }
+
+    console.log('User updated successfully')
+  } catch (error) {
+    console.error('Error updating Auth0 user:', error)
+    throw error
+  }
+}
+
+// Auth0ユーザーを削除
 export async function deleteAuth0User(userId: string) {
   try {
     // アクセストークンを取得

@@ -1,4 +1,5 @@
 import { RxCross2 } from 'react-icons/rx'
+import { useTranslation } from 'react-i18next'
 import { Table } from '@tanstack/react-table'
 
 import { Button } from '~/components/ui/button'
@@ -15,6 +16,7 @@ interface TodoTableToolbarProps<TData> {
 export function TodoTableToolbar<TData>({
   table,
 }: TodoTableToolbarProps<TData>) {
+  const { t } = useTranslation()
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
@@ -22,7 +24,7 @@ export function TodoTableToolbar<TData>({
       <div className="flex flex-1 items-center space-x-2">
         <Input
           type="search"
-          placeholder="Filter tasks..."
+          placeholder={t('todo.message.title-filter')}
           value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
             table.getColumn('title')?.setFilterValue(event.target.value)
@@ -33,7 +35,7 @@ export function TodoTableToolbar<TData>({
         {table.getColumn('status') && (
           <TodoTableFacetedFilter
             column={table.getColumn('status')}
-            title="Status"
+            title={t('todo.message.status-filter')}
             options={TaskStatusListByDispOrder}
           />
         )}
@@ -43,7 +45,7 @@ export function TodoTableToolbar<TData>({
             onClick={() => table.resetColumnFilters()}
             className="h-8 px-2 lg:px-3"
           >
-            Reset
+            {t('common.message.reset')}
             <RxCross2 className="ml-2 h-3 w-3" />
           </Button>
         )}

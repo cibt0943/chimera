@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Form } from '@remix-run/react'
+import { useTranslation } from 'react-i18next'
 import {
   useForm,
   getFormProps,
@@ -18,8 +19,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog'
+import { Required } from '~/components/lib/required'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
+import { DateTimePicker } from '~/components/lib/date-time-picker'
 import {
   Select,
   SelectTrigger,
@@ -33,8 +36,6 @@ import {
   FormMessage,
   FormDescription,
 } from '~/components/lib/form'
-import { Required } from '~/components/lib/required'
-import { DateTimePicker } from '~/components/lib/date-time-picker'
 import {
   Task,
   TaskStatus,
@@ -49,25 +50,16 @@ interface TaskDialogProps {
   setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function SelectItems() {
-  return (
-    <>
-      {TaskStatusListByDispOrder.map((status) => (
-        <SelectItem key={status.value} value={status.value.toString()}>
-          {status.label}
-        </SelectItem>
-      ))}
-    </>
-  )
-}
-
 export function TaskUpsertFormDialog({
   task,
   isOpenDialog,
   setIsOpenDialog,
 }: TaskDialogProps) {
-  const title = task ? 'タスク編集' : 'タスク追加'
-  const description = 'タスクの情報を設定してください。'
+  const { t } = useTranslation()
+  const title = task
+    ? t('todo.message.task-editing')
+    : t('todo.message.task-creation')
+  const description = t('todo.message.set-task-info')
   const action = task ? `${task.id}` : ''
 
   const defaultValue = task || {
@@ -104,14 +96,16 @@ export function TaskUpsertFormDialog({
         >
           <FormItem>
             <FormLabel htmlFor={fields.title.id}>
-              タイトル
+              {t('todo.model.title')}
               <Required />
             </FormLabel>
             <Input {...getInputProps(fields.title, { type: 'text' })} />
             <FormMessage message={fields.title.errors} />
           </FormItem>
           <FormItem>
-            <FormLabel htmlFor={fields.memo.id}>メモ</FormLabel>
+            <FormLabel htmlFor={fields.memo.id}>
+              {t('todo.model.memo')}
+            </FormLabel>
             <Textarea
               {...getTextareaProps(fields.memo)}
               className="resize-none"
@@ -119,13 +113,15 @@ export function TaskUpsertFormDialog({
             <FormMessage message={fields.memo.errors} />
           </FormItem>
           <FormItem className="flex flex-col">
-            <FormLabel htmlFor={fields.due_date.id}>期限</FormLabel>
+            <FormLabel htmlFor={fields.due_date.id}>
+              {t('todo.model.due-date')}
+            </FormLabel>
             <DateTimePicker meta={fields.due_date} />
             <FormMessage message={fields.due_date.errors} />
           </FormItem>
           <FormItem>
             <FormLabel htmlFor={fields.status.id}>
-              状態
+              {t('todo.model.status')}
               <Required />
             </FormLabel>
             <Select
@@ -133,20 +129,34 @@ export function TaskUpsertFormDialog({
               defaultValue={fields.status.value}
             >
               <SelectTrigger id={fields.status.id}>
-                <SelectValue placeholder="Select a verified email to display" />
+                <SelectValue placeholder="Select a task status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItems />
               </SelectContent>
             </Select>
-            <FormDescription>タスクの状態を選んでください</FormDescription>
+            <FormDescription>
+              {t('todo.message.select-task-status')}
+            </FormDescription>
             <FormMessage message={fields.status.errors} />
           </FormItem>
           <DialogFooter>
-            <Button type="submit">保存</Button>
+            <Button type="submit">{t('common.message.save')}</Button>
           </DialogFooter>
         </Form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function SelectItems() {
+  return (
+    <>
+      {TaskStatusListByDispOrder.map((status) => (
+        <SelectItem key={status.value} value={status.value.toString()}>
+          {status.label}
+        </SelectItem>
+      ))}
+    </>
   )
 }

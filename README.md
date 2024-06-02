@@ -4,18 +4,19 @@ We assume the following 5 functions.
 
 ## Todo
 
-- [ ] 選択行をキーボードで移動
-- [ ] Enter キーで選択行の編集画面
-- [ ] Delete キーで削除画面
-- [ ] option + 矢印キーで表示順移動
-- [ ] i18n: cloudflare を考えると remix-i18next は使えない
-- [ ] ORM: prisma だとリアルタイム更新には対応できない
+- [x] 選択行をキーボードで移動
+- [x] return キーで選択行を編集
+- [x] delete キーで削除
+- [x] option + 矢印キーで表示順移動
+- [ ] 多言語対応
+- [ ] タイムゾーン対応
 
 ## Memo
 
 - メモには日付情報を持つ。デフォルトは作成日で変更可能
 - 日付情報で、カレンダーに表示
-- パブリック URL を作成したメモはログインしないで共同編集可能
+- パブリック URL を作成したメモはログインしないで共同編集可能（リアルタイム編集にしようかな）
+- Undo Redo
 
 ## Event
 
@@ -31,3 +32,8 @@ We assume the following 5 functions.
 ## Reminder
 
 携帯に Push 通知
+
+## Account
+
+- [ ] 多言語対応
+- [ ] タイムゾーン対応

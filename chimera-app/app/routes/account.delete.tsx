@@ -12,7 +12,7 @@ export const action = withAuthentication(async ({ account: self }) => {
   // Auth0のユーザーを削除
   await deleteAuth0User(accountModel.sub)
 
-  // DBからユーザーを削除
+  // DBからアカウントを削除
   await deleteAccount(self.id)
 
   return redirect('/auth/logout')

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { RxCaretSort } from 'react-icons/rx'
 import { RiSortAsc, RiSortDesc } from 'react-icons/ri'
 import { Column } from '@tanstack/react-table'
@@ -23,6 +24,8 @@ export function TodoTableColumnHeader<TData, TValue>({
   title,
   className,
 }: TodoTableColumnHeaderProps<TData, TValue>) {
+  const { t } = useTranslation()
+
   if (!column.getCanSort()) {
     return <div className={cn(className)}>{title}</div>
   }
@@ -50,13 +53,13 @@ export function TodoTableColumnHeader<TData, TValue>({
           {(column.getIsSorted() === 'desc' || !column.getIsSorted()) && (
             <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
               <RiSortAsc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-              Asc
+              {t('common.message.sort-asc')}
             </DropdownMenuItem>
           )}
           {(column.getIsSorted() === 'asc' || !column.getIsSorted()) && (
             <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
               <RiSortDesc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-              Desc
+              {t('common.message.sort-desc')}
             </DropdownMenuItem>
           )}
           {column.getIsSorted() && (
@@ -64,7 +67,7 @@ export function TodoTableColumnHeader<TData, TValue>({
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => column.clearSorting()}>
                 <RxCaretSort className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                Clear
+                {t('common.message.clear')}
               </DropdownMenuItem>
             </>
           )}

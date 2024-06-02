@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { RxClock } from 'react-icons/rx'
+import { useTranslation } from 'react-i18next'
 import { Label } from '~/components/ui/label'
 import { TimePickerInput } from './time-picker-input'
 
@@ -9,6 +10,7 @@ interface TimePickerProps {
 }
 
 export function TimePicker({ date, setDate }: TimePickerProps) {
+  const { t } = useTranslation()
   const hourRef = React.useRef<HTMLInputElement>(null)
   const minuteRef = React.useRef<HTMLInputElement>(null)
   const secondRef = React.useRef<HTMLInputElement>(null)
@@ -17,7 +19,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
     <div className="flex items-end gap-2">
       <div className="grid gap-1 text-center">
         <Label htmlFor="hours" className="text-xs">
-          時
+          {t("common.format.o'clock")}
         </Label>
         <TimePickerInput
           picker="hours"
@@ -29,7 +31,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
       </div>
       <div className="grid gap-1 text-center">
         <Label htmlFor="minutes" className="text-xs">
-          分
+          {t('common.format.minute')}
         </Label>
         <TimePickerInput
           picker="minutes"
@@ -42,7 +44,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
       </div>
       <div className="grid gap-1 text-center">
         <Label htmlFor="seconds" className="text-xs">
-          秒
+          {t('common.format.second')}
         </Label>
         <TimePickerInput
           picker="seconds"
