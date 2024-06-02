@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useNavigate, useFetcher } from '@remix-run/react'
+import { useTranslation } from 'react-i18next'
 import { RxPlus } from 'react-icons/rx'
 import {
   ColumnDef,
@@ -112,6 +113,7 @@ function DraggableRow({ row }: { row: Row<Task> }) {
 
 // Table Component
 export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
+  const { t } = useTranslation()
   const isLoading = useIsLoading()
   const navigate = useNavigate()
   const memoColumns = React.useMemo(() => columns, [columns])
@@ -237,19 +239,19 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       variant: 'destructive',
       description: (
         <div className="">
-          ソート中は並び順を変更することはできません。
+          {t('common.message.order-cannot-changed-sorting')}
           <br />
-          ソートをクリアしますか？
+          {t('common.message.clear-sort?')}
         </div>
       ),
       action: (
         <ToastAction
-          altText="ソートをクリアする"
+          altText={t('common.message.clear-sorting')}
           onClick={() => {
             table.resetSorting()
           }}
         >
-          クリア
+          {t('common.message.clear')}
         </ToastAction>
       ),
     })
@@ -487,7 +489,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
             onClick={() => openTaskDialog()}
           >
             <RxPlus className="mr-2" />
-            追加
+            {t('common.message.add')}
             <p className="text-[10px] text-muted-foreground ml-2">
               <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 text-muted-foreground">
                 <span className="text-xs">⌘</span>i
@@ -541,7 +543,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      データはありません。
+                      {t('common.message.no-data')}
                     </TableCell>
                   </TableRow>
                 )}
@@ -556,7 +558,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
             onClick={table.previousPage}
             disabled={!table.getCanPreviousPage()}
           >
-            Previous
+            {t('common.message.prev')}
           </Button>
           <Button
             variant="outline"
@@ -564,7 +566,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
             onClick={table.nextPage}
             disabled={!table.getCanNextPage()}
           >
-            Next
+            {t('common.message.next')}
           </Button>
         </div>
         <UpsertTaskDialog />

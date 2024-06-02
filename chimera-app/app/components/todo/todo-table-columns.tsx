@@ -1,5 +1,6 @@
+import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import { ColumnDef } from '@tanstack/react-table'
+import { ColumnDef, Column, Row } from '@tanstack/react-table'
 import { useSortable } from '@dnd-kit/sortable'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
@@ -21,6 +22,27 @@ function RowDragHandleCell({ rowId }: { rowId: number }) {
   )
 }
 
+function ColumnHeader({
+  column,
+  title,
+}: {
+  column: Column<Task, unknown>
+  title: string
+}) {
+  const { t } = useTranslation()
+  return <TodoTableColumnHeader column={column} title={t(title)} />
+}
+
+function DueDateCell({ row }: { row: Row<Task> }) {
+  const { t } = useTranslation()
+  const dateStr = row.original.due_date
+  return dateStr ? (
+    <span>{format(dateStr, t('common.format.datetime-short-format'))}</span>
+  ) : (
+    ''
+  )
+}
+
 export const TodoTableColumns: ColumnDef<Task>[] = [
   {
     id: 'drag-handle',
@@ -31,27 +53,33 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
   {
     accessorKey: 'id',
     size: 65,
-    header: ({ column }) => (
-      <TodoTableColumnHeader column={column} title="ID" />
-    ),
+    header: ({ column }) => {
+      return ColumnHeader({ column, title: 'todo.model.id' })
+    },
     cell: ({ row }) => <span className="">{row.original.id}</span>,
+    meta: {
+      title: 'todo.model.id',
+    },
   },
   {
     accessorKey: 'title',
     size: undefined,
-    header: ({ column }) => (
-      <TodoTableColumnHeader column={column} title="タイトル" />
-    ),
+    header: ({ column }) => {
+      return ColumnHeader({ column, title: 'todo.model.title' })
+    },
     cell: ({ row }) => {
       return <span className="truncate font-medium">{row.original.title}</span>
+    },
+    meta: {
+      title: 'todo.model.title',
     },
   },
   {
     accessorKey: 'status',
     size: 100,
-    header: ({ column }) => (
-      <TodoTableColumnHeader column={column} title="状態" />
-    ),
+    header: ({ column }) => {
+      return ColumnHeader({ column, title: 'todo.model.status' })
+    },
     cell: ({ row }) => {
       const status = TaskStatusList[row.original.status]
       return status ? (
@@ -63,16 +91,19 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.original.status) //id="status"
     },
+    meta: {
+      title: 'todo.model.status',
+    },
   },
   {
     accessorKey: 'due_date',
     size: 150,
-    header: ({ column }) => (
-      <TodoTableColumnHeader column={column} title="期限" />
-    ),
-    cell: ({ row }) => {
-      const dateStr = row.original.due_date
-      return dateStr ? <span>{format(dateStr, 'yyyy/MM/dd HH:mm')}</span> : ''
+    header: ({ column }) => {
+      return ColumnHeader({ column, title: 'todo.model.due-date' })
+    },
+    cell: DueDateCell,
+    meta: {
+      title: 'todo.model.due-date',
     },
   },
   {

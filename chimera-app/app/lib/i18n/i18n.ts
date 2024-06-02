@@ -16,27 +16,29 @@ i18n
         translation: translationJa,
       },
     },
-    fallbackLng: 'en', // 言語が見つからなかった場合のフォールバック
     // debug: true, // 開発モードでデバッグログを出力
+    fallbackLng: 'en', // 言語が見つからなかった場合のフォールバック
     supportedLngs: ['en', 'ja'], // サポートする言語
     interpolation: {
       escapeValue: false, // ReactはXSS対策を既に行っているため
     },
-    // react: {
-    //   useSuspense: false, // Turn off suspense for SSR
-    // },
-    // detection: {
-    //   order: [
-    //     'querystring',
-    //     'cookie',
-    //     'localStorage',
-    //     'navigator',
-    //     'htmlTag',
-    //     'path',
-    //     'subdomain',
-    //   ],
-    //   caches: ['localStorage', 'cookie'],
-    // },
+    react: {
+      useSuspense: false, // Turn off suspense for SSR
+    },
+    detection: {
+      // デフォルト→https://github.com/i18next/i18next-browser-languageDetector/blob/9efebe6ca0271c3797bc09b84babf1ba2d9b4dbb/src/index.js#L11
+      order: [
+        'querystring',
+        'cookie',
+        'localStorage',
+        'sessionStorage',
+        'navigator',
+        'htmlTag',
+        'path',
+        'subdomain',
+      ],
+      caches: ['localStorage', 'cookie'],
+    },
   })
 
 export default i18n

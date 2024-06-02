@@ -13,7 +13,10 @@ export const loader = withAuthentication(async ({ account }) => {
 export default function Index() {
   return (
     <div>
-      <h1 className="mb-2 text-xl font-bold">カレンダー機能</h1>
+      <h1 className="mb-4 text-xl font-bold">Event Calendar</h1>
+      <div className="mb-8 text-l font-bold">
+        This feature is under development. Please check back later.
+      </div>
       <ul>
         <li>カレンダーにTodoを表示</li>
         <li>カレンダーにMemoを表示</li>

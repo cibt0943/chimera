@@ -8,7 +8,7 @@ export default function Login() {
 
   return (
     <div className="p-10">
-      <div>{t('login.msg.need_login')}</div>
+      <div>{t('account.message.need-login')}</div>
       <div className="mt-4">
         <Form action="/auth/auth0" method="post">
           <Button>

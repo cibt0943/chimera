@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Row, Table } from '@tanstack/react-table'
 import {
   RxDotsHorizontal,
@@ -29,6 +30,7 @@ export function TodoTableRowActions<TData>({
   row,
   table,
 }: DataTableRowActionsProps<TData>) {
+  const { t } = useTranslation()
   const task = row.original
 
   return (
@@ -49,7 +51,7 @@ export function TodoTableRowActions<TData>({
           }}
         >
           <RxArrowUp className="mr-2 h-4 w-4" />
-          一つ上に移動
+          {t('common.message.position-up')}
           <DropdownMenuShortcut>⌘↑</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -58,7 +60,7 @@ export function TodoTableRowActions<TData>({
           }}
         >
           <RxArrowDown className="mr-2 h-4 w-4" />
-          一つ下に移動
+          {t('common.message.position-down')}
           <DropdownMenuShortcut>⌘↓</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -68,7 +70,7 @@ export function TodoTableRowActions<TData>({
           }}
         >
           <RxCheckCircled className="mr-2 h-4 w-4" />
-          完了する
+          {t('todo.message.to-complete')}
           <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -78,7 +80,7 @@ export function TodoTableRowActions<TData>({
           }}
         >
           <RxPencil1 className="mr-2 h-4 w-4" />
-          編集
+          {t('common.message.edit')}
           <DropdownMenuShortcut>
             ⌘
             <RiCornerDownLeftLine className="h-3 w-3 inline" />
@@ -92,7 +94,7 @@ export function TodoTableRowActions<TData>({
           className="text-red-600 focus:text-red-600"
         >
           <RxTrash className="mr-2 h-4 w-4" />
-          削除
+          {t('common.message.delete')}
           <DropdownMenuShortcut>
             ⌘<RiDeleteBack2Line className="h-3 w-3 inline" />
           </DropdownMenuShortcut>

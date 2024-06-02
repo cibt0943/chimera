@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Form } from '@remix-run/react'
+import { useTranslation } from 'react-i18next'
 import { AlertDialogCancel } from '~/components/ui/alert-dialog'
 import { Button } from '~/components/ui/button'
 import { DeleteConfirmDialog } from '~/components/lib/delete-confirm-dialog'
@@ -16,14 +17,18 @@ export function TaskDeleteConfirmDialog({
   isOpenDialog,
   setIsOpenDialog,
 }: DeleteTaskConfirmDialogProps) {
+  const { t } = useTranslation()
+
   return (
     <DeleteConfirmDialog
-      title="Todoの削除"
-      description={'「' + task.title + '」を削除します。よろしいですか？'}
+      title={t('todo.message.task-deletion')}
+      description={
+        '「' + task.title + '」' + t('common.message.confirm-deletion')
+      }
       isOpenDialog={isOpenDialog}
       setIsOpenDialog={setIsOpenDialog}
     >
-      <AlertDialogCancel>キャンセル</AlertDialogCancel>
+      <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <Form
         action={`/todos/${task.id}/delete`}
         method="delete"
@@ -32,7 +37,7 @@ export function TaskDeleteConfirmDialog({
         }}
       >
         <Button type="submit" variant="destructive">
-          削除
+          {t('common.message.delete')}
         </Button>
       </Form>
     </DeleteConfirmDialog>

@@ -13,7 +13,11 @@ export const loader = withAuthentication(async ({ account }) => {
 export default function Index() {
   return (
     <div>
-      <h1 className="mb-2 text-xl font-bold">メモ機能</h1>
+      <h1 className="mb-4 text-xl font-bold">Memo</h1>
+      <div className="mb-8 text-l font-bold">
+        This feature is under development. Please check back later.
+      </div>
+
       <ul>
         <li>メモには日付情報を持つ。デフォルトは作成日で変更可能</li>
         <li>日付情報で、カレンダーに表示</li>

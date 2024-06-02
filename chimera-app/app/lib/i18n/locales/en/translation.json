@@ -1,4 +1,91 @@
 {
-  "login.msg.need_login": "You must be logged in to use this feature.",
-  "date_format": "MM/dd/yyyy"
+  "common": {
+    "format": {
+      "date-format": "MM/dd/yyyy",
+      "time-format": "HH:mm:ss",
+      "datetime-format": "MM/dd/yyyy HH:mm:ss",
+      "datetime-short-format": "MM/dd/yyyy HH:mm",
+      "hour": "hour",
+      "o'clock": "o'clock",
+      "minute": "minute",
+      "second": "second"
+    },
+    "message": {
+      "ok": "OK",
+      "cancel": "Cancel",
+      "close": "Close",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "add": "Add",
+      "back": "Back",
+      "next": "Next",
+      "prev": "Previous",
+      "submit": "Submit",
+      "search": "Search",
+      "reset": "Reset",
+      "clear": "Clear",
+      "confirm": "Confirm",
+      "required": "Required",
+      "optional": "Optional",
+      "error": "Error",
+      "warning": "Warning",
+      "info": "Info",
+      "success": "Success",
+      "loading": "Loading...",
+      "no-data": "No Data Available",
+      "no-result": "No Results Found",
+      "no-match": "No Matches Found",
+      "no-select": "Nothing Selected",
+      "no-choose": "Please Select",
+      "no-input": "Please Input",
+      "no-change": "No Changes",
+      "no-permission": "Permission Denied",
+      "no-support": "Not Supported",
+      "confirm-deletion": "will be deleted. Are you sure?",
+      "sort-asc": "Asc",
+      "sort-desc": "Desc",
+      "order-cannot-changed-sorting": "The order cannot be changed during sorting.",
+      "clear-sort?": "Clear sort?",
+      "clear-sorting": "Clear sorting",
+      "clear-filters?": "Do you want to clear the filters?",
+      "clear-filters": "Clear Filters",
+      "position-up": "Move Up",
+      "position-down": "Move Down"
+    }
+  },
+  "account": {
+    "model": {
+      "email": "Email",
+      "name": "Name",
+      "birthday": "Birthday"
+    },
+    "message": {
+      "need-login": "You must be logged in to use this feature.",
+      "login": "Login",
+      "logout": "Logout"
+    }
+  },
+  "todo": {
+    "model": {
+      "id": "ID",
+      "title": "Title",
+      "memo": "Memo",
+      "status": "Status",
+      "due-date": "Due date",
+      "position": "Position"
+    },
+    "message": {
+      "task-creation": "Task Creation",
+      "task-editing": "Task Editing",
+      "task-deletion": "Task Deletion",
+      "set-task-info": "Set the task information.",
+      "select-task-status": "Select the task status",
+      "title-filter": "Filter tasks...",
+      "status-filter": "Status",
+      "to-complete": "Complete",
+      "view-settings": "View",
+      "select-columns": "Select Columns"
+    }
+  }
 }

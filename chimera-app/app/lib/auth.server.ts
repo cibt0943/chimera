@@ -2,7 +2,11 @@ import { Authenticator } from 'remix-auth'
 import { Auth0Strategy } from 'remix-auth-auth0'
 import { sessionStorage } from '~/lib/session.server'
 import { getOrInsertAccount } from '~/models/account.server'
-import { Account, Auth0Profile } from '~/types/accounts'
+import {
+  Account,
+  Auth0User,
+  Auth0UserAndAccountModel2Account,
+} from '~/types/accounts'
 
 export const authenticator = new Authenticator<Account>(sessionStorage)
 
@@ -16,26 +20,13 @@ const auth0Strategy = new Auth0Strategy<Account>(
   // アカウント情報の取得
   // async ({ accessToken, refreshToken, extraParams, profile }) => {
   async ({ profile }) => {
-    const auth0Profile = profile._json as Auth0Profile
+    const auth0User = profile._json as Auth0User
 
-    // アカウントを取得または作成
-    const account = await getOrInsertAccount({ sub: auth0Profile.sub })
+    // DBからアカウント情報を取得または作成
+    const accountModel = await getOrInsertAccount({ sub: auth0User.sub })
 
     // アカウント情報を返す
-    return {
-      id: account.id,
-      sub: account.sub,
-      name: auth0Profile.name,
-      email: auth0Profile.email,
-      picture: auth0Profile.picture,
-      language: account.language,
-      timezone: account.timezone,
-      created_at: account.created_at,
-      updated_at:
-        account.updated_at > auth0Profile.updated_at
-          ? account.updated_at
-          : auth0Profile.updated_at,
-    }
+    return Auth0UserAndAccountModel2Account(auth0User, accountModel)
   },
 )
 

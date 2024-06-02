@@ -1,22 +1,14 @@
 import type { MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
-import { useLoaderData, Form, useFetcher } from '@remix-run/react'
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '~/components/ui/select'
-
-import { Button } from '~/components/ui/button'
+import { Form, useLoaderData } from '@remix-run/react'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { Account } from '~/types/accounts'
 import { getAccountBySub, updateAccount } from '~/models/account.server'
-import { useTranslation } from 'react-i18next'
 import { authenticator } from '~/lib/auth.server'
+import { updateAuth0User } from '~/lib/auth0-api.server'
 import { getSession, commitSession } from '~/lib/session.server'
-import { se } from 'date-fns/locale'
+import { Separator } from '~/components/ui/separator'
+import { Button } from '~/components/ui/button'
+import { AccountForm } from '~/components/account/account-form'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Profile | Kobushi' }]
@@ -29,19 +21,24 @@ export const action = withAuthentication(async ({ request, account: self }) => {
   }
 
   const formData = await request.formData()
-  const language = formData.get('language')?.toString()
-  if (!language) {
-    throw new Error('Error: Invalid language.')
-  }
-  accountModel.language = language
+  // Auth0のユーザー情報を更新
+  const name = formData.get('name')?.toString()
 
-  // DBのユーザー情報を更新
+  await updateAuth0User({
+    sub: self.sub,
+    name: name || self.name,
+  })
+
+  // DBのアカウント情報を更新
+  const language = formData.get('language')?.toString()
+  accountModel.language = language || 'auto'
   await updateAccount(accountModel)
 
   // セッション情報を更新
   const session = await getSession(request.headers.get('cookie'))
   session.set(authenticator.sessionKey, {
     ...self,
+    name,
     language,
   })
 
@@ -60,50 +57,24 @@ export const loader = withAuthentication(async ({ account: self }) => {
   return json({ self })
 })
 
-type LoaderData = {
-  self: Account
-}
-
 export default function Profile() {
-  const { self } = useLoaderData<LoaderData>()
-  const { t } = useTranslation()
-  const fetcher = useFetcher()
-
-  const handleLanguageChange = (value: string) => {
-    // 言語を更新
-    fetcher.submit({ language: value }, { method: 'post' })
-  }
+  const { self } = useLoaderData<typeof loader>()
 
   return (
-    <div>
-      <ul>
-        <li>id: {self.sub}</li>
-        <li>name: {self.name}</li>
-        <li>email: {self.email}</li>
-      </ul>
-      <div>{t('login.msg.need_login')}</div>
+    <div className="space-y-6 w-1/3">
       <div>
-        <Select
-          onValueChange={handleLanguageChange}
-          defaultValue={self.language}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select language" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="auto">自動検出</SelectItem>
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="ja">日本語</SelectItem>
-          </SelectContent>
-        </Select>
+        <h3 className="text-lg font-medium">Account</h3>
+        <p className="text-sm text-muted-foreground">
+          Update your account settings.
+        </p>
       </div>
-      <div className="mt-8">
-        <Form action={`/account/delete`} method="delete">
-          <Button type="submit" variant="destructive">
-            アカウントを削除する
-          </Button>
-        </Form>
-      </div>
+      <Separator />
+      <AccountForm account={self} />
+      <Form action={`/account/delete`} method="delete">
+        <Button type="submit" variant="destructive">
+          アカウントを削除する
+        </Button>
+      </Form>
     </div>
   )
 }

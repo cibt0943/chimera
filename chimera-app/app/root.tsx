@@ -30,37 +30,42 @@ export const links: LinksFunction = () => [
 ]
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  // クッキーからカラーモードを取得
-  const cookieHeader = request.headers.get('Cookie')
-  const cookie = (await themeCookie.parse(cookieHeader)) || {}
-
   // セッションから認証情報を取得
   const account = await authenticator.isAuthenticated(request)
 
+  const cookieHeader = request.headers.get('Cookie')
+  // クッキーからカラーモードを取得
+  const cookie = (await themeCookie.parse(cookieHeader)) || {}
+
   // 言語を変更
-  if (account && account.language !== 'auto') {
-    console.log('account.language:', account.language)
-    i18n.changeLanguage(account.language)
+  let language = (account && account.language) || 'auto'
+  if (language === 'auto') {
+    // リクエストヘッダから言語を取得
+    const acceptLanguage = request.headers.get('Accept-Language')
+    if (cookieHeader && cookieHeader.includes('i18next=ja')) {
+      language = 'ja'
+    } else if (acceptLanguage && acceptLanguage.startsWith('ja')) {
+      language = 'ja'
+    } else {
+      language = 'en'
+    }
   }
 
-  return json({ theme: cookie.theme, account })
+  i18n.changeLanguage(language)
+  return json({ theme: cookie.theme, account, language })
 }
 
 export default function App() {
-  const { theme, account } = useLoaderData<typeof loader>()
+  const { theme, account, language } = useLoaderData<typeof loader>()
   const loadingCss = useIsLoading() ? 'opacity-20' : ''
 
   // クライアントサイドでの言語設定
   React.useEffect(() => {
-    if (account && account.language !== 'auto') {
-      console.log('account.language:', account.language)
-
-      i18n.changeLanguage(account?.language)
-    }
-  }, [account])
+    i18n.changeLanguage(language)
+  }, [language])
 
   return (
-    <html lang={i18n.language} className={clsx(theme)}>
+    <html lang={language} className={clsx(theme)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />

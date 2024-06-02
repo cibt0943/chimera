@@ -1,5 +1,6 @@
 // import * as React from 'react'
 import { RxCheck, RxPlusCircled } from 'react-icons/rx'
+import { useTranslation } from 'react-i18next'
 import { Column } from '@tanstack/react-table'
 
 import { cn } from '~/lib/utils'
@@ -37,6 +38,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
   title,
   options,
 }: TodoTableFacetedFilterProps<TData, TValue>) {
+  const { t } = useTranslation()
   const facets = column?.getFacetedUniqueValues()
   const selectedValues = new Set(column?.getFilterValue() as TaskStatus[])
 
@@ -85,7 +87,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
         <Command>
           <CommandInput placeholder={title} />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>{t('common.message.no-result')}</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
                 const isSelected = selectedValues.has(option.value)
@@ -136,7 +138,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
                     onSelect={() => column?.setFilterValue(undefined)}
                     className="justify-center text-center"
                   >
-                    Clear filters
+                    {t('common.message.clear-filters')}
                   </CommandItem>
                 </CommandGroup>
               </>

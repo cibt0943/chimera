@@ -65,7 +65,7 @@ export function ThemeProvider({
       {
         method: 'post',
         encType: 'application/json',
-        action: '/action/set-theme',
+        action: '/theme',
       },
     )
   }

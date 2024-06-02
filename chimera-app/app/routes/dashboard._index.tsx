@@ -13,7 +13,10 @@ export const loader = withAuthentication(async ({ account }) => {
 export default function Dashboard() {
   return (
     <div className="p-4">
-      <h1>ダッシュボード機能を実装する予定</h1>
+      <h1 className="mb-4 text-xl font-bold">Dashboard</h1>
+      <div className="mb-8 text-l font-bold">
+        This feature is under development. Please check back later.
+      </div>
     </div>
   )
 }
