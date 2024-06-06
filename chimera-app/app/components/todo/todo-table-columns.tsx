@@ -54,31 +54,31 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
     accessorKey: 'id',
     size: 65,
     header: ({ column }) => {
-      return ColumnHeader({ column, title: 'todo.model.id' })
+      return ColumnHeader({ column, title: 'task.model.id' })
     },
     cell: ({ row }) => <span className="">{row.original.id}</span>,
     meta: {
-      title: 'todo.model.id',
+      title: 'task.model.id',
     },
   },
   {
     accessorKey: 'title',
     size: undefined,
     header: ({ column }) => {
-      return ColumnHeader({ column, title: 'todo.model.title' })
+      return ColumnHeader({ column, title: 'task.model.title' })
     },
     cell: ({ row }) => {
       return <span className="truncate font-medium">{row.original.title}</span>
     },
     meta: {
-      title: 'todo.model.title',
+      title: 'task.model.title',
     },
   },
   {
     accessorKey: 'status',
     size: 100,
     header: ({ column }) => {
-      return ColumnHeader({ column, title: 'todo.model.status' })
+      return ColumnHeader({ column, title: 'task.model.status' })
     },
     cell: ({ row }) => {
       const status = TaskStatusList[row.original.status]
@@ -92,18 +92,18 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
       return value.includes(row.original.status) //id="status"
     },
     meta: {
-      title: 'todo.model.status',
+      title: 'task.model.status',
     },
   },
   {
     accessorKey: 'due_date',
     size: 150,
     header: ({ column }) => {
-      return ColumnHeader({ column, title: 'todo.model.due-date' })
+      return ColumnHeader({ column, title: 'task.model.due-date' })
     },
     cell: DueDateCell,
     meta: {
-      title: 'todo.model.due-date',
+      title: 'task.model.due-date',
     },
   },
   {

@@ -29,12 +29,12 @@ export function TodoTableViewOptions<TData>({
           className="ml-auto hidden h-8 lg:flex"
         >
           <RxMixerHorizontal className="mr-2 h-4 w-4" />
-          {t('todo.message.view-settings')}
+          {t('task.message.view-settings')}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[150px]">
         <DropdownMenuLabel>
-          {t('todo.message.select-columns')}
+          {t('task.message.select-columns')}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table

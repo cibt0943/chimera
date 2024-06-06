@@ -57,9 +57,9 @@ export function TaskUpsertFormDialog({
 }: TaskDialogProps) {
   const { t } = useTranslation()
   const title = task
-    ? t('todo.message.task-editing')
-    : t('todo.message.task-creation')
-  const description = t('todo.message.set-task-info')
+    ? t('task.message.task-editing')
+    : t('task.message.task-creation')
+  const description = t('task.message.set-task-info')
   const action = task ? `${task.id}` : ''
 
   const defaultValue = task || {
@@ -96,7 +96,7 @@ export function TaskUpsertFormDialog({
         >
           <FormItem>
             <FormLabel htmlFor={fields.title.id}>
-              {t('todo.model.title')}
+              {t('task.model.title')}
               <Required />
             </FormLabel>
             <Input {...getInputProps(fields.title, { type: 'text' })} />
@@ -104,7 +104,7 @@ export function TaskUpsertFormDialog({
           </FormItem>
           <FormItem>
             <FormLabel htmlFor={fields.memo.id}>
-              {t('todo.model.memo')}
+              {t('task.model.memo')}
             </FormLabel>
             <Textarea
               {...getTextareaProps(fields.memo)}
@@ -114,14 +114,14 @@ export function TaskUpsertFormDialog({
           </FormItem>
           <FormItem className="flex flex-col">
             <FormLabel htmlFor={fields.due_date.id}>
-              {t('todo.model.due-date')}
+              {t('task.model.due-date')}
             </FormLabel>
             <DateTimePicker meta={fields.due_date} />
             <FormMessage message={fields.due_date.errors} />
           </FormItem>
           <FormItem>
             <FormLabel htmlFor={fields.status.id}>
-              {t('todo.model.status')}
+              {t('task.model.status')}
               <Required />
             </FormLabel>
             <Select
@@ -136,7 +136,7 @@ export function TaskUpsertFormDialog({
               </SelectContent>
             </Select>
             <FormDescription>
-              {t('todo.message.select-task-status')}
+              {t('task.message.select-task-status')}
             </FormDescription>
             <FormMessage message={fields.status.errors} />
           </FormItem>
