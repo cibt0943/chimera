@@ -42,7 +42,7 @@
       "no-change": "No Changes",
       "no-permission": "Permission Denied",
       "no-support": "Not Supported",
-      "confirm-deletion": "will be deleted. Are you sure?",
+      "confirm-deletion": " will be deleted. Are you sure?",
       "sort-asc": "Asc",
       "sort-desc": "Desc",
       "order-cannot-changed-sorting": "The order cannot be changed during sorting.",
@@ -55,6 +55,7 @@
     }
   },
   "account": {
+    "title": "Account",
     "model": {
       "email": "Email",
       "name": "Name",
@@ -63,10 +64,12 @@
     "message": {
       "need-login": "You must be logged in to use this feature.",
       "login": "Login",
-      "logout": "Logout"
+      "logout": "Logout",
+      "account-deletion": "Account Deletion"
     }
   },
-  "todo": {
+  "task": {
+    "title": "Task",
     "model": {
       "id": "ID",
       "title": "Title",

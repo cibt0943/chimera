@@ -1,6 +1,7 @@
+import * as React from 'react'
 import type { MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
-import { Form, useLoaderData } from '@remix-run/react'
+import { useLoaderData } from '@remix-run/react'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { getAccountBySub, updateAccount } from '~/models/account.server'
 import { authenticator } from '~/lib/auth.server'
@@ -9,6 +10,7 @@ import { getSession, commitSession } from '~/lib/session.server'
 import { Separator } from '~/components/ui/separator'
 import { Button } from '~/components/ui/button'
 import { AccountForm } from '~/components/account/account-form'
+import { AccountDeleteConfirmDialog } from '~/components/account/account-delete-confirm-dialog'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Profile | Kobushi' }]
@@ -59,6 +61,16 @@ export const loader = withAuthentication(async ({ account: self }) => {
 
 export default function Profile() {
   const { self } = useLoaderData<typeof loader>()
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
+
+  function DeleteConfirmAccountDialog() {
+    return (
+      <AccountDeleteConfirmDialog
+        isOpenDialog={isOpenDeleteDialog}
+        setIsOpenDialog={setIsOpenDeleteDialog}
+      />
+    )
+  }
 
   return (
     <div className="space-y-6 w-1/3">
@@ -70,11 +82,11 @@ export default function Profile() {
       </div>
       <Separator />
       <AccountForm account={self} />
-      <Form action={`/account/delete`} method="delete">
-        <Button type="submit" variant="destructive">
-          アカウントを削除する
-        </Button>
-      </Form>
+      <Separator />
+      <Button variant="destructive" onClick={() => setIsOpenDeleteDialog(true)}>
+        アカウントを削除する
+      </Button>
+      <DeleteConfirmAccountDialog />
     </div>
   )
 }

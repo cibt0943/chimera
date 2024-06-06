@@ -4,33 +4,28 @@ import { useTranslation } from 'react-i18next'
 import { AlertDialogCancel } from '~/components/ui/alert-dialog'
 import { Button } from '~/components/ui/button'
 import { DeleteConfirmDialog } from '~/components/lib/delete-confirm-dialog'
-import { Task } from '~/types/tasks'
 
-interface DeleteTaskConfirmDialogProps {
-  task: Task
+interface DeleteAccountConfirmDialogProps {
   isOpenDialog: boolean
   setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export function TaskDeleteConfirmDialog({
-  task,
+export function AccountDeleteConfirmDialog({
   isOpenDialog,
   setIsOpenDialog,
-}: DeleteTaskConfirmDialogProps) {
+}: DeleteAccountConfirmDialogProps) {
   const { t } = useTranslation()
 
   return (
     <DeleteConfirmDialog
-      title={t('task.message.task-deletion')}
-      description={
-        '「' + task.title + '」' + t('common.message.confirm-deletion')
-      }
+      title={t('account.message.account-deletion')}
+      description={t('account.title') + t('common.message.confirm-deletion')}
       isOpenDialog={isOpenDialog}
       setIsOpenDialog={setIsOpenDialog}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <Form
-        action={`/todos/${task.id}/delete`}
+        action={`/account/delete`}
         method="delete"
         onSubmit={() => {
           setIsOpenDialog(false)

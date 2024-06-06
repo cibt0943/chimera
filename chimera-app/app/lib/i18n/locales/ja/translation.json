@@ -55,6 +55,7 @@
     }
   },
   "account": {
+    "title": "アカウント",
     "model": {
       "email": "メールアドレス",
       "name": "名前",
@@ -63,10 +64,12 @@
     "message": {
       "need-login": "この機能を利用するにはログインする必要があります。",
       "login": "ログイン",
-      "logout": "ログアウト"
+      "logout": "ログアウト",
+      "account-deletion": "アカウントの削除"
     }
   },
-  "todo": {
+  "task": {
+    "title": "タスク",
     "model": {
       "id": "ID",
       "title": "タイトル",

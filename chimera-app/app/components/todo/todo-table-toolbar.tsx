@@ -24,7 +24,7 @@ export function TodoTableToolbar<TData>({
       <div className="flex flex-1 items-center space-x-2">
         <Input
           type="search"
-          placeholder={t('todo.message.title-filter')}
+          placeholder={t('task.message.title-filter')}
           value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
             table.getColumn('title')?.setFilterValue(event.target.value)
@@ -35,7 +35,7 @@ export function TodoTableToolbar<TData>({
         {table.getColumn('status') && (
           <TodoTableFacetedFilter
             column={table.getColumn('status')}
-            title={t('todo.message.status-filter')}
+            title={t('task.message.status-filter')}
             options={TaskStatusListByDispOrder}
           />
         )}

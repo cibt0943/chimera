@@ -70,7 +70,7 @@ export function TodoTableRowActions<TData>({
           }}
         >
           <RxCheckCircled className="mr-2 h-4 w-4" />
-          {t('todo.message.to-complete')}
+          {t('task.message.to-complete')}
           <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
