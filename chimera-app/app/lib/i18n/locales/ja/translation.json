@@ -51,7 +51,8 @@
       "clear-filters?": "フィルタをクリアしますか？",
       "clear-filters": "フィルタをクリア",
       "position-up": "一つ上に移動",
-      "position-down": "一つ下に移動"
+      "position-down": "一つ下に移動",
+      "settings": "設定"
     }
   },
   "account": {
@@ -59,13 +60,27 @@
     "model": {
       "email": "メールアドレス",
       "name": "名前",
-      "birthday": "生年月日"
+      "birthday": "生年月日",
+      "language": "言語",
+      "theme": "テーマ",
+      "language-type": {
+        "auto": "自動検出",
+        "en": "English",
+        "ja": "日本語"
+      },
+      "theme-type": {
+        "system": "システム",
+        "light": "ライト",
+        "dark": "ダーク"
+      }
     },
     "message": {
       "need-login": "この機能を利用するにはログインする必要があります。",
       "login": "ログイン",
       "logout": "ログアウト",
-      "account-deletion": "アカウントの削除"
+      "account-deletion": "アカウントの削除",
+      "settings-info": "アカウントの情報を設定してください。",
+      "do-delete": "アカウントを削除する"
     }
   },
   "task": {

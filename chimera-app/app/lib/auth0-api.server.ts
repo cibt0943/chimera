@@ -62,12 +62,12 @@ export async function updateAuth0User(auth0User: UpdateAuth0User) {
     if (!response.ok) {
       const errorData = await response.json()
       console.error('Error response from Auth0:', errorData)
-      throw new Error(errorData.message || 'Failed to update user')
+      throw new Error(errorData.message || 'Failed to update Auth0User')
     }
 
-    console.log('User updated successfully')
+    console.log('Auth0User updated successfully')
   } catch (error) {
-    console.error('Error updating Auth0 user:', error)
+    console.error('Error updating Auth0User:', error)
     throw error
   }
 }
@@ -88,12 +88,12 @@ export async function deleteAuth0User(userId: string) {
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.message || 'Failed to delete user')
+      throw new Error(errorData.message || 'Failed to delete Auth0User')
     }
 
-    console.log('User deleted successfully')
+    console.log('Auth0User deleted successfully')
   } catch (error) {
-    console.error('Error deleting user:', error)
+    console.error('Error deleting Auth0User:', error)
     throw error
   }
 }
