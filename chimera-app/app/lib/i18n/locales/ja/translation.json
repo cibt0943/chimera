@@ -63,12 +63,12 @@
       "birthday": "生年月日",
       "language": "言語",
       "theme": "テーマ",
-      "language-type": {
+      "language-list": {
         "auto": "自動検出",
         "en": "English",
         "ja": "日本語"
       },
-      "theme-type": {
+      "theme-list": {
         "system": "システム",
         "light": "ライト",
         "dark": "ダーク"
@@ -91,7 +91,13 @@
       "memo": "メモ",
       "status": "状態",
       "due-date": "期限",
-      "position": "表示位置"
+      "position": "表示位置",
+      "status-list": {
+        "new": "新規",
+        "done": "完了",
+        "doing": "進行中",
+        "pending": "保留"
+      }
     },
     "message": {
       "task-creation": "タスクの作成",

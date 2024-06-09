@@ -150,11 +150,13 @@ export function TaskUpsertFormDialog({
 }
 
 function SelectItems() {
+  const { t } = useTranslation()
+
   return (
     <>
       {TaskStatusListByDispOrder.map((status) => (
         <SelectItem key={status.value} value={status.value.toString()}>
-          {status.label}
+          {t(status.label)}
         </SelectItem>
       ))}
     </>

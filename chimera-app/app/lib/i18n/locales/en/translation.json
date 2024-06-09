@@ -63,12 +63,12 @@
       "birthday": "Birthday",
       "language": "Language",
       "theme": "Theme",
-      "language-type": {
+      "language-list": {
         "auto": "Auto detect",
         "en": "English",
         "ja": "Japanese"
       },
-      "theme-type": {
+      "theme-list": {
         "system": "System",
         "light": "Light",
         "dark": "Dark"
@@ -91,7 +91,13 @@
       "memo": "Memo",
       "status": "Status",
       "due-date": "Due date",
-      "position": "Position"
+      "position": "Position",
+      "status-list": {
+        "new": "New",
+        "done": "Done",
+        "doing": "Doing",
+        "pending": "Pending"
+      }
     },
     "message": {
       "task-creation": "Task Creation",

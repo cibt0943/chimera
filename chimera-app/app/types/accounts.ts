@@ -9,9 +9,9 @@ export type Language = (typeof Language)[keyof typeof Language]
 
 // 利用可能な言語リスト
 export const LanguageList = [
-  { value: Language.AUTO, label: 'account.model.language-type.auto' },
-  { value: Language.EN, label: 'account.model.language-type.en' },
-  { value: Language.JA, label: 'account.model.language-type.ja' },
+  { value: Language.AUTO, label: 'account.model.language-list.auto' },
+  { value: Language.EN, label: 'account.model.language-list.en' },
+  { value: Language.JA, label: 'account.model.language-list.ja' },
 ]
 
 export const Theme = {
@@ -23,9 +23,9 @@ export type Theme = (typeof Theme)[keyof typeof Theme]
 
 // 利用可能な言語リスト
 export const ThemeList = [
-  { value: Theme.SYSTEM, label: 'account.model.theme-type.system' },
-  { value: Theme.LIGHT, label: 'account.model.theme-type.light' },
-  { value: Theme.DARK, label: 'account.model.theme-type.dark' },
+  { value: Theme.SYSTEM, label: 'account.model.theme-list.system' },
+  { value: Theme.LIGHT, label: 'account.model.theme-list.light' },
+  { value: Theme.DARK, label: 'account.model.theme-list.dark' },
 ]
 
 export type AccountModel = {

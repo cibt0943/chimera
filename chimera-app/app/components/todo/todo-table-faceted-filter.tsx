@@ -74,7 +74,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
                         key={option.value}
                         className="rounded-sm px-1 font-normal"
                       >
-                        {option.label}
+                        {t(option.label)}
                       </Badge>
                     ))
                 )}
@@ -120,7 +120,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
                     {/* {option.icon && (
                       <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                     )} */}
-                    <span>{option.label}</span>
+                    <span>{t(option.label)}</span>
                     {facets?.get(option.value) && (
                       <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
                         {facets.get(option.value)}

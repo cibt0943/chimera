@@ -11,22 +11,27 @@ export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
 
 // タスクの全状態の値順リスト
 export const TaskStatusList = [
-  { value: TaskStatus.NEW, label: 'new', disp_order: 0, color: '' },
+  {
+    value: TaskStatus.NEW,
+    label: 'task.model.status-list.new',
+    disp_order: 0,
+    color: '',
+  },
   {
     value: TaskStatus.DONE,
-    label: 'done',
+    label: 'task.model.status-list.done',
     disp_order: 2,
     color: 'bg-violet-600',
   }, //bg-orange-500
   {
     value: TaskStatus.DOING,
-    label: 'doing',
+    label: 'task.model.status-list.doing',
     disp_order: 1,
     color: 'bg-indigo-800',
   }, //bg-violet-600
   {
     value: TaskStatus.PENDING,
-    label: 'pending',
+    label: 'task.model.status-list.pending',
     disp_order: 4,
     color: 'bg-gray-500',
   },
