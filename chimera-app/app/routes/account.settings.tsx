@@ -2,6 +2,8 @@ import * as React from 'react'
 import type { MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
+import { useTranslation } from 'react-i18next'
+import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { getAccountBySub, updateAccount } from '~/models/account.server'
 import { authenticator } from '~/lib/auth.server'
@@ -11,9 +13,13 @@ import { Separator } from '~/components/ui/separator'
 import { Button } from '~/components/ui/button'
 import { AccountForm } from '~/components/account/account-form'
 import { AccountDeleteConfirmDialog } from '~/components/account/account-delete-confirm-dialog'
+import {
+  AccountSchema,
+  Auth0UserAndAccountModel2Account,
+} from '~/types/accounts'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Profile | Kobushi' }]
+  return [{ title: 'Account settings | Kobushi' }]
 }
 
 export const action = withAuthentication(async ({ request, account: self }) => {
@@ -23,30 +29,42 @@ export const action = withAuthentication(async ({ request, account: self }) => {
   }
 
   const formData = await request.formData()
-  // Auth0のユーザー情報を更新
-  const name = formData.get('name')?.toString()
+  const submission = parseWithZod(formData, { schema: AccountSchema })
+  // submission が成功しなかった場合、クライアントに送信結果を報告します。
+  if (submission.status !== 'success') {
+    throw new Error('Invalid submission data.')
+    // return json({ result: submission.reply() }, { status: 422 })
+  }
 
-  await updateAuth0User({
-    sub: self.sub,
-    name: name || self.name,
-  })
+  const data = submission.value
+
+  // Auth0のユーザー情報を更新
+  if (data.name) {
+    self.name = data.name
+    await updateAuth0User({
+      sub: self.sub,
+      name: self.name,
+    })
+  }
 
   // DBのアカウント情報を更新
-  const language = formData.get('language')?.toString()
-  accountModel.language = language || 'auto'
+  accountModel.language = data.language ? data.language : accountModel.language
+  accountModel.theme = data.theme ? data.theme : accountModel.theme
   await updateAccount(accountModel)
 
   // セッション情報を更新
   const session = await getSession(request.headers.get('cookie'))
-  session.set(authenticator.sessionKey, {
-    ...self,
-    name,
-    language,
-  })
+  session.set(
+    authenticator.sessionKey,
+    Auth0UserAndAccountModel2Account(self, accountModel),
+  )
+  // セッション情報を更新
+  const encodedSession = await commitSession(session)
 
-  return redirect('/account/profile', {
+  return redirect('/account/settings', {
     headers: {
-      'Set-Cookie': await commitSession(session),
+      // 新しいセッション情報をクッキーとして設定するように指示
+      'Set-Cookie': encodedSession,
     },
   })
 })
@@ -60,6 +78,7 @@ export const loader = withAuthentication(async ({ account: self }) => {
 })
 
 export default function Profile() {
+  const { t } = useTranslation()
   const { self } = useLoaderData<typeof loader>()
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
@@ -74,17 +93,17 @@ export default function Profile() {
 
   return (
     <div className="space-y-6 w-1/3">
-      <div>
-        <h3 className="text-lg font-medium">Account</h3>
+      <div className="space-y-1.5">
+        <h2 className="text-xl font-bold">{t('account.title')}</h2>
         <p className="text-sm text-muted-foreground">
-          Update your account settings.
+          {t('account.message.settings-info')}
         </p>
       </div>
       <Separator />
       <AccountForm account={self} />
       <Separator />
       <Button variant="destructive" onClick={() => setIsOpenDeleteDialog(true)}>
-        アカウントを削除する
+        {t('account.message.do-delete')}
       </Button>
       <DeleteConfirmAccountDialog />
     </div>

@@ -51,7 +51,8 @@
       "clear-filters?": "Do you want to clear the filters?",
       "clear-filters": "Clear Filters",
       "position-up": "Move Up",
-      "position-down": "Move Down"
+      "position-down": "Move Down",
+      "settings": "Settings"
     }
   },
   "account": {
@@ -59,13 +60,27 @@
     "model": {
       "email": "Email",
       "name": "Name",
-      "birthday": "Birthday"
+      "birthday": "Birthday",
+      "language": "Language",
+      "theme": "Theme",
+      "language-type": {
+        "auto": "Auto detect",
+        "en": "English",
+        "ja": "Japanese"
+      },
+      "theme-type": {
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      }
     },
     "message": {
       "need-login": "You must be logged in to use this feature.",
-      "login": "Login",
-      "logout": "Logout",
-      "account-deletion": "Account Deletion"
+      "login": "Log in",
+      "logout": "Log out",
+      "account-deletion": "Account Deletion",
+      "settings-info": "Update your account settings.",
+      "do-delete": "Delete your account."
     }
   },
   "task": {

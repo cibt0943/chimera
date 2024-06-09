@@ -13,7 +13,7 @@ export default function Login() {
         <Form action="/auth/auth0" method="post">
           <Button>
             <RxEnter className="mr-2 h-4 w-4" />
-            Log in
+            {t('account.message.login')}
           </Button>
         </Form>
       </div>

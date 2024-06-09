@@ -1,7 +1,6 @@
 import { useNavigate, useFetcher } from '@remix-run/react'
-import { RxSun, RxMoon, RxGear, RxPerson, RxExit } from 'react-icons/rx'
-import { MdBrightness4 } from 'react-icons/md'
-
+import { RxGear, RxExit } from 'react-icons/rx'
+import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
@@ -9,32 +8,20 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from '~/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-
-import { useTheme, Theme } from '~/components/theme-provider'
 import { useAccount } from '~/components/account-provider'
 
 export function AccountMenu() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
-  const { theme, updateTheme } = useTheme()
   // const { account, isLoading } = useAccount()
   const { account } = useAccount()
   const fetcher = useFetcher()
 
   if (!account) return null
-
-  const handleValueChange = (theme: string) => {
-    updateTheme(theme as Theme)
-  }
 
   const handleLogoutClick = () => {
     fetcher.submit(
@@ -66,47 +53,17 @@ export function AccountMenu() {
         <DropdownMenuGroup>
           <DropdownMenuItem
             onClick={() => {
-              navigate(`/account/profile`)
+              navigate(`/account/settings`)
             }}
           >
-            <RxPerson className="mr-2 h-4 w-4" />
-            Profile
+            <RxGear className="mr-2 h-4 w-4" />
+            {t('common.message.settings')}
           </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <MdBrightness4 className="mr-2 h-4 w-4" />
-              Mode
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent hideWhenDetached={true}>
-                <DropdownMenuRadioGroup
-                  value={theme}
-                  onValueChange={handleValueChange}
-                >
-                  <DropdownMenuRadioItem value="light">
-                    <RxSun className="mr-2 h-4 w-4" />
-                    <span>Light</span>
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="dark">
-                    <RxMoon className="mr-2 h-4 w-4" />
-                    <span>Dark</span>
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="system">
-                    <RxGear className="mr-2 h-4 w-4" />
-                    <span>System</span>
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogoutClick}>
           <RxExit className="mr-2 h-4 w-4" />
-          Log out
+          {t('account.message.logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

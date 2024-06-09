@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Form } from '@remix-run/react'
 import {
   useForm,
@@ -5,6 +6,7 @@ import {
   getInputProps,
   getSelectProps,
 } from '@conform-to/react'
+import { useTranslation } from 'react-i18next'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
 import { Required } from '~/components/lib/required'
@@ -19,17 +21,46 @@ import {
 import { FormItem, FormLabel, FormMessage } from '~/components/lib/form'
 import {
   Account,
-  LanguageType,
   AccountSchema,
   AccountSchemaType,
-  LanguageTypeList,
+  LanguageList,
+  ThemeList,
 } from '~/types/accounts'
+
+const SelectLanguageItems = React.memo(() => {
+  const { t } = useTranslation()
+  return (
+    <>
+      {LanguageList.map((language) => (
+        <SelectItem key={language.value} value={language.value.toString()}>
+          {t(language.label)}
+        </SelectItem>
+      ))}
+    </>
+  )
+})
+SelectLanguageItems.displayName = 'SelectLanguageItems'
+
+const SelectThemeItems = React.memo(() => {
+  const { t } = useTranslation()
+  return (
+    <>
+      {ThemeList.map((theme) => (
+        <SelectItem key={theme.value} value={theme.value}>
+          {t(theme.label)}
+        </SelectItem>
+      ))}
+    </>
+  )
+})
+SelectThemeItems.displayName = 'SelectThemeItems'
 
 interface AccountFormProps {
   account: Account
 }
 
 export function AccountForm({ account }: AccountFormProps) {
+  const { t } = useTranslation()
   const defaultValue = account
 
   const [form, fields] = useForm<AccountSchemaType>({
@@ -45,7 +76,7 @@ export function AccountForm({ account }: AccountFormProps) {
     <Form method="post" {...getFormProps(form)} className="space-y-6" action="">
       <FormItem>
         <FormLabel htmlFor={fields.name.id}>
-          名称
+          {t('account.model.name')}
           <Required />
         </FormLabel>
         <Input {...getInputProps(fields.name, { type: 'text' })} />
@@ -53,7 +84,7 @@ export function AccountForm({ account }: AccountFormProps) {
       </FormItem>
       <FormItem>
         <FormLabel htmlFor={fields.language.id}>
-          言語
+          {t('account.model.language')}
           <Required />
         </FormLabel>
         <Select
@@ -64,24 +95,30 @@ export function AccountForm({ account }: AccountFormProps) {
             <SelectValue placeholder="Select a language to display" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItems />
+            <SelectLanguageItems />
           </SelectContent>
         </Select>
         <FormMessage message={fields.language.errors} />
       </FormItem>
-      <Button type="submit">保存</Button>
+      <FormItem>
+        <FormLabel htmlFor={fields.theme.id}>
+          {t('account.model.theme')}
+          <Required />
+        </FormLabel>
+        <Select
+          {...getSelectProps(fields.theme)}
+          defaultValue={fields.theme.value}
+        >
+          <SelectTrigger id={fields.theme.id}>
+            <SelectValue placeholder="Select a theme to display" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectThemeItems />
+          </SelectContent>
+        </Select>
+        <FormMessage message={fields.theme.errors} />
+      </FormItem>
+      <Button type="submit">{t('common.message.save')}</Button>
     </Form>
-  )
-}
-
-function SelectItems() {
-  return (
-    <>
-      {LanguageTypeList.map((language) => (
-        <SelectItem key={language.value} value={language.value.toString()}>
-          {language.label}
-        </SelectItem>
-      ))}
-    </>
   )
 }

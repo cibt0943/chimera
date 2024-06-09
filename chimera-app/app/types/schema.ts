@@ -41,6 +41,7 @@ export type Database = {
           id: number
           language: string
           sub: string
+          theme: string
           timezone: string
           updated_at: string
         }
@@ -49,6 +50,7 @@ export type Database = {
           id?: number
           language?: string
           sub: string
+          theme?: string
           timezone?: string
           updated_at?: string
         }
@@ -57,6 +59,7 @@ export type Database = {
           id?: number
           language?: string
           sub?: string
+          theme?: string
           timezone?: string
           updated_at?: string
         }
