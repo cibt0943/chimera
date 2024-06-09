@@ -26,7 +26,6 @@ export const action = withAuthentication(
     await updateTask({
       id: task.id,
       status: data.status,
-      updated_at: new Date().toISOString(),
     })
 
     return redirect('/todos')

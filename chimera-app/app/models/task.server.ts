@@ -67,7 +67,14 @@ interface updateTaskProps {
   updated_at?: string
 }
 
-export async function updateTask(task: updateTaskProps): Promise<TaskModel> {
+export async function updateTask(
+  task: updateTaskProps,
+  noUpdated = false,
+): Promise<TaskModel> {
+  if (!noUpdated) {
+    task.updated_at = new Date().toISOString()
+  }
+
   const { data, error } = await supabase
     .from('tasks')
     .update(task)
@@ -110,7 +117,6 @@ export async function updateTaskPosition(
   return await updateTask({
     id: fromTask.id,
     position,
-    updated_at: new Date().toISOString(),
   })
 }
 
