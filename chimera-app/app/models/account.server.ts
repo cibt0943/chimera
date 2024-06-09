@@ -47,7 +47,12 @@ export async function getOrInsertAccount({
 // アカウント情報の更新
 export async function updateAccount(
   account: AccountModel,
+  noUpdated = false,
 ): Promise<AccountModel> {
+  if (!noUpdated) {
+    account.updated_at = new Date().toISOString()
+  }
+
   const { data, error } = await supabase
     .from('accounts')
     .update(account)
