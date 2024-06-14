@@ -14,7 +14,7 @@ const AccountContext = createContext<AccountContextState>(initialState)
 export function useAccount() {
   const context = useContext(AccountContext)
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider')
+    throw new Error('AccountProviderが見つかりませんでした')
   }
   return context
 }

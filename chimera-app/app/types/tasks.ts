@@ -91,7 +91,8 @@ export const TaskSchema = zod.object({
   memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
   status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
   // status: zod.nativeEnum(TaskStatus),
-  due_date: zod.coerce.date().optional().nullable(),
+  // due_date: zod.coerce.date().optional(),
+  due_date: zod.date().optional(),
 })
 
 export type TaskSchemaType = zod.infer<typeof TaskSchema>

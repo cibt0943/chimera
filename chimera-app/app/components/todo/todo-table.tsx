@@ -399,7 +399,8 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       'alt+backspace',
     ],
     (_, handler) => {
-      if (isLoading) return // ローディング中は何もしない
+      // ローディング中、ダイアログが開いている場合は何もしない
+      if (isLoading || isOpenUpsertDialog || isOpenDeleteDialog) return
       switch (handler.keys?.join('')) {
         case 'up':
         case 'down':

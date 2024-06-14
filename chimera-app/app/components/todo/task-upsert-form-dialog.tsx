@@ -36,6 +36,7 @@ import {
   FormMessage,
   FormDescription,
 } from '~/components/lib/form'
+import { TaskDueDateTimePicker } from './task-due-date-time-picker'
 import {
   Task,
   TaskStatus,
@@ -116,7 +117,7 @@ export function TaskUpsertFormDialog({
             <FormLabel htmlFor={fields.due_date.id}>
               {t('task.model.due-date')}
             </FormLabel>
-            <DateTimePicker meta={fields.due_date} />
+            <TaskDueDateTimePicker meta={fields.due_date} />
             <FormMessage message={fields.due_date.errors} />
           </FormItem>
           <FormItem>
