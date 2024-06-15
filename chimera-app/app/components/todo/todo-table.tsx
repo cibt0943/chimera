@@ -239,14 +239,14 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       variant: 'destructive',
       description: (
         <div className="">
-          {t('common.message.order-cannot-changed-sorting')}
+          {t('common.message.order_cannot_changed_sorting')}
           <br />
-          {t('common.message.clear-sort?')}
+          {t('common.message.clear_sort?')}
         </div>
       ),
       action: (
         <ToastAction
-          altText={t('common.message.clear-sorting')}
+          altText={t('common.message.clear_sorting')}
           onClick={() => {
             table.resetSorting()
           }}
@@ -547,7 +547,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      {t('common.message.no-data')}
+                      {t('common.message.no_data')}
                     </TableCell>
                   </TableRow>
                 )}

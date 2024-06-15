@@ -1,10 +1,10 @@
 {
   "common": {
     "format": {
-      "date-format": "yyyy/MM/dd/",
-      "time-format": "HH:mm:ss",
-      "datetime-format": "yyyy/MM/dd HH:mm:ss",
-      "datetime-short-format": "yyyy/MM/dd HH:mm",
+      "date_format": "yyyy/MM/dd/",
+      "time_format": "HH:mm:ss",
+      "datetime_format": "yyyy/MM/dd HH:mm:ss",
+      "datetime_short_format": "yyyy/MM/dd HH:mm",
       "hour": "時間",
       "o'clock": "時",
       "minute": "分",
@@ -33,25 +33,25 @@
       "info": "情報",
       "success": "成功",
       "loading": "読み込み中...",
-      "no-data": "データがありません",
-      "no-result": "結果がありません",
-      "no-match": "一致するものがありません",
-      "no-select": "選択されていません",
-      "no-choose": "選択してください",
-      "no-input": "入力してください",
-      "no-change": "変更されていません",
-      "no-permission": "権限がありません",
-      "no-support": "サポートされていません",
-      "confirm-deletion": "を削除します。よろしいですか？",
-      "sort-asc": "昇順",
-      "sort-desc": "降順",
-      "order-cannot-changed-sorting": "ソート中は並び順を変更することはできません。",
-      "clear-sort?": "ソートをクリアしますか？",
-      "clear-sorting": "ソートをクリアする",
-      "clear-filters?": "フィルタをクリアしますか？",
-      "clear-filters": "フィルタをクリア",
-      "position-up": "一つ上に移動",
-      "position-down": "一つ下に移動",
+      "no_data": "データがありません",
+      "no_result": "結果がありません",
+      "no_match": "一致するものがありません",
+      "no_select": "選択されていません",
+      "no_choose": "選択してください",
+      "no_input": "入力してください",
+      "no_change": "変更されていません",
+      "no_permission": "権限がありません",
+      "no_support": "サポートされていません",
+      "confirm_deletion": "を削除します。よろしいですか？",
+      "sort_asc": "昇順",
+      "sort_desc": "降順",
+      "order_cannot_changed_sorting": "ソート中は並び順を変更することはできません。",
+      "clear_sort?": "ソートをクリアしますか？",
+      "clear_sorting": "ソートをクリアする",
+      "clear_filters?": "フィルタをクリアしますか？",
+      "clear_filters": "フィルタをクリア",
+      "position_up": "一つ上に移動",
+      "position_down": "一つ下に移動",
       "settings": "設定"
     }
   },
@@ -63,24 +63,24 @@
       "birthday": "生年月日",
       "language": "言語",
       "theme": "テーマ",
-      "language-list": {
+      "language_list": {
         "auto": "自動検出",
         "en": "English",
         "ja": "日本語"
       },
-      "theme-list": {
+      "theme_list": {
         "system": "システム",
         "light": "ライト",
         "dark": "ダーク"
       }
     },
     "message": {
-      "need-login": "この機能を利用するにはログインする必要があります。",
+      "need_login": "この機能を利用するにはログインする必要があります。",
       "login": "ログイン",
       "logout": "ログアウト",
-      "account-deletion": "アカウントの削除",
-      "settings-info": "アカウントの情報を設定してください。",
-      "do-delete": "アカウントを削除する"
+      "account_deletion": "アカウントの削除",
+      "settings_info": "アカウントの情報を設定してください。",
+      "do_delete": "アカウントを削除する"
     }
   },
   "task": {
@@ -90,9 +90,9 @@
       "title": "タイトル",
       "memo": "メモ",
       "status": "状態",
-      "due-date": "期限",
+      "due_date": "期限",
       "position": "表示位置",
-      "status-list": {
+      "status_list": {
         "new": "新規",
         "done": "完了",
         "doing": "進行中",
@@ -100,16 +100,16 @@
       }
     },
     "message": {
-      "task-creation": "タスクの作成",
-      "task-editing": "タスクの編集",
-      "task-deletion": "タスクの削除",
-      "set-task-info": "タスクの情報を設定してください。",
-      "select-task-status": "タスクの状態を選んでください。",
-      "title-filter": "タイトルを検索",
-      "status-filter": "状態",
-      "to-complete": "完了する",
-      "view-settings": "表示設定",
-      "select-columns": "表示項目"
+      "task_creation": "タスクの作成",
+      "task_editing": "タスクの編集",
+      "task_deletion": "タスクの削除",
+      "set_task_info": "タスクの情報を設定してください。",
+      "select_task_status": "タスクの状態を選んでください。",
+      "title_filter": "タイトルを検索",
+      "status_filter": "状態",
+      "to_complete": "完了する",
+      "view_settings": "表示設定",
+      "select_columns": "表示項目"
     }
   }
 }

@@ -29,12 +29,12 @@ export function TodoTableViewOptions<TData>({
           className="ml-auto hidden h-8 lg:flex"
         >
           <RxMixerHorizontal className="mr-2 h-4 w-4" />
-          {t('task.message.view-settings')}
+          {t('task.message.view_settings')}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[150px]">
         <DropdownMenuLabel>
-          {t('task.message.select-columns')}
+          {t('task.message.select_columns')}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
@@ -51,7 +51,7 @@ export function TodoTableViewOptions<TData>({
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
               >
-                {t(column.columnDef.meta?.title)}
+                {t(`task.model.${column.id}`)}
               </DropdownMenuCheckboxItem>
             )
           })}

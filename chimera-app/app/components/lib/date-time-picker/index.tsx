@@ -52,7 +52,7 @@ export function DateTimePicker({
         <PopoverTrigger asChild>
           <div className="grow pl-3 cursor-pointer">
             {value ? (
-              format(value, t('common.format.datetime-format'))
+              format(value, t('common.format.datetime_format'))
             ) : (
               <span className="opacity-50">Pick a date</span>
             )}

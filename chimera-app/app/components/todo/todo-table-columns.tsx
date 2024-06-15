@@ -37,7 +37,7 @@ function DueDateCell({ row }: { row: Row<Task> }) {
   const { t } = useTranslation()
   const dateStr = row.original.due_date
   return dateStr ? (
-    <span>{format(dateStr, t('common.format.datetime-short-format'))}</span>
+    <span>{format(dateStr, t('common.format.datetime_short_format'))}</span>
   ) : (
     ''
   )
@@ -89,7 +89,7 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
     accessorKey: 'due_date',
     size: 150,
     header: ({ column }) => {
-      return ColumnHeader({ column, title: 'task.model.due-date' })
+      return ColumnHeader({ column, title: 'task.model.due_date' })
     },
     cell: DueDateCell,
   },

@@ -57,9 +57,9 @@ export function TaskUpsertFormDialog({
 }: TaskDialogProps) {
   const { t } = useTranslation()
   const title = task
-    ? t('task.message.task-editing')
-    : t('task.message.task-creation')
-  const description = t('task.message.set-task-info')
+    ? t('task.message.task_editing')
+    : t('task.message.task_creation')
+  const description = t('task.message.set_task_info')
   const action = task ? `${task.id}` : ''
 
   const defaultValue = task || {
@@ -114,7 +114,7 @@ export function TaskUpsertFormDialog({
           </FormItem>
           <FormItem className="flex flex-col">
             <FormLabel htmlFor={fields.due_date.id}>
-              {t('task.model.due-date')}
+              {t('task.model.due_date')}
             </FormLabel>
             <TaskDueDateTimePicker meta={fields.due_date} />
             <FormMessage message={fields.due_date.errors} />
@@ -136,7 +136,7 @@ export function TaskUpsertFormDialog({
               </SelectContent>
             </Select>
             <FormDescription>
-              {t('task.message.select-task-status')}
+              {t('task.message.select_task_status')}
             </FormDescription>
             <FormMessage message={fields.status.errors} />
           </FormItem>

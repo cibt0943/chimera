@@ -87,7 +87,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
         <Command>
           <CommandInput placeholder={title} />
           <CommandList>
-            <CommandEmpty>{t('common.message.no-result')}</CommandEmpty>
+            <CommandEmpty>{t('common.message.no_result')}</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
                 const isSelected = selectedValues.has(option.value)
@@ -138,7 +138,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
                     onSelect={() => column?.setFilterValue(undefined)}
                     className="justify-center text-center"
                   >
-                    {t('common.message.clear-filters')}
+                    {t('common.message.clear_filters')}
                   </CommandItem>
                 </CommandGroup>
               </>
