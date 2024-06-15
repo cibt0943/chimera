@@ -3,7 +3,9 @@ import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { useNavigation } from '@remix-run/react'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ReturnVoidFunctionType = (...args: any[]) => void
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ReturnPromiseVoidFunctionType = (...args: any[]) => Promise<void>
 
 export function cn(...inputs: ClassValue[]) {

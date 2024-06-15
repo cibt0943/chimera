@@ -133,7 +133,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   const [isOpenUpsertDialog, setIsOpenUpsertDialog] = React.useState(false)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
   const [selectedTask, setSelectedTask] = React.useState<Task>() // 編集・削除するタスク
-  const useTBodyRef = React.useRef<HTMLTableElement>(null)
+  const useTBodyRef = React.useRef<HTMLTableSectionElement>(null)
 
   const fetcher = useFetcher()
 
@@ -424,13 +424,14 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       preventDefault: true,
       ignoreEventWhen: (e) => {
         const pressedKeys = e.key.toLowerCase()
+        const target = e.target as HTMLElement
         switch (pressedKeys) {
           case 'enter':
-            return !['tr', 'body'].includes(e.target?.tagName.toLowerCase())
+            return !['tr', 'body'].includes(target.tagName.toLowerCase())
           case 'arrowup':
           case 'arrowdown':
             return !['tr', 'tbody', 'body'].includes(
-              e.target?.tagName.toLowerCase(),
+              target.tagName.toLowerCase(),
             )
           default:
             return false
@@ -465,7 +466,9 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       useTBodyRef.current?.focus()
       return
     }
-    useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus()
+    useTBodyRef.current
+      ?.querySelector<HTMLElement>(`#row-${nowSelectedRow.id}`)
+      ?.focus()
     // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
   }, [useTBodyRef, table, rowSelection, isOpenUpsertDialog, isOpenDeleteDialog])
 
