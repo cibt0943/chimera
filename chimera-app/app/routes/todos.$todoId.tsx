@@ -49,14 +49,5 @@ export const loader = withAuthentication(async ({ params, account }) => {
 export default function Todo() {
   const { task } = useLoaderData<typeof loader>()
 
-  return (
-    <div>
-      <div>id: {task.id}</div>
-      <div>title: {task.title}</div>
-      <div>memo: {task.memo}</div>
-      <div>due_date: {task.due_date}</div>
-      <div>status: {task.status}</div>
-      <div>position: {task.position}</div>
-    </div>
-  )
+  return <UpsertTaskDialog />
 }

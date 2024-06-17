@@ -3,7 +3,6 @@ import { useNavigate, useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { RxPlus } from 'react-icons/rx'
 import {
-  ColumnDef,
   ColumnFiltersState,
   VisibilityState,
   SortingState,
@@ -54,6 +53,7 @@ import { useToast } from '~/components/ui/use-toast'
 import { useDebounce, useQueue, useIsLoading } from '~/lib/utils'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
+import { TodoTableColumns } from './todo-table-columns'
 import { TaskUpsertFormDialog } from './task-upsert-form-dialog'
 import { TaskDeleteConfirmDialog } from './task-delete-confirm-dialog'
 
@@ -66,8 +66,7 @@ declare module '@tanstack/table-core' {
   }
 }
 
-interface TodoTableProps<TData extends RowData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
+interface TodoTableProps<TData extends RowData> {
   tasks: TData[]
 }
 
@@ -112,11 +111,10 @@ function DraggableRow({ row }: { row: Row<Task> }) {
 }
 
 // Table Component
-export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
+export function TodoTable({ tasks }: TodoTableProps<Task>) {
   const { t } = useTranslation()
   const isLoading = useIsLoading()
   const navigate = useNavigate()
-  const memoColumns = React.useMemo(() => columns, [columns])
   const { toast } = useToast()
   const { enqueue } = useQueue()
 
@@ -139,7 +137,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
 
   const table = useReactTable({
     data: tableData,
-    columns: memoColumns,
+    columns: TodoTableColumns,
     state: {
       rowSelection,
       sorting,
@@ -544,7 +542,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={columns.length}
+                      colSpan={table.getAllColumns().length}
                       className="h-24 text-center"
                     >
                       {t('common.message.no_data')}
