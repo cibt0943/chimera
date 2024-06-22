@@ -4,12 +4,11 @@ We assume the following 5 functions.
 
 ## Todo
 
-- [x] 選択行をキーボードで移動
+- [x] ↑↓ キーで選択行を移動
 - [x] return キーで選択行を編集
-- [x] delete キーで削除
-- [x] option + 矢印キーで表示順移動
-- [ ] 多言語対応
-- [ ] タイムゾーン対応
+- [x] (Command or Option) + c キーで状態を完了
+- [x] (Command or Option) + delete キーで削除
+- [x] (Command or Option) + 矢印キーで表示順移動
 
 ## Memo
 
@@ -35,5 +34,6 @@ We assume the following 5 functions.
 
 ## Account
 
-- [ ] 多言語対応
+- [x] ダークモード
+- [x] 多言語対応
 - [ ] タイムゾーン対応

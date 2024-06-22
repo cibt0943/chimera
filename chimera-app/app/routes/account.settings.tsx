@@ -96,14 +96,14 @@ export default function Profile() {
       <div className="space-y-1.5">
         <h2 className="text-xl font-bold">{t('account.title')}</h2>
         <p className="text-sm text-muted-foreground">
-          {t('account.message.settings-info')}
+          {t('account.message.settings_info')}
         </p>
       </div>
       <Separator />
       <AccountForm account={self} />
       <Separator />
       <Button variant="destructive" onClick={() => setIsOpenDeleteDialog(true)}>
-        {t('account.message.do-delete')}
+        {t('account.message.do_delete')}
       </Button>
       <DeleteConfirmAccountDialog />
     </div>

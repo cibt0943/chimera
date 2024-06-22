@@ -51,7 +51,7 @@ export function TodoTableRowActions<TData>({
           }}
         >
           <RxArrowUp className="mr-2 h-4 w-4" />
-          {t('common.message.position-up')}
+          {t('common.message.position_up')}
           <DropdownMenuShortcut>⌘↑</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -60,7 +60,7 @@ export function TodoTableRowActions<TData>({
           }}
         >
           <RxArrowDown className="mr-2 h-4 w-4" />
-          {t('common.message.position-down')}
+          {t('common.message.position_down')}
           <DropdownMenuShortcut>⌘↓</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -70,7 +70,7 @@ export function TodoTableRowActions<TData>({
           }}
         >
           <RxCheckCircled className="mr-2 h-4 w-4" />
-          {t('task.message.to-complete')}
+          {t('task.message.to_complete')}
           <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

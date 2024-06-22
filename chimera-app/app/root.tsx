@@ -16,9 +16,9 @@ import { I18nextProvider } from 'react-i18next'
 import styles from '~/tailwind.css'
 import { authenticator } from '~/lib/auth.server'
 import { useTheme } from './lib/useTheme'
-import { useIsLoading } from '~/lib/utils'
 import i18n from '~/lib/i18n/i18n'
 import { Theme } from '~/types/accounts'
+import { LoadingEffect } from '~/components/loading-effect'
 import { AccountProvider } from '~/components/account-provider'
 import { Sidebar } from '~/components/sidebar'
 import { Toaster } from '~/components/ui/toaster'
@@ -53,7 +53,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function App() {
   const { account, language } = useLoaderData<typeof loader>()
-  const loadingCss = useIsLoading() ? 'opacity-20' : ''
   const theme = (account?.theme || Theme.SYSTEM) as Theme
   useTheme(theme)
 
@@ -78,9 +77,9 @@ export default function App() {
                 <Sidebar />
               </aside>
               <main className="grow h-screen overflow-auto">
-                <div className={loadingCss}>
+                <LoadingEffect>
                   <Outlet />
-                </div>
+                </LoadingEffect>
               </main>
               <Toaster />
             </div>

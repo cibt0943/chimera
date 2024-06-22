@@ -11,22 +11,27 @@ export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
 
 // タスクの全状態の値順リスト
 export const TaskStatusList = [
-  { value: TaskStatus.NEW, label: 'new', disp_order: 0, color: '' },
+  {
+    value: TaskStatus.NEW,
+    label: 'task.model.status_list.new',
+    disp_order: 0,
+    color: '',
+  },
   {
     value: TaskStatus.DONE,
-    label: 'done',
+    label: 'task.model.status_list.done',
     disp_order: 2,
     color: 'bg-violet-600',
   }, //bg-orange-500
   {
     value: TaskStatus.DOING,
-    label: 'doing',
+    label: 'task.model.status_list.doing',
     disp_order: 1,
     color: 'bg-indigo-800',
   }, //bg-violet-600
   {
     value: TaskStatus.PENDING,
-    label: 'pending',
+    label: 'task.model.status_list.pending',
     disp_order: 4,
     color: 'bg-gray-500',
   },
@@ -86,7 +91,8 @@ export const TaskSchema = zod.object({
   memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
   status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
   // status: zod.nativeEnum(TaskStatus),
-  due_date: zod.coerce.date().optional().nullable(),
+  // due_date: zod.coerce.date().optional(),
+  due_date: zod.date().optional(),
 })
 
 export type TaskSchemaType = zod.infer<typeof TaskSchema>

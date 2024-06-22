@@ -48,7 +48,7 @@ export function Sidebar() {
             <RxPencil2 className="mr-2 h-5 w-5" />
             Memo
           </NavLink>
-          <NavLink to="/events" className={navLinkClassName}>
+          <NavLink to="/events" className={navLinkClassName} reloadDocument>
             <RxCalendar className="mr-2 h-5 w-5" />
             Event
           </NavLink>

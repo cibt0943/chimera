@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form } from '@remix-run/react'
+import { Form, useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import {
   useForm,
@@ -22,7 +22,6 @@ import {
 import { Required } from '~/components/lib/required'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
-import { DateTimePicker } from '~/components/lib/date-time-picker'
 import {
   Select,
   SelectTrigger,
@@ -36,6 +35,7 @@ import {
   FormMessage,
   FormDescription,
 } from '~/components/lib/form'
+import { TaskDueDateTimePicker } from './task-due-date-time-picker'
 import {
   Task,
   TaskStatus,
@@ -44,23 +44,25 @@ import {
   TaskStatusListByDispOrder,
 } from '~/types/tasks'
 
-interface TaskDialogProps {
+interface TaskFormDialogProps {
   task: Task | undefined
-  isOpenDialog: boolean
-  setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>
+  isOpen: boolean
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export function TaskUpsertFormDialog({
+export function TaskFormDialog({
   task,
-  isOpenDialog,
-  setIsOpenDialog,
-}: TaskDialogProps) {
+  isOpen,
+  setIsOpen,
+}: TaskFormDialogProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+
   const title = task
-    ? t('task.message.task-editing')
-    : t('task.message.task-creation')
-  const description = t('task.message.set-task-info')
-  const action = task ? `${task.id}` : ''
+    ? t('task.message.task_editing')
+    : t('task.message.task_creation')
+  const description = t('task.message.set_task_info')
+  const action = task ? `/todos/${task.id}` : '/todos'
 
   const defaultValue = task || {
     title: '',
@@ -70,19 +72,27 @@ export function TaskUpsertFormDialog({
   }
 
   const [form, fields] = useForm<TaskSchemaType>({
-    id: 'task-from',
+    id: `task-from${task ? `-${task.id}` : ''}`,
     defaultValue: defaultValue,
     constraint: getZodConstraint(TaskSchema),
     onValidate: ({ formData }) => {
       return parseWithZod(formData, { schema: TaskSchema })
     },
     onSubmit: () => {
-      setIsOpenDialog(false)
+      setIsOpen(false)
     },
   })
 
   return (
-    <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open)
+        if (!open && !location.pathname.match(/^\/todos\/?$/)) {
+          navigate('/todos')
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -114,9 +124,9 @@ export function TaskUpsertFormDialog({
           </FormItem>
           <FormItem className="flex flex-col">
             <FormLabel htmlFor={fields.due_date.id}>
-              {t('task.model.due-date')}
+              {t('task.model.due_date')}
             </FormLabel>
-            <DateTimePicker meta={fields.due_date} />
+            <TaskDueDateTimePicker meta={fields.due_date} />
             <FormMessage message={fields.due_date.errors} />
           </FormItem>
           <FormItem>
@@ -136,7 +146,7 @@ export function TaskUpsertFormDialog({
               </SelectContent>
             </Select>
             <FormDescription>
-              {t('task.message.select-task-status')}
+              {t('task.message.select_task_status')}
             </FormDescription>
             <FormMessage message={fields.status.errors} />
           </FormItem>
@@ -150,11 +160,13 @@ export function TaskUpsertFormDialog({
 }
 
 function SelectItems() {
+  const { t } = useTranslation()
+
   return (
     <>
       {TaskStatusListByDispOrder.map((status) => (
         <SelectItem key={status.value} value={status.value.toString()}>
-          {status.label}
+          {t(status.label)}
         </SelectItem>
       ))}
     </>

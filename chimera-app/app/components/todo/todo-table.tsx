@@ -3,7 +3,6 @@ import { useNavigate, useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { RxPlus } from 'react-icons/rx'
 import {
-  ColumnDef,
   ColumnFiltersState,
   VisibilityState,
   SortingState,
@@ -54,7 +53,8 @@ import { useToast } from '~/components/ui/use-toast'
 import { useDebounce, useQueue, useIsLoading } from '~/lib/utils'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
-import { TaskUpsertFormDialog } from './task-upsert-form-dialog'
+import { TodoTableColumns } from './todo-table-columns'
+import { TaskFormDialog } from './task-form-dialog'
 import { TaskDeleteConfirmDialog } from './task-delete-confirm-dialog'
 
 declare module '@tanstack/table-core' {
@@ -66,8 +66,7 @@ declare module '@tanstack/table-core' {
   }
 }
 
-interface TodoTableProps<TData extends RowData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
+interface TodoTableProps<TData extends RowData> {
   tasks: TData[]
 }
 
@@ -112,13 +111,12 @@ function DraggableRow({ row }: { row: Row<Task> }) {
 }
 
 // Table Component
-export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
+export function TodoTable({ tasks }: TodoTableProps<Task>) {
   const { t } = useTranslation()
-  const isLoading = useIsLoading()
   const navigate = useNavigate()
-  const memoColumns = React.useMemo(() => columns, [columns])
   const { toast } = useToast()
   const { enqueue } = useQueue()
+  const isLoading = useIsLoading()
 
   // tanstack/react-table
   const [tableData, setTableData] = React.useState<Tasks>(tasks)
@@ -130,16 +128,16 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
 
-  const [isOpenUpsertDialog, setIsOpenUpsertDialog] = React.useState(false)
+  const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
   const [selectedTask, setSelectedTask] = React.useState<Task>() // 編集・削除するタスク
-  const useTBodyRef = React.useRef<HTMLTableElement>(null)
+  const useTBodyRef = React.useRef<HTMLTableSectionElement>(null)
 
   const fetcher = useFetcher()
 
   const table = useReactTable({
     data: tableData,
-    columns: memoColumns,
+    columns: TodoTableColumns,
     state: {
       rowSelection,
       sorting,
@@ -190,7 +188,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
         )
       },
       editTask: (task: Task) => {
-        openTaskDialog(task)
+        navigate(task.id.toString())
       },
       deleteTask: (task: Task) => {
         openDeleteTaskDialog(task)
@@ -198,10 +196,10 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     },
   })
 
-  // タスク追加・編集ダイアログを開く
-  function openTaskDialog(task: Task | undefined = undefined) {
-    setSelectedTask(task)
-    setIsOpenUpsertDialog(true)
+  // タスク追加ダイアログを開く
+  function openAddTaskDialog() {
+    setSelectedTask(undefined)
+    setIsOpenAddDialog(true)
   }
 
   // タスク削除ダイアログを開く
@@ -210,13 +208,13 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
     setIsOpenDeleteDialog(true)
   }
 
-  // タスク追加・編集ダイアログ
-  function UpsertTaskDialog() {
+  // タスク追加ダイアログ
+  function AddTaskDialog() {
     return (
-      <TaskUpsertFormDialog
-        task={selectedTask}
-        isOpenDialog={isOpenUpsertDialog}
-        setIsOpenDialog={setIsOpenUpsertDialog}
+      <TaskFormDialog
+        task={undefined}
+        isOpen={isOpenAddDialog}
+        setIsOpen={setIsOpenAddDialog}
       />
     )
   }
@@ -239,14 +237,14 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       variant: 'destructive',
       description: (
         <div className="">
-          {t('common.message.order-cannot-changed-sorting')}
+          {t('common.message.order_cannot_changed_sorting')}
           <br />
-          {t('common.message.clear-sort?')}
+          {t('common.message.clear_sort?')}
         </div>
       ),
       action: (
         <ToastAction
-          altText={t('common.message.clear-sorting')}
+          altText={t('common.message.clear_sorting')}
           onClick={() => {
             table.resetSorting()
           }}
@@ -368,8 +366,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   function keyEditTask() {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
     if (!nowSelectedRow) return
-
-    openTaskDialog(nowSelectedRow.original)
+    navigate(nowSelectedRow.original.id.toString())
   }
 
   // 選択行を削除
@@ -399,7 +396,8 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       'alt+backspace',
     ],
     (_, handler) => {
-      if (isLoading) return // ローディング中は何もしない
+      // ローディング中、ダイアログが開いている場合は何もしない
+      if (isLoading || isOpenAddDialog || isOpenDeleteDialog) return
       switch (handler.keys?.join('')) {
         case 'up':
         case 'down':
@@ -423,13 +421,14 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
       preventDefault: true,
       ignoreEventWhen: (e) => {
         const pressedKeys = e.key.toLowerCase()
+        const target = e.target as HTMLElement
         switch (pressedKeys) {
           case 'enter':
-            return !['tr', 'body'].includes(e.target?.tagName.toLowerCase())
+            return !['tr', 'body'].includes(target.tagName.toLowerCase())
           case 'arrowup':
           case 'arrowdown':
             return !['tr', 'tbody', 'body'].includes(
-              e.target?.tagName.toLowerCase(),
+              target.tagName.toLowerCase(),
             )
           default:
             return false
@@ -441,8 +440,8 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
   // タスク追加ダイアログを開く
   useHotkeys(['mod+i', 'alt+i'], () => {
     // ローディング中、ダイアログが開いている場合は何もしない
-    if (isLoading || isOpenUpsertDialog || isOpenDeleteDialog) return
-    openTaskDialog()
+    if (isLoading || isOpenAddDialog || isOpenDeleteDialog) return
+    openAddTaskDialog()
   })
 
   const sensors = useSensors(
@@ -458,15 +457,17 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
 
   // 選択行が変更された時とモーダルを閉じた時にテーブルにフォーカスを移動
   React.useEffect(() => {
-    if (isOpenDeleteDialog || isOpenUpsertDialog) return
+    if (isOpenDeleteDialog || isOpenAddDialog) return
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
     if (!nowSelectedRow) {
       useTBodyRef.current?.focus()
       return
     }
-    useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus()
+    useTBodyRef.current
+      ?.querySelector<HTMLElement>(`#row-${nowSelectedRow.id}`)
+      ?.focus()
     // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
-  }, [useTBodyRef, table, rowSelection, isOpenUpsertDialog, isOpenDeleteDialog])
+  }, [useTBodyRef, table, rowSelection, isOpenAddDialog, isOpenDeleteDialog])
 
   return (
     <DndContext
@@ -486,7 +487,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
           <Button
             variant="secondary"
             className="h-8 px-2 lg:px-3"
-            onClick={() => openTaskDialog()}
+            onClick={() => openAddTaskDialog()}
           >
             <RxPlus className="mr-2" />
             {t('common.message.add')}
@@ -540,10 +541,10 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={columns.length}
+                      colSpan={table.getAllColumns().length}
                       className="h-24 text-center"
                     >
-                      {t('common.message.no-data')}
+                      {t('common.message.no_data')}
                     </TableCell>
                   </TableRow>
                 )}
@@ -569,7 +570,7 @@ export function TodoTable({ columns, tasks }: TodoTableProps<Task, Tasks>) {
             {t('common.message.next')}
           </Button>
         </div>
-        <UpsertTaskDialog />
+        <AddTaskDialog />
         <DeleteConfirmTaskDialog />
       </div>
     </DndContext>

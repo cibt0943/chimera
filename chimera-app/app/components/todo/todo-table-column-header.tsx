@@ -53,13 +53,13 @@ export function TodoTableColumnHeader<TData, TValue>({
           {(column.getIsSorted() === 'desc' || !column.getIsSorted()) && (
             <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
               <RiSortAsc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-              {t('common.message.sort-asc')}
+              {t('common.message.sort_asc')}
             </DropdownMenuItem>
           )}
           {(column.getIsSorted() === 'asc' || !column.getIsSorted()) && (
             <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
               <RiSortDesc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-              {t('common.message.sort-desc')}
+              {t('common.message.sort_desc')}
             </DropdownMenuItem>
           )}
           {column.getIsSorted() && (

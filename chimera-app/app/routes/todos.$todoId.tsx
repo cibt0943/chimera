@@ -1,3 +1,4 @@
+import * as React from 'react'
 import type { MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
@@ -5,9 +6,10 @@ import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { TaskSchema } from '~/types/tasks'
 import { getTask, updateTask } from '~/models/task.server'
+import { TaskUpsertFormDialog } from '~/components/todo/task-upsert-form-dialog'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: 'Todo ' + data?.task.id + ' Show | Kobushi' }]
+  return [{ title: 'Todo ' + data?.task.id + ' Edit | Kobushi' }]
 }
 
 export const action = withAuthentication(
@@ -48,15 +50,17 @@ export const loader = withAuthentication(async ({ params, account }) => {
 
 export default function Todo() {
   const { task } = useLoaderData<typeof loader>()
+  const [isOpenDialog, setIsOpenDialog] = React.useState(false)
+
+  React.useEffect(() => {
+    setIsOpenDialog(true)
+  }, [])
 
   return (
-    <div>
-      <div>id: {task.id}</div>
-      <div>title: {task.title}</div>
-      <div>memo: {task.memo}</div>
-      <div>due_date: {task.due_date}</div>
-      <div>status: {task.status}</div>
-      <div>position: {task.position}</div>
-    </div>
+    <TaskUpsertFormDialog
+      task={task}
+      isOpen={isOpenDialog}
+      setIsOpen={setIsOpenDialog}
+    />
   )
 }

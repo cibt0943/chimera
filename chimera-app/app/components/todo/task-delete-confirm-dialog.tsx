@@ -21,9 +21,9 @@ export function TaskDeleteConfirmDialog({
 
   return (
     <DeleteConfirmDialog
-      title={t('task.message.task-deletion')}
+      title={t('task.message.task_deletion')}
       description={
-        '「' + task.title + '」' + t('common.message.confirm-deletion')
+        '「' + task.title + '」' + t('common.message.confirm_deletion')
       }
       isOpenDialog={isOpenDialog}
       setIsOpenDialog={setIsOpenDialog}

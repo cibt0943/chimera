@@ -37,10 +37,16 @@ function DueDateCell({ row }: { row: Row<Task> }) {
   const { t } = useTranslation()
   const dateStr = row.original.due_date
   return dateStr ? (
-    <span>{format(dateStr, t('common.format.datetime-short-format'))}</span>
+    <span>{format(dateStr, t('common.format.datetime_short_format'))}</span>
   ) : (
     ''
   )
+}
+
+function StatusCell({ row }: { row: Row<Task> }) {
+  const { t } = useTranslation()
+  const status = TaskStatusList[row.original.status]
+  return status ? <Badge className={status.color}>{t(status.label)}</Badge> : ''
 }
 
 export const TodoTableColumns: ColumnDef<Task>[] = [
@@ -57,9 +63,6 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
       return ColumnHeader({ column, title: 'task.model.id' })
     },
     cell: ({ row }) => <span className="">{row.original.id}</span>,
-    meta: {
-      title: 'task.model.id',
-    },
   },
   {
     accessorKey: 'title',
@@ -70,9 +73,6 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
     cell: ({ row }) => {
       return <span className="truncate font-medium">{row.original.title}</span>
     },
-    meta: {
-      title: 'task.model.title',
-    },
   },
   {
     accessorKey: 'status',
@@ -80,31 +80,18 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
     header: ({ column }) => {
       return ColumnHeader({ column, title: 'task.model.status' })
     },
-    cell: ({ row }) => {
-      const status = TaskStatusList[row.original.status]
-      return status ? (
-        <Badge className={status.color}>{status.label}</Badge>
-      ) : (
-        ''
-      )
-    },
+    cell: StatusCell,
     filterFn: (row, id, value) => {
       return value.includes(row.original.status) //id="status"
-    },
-    meta: {
-      title: 'task.model.status',
     },
   },
   {
     accessorKey: 'due_date',
     size: 150,
     header: ({ column }) => {
-      return ColumnHeader({ column, title: 'task.model.due-date' })
+      return ColumnHeader({ column, title: 'task.model.due_date' })
     },
     cell: DueDateCell,
-    meta: {
-      title: 'task.model.due-date',
-    },
   },
   {
     id: 'actions',
