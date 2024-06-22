@@ -6,7 +6,7 @@ import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { TaskSchema } from '~/types/tasks'
 import { getTask, updateTask } from '~/models/task.server'
-import { TaskUpsertFormDialog } from '~/components/todo/task-upsert-form-dialog'
+import { TaskFormDialog } from '~/components/todo/task-form-dialog'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: 'Todo ' + data?.task.id + ' Edit | Kobushi' }]
@@ -57,7 +57,7 @@ export default function Todo() {
   }, [])
 
   return (
-    <TaskUpsertFormDialog
+    <TaskFormDialog
       task={task}
       isOpen={isOpenDialog}
       setIsOpen={setIsOpenDialog}
