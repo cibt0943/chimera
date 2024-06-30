@@ -1,0 +1,39 @@
+{
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  //   "[graphql]": {
+  //     "editor.formatOnSave": true
+  //   },
+  //   "[javascript]": {
+  //     "editor.formatOnSave": true
+  //   },
+  //   "[javascriptreact]": {
+  //     "editor.formatOnSave": true
+  //   },
+  //   "[json]": {
+  //     "editor.formatOnSave": true
+  //   },
+  //   "[typescript]": {
+  //     "editor.formatOnSave": true
+  //   },
+  //   "[typescriptreact]": {
+  //     "editor.formatOnSave": true
+  //   },
+  // "eslint.packageManager": "yarn",
+  "[markdown]": {
+    "files.trimTrailingWhitespace": false
+  },
+  "editor.tabSize": 2,
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "css.validate": false,
+  "scss.validate": false,
+  "stylelint.validate": ["css", "scss"],
+  "eslint.workingDirectories": ["./chimera-app"]
+}

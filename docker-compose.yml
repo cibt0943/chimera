@@ -1,0 +1,22 @@
+services:
+  app:
+    container_name: chimera-app
+    build:
+      context: ./chimera-app
+    volumes:
+      - ./chimera-app:/chimera-app
+    ports:
+      - 3000:3000
+      - 3001:3001
+    # env_file: ./chimera-app/.env
+    tty: true
+    stdin_open: true
+    # command: >
+    #   bash -c "
+    #     yarn
+    #     yarn dev"
+#     networks:
+#       - supabase_network_chimera
+# networks:
+#   supabase_network_chimera:
+#     external: true
