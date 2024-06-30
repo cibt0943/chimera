@@ -1,0 +1,27 @@
+# fly.toml app configuration file generated for kobushi on 2024-06-30T11:23:23+09:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'kobushi'
+primary_region = 'nrt'
+
+[build]
+  dockerfile = "Dockerfile.fly"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '256mb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[env]
+  DOMAIN = 'kobushi.fly.dev'
+  PORT = 8080

@@ -15,3 +15,8 @@ services:
     #   bash -c "
     #     yarn
     #     yarn dev"
+#     networks:
+#       - supabase_network_chimera
+# networks:
+#   supabase_network_chimera:
+#     external: true
