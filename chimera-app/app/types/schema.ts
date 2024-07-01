@@ -1,4 +1,3 @@
-
 export type Json =
   | string
   | number
@@ -61,6 +60,39 @@ export type Database = {
           sub?: string
           theme?: string
           timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      memos: {
+        Row: {
+          account_id: number
+          content: string
+          created_at: string
+          id: number
+          position: number
+          related_date: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: number
+          content?: string
+          created_at?: string
+          id?: number
+          position?: number
+          related_date?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: number
+          content?: string
+          created_at?: string
+          id?: number
+          position?: number
+          related_date?: string | null
+          title?: string
           updated_at?: string
         }
         Relationships: []
@@ -391,6 +423,10 @@ export type Database = {
           metadata: Json
           updated_at: string
         }[]
+      }
+      operation: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       search: {
         Args: {
