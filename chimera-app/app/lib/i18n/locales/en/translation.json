@@ -111,5 +111,22 @@
       "view_settings": "View",
       "select_columns": "Select Columns"
     }
+  },
+  "memo": {
+    "title": "Memo",
+    "model": {
+      "id": "ID",
+      "title": "Title",
+      "content": "Content",
+      "related_date": "Related date",
+      "position": "Position"
+    },
+    "message": {
+      "memo_creation": "Memo Creation",
+      "memo_editing": "Memo Editing",
+      "memo_deletion": "Memo Deletion",
+      "set_memo_info": "Set the memo information.",
+      "title_filter": "Filter memos..."
+    }
   }
 }

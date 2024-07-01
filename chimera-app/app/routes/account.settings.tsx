@@ -92,7 +92,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="space-y-6 w-1/3">
+    <div className="space-y-6 w-[400px]">
       <div className="space-y-1.5">
         <h2 className="text-xl font-bold">{t('account.title')}</h2>
         <p className="text-sm text-muted-foreground">
