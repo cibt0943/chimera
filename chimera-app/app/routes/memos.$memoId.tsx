@@ -1,6 +1,7 @@
 import type { MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
+import { ClientOnly } from 'remix-utils/client-only'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { MemoSchema } from '~/types/memos'
@@ -49,5 +50,5 @@ export const loader = withAuthentication(async ({ params, account }) => {
 export default function Memo() {
   const { memo } = useLoaderData<typeof loader>()
 
-  return <MemoForm memo={memo} />
+  return <ClientOnly>{() => <MemoForm memo={memo} />}</ClientOnly>
 }

@@ -11,7 +11,6 @@ import { Button } from '~/components/ui/button'
 import { Required } from '~/components/lib/required'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
-import { Separator } from '~/components/ui/separator'
 import { FormItem, FormLabel, FormMessage } from '~/components/lib/form'
 import { MemoRelatedDateTimePicker } from './memo-related-date-time-picker'
 import { Memo, MemoSchema, MemoSchemaType } from '~/types/memos'
@@ -32,7 +31,7 @@ export function MemoForm({ memo }: MemoFormProps) {
   }
 
   const [form, fields] = useForm<MemoSchemaType>({
-    id: `memo-from${memo ? `-${memo.id}` : ''}`,
+    id: `memo-form${memo ? `-${memo.id}` : ''}`,
     defaultValue: defaultValue,
     constraint: getZodConstraint(MemoSchema),
     onValidate: ({ formData }) => {
@@ -41,7 +40,7 @@ export function MemoForm({ memo }: MemoFormProps) {
   })
 
   return (
-    <div className="mx-10 p-6">
+    <div className="mx-10 p-10 bg-muted h-full">
       <Form
         method="post"
         className="space-y-6"
@@ -53,7 +52,10 @@ export function MemoForm({ memo }: MemoFormProps) {
             {t('memo.model.title')}
             <Required />
           </FormLabel>
-          <Input {...getInputProps(fields.title, { type: 'text' })} />
+          <Input
+            {...getInputProps(fields.title, { type: 'text' })}
+            key={fields.title.key}
+          />
           <FormMessage message={fields.title.errors} />
         </FormItem>
         <FormItem>
@@ -62,6 +64,7 @@ export function MemoForm({ memo }: MemoFormProps) {
           </FormLabel>
           <Textarea
             {...getTextareaProps(fields.content)}
+            key={fields.content.key}
             className="resize-none"
             rows={15}
           />
