@@ -56,6 +56,7 @@ export async function insertTask(task: insertTaskProps): Promise<TaskModel> {
   return newTask
 }
 
+// タスク情報の追加
 interface updateTaskProps {
   id: number
   position?: number
@@ -86,6 +87,7 @@ export async function updateTask(
   return data
 }
 
+// タスク情報の削除
 export async function deleteTask(taskId: number): Promise<void> {
   const { error } = await supabase.from('tasks').delete().eq('id', taskId)
   if (error) throw error
