@@ -43,13 +43,13 @@ export const TaskStatusListByDispOrder = TaskStatusList.slice().sort(
 )
 
 export type Task = {
-  id: number
+  id: string
   title: string
   memo: string
   status: TaskStatus
   due_date: Date | null
   // position: number
-  account_id: number
+  account_id: string
   created_at: Date
   updated_at: Date
 }
@@ -57,13 +57,13 @@ export type Task = {
 export type Tasks = Task[]
 
 export type TaskModel = {
-  id: number
+  id: string
   title: string
   memo: string
   status: number
   due_date: string | null
   position: number
-  account_id: number
+  account_id: string
   created_at: string
   updated_at: string
 }

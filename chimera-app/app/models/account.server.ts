@@ -65,7 +65,7 @@ export async function updateAccount(
 }
 
 // アカウント情報の削除
-export async function deleteAccount(account_id: number): Promise<void> {
+export async function deleteAccount(account_id: string): Promise<void> {
   const { error } = await supabase
     .from('accounts')
     .delete()

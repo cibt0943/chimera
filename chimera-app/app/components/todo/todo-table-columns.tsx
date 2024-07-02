@@ -10,7 +10,7 @@ import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
 
 // Cell Component
-function RowDragHandleCell({ rowId }: { rowId: number }) {
+function RowDragHandleCell({ rowId }: { rowId: string }) {
   const { attributes, listeners } = useSortable({
     id: rowId,
   })
@@ -56,14 +56,14 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
     cell: ({ row }) => <RowDragHandleCell rowId={row.original.id} />,
     size: 40,
   },
-  {
-    accessorKey: 'id',
-    size: 65,
-    header: ({ column }) => {
-      return ColumnHeader({ column, title: 'task.model.id' })
-    },
-    cell: ({ row }) => <span className="">{row.original.id}</span>,
-  },
+  // {
+  //   accessorKey: 'id',
+  //   size: 65,
+  //   header: ({ column }) => {
+  //     return ColumnHeader({ column, title: 'task.model.id' })
+  //   },
+  //   cell: ({ row }) => <span className="">{row.original.id}</span>,
+  // },
   {
     accessorKey: 'title',
     size: undefined,
