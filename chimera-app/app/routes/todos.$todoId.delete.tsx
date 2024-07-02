@@ -3,7 +3,7 @@ import { withAuthentication } from '~/lib/auth-middleware'
 import { getTask, deleteTask } from '~/models/task.server'
 
 export const action = withAuthentication(async ({ params, account }) => {
-  const task = await getTask(Number(params.todoId))
+  const task = await getTask(params.todoId || '')
   if (task.account_id !== account.id) throw new Error('erorr')
 
   await deleteTask(task.id)

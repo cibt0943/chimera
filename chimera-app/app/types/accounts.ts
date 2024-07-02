@@ -29,7 +29,7 @@ export const ThemeList = [
 ]
 
 export type AccountModel = {
-  id: number
+  id: string
   sub: string
   language: string
   timezone: string
@@ -39,7 +39,7 @@ export type AccountModel = {
 }
 
 export type Account = {
-  id: number
+  id: string
   sub: string
   name: string
   email: string
