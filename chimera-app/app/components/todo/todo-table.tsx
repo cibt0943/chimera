@@ -273,7 +273,12 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
 
   // タスクの表示順を更新APIをdebounce
   const updateTaskPositionApiDebounce = useDebounce((fromTask, toTask) => {
-    enqueue(() => updateTaskPositionApi(fromTask, toTask))
+    enqueue(() =>
+      updateTaskPositionApi(fromTask, toTask).catch((error) => {
+        alert(error.message)
+        navigate('.', { replace: true })
+      }),
+    )
   }, 300)
 
   // タスクの表示順更新APIの呼び出し
@@ -309,7 +314,6 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
       const msg = error instanceof Error ? error.message : 'Error'
       alert(msg)
       navigate('.', { replace: true })
-      return
     }
   }
 

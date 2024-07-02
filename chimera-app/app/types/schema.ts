@@ -1,4 +1,3 @@
-
 export type Json =
   | string
   | number
@@ -38,7 +37,7 @@ export type Database = {
       accounts: {
         Row: {
           created_at: string
-          id: number
+          id: string
           language: string
           sub: string
           theme: string
@@ -47,7 +46,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          id?: number
+          id?: string
           language?: string
           sub: string
           theme?: string
@@ -56,7 +55,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          id?: number
+          id?: string
           language?: string
           sub?: string
           theme?: string
@@ -65,12 +64,45 @@ export type Database = {
         }
         Relationships: []
       }
+      memos: {
+        Row: {
+          account_id: string
+          content: string
+          created_at: string
+          id: string
+          position: number
+          related_date: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          content?: string
+          created_at?: string
+          id?: string
+          position?: number
+          related_date?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          position?: number
+          related_date?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
-          account_id: number
+          account_id: string
           created_at: string
           due_date: string | null
-          id: number
+          id: string
           memo: string
           position: number
           status: number
@@ -78,10 +110,10 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          account_id: number
+          account_id: string
           created_at?: string
           due_date?: string | null
-          id?: number
+          id?: string
           memo?: string
           position?: number
           status?: number
@@ -89,10 +121,10 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          account_id?: number
+          account_id?: string
           created_at?: string
           due_date?: string | null
-          id?: number
+          id?: string
           memo?: string
           position?: number
           status?: number
@@ -391,6 +423,10 @@ export type Database = {
           metadata: Json
           updated_at: string
         }[]
+      }
+      operation: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       search: {
         Args: {
