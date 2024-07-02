@@ -16,9 +16,9 @@ type NavLinkClassNameProps = {
   isPending: boolean
 }
 
-function NavLinkClassName({ isActive, isPending }: NavLinkClassNameProps) {
-  const className = isActive ? 'bg-muted' : isPending ? 'pending' : ''
-  return cn('rounded-lg border p-3 hover:bg-accent', className)
+function NavLinkClassName({ isActive }: NavLinkClassNameProps) {
+  const className = isActive ? 'bg-blue-100' : 'hover:bg-accent'
+  return cn('flex flex-col gap-2 rounded-lg border p-3 text-sm', className)
 }
 
 // Item Component
@@ -30,7 +30,10 @@ function ListIterm({ item }: { item: Memo }) {
       key={item.id}
       id={`row-${item.id}`}
     >
-      {item.title}
+      <div>{item.title}</div>
+      <div className="line-clamp-2 text-xs text-muted-foreground">
+        {item.content.substring(0, 300)}
+      </div>
     </NavLink>
   )
 }
@@ -40,7 +43,7 @@ export function MemoList({ items }: MemoListProps) {
   const navigate = useNavigate()
 
   return (
-    <div className="pr-6 space-y-4">
+    <div className="mr-6 space-y-4">
       <div className="flex items-center space-x-2">
         <Input
           type="search"

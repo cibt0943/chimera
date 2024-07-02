@@ -40,7 +40,7 @@ export function MemoForm({ memo }: MemoFormProps) {
   })
 
   return (
-    <div className="mx-10 p-10 bg-muted h-full">
+    <div className="mx-6 p-10 bg-muted h-full">
       <Form
         method="post"
         className="space-y-6"

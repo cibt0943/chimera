@@ -30,16 +30,18 @@ export const ThemeList = [
 
 export type AccountModel = {
   id: string
+  created_at: string
+  updated_at: string
   sub: string
   language: string
   timezone: string
   theme: string
-  created_at: string
-  updated_at: string
 }
 
 export type Account = {
   id: string
+  created_at: string
+  updated_at: string
   sub: string
   name: string
   email: string
@@ -48,18 +50,16 @@ export type Account = {
   language: string
   timezone: string
   theme: string
-  created_at: string
-  updated_at: string
 }
 
 export type Auth0User = {
+  updated_at: string
   sub: string
   // nickname: string
   name: string
   email: string
   email_verified: boolean
   picture: string
-  updated_at: string
 }
 
 // Auth0のユーザー情報とDBのアカウント情報をマージしてAccountオブジェクトを生成
@@ -69,6 +69,11 @@ export function Auth0UserAndAccountModel2Account(
 ): Account {
   return {
     id: accountModel.id,
+    created_at: accountModel.created_at,
+    updated_at:
+      accountModel.updated_at > auth0User.updated_at
+        ? accountModel.updated_at
+        : auth0User.updated_at,
     sub: accountModel.sub,
     name: auth0User.name,
     email: auth0User.email,
@@ -77,23 +82,18 @@ export function Auth0UserAndAccountModel2Account(
     language: accountModel.language,
     timezone: accountModel.timezone,
     theme: accountModel.theme,
-    created_at: accountModel.created_at,
-    updated_at:
-      accountModel.updated_at > auth0User.updated_at
-        ? accountModel.updated_at
-        : auth0User.updated_at,
   }
 }
 
 export function Account2AccountModel(account: Account): AccountModel {
   return {
     id: account.id,
+    created_at: account.created_at,
+    updated_at: account.updated_at,
     sub: account.sub,
     language: account.language,
     timezone: account.timezone,
     theme: account.theme,
-    created_at: account.created_at,
-    updated_at: account.updated_at,
   }
 }
 

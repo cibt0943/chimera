@@ -44,28 +44,28 @@ export const TaskStatusListByDispOrder = TaskStatusList.slice().sort(
 
 export type Task = {
   id: string
+  created_at: Date
+  updated_at: Date
+  account_id: string
   title: string
   memo: string
   status: TaskStatus
   due_date: Date | null
   // position: number
-  account_id: string
-  created_at: Date
-  updated_at: Date
 }
 
 export type Tasks = Task[]
 
 export type TaskModel = {
   id: string
+  created_at: string
+  updated_at: string
+  account_id: string
   title: string
   memo: string
   status: number
   due_date: string | null
   position: number
-  account_id: string
-  created_at: string
-  updated_at: string
 }
 
 export type TaskModels = TaskModel[]
@@ -73,14 +73,14 @@ export type TaskModels = TaskModel[]
 export function TaskModel2Task(taskModel: TaskModel): Task {
   return {
     id: taskModel.id,
+    created_at: toDate(taskModel.created_at),
+    updated_at: toDate(taskModel.updated_at),
+    account_id: taskModel.account_id,
     title: taskModel.title,
     memo: taskModel.memo,
     status: taskModel.status as TaskStatus,
     due_date: taskModel.due_date ? toDate(taskModel.due_date) : null,
     // position: taskModel.position,
-    account_id: taskModel.account_id,
-    created_at: toDate(taskModel.created_at),
-    updated_at: toDate(taskModel.updated_at),
   }
 }
 

@@ -14,7 +14,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 export const action = withAuthentication(
   async ({ params, request, account }) => {
-    const memo = await getMemo(Number(params.memoId))
+    const memo = await getMemo(params.memoId || '')
     if (memo.account_id !== account.id) throw new Error('erorr')
 
     const formData = await request.formData()
@@ -41,7 +41,7 @@ export const action = withAuthentication(
 )
 
 export const loader = withAuthentication(async ({ params, account }) => {
-  const memo = await getMemo(Number(params.memoId))
+  const memo = await getMemo(params.memoId || '')
   if (memo.account_id !== account.id) throw new Error('erorr')
 
   return json({ memo })

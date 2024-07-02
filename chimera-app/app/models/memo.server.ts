@@ -2,7 +2,7 @@ import { MemoModel, MemoModels } from '~/types/memos'
 import { supabase } from '~/lib/supabase-client.server'
 
 // メモ一覧を取得
-export async function getMemos(account_id: number): Promise<MemoModels> {
+export async function getMemos(account_id: string): Promise<MemoModels> {
   const { data, error } = await supabase
     .from('memos')
     .select()
@@ -15,7 +15,7 @@ export async function getMemos(account_id: number): Promise<MemoModels> {
 }
 
 // メモを取得
-export async function getMemo(memoId: number): Promise<MemoModel> {
+export async function getMemo(memoId: string): Promise<MemoModel> {
   const { data, error } = await supabase
     .from('memos')
     .select()
@@ -28,10 +28,10 @@ export async function getMemo(memoId: number): Promise<MemoModel> {
 
 // メモ情報の追加
 interface insertMemoProps {
+  account_id: string
   title: string
   content: string
   related_date: string | null
-  account_id: number
 }
 
 export async function insertMemo(memo: insertMemoProps): Promise<MemoModel> {
@@ -57,13 +57,13 @@ export async function insertMemo(memo: insertMemoProps): Promise<MemoModel> {
 
 // メモ情報の更新
 interface updateMemoProps {
-  id: number
+  id: string
+  updated_at?: string
+  account_id?: string
   title?: string
   content?: string
   related_date?: string | null
   position?: number
-  account_id?: number
-  updated_at?: string
 }
 
 export async function updateMemo(
@@ -86,7 +86,7 @@ export async function updateMemo(
 }
 
 // メモ情報の削除
-export async function deleteMemo(memoId: number): Promise<void> {
+export async function deleteMemo(memoId: string): Promise<void> {
   const { error } = await supabase.from('memos').delete().eq('id', memoId)
   if (error) throw error
 }
@@ -95,7 +95,7 @@ export async function deleteMemo(memoId: number): Promise<void> {
 // memoIdにて指定されたメモの位置をpositionに変更します。
 // この変更による他のメモの位置の変更もあわせて行います。
 export async function updateMemoPosition(
-  memoId: number,
+  memoId: string,
   position: number,
 ): Promise<MemoModel> {
   const fromMemo = await getMemo(memoId)

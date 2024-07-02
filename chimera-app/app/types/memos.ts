@@ -2,26 +2,26 @@ import * as zod from 'zod'
 import { toDate } from 'date-fns'
 
 export type Memo = {
-  id: number
+  id: string
+  created_at: Date
+  updated_at: Date
+  account_id: string
   title: string
   content: string
   related_date: Date | null
-  account_id: number
-  created_at: Date
-  updated_at: Date
 }
 
 export type Memos = Memo[]
 
 export type MemoModel = {
-  id: number
+  id: string
+  created_at: string
+  updated_at: string
+  account_id: string
   title: string
   content: string
   related_date: string | null
   position: number
-  account_id: number
-  created_at: string
-  updated_at: string
 }
 
 export type MemoModels = MemoModel[]
@@ -29,14 +29,14 @@ export type MemoModels = MemoModel[]
 export function MemoModel2Memo(memoModel: MemoModel): Memo {
   return {
     id: memoModel.id,
+    created_at: toDate(memoModel.created_at),
+    updated_at: toDate(memoModel.updated_at),
+    account_id: memoModel.account_id,
     title: memoModel.title,
     content: memoModel.content,
     related_date: memoModel.related_date
       ? toDate(memoModel.related_date)
       : null,
-    account_id: memoModel.account_id,
-    created_at: toDate(memoModel.created_at),
-    updated_at: toDate(memoModel.updated_at),
   }
 }
 
