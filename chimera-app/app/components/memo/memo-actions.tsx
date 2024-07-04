@@ -47,8 +47,9 @@ export function MemoActions({ memo, handleDeleteMemo }: MemoActionsProps) {
       <DropdownMenuPortal>
         <DropdownMenuContent align="end" className="w-52">
           <DropdownMenuItem
-            onClick={() => {
+            onClick={(event) => {
               console.log('position up')
+              event.stopPropagation()
             }}
           >
             <RxArrowUp className="mr-2 h-4 w-4" />
@@ -56,8 +57,9 @@ export function MemoActions({ memo, handleDeleteMemo }: MemoActionsProps) {
             <DropdownMenuShortcut>⌘↑</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => {
+            onClick={(event) => {
               console.log('position down')
+              event.stopPropagation()
             }}
           >
             <RxArrowDown className="mr-2 h-4 w-4" />
@@ -66,8 +68,9 @@ export function MemoActions({ memo, handleDeleteMemo }: MemoActionsProps) {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={() => {
+            onClick={(event) => {
               navigate(`/memos/${memo.id}`)
+              event.stopPropagation()
             }}
           >
             <RxPencil1 className="mr-2 h-4 w-4" />
