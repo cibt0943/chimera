@@ -496,7 +496,7 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
             <RxPlus className="mr-2" />
             {t('common.message.add')}
             <p className="text-[10px] text-muted-foreground ml-2">
-              <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 text-muted-foreground">
+              <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 text-muted-foreground">
                 <span className="text-xs">⌘</span>i
               </kbd>
             </p>

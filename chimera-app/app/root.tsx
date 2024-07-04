@@ -73,7 +73,7 @@ export default function App() {
         <I18nextProvider i18n={i18n}>
           <AccountProvider account={account}>
             <div className="flex">
-              <aside className="w-48">
+              <aside className="">
                 <Sidebar />
               </aside>
               <main className="grow h-screen overflow-auto">

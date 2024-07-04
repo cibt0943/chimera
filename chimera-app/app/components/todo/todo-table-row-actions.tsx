@@ -73,7 +73,6 @@ export function TodoTableRowActions<TData>({
           {t('task.message.to_complete')}
           <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
             table.options.meta?.editTask(task)

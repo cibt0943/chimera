@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import { NavLink } from '@remix-run/react'
 import { PiHandFistBold } from 'react-icons/pi'
 import {
@@ -17,17 +16,17 @@ type NavLinkClassNameProps = {
   isPending: boolean
 }
 
-export function Sidebar() {
-  const navLinkClassName = ({ isActive, isPending }: NavLinkClassNameProps) => {
-    const className = isActive ? 'font-bold' : isPending ? 'pending' : ''
-    return cn(
-      buttonVariants({
-        variant: isActive ? 'secondary' : 'ghost',
-        className: clsx('justify-start', className),
-      }),
-    )
-  }
+function NavLinkClassName({ isActive, isPending }: NavLinkClassNameProps) {
+  const className = isActive ? 'font-bold' : isPending ? 'pending' : ''
+  return cn(
+    buttonVariants({
+      variant: isActive ? 'secondary' : 'ghost',
+      className: cn('justify-start', className),
+    }),
+  )
+}
 
+export function Sidebar() {
   return (
     <div className="px-2 flex flex-col justify-between h-screen">
       <div className="overflow-auto">
@@ -40,23 +39,23 @@ export function Sidebar() {
           </h1>
         </div>
         <div className="grid gap-1 p-px">
-          <NavLink to="/todos" className={navLinkClassName} reloadDocument>
+          <NavLink to="/todos" className={NavLinkClassName} reloadDocument>
             <RxCheck className="mr-2 h-5 w-5" />
             Todo
           </NavLink>
-          <NavLink to="/memos" className={navLinkClassName} reloadDocument>
+          <NavLink to="/memos" className={NavLinkClassName} reloadDocument>
             <RxPencil2 className="mr-2 h-5 w-5" />
             Memo
           </NavLink>
-          <NavLink to="/events" className={navLinkClassName} reloadDocument>
+          <NavLink to="/events" className={NavLinkClassName} reloadDocument>
             <RxCalendar className="mr-2 h-5 w-5" />
             Event
           </NavLink>
-          <NavLink to="/files" className={navLinkClassName} reloadDocument>
+          <NavLink to="/files" className={NavLinkClassName} reloadDocument>
             <RxFile className="mr-2 h-5 w-5" />
             File
           </NavLink>
-          <NavLink to="/reminders" className={navLinkClassName} reloadDocument>
+          <NavLink to="/reminders" className={NavLinkClassName} reloadDocument>
             <RxPaperPlane className="mr-2 h-5 w-5" />
             Reminder
           </NavLink>

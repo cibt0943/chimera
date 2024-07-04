@@ -44,7 +44,7 @@ export const loader = withAuthentication(async ({ account }) => {
   return json({ taskModels })
 })
 
-export default function Index() {
+export default function Layout() {
   const { taskModels } = useLoaderData<LoaderData>()
   const tasks = taskModels.map<Task>((value) => {
     return TaskModel2Task(value)
