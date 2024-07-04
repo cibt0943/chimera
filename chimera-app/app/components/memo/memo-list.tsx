@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { RxPlus } from 'react-icons/rx'
 import { NavLink, useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
@@ -6,6 +7,8 @@ import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
 import { Memos, Memo } from '~/types/memos'
+import { MemoActions } from './memo-actions'
+import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 
 interface MemoListProps {
   items: Memos
@@ -18,19 +21,32 @@ type NavLinkClassNameProps = {
 
 function NavLinkClassName({ isActive }: NavLinkClassNameProps) {
   const className = isActive ? 'bg-blue-100' : 'hover:bg-accent'
-  return cn('flex flex-col gap-2 rounded-lg border p-3 text-sm', className)
+  return cn(
+    'flex flex-col gap-2 rounded-lg border outline-offset-0 p-3 text-sm group',
+    className,
+  )
 }
 
 // Item Component
-function ListIterm({ item }: { item: Memo }) {
+interface ListItemProps {
+  item: Memo
+  handleDeleteMemo: (memo: Memo) => void
+}
+
+function ListIterm({ item, handleDeleteMemo }: ListItemProps) {
   return (
     <NavLink
       className={NavLinkClassName}
-      to={`${item.id}`}
+      to={`/memos/${item.id}`}
       key={item.id}
       id={`row-${item.id}`}
     >
-      <div>{item.title}</div>
+      <div className="flex items-center">
+        <div className="line-clamp-1">{item.title}</div>
+        <div className="ml-auto">
+          <MemoActions memo={item} handleDeleteMemo={handleDeleteMemo} />
+        </div>
+      </div>
       <div className="line-clamp-2 text-xs text-muted-foreground">
         {item.content.substring(0, 300)}
       </div>
@@ -41,10 +57,29 @@ function ListIterm({ item }: { item: Memo }) {
 export function MemoList({ items }: MemoListProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
+  const [selectedMemo, setSelectedMemo] = React.useState<Memo>() // 編集・削除するメモ
+
+  function handleDeleteMemo(memo: Memo) {
+    setSelectedMemo(memo)
+    setIsOpenDeleteDialog(true)
+  }
+
+  function DeleteConfirmMemoDialog() {
+    if (!selectedMemo) return null
+
+    return (
+      <MemoDeleteConfirmDialog
+        memo={selectedMemo}
+        isOpenDialog={isOpenDeleteDialog}
+        setIsOpenDialog={setIsOpenDeleteDialog}
+      />
+    )
+  }
 
   return (
-    <div className="mr-6 space-y-4">
-      <div className="flex items-center space-x-2">
+    <div className="space-y-4 px-1 py-4">
+      <div className="flex items-center space-x-2 px-3">
         <Input
           type="search"
           placeholder={t('memo.message.title_filter')}
@@ -67,13 +102,18 @@ export function MemoList({ items }: MemoListProps) {
           </p>
         </Button>
       </div>
-      <ScrollArea className="h-screen">
-        <div className="flex flex-col space-y-3">
+      <ScrollArea className="h-[calc(100vh_-_110px)]">
+        <div className="space-y-3 px-3">
           {items.map((item) => (
-            <ListIterm key={item.id} item={item} />
+            <ListIterm
+              key={item.id}
+              item={item}
+              handleDeleteMemo={handleDeleteMemo}
+            />
           ))}
         </div>
       </ScrollArea>
+      <DeleteConfirmMemoDialog />
     </div>
   )
 }

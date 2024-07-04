@@ -56,7 +56,7 @@ export default function Layout() {
 
   return (
     <div className="p-4 h-screen">
-      <ResizablePanelGroup direction="horizontal">
+      <ResizablePanelGroup direction="horizontal" className="border rounded-lg">
         <ResizablePanel defaultSize={30}>
           <MemoList items={memos} />
         </ResizablePanel>
