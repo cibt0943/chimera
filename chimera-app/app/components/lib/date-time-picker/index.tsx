@@ -16,6 +16,7 @@ type DateTimePickerProps = {
   value: Date | undefined
   handleChange: (date: Date | undefined) => void
   triggerId?: string
+  placeholder?: string
 }
 
 // date-fnsのlocaleを動的に読み込む
@@ -28,6 +29,7 @@ export function DateTimePicker({
   value,
   handleChange,
   triggerId,
+  placeholder,
 }: DateTimePickerProps) {
   const { t, i18n } = useTranslation()
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
@@ -54,7 +56,7 @@ export function DateTimePicker({
             {value ? (
               format(value, t('common.format.datetime_format'))
             ) : (
-              <span className="opacity-50">Pick a date</span>
+              <span className="opacity-50">{placeholder || 'Pick a date'}</span>
             )}
           </div>
         </PopoverTrigger>

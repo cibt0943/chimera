@@ -1,17 +1,15 @@
 import { Form } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import {
-  useForm,
-  getFormProps,
-  getInputProps,
-  getTextareaProps,
-} from '@conform-to/react'
+import { useForm, getFormProps, getTextareaProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
-import { Required } from '~/components/lib/required'
-import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
-import { FormItem, FormLabel, FormMessage } from '~/components/lib/form'
+import {
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from '~/components/lib/form'
 import { MemoRelatedDateTimePicker } from './memo-related-date-time-picker'
 import { Memo, MemoSchema, MemoSchemaType } from '~/types/memos'
 
@@ -24,10 +22,9 @@ export function MemoForm({ memo }: MemoFormProps) {
 
   const action = memo ? `/memos/${memo.id}` : '/memos'
 
-  const defaultValue = memo || {
-    title: '',
-    content: '',
-    related_date: null,
+  const defaultValue = {
+    content: memo ? memo.title.concat('\n', memo.content) : '',
+    related_date: memo ? memo.related_date : null,
   }
 
   const [form, fields] = useForm<MemoSchemaType>({
@@ -40,7 +37,7 @@ export function MemoForm({ memo }: MemoFormProps) {
   })
 
   return (
-    <div className="m-4 p-8 bg-muted rounded-lg h-[calc(100vh_-_60px)] overflow-auto">
+    <div className="m-4">
       <Form
         method="post"
         className="space-y-6"
@@ -48,36 +45,26 @@ export function MemoForm({ memo }: MemoFormProps) {
         action={action}
       >
         <FormItem>
-          <FormLabel htmlFor={fields.title.id}>
-            {t('memo.model.title')}
-            <Required />
-          </FormLabel>
-          <Input
-            {...getInputProps(fields.title, { type: 'text' })}
-            key={fields.title.key}
-          />
-          <FormMessage message={fields.title.errors} />
-        </FormItem>
-        <FormItem>
-          <FormLabel htmlFor={fields.content.id}>
-            {t('memo.model.content')}
-          </FormLabel>
+          <FormDescription>
+            {t('memo.message.first_line_is_title')}
+          </FormDescription>
           <Textarea
             {...getTextareaProps(fields.content)}
             key={fields.content.key}
-            className="resize-none"
+            className="resize-none bg-[#303841] text-white focus-visible:ring-0  h-[calc(100vh_-_170px)]"
             rows={15}
           />
           <FormMessage message={fields.content.errors} />
         </FormItem>
-        <FormItem className="flex flex-col">
-          <FormLabel htmlFor={fields.related_date.id}>
-            {t('memo.model.related_date')}
-          </FormLabel>
-          <MemoRelatedDateTimePicker meta={fields.related_date} />
-          <FormMessage message={fields.related_date.errors} />
-        </FormItem>
-        <Button type="submit">{t('common.message.save')}</Button>
+        <div className="flex items-center justify-between">
+          <FormItem className="flex items-center w-64">
+            <MemoRelatedDateTimePicker meta={fields.related_date} />
+            <FormMessage message={fields.related_date.errors} />
+          </FormItem>
+          <Button type="submit" className="w-32">
+            {t('common.message.save')}
+          </Button>
+        </div>
       </Form>
     </div>
   )

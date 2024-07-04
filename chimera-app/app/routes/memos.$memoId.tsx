@@ -27,10 +27,11 @@ export const action = withAuthentication(
 
     const data = submission.value
 
+    const [title, ...content] = (data.content || '').split('\n')
     await updateMemo({
       id: memo.id,
-      title: data.title,
-      content: data.content || '',
+      title: title,
+      content: content.join('\n'),
       related_date: data.related_date?.toISOString() || null,
       account_id: account.id,
       updated_at: new Date().toISOString(),

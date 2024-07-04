@@ -114,6 +114,7 @@
   },
   "memo": {
     "title": "Memo",
+    "un_titled": "Untitled",
     "model": {
       "id": "ID",
       "title": "Title",
@@ -126,7 +127,8 @@
       "memo_editing": "Memo Editing",
       "memo_deletion": "Memo Deletion",
       "set_memo_info": "Set the memo information.",
-      "title_filter": "Filter memos..."
+      "title_filter": "Filter memos...",
+      "first_line_is_title": "The first line is the title."
     }
   }
 }

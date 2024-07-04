@@ -34,6 +34,8 @@ interface ListItemProps {
 }
 
 function ListIterm({ item, handleDeleteMemo }: ListItemProps) {
+  const { t } = useTranslation()
+
   return (
     <NavLink
       className={NavLinkClassName}
@@ -42,7 +44,7 @@ function ListIterm({ item, handleDeleteMemo }: ListItemProps) {
       id={`row-${item.id}`}
     >
       <div className="flex items-center">
-        <div className="line-clamp-1">{item.title}</div>
+        <div className="line-clamp-1">{item.title || t('memo.un_titled')}</div>
         <div className="ml-auto">
           <MemoActions memo={item} handleDeleteMemo={handleDeleteMemo} />
         </div>
