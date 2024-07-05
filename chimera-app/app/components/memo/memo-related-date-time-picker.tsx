@@ -5,9 +5,13 @@ import { DateTimePicker } from '~/components/lib/date-time-picker'
 
 type DateTimePickerProps = {
   meta: FieldMetadata<Date | null>
+  divProps?: React.ComponentProps<'div'>
 }
 
-export function MemoRelatedDateTimePicker({ meta }: DateTimePickerProps) {
+export function MemoRelatedDateTimePicker({
+  meta,
+  divProps,
+}: DateTimePickerProps) {
   const { t } = useTranslation()
   const control = useInputControl(meta)
 
@@ -23,6 +27,7 @@ export function MemoRelatedDateTimePicker({ meta }: DateTimePickerProps) {
       handleChange={handleChange}
       triggerId={meta.id}
       placeholder={t('memo.model.related_date')}
+      divProps={divProps}
     />
   )
 }

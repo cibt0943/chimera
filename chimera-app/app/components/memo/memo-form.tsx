@@ -4,12 +4,7 @@ import { useForm, getFormProps, getTextareaProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
-import {
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from '~/components/lib/form'
+import { FormItem, FormMessage, FormDescription } from '~/components/lib/form'
 import { MemoRelatedDateTimePicker } from './memo-related-date-time-picker'
 import { Memo, MemoSchema, MemoSchemaType } from '~/types/memos'
 
@@ -57,8 +52,11 @@ export function MemoForm({ memo }: MemoFormProps) {
           <FormMessage message={fields.content.errors} />
         </FormItem>
         <div className="flex items-center justify-between">
-          <FormItem className="flex items-center w-64">
-            <MemoRelatedDateTimePicker meta={fields.related_date} />
+          <FormItem>
+            <MemoRelatedDateTimePicker
+              meta={fields.related_date}
+              divProps={{ className: 'w-64' }}
+            />
             <FormMessage message={fields.related_date.errors} />
           </FormItem>
           <Button type="submit" className="w-32">
