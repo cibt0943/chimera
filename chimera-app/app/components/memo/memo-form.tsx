@@ -18,7 +18,10 @@ export function MemoForm({ memo }: MemoFormProps) {
   const action = memo ? `/memos/${memo.id}` : '/memos'
 
   const defaultValue = {
-    content: memo ? memo.title.concat('\n', memo.content) : '',
+    content:
+      memo && memo.title + memo.content !== ''
+        ? memo.title.concat('\n', memo.content)
+        : '',
     related_date: memo ? memo.related_date : null,
   }
 

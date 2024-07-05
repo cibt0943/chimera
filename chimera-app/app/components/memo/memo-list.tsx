@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { RxPlus } from 'react-icons/rx'
-import { NavLink, useNavigate } from '@remix-run/react'
+import { NavLink, useNavigate, Form } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { ScrollArea } from '~/components/ui/scroll-area'
@@ -97,19 +97,21 @@ export function MemoList({ items }: MemoListProps) {
           className="h-8"
           id="memos-title-filter"
         />
-        <Button
-          variant="secondary"
-          className="h-8 px-2 lg:px-3"
-          onClick={() => navigate('/memos')}
-        >
-          <RxPlus className="mr-2" />
-          {t('common.message.add')}
-          <p className="text-[10px] text-muted-foreground ml-2">
-            <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 text-muted-foreground">
-              <span className="text-xs">⌘</span>i
-            </kbd>
-          </p>
-        </Button>
+        <Form action={`/memos`} method="post">
+          <Button
+            type="submit"
+            variant="secondary"
+            className="h-8 px-2 lg:px-3"
+          >
+            <RxPlus className="mr-2" />
+            {t('common.message.add')}
+            <p className="text-[10px] text-muted-foreground ml-2">
+              <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 text-muted-foreground">
+                <span className="text-xs">⌘</span>i
+              </kbd>
+            </p>
+          </Button>
+        </Form>
       </div>
       <ScrollArea className="h-[calc(100vh_-_110px)]">
         <div className="space-y-3 px-3">

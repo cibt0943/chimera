@@ -30,14 +30,14 @@ export const action = withAuthentication(async ({ request, account }) => {
   const data = submission.value
 
   const [title, ...content] = (data.content || '').split('\n')
-  await insertMemo({
+  const newMemo = await insertMemo({
     title: title,
     content: content.join('\n'),
     related_date: data.related_date?.toISOString() || null,
     account_id: account.id,
   })
 
-  return redirect('/memos')
+  return redirect(`/memos/${newMemo.id}`)
 })
 
 type LoaderData = {
