@@ -2,10 +2,11 @@ import * as React from 'react'
 import { RxPlus } from 'react-icons/rx'
 import { NavLink, useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
-import { cn } from '~/lib/utils'
+import { cn, useAgoFormat } from '~/lib/utils'
 import { Memos, Memo } from '~/types/memos'
 import { MemoActions } from './memo-actions'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
@@ -51,6 +52,12 @@ function ListIterm({ item, handleDeleteMemo }: ListItemProps) {
       </div>
       <div className="line-clamp-2 text-xs text-muted-foreground">
         {item.content.substring(0, 300)}
+      </div>
+      <div
+        className="ml-auto text-xs text-muted-foreground"
+        title={format(item.updated_at, t('common.format.datetime_format'))}
+      >
+        {useAgoFormat(item.updated_at)}
       </div>
     </NavLink>
   )

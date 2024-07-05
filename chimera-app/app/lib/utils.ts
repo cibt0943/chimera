@@ -2,6 +2,9 @@ import * as React from 'react'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { useNavigation } from '@remix-run/react'
+import { useTranslation } from 'react-i18next'
+import { formatDistanceToNowStrict, Locale } from 'date-fns'
+import * as locales from 'date-fns/locale'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ReturnVoidFunctionType = (...args: any[]) => void
@@ -65,4 +68,15 @@ export function useQueue() {
 export function useIsLoading() {
   const navigation = useNavigation()
   return ['loading', 'submitting'].includes(navigation.state)
+}
+
+// date-fnsのlocaleを取得
+export function getLocale(locale: string): Locale {
+  return locales[locale as keyof typeof locales] || locales.ja
+}
+
+export function useAgoFormat(date: Date): string {
+  const { i18n } = useTranslation()
+  const local = getLocale(i18n.language)
+  return formatDistanceToNowStrict(date, { locale: local, addSuffix: true })
 }
