@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS "public"."memos" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "account_id" "uuid" NOT NULL,
-    "title" "text" NOT NULL,
+    "title" "text" DEFAULT ''::"text" NOT NULL,
     "content" "text" DEFAULT ''::"text" NOT NULL,
     "related_date" timestamp with time zone,
     "position" bigint DEFAULT '1'::bigint NOT NULL

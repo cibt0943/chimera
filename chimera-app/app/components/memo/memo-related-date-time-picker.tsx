@@ -1,12 +1,18 @@
 import { toDate } from 'date-fns'
+import { useTranslation } from 'react-i18next'
 import { FieldMetadata, useInputControl } from '@conform-to/react'
 import { DateTimePicker } from '~/components/lib/date-time-picker'
 
 type DateTimePickerProps = {
   meta: FieldMetadata<Date | null>
+  divProps?: React.ComponentProps<'div'>
 }
 
-export function MemoRelatedDateTimePicker({ meta }: DateTimePickerProps) {
+export function MemoRelatedDateTimePicker({
+  meta,
+  divProps,
+}: DateTimePickerProps) {
+  const { t } = useTranslation()
   const control = useInputControl(meta)
 
   const handleChange = (date: Date | undefined) => {
@@ -20,6 +26,8 @@ export function MemoRelatedDateTimePicker({ meta }: DateTimePickerProps) {
       value={value}
       handleChange={handleChange}
       triggerId={meta.id}
+      placeholder={t('memo.model.related_date')}
+      divProps={divProps}
     />
   )
 }

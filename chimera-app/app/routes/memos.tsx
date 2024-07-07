@@ -1,6 +1,6 @@
 import type { MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
-import { useLoaderData, Outlet } from '@remix-run/react'
+import { useLoaderData, Outlet, useParams } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { Memo, MemoModels, MemoModel2Memo, MemoSchema } from '~/types/memos'
@@ -29,14 +29,15 @@ export const action = withAuthentication(async ({ request, account }) => {
 
   const data = submission.value
 
-  await insertMemo({
-    title: data.title,
-    content: data.content || '',
+  const [title, ...content] = (data.content || '').split('\n')
+  const newMemo = await insertMemo({
+    title: title,
+    content: content.join('\n'),
     related_date: data.related_date?.toISOString() || null,
     account_id: account.id,
   })
 
-  return redirect('/memos')
+  return redirect(`/memos/${newMemo.id}`)
 })
 
 type LoaderData = {
@@ -53,12 +54,14 @@ export default function Layout() {
   const memos = memoModels.map<Memo>((value) => {
     return MemoModel2Memo(value)
   })
+  const params = useParams()
+  const { memoId } = params
 
   return (
     <div className="p-4 h-screen">
       <ResizablePanelGroup direction="horizontal" className="border rounded-lg">
         <ResizablePanel defaultSize={30}>
-          <MemoList items={memos} />
+          <MemoList defaultMemos={memos} showId={memoId || ''} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={70}>

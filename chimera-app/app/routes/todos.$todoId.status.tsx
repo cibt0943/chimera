@@ -7,7 +7,7 @@ import { getTask, updateTask } from '~/models/task.server'
 
 export const action = withAuthentication(
   async ({ params, request, account }) => {
-    const task = await getTask(Number(params.todoId))
+    const task = await getTask(params.todoId || '')
     if (task.account_id !== account.id) throw new Error('erorr')
 
     const formData = await request.formData()

@@ -41,9 +41,6 @@ export function MemoModel2Memo(memoModel: MemoModel): Memo {
 }
 
 export const MemoSchema = zod.object({
-  title: zod
-    .string({ required_error: '必須項目です' })
-    .max(255, { message: '255文字以内で入力してください' }),
   content: zod
     .string()
     .max(60000, '60000文字以内で入力してください')
