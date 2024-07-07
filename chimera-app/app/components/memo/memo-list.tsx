@@ -40,22 +40,29 @@ export function MemoList({ items, showId }: MemoListProps) {
       ?.focus()
   }, [focusedMemo, memos])
 
+  // フォーカス移動
+  useHotkeys(['up', 'down'], (_, handler) => {
+    if (!memos.length || !focusedMemo) return
+    const isUp = handler.keys?.includes('up')
+
+    const nowIndex = memos.findIndex((memo) => memo.id === focusedMemo.id)
+    const toIndex = isUp ? nowIndex - 1 : nowIndex + 1
+    if (toIndex < 0 || toIndex >= memos.length) return
+    setFocusedMemo(memos[toIndex])
+  })
+
   // メモ追加
   useHotkeys(['mod+i', 'alt+i'], () => {
+    console.log('insert')
     addButtonRef.current?.click()
   })
 
-  // フォーカス移動
+  // メモ削除
   useHotkeys(
-    ['up', 'down', 'mod+up', 'mod+down', 'alt+up', 'alt+down'],
-    (_, handler) => {
-      if (!memos.length || !focusedMemo) return
-      const isUp = handler.keys?.includes('up')
-
-      const nowIndex = memos.findIndex((memo) => memo.id === focusedMemo.id)
-      const toIndex = isUp ? nowIndex - 1 : nowIndex + 1
-      if (toIndex < 0 || toIndex >= memos.length) return
-      setFocusedMemo(memos[toIndex])
+    ['mod+delete', 'alt+delete', 'mod+backspace', 'alt+backspace'],
+    () => {
+      if (!selectedMemo) return
+      handleDeleteMemo(selectedMemo)
     },
   )
 
