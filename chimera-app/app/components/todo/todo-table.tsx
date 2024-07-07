@@ -219,6 +219,7 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
     )
   }
 
+  // タスク削除ダイアログ
   function DeleteConfirmTaskDialog() {
     if (!selectedTask) return null
 
@@ -231,6 +232,7 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
     )
   }
 
+  // 並び順を変更できない場合のトースト表示
   function clearSortToast() {
     toast({
       duration: 8000,

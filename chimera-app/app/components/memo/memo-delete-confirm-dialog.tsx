@@ -23,7 +23,10 @@ export function MemoDeleteConfirmDialog({
     <DeleteConfirmDialog
       title={t('memo.message.memo_deletion')}
       description={
-        '「' + memo.title + '」' + t('common.message.confirm_deletion')
+        '「' +
+        (memo.title || t('memo.un_titled')) +
+        '」' +
+        t('common.message.confirm_deletion')
       }
       isOpenDialog={isOpenDialog}
       setIsOpenDialog={setIsOpenDialog}

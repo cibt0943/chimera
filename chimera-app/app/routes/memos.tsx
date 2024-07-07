@@ -1,6 +1,6 @@
 import type { MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
-import { useLoaderData, Outlet } from '@remix-run/react'
+import { useLoaderData, Outlet, useParams } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { Memo, MemoModels, MemoModel2Memo, MemoSchema } from '~/types/memos'
@@ -54,12 +54,14 @@ export default function Layout() {
   const memos = memoModels.map<Memo>((value) => {
     return MemoModel2Memo(value)
   })
+  const params = useParams()
+  const { memoId } = params
 
   return (
     <div className="p-4 h-screen">
       <ResizablePanelGroup direction="horizontal" className="border rounded-lg">
         <ResizablePanel defaultSize={30}>
-          <MemoList items={memos} />
+          <MemoList items={memos} showId={memoId || ''} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={70}>
