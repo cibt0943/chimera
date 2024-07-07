@@ -33,6 +33,12 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   const memosRefs = React.useRef<HTMLDivElement>(null)
   const addButtonRef = React.useRef<HTMLButtonElement>(null)
 
+  // メモデータが変更されたら一覧を更新
+  React.useEffect(() => {
+    setMemos(defaultMemos)
+  }, [defaultMemos])
+
+  // focusedMemoに合わせてフォーカスを設定
   React.useEffect(() => {
     if (!focusedMemo) return
     memosRefs.current
