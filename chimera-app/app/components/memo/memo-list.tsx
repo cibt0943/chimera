@@ -12,16 +12,15 @@ import { ListIterm } from './memo-list-item'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 
 interface MemoListProps {
-  items: Memos
+  defaultMemos: Memos
   showId: string
 }
 
-export function MemoList({ items, showId }: MemoListProps) {
+export function MemoList({ defaultMemos, showId }: MemoListProps) {
   const { t } = useTranslation()
   const { enqueue } = useQueue()
-  const [memos, setMemos] = React.useState(items)
-  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
-  const showMemo = items.find((item) => item.id === showId)
+  const [memos, setMemos] = React.useState(defaultMemos)
+  const showMemo = defaultMemos.find((memo) => memo.id === showId)
   const [actionMemo, setActionMemo] = React.useState<Memo | undefined>(showMemo) // 編集・削除するメモ
   const [focusedMemo, setFocusedMemo] = React.useState<Memo | undefined>(
     showMemo,
@@ -29,6 +28,7 @@ export function MemoList({ items, showId }: MemoListProps) {
   const [selectedMemo, setSelectedMemo] = React.useState<Memo | undefined>(
     showMemo,
   ) // 一覧で選択しているメモ
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   const memosRefs = React.useRef<HTMLDivElement>(null)
   const addButtonRef = React.useRef<HTMLButtonElement>(null)
@@ -68,12 +68,12 @@ export function MemoList({ items, showId }: MemoListProps) {
   // メモ一覧をフィルタリング
   async function filterMemos(searchTerm: string) {
     if (!searchTerm) {
-      setMemos(items)
+      setMemos(defaultMemos)
       return
     }
 
     const search = searchTerm.toLowerCase()
-    const filteredMemos = items.filter((memo) =>
+    const filteredMemos = defaultMemos.filter((memo) =>
       memo.title.toLowerCase().includes(search),
     )
 
