@@ -6,6 +6,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
+import { useDebounce, useQueue } from '~/lib/utils'
 import { Memos, Memo } from '~/types/memos'
 import { ListIterm } from './memo-list-item'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
@@ -17,6 +18,7 @@ interface MemoListProps {
 
 export function MemoList({ items, showId }: MemoListProps) {
   const { t } = useTranslation()
+  const { enqueue } = useQueue()
   const [memos, setMemos] = React.useState(items)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
   const showMemo = items.find((item) => item.id === showId)
@@ -33,12 +35,10 @@ export function MemoList({ items, showId }: MemoListProps) {
 
   React.useEffect(() => {
     if (!focusedMemo) return
-    const index = memos.findIndex((memo) => memo.id === focusedMemo.id)
-    if (index === -1) return
     memosRefs.current
       ?.querySelector<HTMLElement>(`#memo-${focusedMemo.id}`)
       ?.focus()
-  }, [focusedMemo, memos])
+  }, [focusedMemo])
 
   // フォーカス移動
   useHotkeys(['up', 'down'], (_, handler) => {
@@ -53,7 +53,6 @@ export function MemoList({ items, showId }: MemoListProps) {
 
   // メモ追加
   useHotkeys(['mod+i', 'alt+i'], () => {
-    console.log('insert')
     addButtonRef.current?.click()
   })
 
@@ -66,6 +65,24 @@ export function MemoList({ items, showId }: MemoListProps) {
     },
   )
 
+  // メモ一覧をフィルタリング
+  async function filterMemos(searchTerm: string) {
+    if (!searchTerm) {
+      setMemos(items)
+      return
+    }
+
+    const search = searchTerm.toLowerCase()
+    const filteredMemos = items.filter((memo) =>
+      memo.title.toLowerCase().includes(search),
+    )
+
+    setMemos(filteredMemos)
+  }
+  const filterMemosDebounce = useDebounce((searchTerm) => {
+    enqueue(() => filterMemos(searchTerm))
+  }, 300)
+
   function handleDeleteMemo(memo: Memo) {
     setActionMemo(memo)
     setIsOpenDeleteDialog(true)
@@ -77,8 +94,9 @@ export function MemoList({ items, showId }: MemoListProps) {
         <Input
           type="search"
           placeholder={t('memo.message.title_filter')}
-          value={''}
-          onChange={(event) => console.log(event.target.value)}
+          onChange={(event) => {
+            filterMemosDebounce(event.target.value)
+          }}
           className="h-8"
           id="memos-title-filter"
         />
@@ -101,7 +119,7 @@ export function MemoList({ items, showId }: MemoListProps) {
       </div>
       <ScrollArea className="h-[calc(100vh_-_110px)]">
         <div className="space-y-3 px-3" id="memos" ref={memosRefs}>
-          {items.map((item: Memo) => (
+          {memos.map((item: Memo) => (
             <ListIterm
               key={item.id}
               item={item}

@@ -48,7 +48,7 @@ export function MemoActions({ memo, handleDeleteMemo }: MemoActionsProps) {
         <DropdownMenuContent align="end" className="w-52">
           <DropdownMenuItem
             onClick={(event) => {
-              console.log('position up')
+              alert('comming soon')
               event.stopPropagation()
             }}
           >
@@ -58,7 +58,7 @@ export function MemoActions({ memo, handleDeleteMemo }: MemoActionsProps) {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={(event) => {
-              console.log('position down')
+              alert('comming soon')
               event.stopPropagation()
             }}
           >
