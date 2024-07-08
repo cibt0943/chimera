@@ -76,7 +76,6 @@ export function MemoActions({ memo, handleDeleteMemo }: MemoActionsProps) {
             <RxPencil1 className="mr-2 h-4 w-4" />
             {t('common.message.edit')}
             <DropdownMenuShortcut>
-              ⌘
               <RiCornerDownLeftLine className="h-3 w-3 inline" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>

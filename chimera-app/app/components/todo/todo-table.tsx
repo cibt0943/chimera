@@ -114,6 +114,7 @@ function DraggableRow({ row }: { row: Row<Task> }) {
 export function TodoTable({ tasks }: TodoTableProps<Task>) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const fetcher = useFetcher()
   const { toast } = useToast()
   const { enqueue } = useQueue()
   const isLoading = useIsLoading()
@@ -132,8 +133,6 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
   const [selectedTask, setSelectedTask] = React.useState<Task>() // 編集・削除するタスク
   const useTBodyRef = React.useRef<HTMLTableSectionElement>(null)
-
-  const fetcher = useFetcher()
 
   const table = useReactTable({
     data: tableData,

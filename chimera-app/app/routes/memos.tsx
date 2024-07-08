@@ -51,9 +51,10 @@ export const loader = withAuthentication(async ({ account }) => {
 
 export default function Layout() {
   const { memoModels } = useLoaderData<LoaderData>()
-  const memos = memoModels.map<Memo>((value) => {
+  const loadMemos = memoModels.map<Memo>((value) => {
     return MemoModel2Memo(value)
   })
+
   const params = useParams()
   const { memoId } = params
 
@@ -61,7 +62,7 @@ export default function Layout() {
     <div className="p-4 h-screen">
       <ResizablePanelGroup direction="horizontal" className="border rounded-lg">
         <ResizablePanel defaultSize={30}>
-          <MemoList defaultMemos={memos} showId={memoId || ''} />
+          <MemoList defaultMemos={loadMemos} showId={memoId || ''} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={70}>

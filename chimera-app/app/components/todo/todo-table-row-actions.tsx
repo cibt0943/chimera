@@ -19,17 +19,17 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
-import { TaskStatus } from '~/types/tasks'
+import { Task, TaskStatus } from '~/types/tasks'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
   table: Table<TData>
 }
 
-export function TodoTableRowActions<TData>({
+export function TodoTableRowActions({
   row,
   table,
-}: DataTableRowActionsProps<TData>) {
+}: DataTableRowActionsProps<Task>) {
   const { t } = useTranslation()
   const task = row.original
 
@@ -65,6 +65,7 @@ export function TodoTableRowActions<TData>({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
+          disabled={task.status === TaskStatus.DONE}
           onClick={() => {
             table.options.meta?.updateTaskStatus(task, TaskStatus.DONE)
           }}

@@ -1,8 +1,23 @@
 import * as React from 'react'
 import { RxPlus } from 'react-icons/rx'
-import { Form } from '@remix-run/react'
+import { Form, useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from 'react-hotkeys-hook'
+import {
+  DndContext,
+  MouseSensor,
+  TouchSensor,
+  closestCenter,
+  type DragEndEvent,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
@@ -19,8 +34,20 @@ interface MemoListProps {
 export function MemoList({ defaultMemos, showId }: MemoListProps) {
   const { t } = useTranslation()
   const { enqueue } = useQueue()
+  const navigate = useNavigate()
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
+    useSensor(TouchSensor, {}),
+  )
+
   const [memos, setMemos] = React.useState(defaultMemos)
-  const showMemo = defaultMemos.find((memo) => memo.id === showId)
+  const [dispMemos, setDispMemos] = React.useState(defaultMemos)
+  const [filter, setFilter] = React.useState('')
+  const showMemo = memos.find((memo) => memo.id === showId)
   const [actionMemo, setActionMemo] = React.useState<Memo | undefined>(showMemo) // 編集・削除するメモ
   const [focusedMemo, setFocusedMemo] = React.useState<Memo | undefined>(
     showMemo,
@@ -38,6 +65,14 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     setMemos(defaultMemos)
   }, [defaultMemos])
 
+  // フィルタリング
+  React.useEffect(() => {
+    const dispMemos = memos.filter((memo) =>
+      memo.title.toLowerCase().includes(filter),
+    )
+    setDispMemos(dispMemos)
+  }, [filter, memos])
+
   // focusedMemoに合わせてフォーカスを設定
   React.useEffect(() => {
     if (!focusedMemo) return
@@ -48,13 +83,12 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
 
   // フォーカス移動
   useHotkeys(['up', 'down'], (_, handler) => {
-    if (!memos.length || !focusedMemo) return
+    if (!dispMemos.length || !focusedMemo) return
     const isUp = handler.keys?.includes('up')
-
-    const nowIndex = memos.findIndex((memo) => memo.id === focusedMemo.id)
+    const nowIndex = dispMemos.findIndex((memo) => memo.id === focusedMemo.id)
     const toIndex = isUp ? nowIndex - 1 : nowIndex + 1
-    if (toIndex < 0 || toIndex >= memos.length) return
-    setFocusedMemo(memos[toIndex])
+    if (toIndex < 0 || toIndex >= dispMemos.length) return
+    setFocusedMemo(dispMemos[toIndex])
   })
 
   // メモ追加
@@ -73,17 +107,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
 
   // メモ一覧をフィルタリング
   async function filterMemos(searchTerm: string) {
-    if (!searchTerm) {
-      setMemos(defaultMemos)
-      return
-    }
-
-    const search = searchTerm.toLowerCase()
-    const filteredMemos = defaultMemos.filter((memo) =>
-      memo.title.toLowerCase().includes(search),
-    )
-
-    setMemos(filteredMemos)
+    setFilter(searchTerm.toLowerCase())
   }
   const filterMemosDebounce = useDebounce((searchTerm) => {
     enqueue(() => filterMemos(searchTerm))
@@ -92,6 +116,62 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   function handleDeleteMemo(memo: Memo) {
     setActionMemo(memo)
     setIsOpenDeleteDialog(true)
+  }
+
+  // 行のドラッグ&ドロップによるメモの表示順変更
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      const fromIndex = memos.findIndex((memo) => memo.id === active.id)
+      const toIndex = memos.findIndex((memo) => memo.id === over.id)
+      updateMemoPosition(fromIndex, toIndex)
+    }
+  }
+
+  // メモの表示順を更新APIをdebounce
+  const updateMemoPositionApiDebounce = useDebounce((fromMemo, toMemo) => {
+    enqueue(() =>
+      updateMemoPositionApi(fromMemo, toMemo).catch((error) => {
+        alert(error.message)
+        navigate('.', { replace: true })
+      }),
+    )
+  }, 300)
+
+  // メモの表示順更新APIの呼び出し
+  async function updateMemoPositionApi(fromMemo: Memo, toMemo: Memo) {
+    await fetch(`/memos/${fromMemo.id}/position`, {
+      method: 'POST',
+      body: JSON.stringify({ toMemoId: toMemo.id }),
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to update position api')
+      }
+    })
+  }
+
+  // メモの表示順を更新
+  function updateMemoPosition(fromIndex: number, toIndex: number) {
+    try {
+      const fromMemo = memos[fromIndex]
+      const toMemo = memos[toIndex]
+      if (!fromMemo || !toMemo) {
+        throw new Error('Failed to update position')
+      }
+
+      setMemos((prev) => {
+        return arrayMove(prev, fromIndex, toIndex) //this is just a splice util
+      })
+
+      setSelectedMemo(fromMemo)
+
+      // メモの表示順を更新API
+      updateMemoPositionApiDebounce(fromMemo, toMemo)
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Error'
+      alert(msg)
+      navigate('.', { replace: true })
+    }
   }
 
   return (
@@ -124,18 +204,30 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
         </Form>
       </div>
       <ScrollArea className="h-[calc(100vh_-_110px)]">
-        <div className="space-y-3 px-3" id="memos" ref={memosRefs}>
-          {memos.map((item: Memo) => (
-            <ListIterm
-              key={item.id}
-              item={item}
-              handleDeleteMemo={handleDeleteMemo}
-              setFucusedMemo={setFocusedMemo}
-              isSelected={item.id === selectedMemo?.id}
-              setSelectedMemo={setSelectedMemo}
-            />
-          ))}
-        </div>
+        <DndContext
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+          sensors={sensors}
+        >
+          <div className="space-y-3 px-3" id="memos" ref={memosRefs}>
+            <SortableContext
+              items={memos}
+              strategy={verticalListSortingStrategy}
+            >
+              {dispMemos.map((item: Memo) => (
+                <ListIterm
+                  key={item.id}
+                  item={item}
+                  handleDeleteMemo={handleDeleteMemo}
+                  setFocusedMemo={setFocusedMemo}
+                  isSelected={item.id === selectedMemo?.id}
+                  setSelectedMemo={setSelectedMemo}
+                />
+              ))}
+            </SortableContext>
+          </div>
+        </DndContext>
       </ScrollArea>
       {actionMemo ? (
         <MemoDeleteConfirmDialog
