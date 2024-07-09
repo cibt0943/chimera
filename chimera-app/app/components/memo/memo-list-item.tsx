@@ -4,7 +4,7 @@ import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { CSS } from '@dnd-kit/utilities'
 import { useSortable } from '@dnd-kit/sortable'
-import { cn, useAgoFormat } from '~/lib/utils'
+import { cn, useDateDiffFormat } from '~/lib/utils'
 import { MemoActions } from './memo-actions'
 import { Memo } from '~/types/memos'
 
@@ -54,7 +54,7 @@ export function ListIterm(props: ListItemProps) {
     }),
   }
 
-  const updateAgo = useAgoFormat(item.updated_at)
+  const updatedAtDiff = useDateDiffFormat(item.updated_at)
 
   return (
     <ClientOnly>
@@ -85,9 +85,9 @@ export function ListIterm(props: ListItemProps) {
           <div
             className="ml-auto text-xs text-muted-foreground"
             // 下記を表示するとエラーが発生する。サーバーサイドとクライアントで時間側が異なるためと思われる。
-            title={format(item.updated_at, t('common.format.datetime_format'))}
+            title={format(item.updated_at, t('common.format.date_time_format'))}
           >
-            {updateAgo}
+            {updatedAtDiff}
           </div>
         </NavLink>
       )}

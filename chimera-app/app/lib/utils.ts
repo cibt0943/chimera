@@ -3,7 +3,13 @@ import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { useNavigation } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { formatDistanceToNowStrict, Locale } from 'date-fns'
+import {
+  formatDistanceToNowStrict,
+  Locale,
+  format,
+  isSameDay,
+  isSameYear,
+} from 'date-fns'
 import * as locales from 'date-fns/locale'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,4 +85,19 @@ export function useAgoFormat(date: Date): string {
   const { i18n } = useTranslation()
   const local = getLocale(i18n.language)
   return formatDistanceToNowStrict(date, { locale: local, addSuffix: true })
+}
+
+export function useDateDiffFormat(targetDate: Date, baseDate?: Date): string {
+  const { t } = useTranslation()
+  if (!baseDate) {
+    baseDate = new Date()
+  }
+
+  if (isSameDay(baseDate, targetDate)) {
+    return format(targetDate, t('common.format.time_short_format'))
+  } else if (isSameYear(baseDate, targetDate)) {
+    return format(targetDate, t('common.format.date_short_time_short_format'))
+  } else {
+    return format(targetDate, t('common.format.date_time_short_format'))
+  }
 }

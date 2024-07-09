@@ -37,7 +37,7 @@ function DueDateCell({ row }: { row: Row<Task> }) {
   const { t } = useTranslation()
   const dateStr = row.original.due_date
   return dateStr ? (
-    <span>{format(dateStr, t('common.format.datetime_short_format'))}</span>
+    <span>{format(dateStr, t('common.format.date_time_short_format'))}</span>
   ) : (
     ''
   )
