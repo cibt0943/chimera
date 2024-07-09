@@ -23,18 +23,12 @@ interface ListItemProps {
   handleDeleteMemo: (memo: Memo) => void
   setFocusedMemo: (memo: Memo) => void
   isSelected: boolean
-  setSelectedMemo: (memo: Memo) => void
 }
 
-export function ListIterm({
-  item,
-  handleDeleteMemo,
-  setFocusedMemo,
-  isSelected,
-  setSelectedMemo,
-}: ListItemProps) {
-  const { t } = useTranslation()
+export function ListIterm(props: ListItemProps) {
+  const { item, handleDeleteMemo, setFocusedMemo, isSelected } = props
 
+  const { t } = useTranslation()
   const {
     transform,
     transition,
@@ -69,10 +63,6 @@ export function ListIterm({
           className={NavLinkClassName({ isSelected })}
           to={`/memos/${item.id}`}
           id={`memo-${item.id}`}
-          onClick={() => {
-            setFocusedMemo(item)
-            setSelectedMemo(item)
-          }}
           onFocus={() => {
             setFocusedMemo(item)
           }}

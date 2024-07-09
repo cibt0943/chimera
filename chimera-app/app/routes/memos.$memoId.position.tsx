@@ -9,8 +9,7 @@ export const action = withAuthentication(
       throw new Error('erorr')
 
     const data = await request.json()
-    const toMemoId = data.toMemoId
-    const toMemo = await getMemo(toMemoId)
+    const toMemo = await getMemo(data.toMemoId)
     if (!toMemo || toMemo.account_id !== account.id) throw new Error('erorr')
 
     const updatedMemo = await updateMemoPosition(fromMemo.id, toMemo.position)

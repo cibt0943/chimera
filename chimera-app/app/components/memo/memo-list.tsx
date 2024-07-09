@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { RxPlus } from 'react-icons/rx'
-import { Form, useNavigate } from '@remix-run/react'
+import { Form, useNavigate, useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
@@ -35,6 +35,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   const { t } = useTranslation()
   const { enqueue } = useQueue()
   const navigate = useNavigate()
+  const fetcher = useFetcher()
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
@@ -44,34 +45,33 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     useSensor(TouchSensor, {}),
   )
 
-  const [memos, setMemos] = React.useState(defaultMemos)
+  const showMemo = defaultMemos.find((memo) => memo.id === showId)
+
   const [dispMemos, setDispMemos] = React.useState(defaultMemos)
-  const [filter, setFilter] = React.useState('')
-  const showMemo = memos.find((memo) => memo.id === showId)
-  const [actionMemo, setActionMemo] = React.useState<Memo | undefined>(showMemo) // 編集・削除するメモ
-  const [focusedMemo, setFocusedMemo] = React.useState<Memo | undefined>(
-    showMemo,
-  ) // 一覧でフォーカスしているメモ
-  const [selectedMemo, setSelectedMemo] = React.useState<Memo | undefined>(
-    showMemo,
-  ) // 一覧で選択しているメモ
+  const [actionMemo, setActionMemo] = React.useState(showMemo) // 編集・削除するメモ
+  const [focusedMemo, setFocusedMemo] = React.useState(showMemo) // 一覧でフォーカスしているメモ
+  const [selectedMemo, setSelectedMemo] = React.useState(showMemo) // 一覧で選択しているメモ
+  const [filter, setFilter] = React.useState('') // フィルタリング文字列
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   const memosRefs = React.useRef<HTMLDivElement>(null)
   const addButtonRef = React.useRef<HTMLButtonElement>(null)
 
-  // メモデータが変更されたら一覧を更新
+  // 選択＆フォーカスメモの更新
   React.useEffect(() => {
-    setMemos(defaultMemos)
-  }, [defaultMemos])
+    if (showMemo?.id === selectedMemo?.id) return
+    setSelectedMemo(showMemo)
+    setFocusedMemo(showMemo)
+  }, [showMemo, selectedMemo])
 
-  // フィルタリング
+  // メモ一覧のフィルタリング
   React.useEffect(() => {
-    const dispMemos = memos.filter((memo) =>
+    if (fetcher.state !== 'idle') return
+    const dispMemos = defaultMemos.filter((memo) =>
       memo.title.toLowerCase().includes(filter),
     )
     setDispMemos(dispMemos)
-  }, [filter, memos])
+  }, [filter, defaultMemos, fetcher.state])
 
   // focusedMemoに合わせてフォーカスを設定
   React.useEffect(() => {
@@ -122,8 +122,9 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     if (over && active.id !== over.id) {
-      const fromIndex = memos.findIndex((memo) => memo.id === active.id)
-      const toIndex = memos.findIndex((memo) => memo.id === over.id)
+      // フィルタ等を行っているリスト(dispMemos)を元に表示順更新対象のメモのインデックスを取得
+      const fromIndex = dispMemos.findIndex((memo) => memo.id === active.id)
+      const toIndex = dispMemos.findIndex((memo) => memo.id === over.id)
       updateMemoPosition(fromIndex, toIndex)
     }
   }
@@ -140,30 +141,29 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
 
   // メモの表示順更新APIの呼び出し
   async function updateMemoPositionApi(fromMemo: Memo, toMemo: Memo) {
-    await fetch(`/memos/${fromMemo.id}/position`, {
-      method: 'POST',
-      body: JSON.stringify({ toMemoId: toMemo.id }),
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to update position api')
-      }
-    })
+    fetcher.submit(
+      { toMemoId: toMemo.id },
+      {
+        action: `/memos/${fromMemo.id}/position`,
+        method: 'post',
+        encType: 'application/json',
+      },
+    )
   }
 
   // メモの表示順を更新
   function updateMemoPosition(fromIndex: number, toIndex: number) {
     try {
-      const fromMemo = memos[fromIndex]
-      const toMemo = memos[toIndex]
+      // フィルタ等を行っているリスト(dispMemos)を元に表示順更新対象のメモを取得
+      const fromMemo = dispMemos[fromIndex]
+      const toMemo = dispMemos[toIndex]
       if (!fromMemo || !toMemo) {
         throw new Error('Failed to update position')
       }
 
-      setMemos((prev) => {
+      setDispMemos((prev) => {
         return arrayMove(prev, fromIndex, toIndex) //this is just a splice util
       })
-
-      setSelectedMemo(fromMemo)
 
       // メモの表示順を更新API
       updateMemoPositionApiDebounce(fromMemo, toMemo)
@@ -212,19 +212,22 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
         >
           <div className="space-y-3 px-3" id="memos" ref={memosRefs}>
             <SortableContext
-              items={memos}
+              items={dispMemos}
               strategy={verticalListSortingStrategy}
             >
-              {dispMemos.map((item: Memo) => (
-                <ListIterm
-                  key={item.id}
-                  item={item}
-                  handleDeleteMemo={handleDeleteMemo}
-                  setFocusedMemo={setFocusedMemo}
-                  isSelected={item.id === selectedMemo?.id}
-                  setSelectedMemo={setSelectedMemo}
-                />
-              ))}
+              {dispMemos.length ? (
+                dispMemos.map((item: Memo) => (
+                  <ListIterm
+                    key={item.id}
+                    item={item}
+                    handleDeleteMemo={handleDeleteMemo}
+                    setFocusedMemo={setFocusedMemo}
+                    isSelected={item.id === selectedMemo?.id}
+                  />
+                ))
+              ) : (
+                <div className="text-sm">{t('common.message.no_data')}</div>
+              )}
             </SortableContext>
           </div>
         </DndContext>
