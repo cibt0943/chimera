@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { RxPlus } from 'react-icons/rx'
-import { Form, useNavigate, useFetcher } from '@remix-run/react'
+import { Form, useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
@@ -24,18 +24,24 @@ import { Button } from '~/components/ui/button'
 import { useDebounce, useQueue } from '~/lib/utils'
 import { Memos, Memo } from '~/types/memos'
 import { ListIterm } from './memo-list-item'
+import { MemoActions } from './memo-actions'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 
 interface MemoListProps {
   defaultMemos: Memos
   showId: string
+  memosLoadDate: Date
 }
 
-export function MemoList({ defaultMemos, showId }: MemoListProps) {
+export function MemoList({
+  defaultMemos,
+  showId,
+  memosLoadDate,
+}: MemoListProps) {
   const { t } = useTranslation()
-  const { enqueue } = useQueue()
+  const { enqueue: filterEnqueue } = useQueue()
+  const { enqueue: positionEnqueue } = useQueue()
   const navigate = useNavigate()
-  const fetcher = useFetcher()
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
@@ -45,33 +51,33 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     useSensor(TouchSensor, {}),
   )
 
-  const showMemo = defaultMemos.find((memo) => memo.id === showId)
-
-  const [dispMemos, setDispMemos] = React.useState(defaultMemos)
-  const [actionMemo, setActionMemo] = React.useState(showMemo) // 編集・削除するメモ
-  const [focusedMemo, setFocusedMemo] = React.useState(showMemo) // 一覧でフォーカスしているメモ
-  const [selectedMemo, setSelectedMemo] = React.useState(showMemo) // 一覧で選択しているメモ
+  const [memos, setMemos] = React.useState(defaultMemos)
+  const [memosLastLoadDate, setMemosLastLoadDate] =
+    React.useState(memosLoadDate)
+  const [actionMemo, setActionMemo] = React.useState<Memo>() // 編集・削除するメモ
+  const [focusedMemo, setFocusedMemo] = React.useState<Memo>() // 一覧でフォーカスしているメモ
   const [filter, setFilter] = React.useState('') // フィルタリング文字列
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   const memosRefs = React.useRef<HTMLDivElement>(null)
   const addButtonRef = React.useRef<HTMLButtonElement>(null)
 
-  // 選択＆フォーカスメモの更新
+  // フィルタリング前のメモ一覧データ更新
   React.useEffect(() => {
-    if (showMemo?.id === selectedMemo?.id) return
-    setSelectedMemo(showMemo)
-    setFocusedMemo(showMemo)
-  }, [showMemo, selectedMemo])
+    setMemos(defaultMemos)
+    setMemosLastLoadDate(memosLoadDate)
+  }, [memosLoadDate > memosLastLoadDate])
 
-  // メモ一覧のフィルタリング
-  React.useEffect(() => {
-    if (fetcher.state !== 'idle') return
-    const dispMemos = defaultMemos.filter((memo) =>
-      memo.title.toLowerCase().includes(filter),
-    )
-    setDispMemos(dispMemos)
-  }, [filter, defaultMemos, fetcher.state])
+  // フィルタリング後のメモ一覧データ更新（memosに依存した値なのでstateで持つ必要はないと考えメモ化した変数で対応）
+  const dispMemos = React.useMemo(() => {
+    if (!filter) return memos
+    return memos.filter((memo) => memo.title.toLowerCase().includes(filter))
+  }, [memos, filter])
+
+  // 一覧で選択しているメモ（選択行はpropsのshowIdで特定されるためstateで持つ必要はないと考えメモ化した変数で対応）
+  const selectedMemo = React.useMemo(() => {
+    return memos.find((memo) => memo.id === showId)
+  }, [memos, showId])
 
   // focusedMemoに合わせてフォーカスを設定
   React.useEffect(() => {
@@ -81,27 +87,42 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
       ?.focus()
   }, [focusedMemo])
 
-  // フォーカス移動
-  useHotkeys(['up', 'down'], (_, handler) => {
-    if (!dispMemos.length || !focusedMemo) return
-    const isUp = handler.keys?.includes('up')
-    const nowIndex = dispMemos.findIndex((memo) => memo.id === focusedMemo.id)
-    const toIndex = isUp ? nowIndex - 1 : nowIndex + 1
-    if (toIndex < 0 || toIndex >= dispMemos.length) return
-    setFocusedMemo(dispMemos[toIndex])
-  })
-
-  // メモ追加
-  useHotkeys(['mod+i', 'alt+i'], () => {
-    addButtonRef.current?.click()
-  })
-
-  // メモ削除
+  // キーボード操作
   useHotkeys(
-    ['mod+delete', 'alt+delete', 'mod+backspace', 'alt+backspace'],
-    () => {
-      if (!selectedMemo) return
-      handleDeleteMemo(selectedMemo)
+    [
+      'up',
+      'down',
+      'mod+i',
+      'alt+i',
+      'mod+up',
+      'alt+up',
+      'mod+down',
+      'alt+down',
+      'mod+delete',
+      'alt+delete',
+      'mod+backspace',
+      'alt+backspace',
+    ],
+    (_, handler) => {
+      switch (handler.keys?.join('')) {
+        // フォーカス移動
+        case 'up':
+        case 'down':
+          handler.mod || handler.alt
+            ? keyUpDownMemoPosition(handler.keys)
+            : keyUpDownMemoFocus(handler.keys)
+          break
+        // メモ追加
+        case 'i':
+          addButtonRef.current?.click()
+          break
+        // メモ削除
+        case 'delete':
+        case 'backspace':
+          if (!selectedMemo) return
+          openDeleteMemoDialog(selectedMemo)
+          break
+      }
     },
   )
 
@@ -110,10 +131,31 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     setFilter(searchTerm.toLowerCase())
   }
   const filterMemosDebounce = useDebounce((searchTerm) => {
-    enqueue(() => filterMemos(searchTerm))
+    filterEnqueue(() => filterMemos(searchTerm))
   }, 300)
 
-  function handleDeleteMemo(memo: Memo) {
+  // 上下キーによるフォーカス移動
+  function keyUpDownMemoFocus(keys: readonly string[]) {
+    if (!dispMemos.length || !focusedMemo) return
+    const isUp = keys?.includes('up')
+    const nowIndex = dispMemos.findIndex((memo) => memo.id === focusedMemo.id)
+    const toIndex = isUp ? nowIndex - 1 : nowIndex + 1
+    if (toIndex < 0 || toIndex >= dispMemos.length) return
+    setFocusedMemo(dispMemos[toIndex])
+  }
+
+  // 上下キーによる表示順移動
+  function keyUpDownMemoPosition(keys: readonly string[]) {
+    if (!dispMemos.length || !selectedMemo) return
+    const isUp = keys?.includes('up')
+    const nowIndex = dispMemos.findIndex((memo) => memo.id === selectedMemo.id)
+    const toIndex = isUp ? nowIndex - 1 : nowIndex + 1
+    if (toIndex < 0 || toIndex >= dispMemos.length) return
+    updateMemoPosition(nowIndex, toIndex)
+  }
+
+  // メモ削除確認ダイアログ表示
+  function openDeleteMemoDialog(memo: Memo) {
     setActionMemo(memo)
     setIsOpenDeleteDialog(true)
   }
@@ -122,16 +164,16 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     if (over && active.id !== over.id) {
-      // フィルタ等を行っているリスト(dispMemos)を元に表示順更新対象のメモのインデックスを取得
-      const fromIndex = dispMemos.findIndex((memo) => memo.id === active.id)
-      const toIndex = dispMemos.findIndex((memo) => memo.id === over.id)
+      // フィルタリング前のメモデータ(memos)を元に表示順更新対象のメモのインデックスを取得
+      const fromIndex = memos.findIndex((memo) => memo.id === active.id)
+      const toIndex = memos.findIndex((memo) => memo.id === over.id)
       updateMemoPosition(fromIndex, toIndex)
     }
   }
 
   // メモの表示順を更新APIをdebounce
   const updateMemoPositionApiDebounce = useDebounce((fromMemo, toMemo) => {
-    enqueue(() =>
+    positionEnqueue(() =>
       updateMemoPositionApi(fromMemo, toMemo).catch((error) => {
         alert(error.message)
         navigate('.', { replace: true })
@@ -141,27 +183,28 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
 
   // メモの表示順更新APIの呼び出し
   async function updateMemoPositionApi(fromMemo: Memo, toMemo: Memo) {
-    fetcher.submit(
-      { toMemoId: toMemo.id },
-      {
-        action: `/memos/${fromMemo.id}/position`,
-        method: 'post',
-        encType: 'application/json',
-      },
-    )
+    // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
+    await fetch(`/memos/${fromMemo.id}/position`, {
+      method: 'POST',
+      body: JSON.stringify({ toMemoId: toMemo.id }),
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to update position api')
+      }
+    })
   }
 
   // メモの表示順を更新
   function updateMemoPosition(fromIndex: number, toIndex: number) {
     try {
-      // フィルタ等を行っているリスト(dispMemos)を元に表示順更新対象のメモを取得
-      const fromMemo = dispMemos[fromIndex]
-      const toMemo = dispMemos[toIndex]
+      // フィルタリング前のメモデータ(memos)を元に表示順更新対象のメモのインデックスを取得
+      const fromMemo = memos[fromIndex]
+      const toMemo = memos[toIndex]
       if (!fromMemo || !toMemo) {
         throw new Error('Failed to update position')
       }
 
-      setDispMemos((prev) => {
+      setMemos((prev) => {
         return arrayMove(prev, fromIndex, toIndex) //this is just a splice util
       })
 
@@ -220,9 +263,14 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
                   <ListIterm
                     key={item.id}
                     item={item}
-                    handleDeleteMemo={handleDeleteMemo}
                     setFocusedMemo={setFocusedMemo}
                     isSelected={item.id === selectedMemo?.id}
+                    actionComponent={
+                      <MemoActions
+                        memo={item}
+                        handleDeleteMemo={openDeleteMemoDialog}
+                      />
+                    }
                   />
                 ))
               ) : (

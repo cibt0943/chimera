@@ -355,8 +355,6 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
     const toIndex = isUp ? targetIndex - 1 : targetIndex + 1
     const toRow = table.getRowModel().rows[toIndex]
     if (!toRow) return
-
-    // タスクの表示順を更新
     updateTaskPosition(targetRow.index, toRow.index)
   }
 
@@ -388,8 +386,8 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
       'up',
       'down',
       'mod+up',
-      'mod+down',
       'alt+up',
+      'mod+down',
       'alt+down',
       'mod+c',
       'alt+c',

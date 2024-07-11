@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { CSS } from '@dnd-kit/utilities'
 import { useSortable } from '@dnd-kit/sortable'
 import { cn, useDateDiffFormat } from '~/lib/utils'
-import { MemoActions } from './memo-actions'
 import { Memo } from '~/types/memos'
 
 function NavLinkClassName({ isSelected }: { isSelected: boolean }) {
@@ -20,13 +19,13 @@ function NavLinkClassName({ isSelected }: { isSelected: boolean }) {
 // Item Component
 interface ListItemProps {
   item: Memo
-  handleDeleteMemo: (memo: Memo) => void
   setFocusedMemo: (memo: Memo) => void
   isSelected: boolean
+  actionComponent: React.ReactNode
 }
 
 export function ListIterm(props: ListItemProps) {
-  const { item, handleDeleteMemo, setFocusedMemo, isSelected } = props
+  const { item, setFocusedMemo, isSelected, actionComponent } = props
 
   const { t } = useTranslation()
   const {
@@ -75,9 +74,7 @@ export function ListIterm(props: ListItemProps) {
             <div className="line-clamp-1">
               {item.title || t('memo.un_titled')}
             </div>
-            <div className="ml-auto">
-              <MemoActions memo={item} handleDeleteMemo={handleDeleteMemo} />
-            </div>
+            <div className="ml-auto">{actionComponent}</div>
           </div>
           <div className="line-clamp-2 text-xs text-muted-foreground">
             {item.content.substring(0, 300)}
