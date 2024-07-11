@@ -2,6 +2,7 @@ import type { MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
 import { useLoaderData, Outlet } from '@remix-run/react'
 import { ClientOnly } from 'remix-utils/client-only'
+import { toDate } from 'date-fns'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { Task, TaskModels, TaskModel2Task, TaskSchema } from '~/types/tasks'
@@ -37,22 +38,30 @@ export const action = withAuthentication(async ({ request, account }) => {
 
 type LoaderData = {
   taskModels: TaskModels
+  loadDate: string
 }
 
 export const loader = withAuthentication(async ({ account }) => {
   const taskModels = await getTasks(account.id)
-  return json({ taskModels })
+  return json({ taskModels, loadDate: new Date().toISOString() })
 })
 
 export default function Layout() {
-  const { taskModels } = useLoaderData<LoaderData>()
-  const tasks = taskModels.map<Task>((value) => {
+  const { taskModels, loadDate } = useLoaderData<LoaderData>()
+  const loadTasks = taskModels.map<Task>((value) => {
     return TaskModel2Task(value)
   })
 
   return (
     <div className="p-4">
-      <ClientOnly>{() => <TodoTable tasks={tasks} />}</ClientOnly>
+      <ClientOnly>
+        {() => (
+          <TodoTable
+            defaultTasks={loadTasks}
+            tasksLoadDate={toDate(loadDate)}
+          />
+        )}
+      </ClientOnly>
       <Outlet />
     </div>
   )

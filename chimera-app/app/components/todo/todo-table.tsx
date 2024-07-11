@@ -67,7 +67,8 @@ declare module '@tanstack/table-core' {
 }
 
 interface TodoTableProps<TData extends RowData> {
-  tasks: TData[]
+  defaultTasks: TData[]
+  tasksLoadDate: Date
 }
 
 // Row Component
@@ -93,9 +94,6 @@ function DraggableRow({ row }: { row: Row<Task> }) {
       onFocus={() => {
         row.toggleSelected(true)
       }}
-      onClick={() => {
-        row.toggleSelected(true)
-      }}
       tabIndex={0}
       id={`row-${row.id}`}
       className="outline-none data-[state=selected]:bg-blue-100"
@@ -111,16 +109,28 @@ function DraggableRow({ row }: { row: Row<Task> }) {
 }
 
 // Table Component
-export function TodoTable({ tasks }: TodoTableProps<Task>) {
+export function TodoTable({
+  defaultTasks,
+  tasksLoadDate,
+}: TodoTableProps<Task>) {
   const { t } = useTranslation()
+  const { enqueue } = useQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const { toast } = useToast()
-  const { enqueue } = useQueue()
   const isLoading = useIsLoading()
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(TouchSensor, {}),
+    useSensor(KeyboardSensor, {}),
+  )
 
   // tanstack/react-table
-  const [tableData, setTableData] = React.useState<Tasks>(tasks)
+  const [tableData, setTableData] = React.useState<Tasks>(defaultTasks)
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
     { id: 'status', value: [0, 2] },
@@ -129,6 +139,8 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
 
+  const [tasksLastLoadDate, setTasksLastLoadDate] =
+    React.useState(tasksLoadDate)
   const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
   const [selectedTask, setSelectedTask] = React.useState<Task>() // 編集・削除するタスク
@@ -194,6 +206,22 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
       },
     },
   })
+
+  // タスクデータが変更されたらテーブルデータを更新
+  React.useEffect(() => {
+    setTableData(defaultTasks)
+    setTasksLastLoadDate(tasksLoadDate)
+  }, [tasksLoadDate > tasksLastLoadDate])
+
+  React.useEffect(() => {
+    if (isOpenDeleteDialog || isOpenAddDialog) return
+    const nowSelectedRow = table.getSelectedRowModel().rows[0]
+    if (!nowSelectedRow) return
+    useTBodyRef.current
+      ?.querySelector<HTMLElement>(`#row-${nowSelectedRow.id}`)
+      ?.focus()
+    // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
+  }, [rowSelection])
 
   // タスク追加ダイアログを開く
   function openAddTaskDialog() {
@@ -266,6 +294,7 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     if (active && over && active.id !== over.id) {
+      // ソートやフィルタが実施されていないリストからインデックス情報を取得
       const fromIndex = tableData.findIndex((data) => data.id === active.id)
       const toIndex = tableData.findIndex((data) => data.id === over.id)
       updateTaskPosition(fromIndex, toIndex)
@@ -284,17 +313,19 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
 
   // タスクの表示順更新APIの呼び出し
   async function updateTaskPositionApi(fromTask: Task, toTask: Task) {
-    fetcher.submit(
-      { toTaskId: toTask.id },
-      {
-        action: `/todos/${fromTask.id}/position`,
-        method: 'post',
-        encType: 'application/json',
-      },
-    )
+    // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
+    await fetch(`/todos/${fromTask.id}/position`, {
+      method: 'POST',
+      body: JSON.stringify({ toTaskId: toTask.id }),
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to update position api')
+      }
+    })
   }
 
   // タスクの表示順を更新
+  // fromIndex, toIndexともにソートやフィルタが実施されていないリストのインデックス
   function updateTaskPosition(fromIndex: number, toIndex: number) {
     try {
       const fromTask = tableData[fromIndex]
@@ -447,32 +478,6 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
     if (isLoading || isOpenAddDialog || isOpenDeleteDialog) return
     openAddTaskDialog()
   })
-
-  const sensors = useSensors(
-    useSensor(MouseSensor, {}),
-    useSensor(TouchSensor, {}),
-    useSensor(KeyboardSensor, {}),
-  )
-
-  // タスクデータが変更されたらテーブルデータを更新
-  React.useEffect(() => {
-    if (fetcher.state !== 'idle') return
-    setTableData(tasks)
-  }, [tasks, fetcher.state])
-
-  // 選択行が変更された時とモーダルを閉じた時にテーブルにフォーカスを移動
-  React.useEffect(() => {
-    if (isOpenDeleteDialog || isOpenAddDialog) return
-    const nowSelectedRow = table.getSelectedRowModel().rows[0]
-    if (!nowSelectedRow) {
-      useTBodyRef.current?.focus()
-      return
-    }
-    useTBodyRef.current
-      ?.querySelector<HTMLElement>(`#row-${nowSelectedRow.id}`)
-      ?.focus()
-    // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
-  }, [useTBodyRef, table, rowSelection, isOpenAddDialog, isOpenDeleteDialog])
 
   return (
     <DndContext
