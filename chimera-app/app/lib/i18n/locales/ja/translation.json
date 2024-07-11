@@ -93,9 +93,9 @@
       "id": "ID",
       "title": "タイトル",
       "memo": "メモ",
-      "status": "状態",
       "due_date": "期限",
       "position": "表示位置",
+      "status": "状態",
       "status_list": {
         "new": "新規",
         "done": "完了",
@@ -124,7 +124,12 @@
       "title": "タイトル",
       "content": "本文",
       "related_date": "関連日時",
-      "position": "表示位置"
+      "position": "表示位置",
+      "status": "状態",
+      "status_list": {
+        "nomal": "",
+        "archive": "アーカイブ"
+      }
     },
     "message": {
       "memo_creation": "メモの作成",
@@ -132,6 +137,7 @@
       "memo_deletion": "メモの削除",
       "set_memo_info": "メモの情報を設定してください。",
       "title_filter": "タイトルを検索",
+      "show_archived": "アーカイブを表示",
       "first_line_is_title": "1行目はタイトルとなります"
     }
   }

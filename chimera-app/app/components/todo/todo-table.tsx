@@ -96,7 +96,7 @@ function DraggableRow({ row }: { row: Row<Task> }) {
       }}
       tabIndex={0}
       id={`row-${row.id}`}
-      className="outline-none data-[state=selected]:bg-blue-100"
+      className="outline-none data-[state=selected]:bg-blue-100 dark:data-[state=selected]:bg-slate-700"
       // className="outline-none"
     >
       {row.getVisibleCells().map((cell) => (

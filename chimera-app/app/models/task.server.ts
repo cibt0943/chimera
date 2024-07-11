@@ -28,11 +28,11 @@ export async function getTask(taskId: string): Promise<TaskModel> {
 
 // タスク情報の追加
 interface insertTaskProps {
+  account_id: string
   title: string
   memo: string
   status: number
   due_date: string | null
-  account_id: string
 }
 
 export async function insertTask(task: insertTaskProps): Promise<TaskModel> {

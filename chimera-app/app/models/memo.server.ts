@@ -1,12 +1,16 @@
-import { MemoModel, MemoModels } from '~/types/memos'
+import { MemoModel, MemoModels, MemoStatus } from '~/types/memos'
 import { supabase } from '~/lib/supabase-client.server'
 
 // メモ一覧を取得
-export async function getMemos(account_id: string): Promise<MemoModels> {
+export async function getMemos(
+  account_id: string,
+  statuses: MemoStatus[],
+): Promise<MemoModels> {
   const { data, error } = await supabase
     .from('memos')
     .select()
     .eq('account_id', account_id)
+    .in('status', statuses)
     .order('position', { ascending: false })
     .order('id')
   if (error) throw error
@@ -31,6 +35,7 @@ interface insertMemoProps {
   account_id: string
   title: string
   content: string
+  status: number
   related_date: string | null
 }
 
@@ -60,10 +65,11 @@ interface updateMemoProps {
   id: string
   updated_at?: string
   account_id?: string
+  position?: number
   title?: string
   content?: string
+  status?: number
   related_date?: string | null
-  position?: number
 }
 
 export async function updateMemo(

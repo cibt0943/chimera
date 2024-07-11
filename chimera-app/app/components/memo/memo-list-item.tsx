@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { NavLink } from '@remix-run/react'
+import { NavLink, useSearchParams } from '@remix-run/react'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { CSS } from '@dnd-kit/utilities'
@@ -8,7 +8,9 @@ import { cn, useDateDiffFormat } from '~/lib/utils'
 import { Memo } from '~/types/memos'
 
 function NavLinkClassName({ isSelected }: { isSelected: boolean }) {
-  const className = isSelected ? 'bg-blue-100' : 'hover:bg-accent'
+  const className = isSelected
+    ? 'bg-blue-100 dark:bg-slate-700'
+    : 'hover:bg-accent'
   return cn(
     'flex flex-col gap-2 rounded-lg border p-3 text-sm group',
     'focus-visible:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400',
@@ -26,6 +28,7 @@ interface ListItemProps {
 
 export function ListIterm(props: ListItemProps) {
   const { item, setFocusedMemo, isSelected, actionComponent } = props
+  const [searchParams] = useSearchParams()
 
   const { t } = useTranslation()
   const {
@@ -60,7 +63,7 @@ export function ListIterm(props: ListItemProps) {
       {() => (
         <NavLink
           className={NavLinkClassName({ isSelected })}
-          to={`/memos/${item.id}`}
+          to={`/memos/${item.id}?${searchParams.toString()}`}
           id={`memo-${item.id}`}
           onFocus={() => {
             setFocusedMemo(item)

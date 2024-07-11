@@ -72,6 +72,7 @@ export type Database = {
           id: string
           position: number
           related_date: string | null
+          status: number
           title: string
           updated_at: string
         }
@@ -82,7 +83,8 @@ export type Database = {
           id?: string
           position?: number
           related_date?: string | null
-          title: string
+          status?: number
+          title?: string
           updated_at?: string
         }
         Update: {
@@ -92,6 +94,7 @@ export type Database = {
           id?: string
           position?: number
           related_date?: string | null
+          status?: number
           title?: string
           updated_at?: string
         }

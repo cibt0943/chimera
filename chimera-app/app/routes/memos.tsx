@@ -4,7 +4,13 @@ import { useLoaderData, Outlet, useParams } from '@remix-run/react'
 import { toDate } from 'date-fns'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { Memo, MemoModels, MemoModel2Memo, MemoSchema } from '~/types/memos'
+import {
+  Memo,
+  MemoModels,
+  MemoModel2Memo,
+  MemoSchema,
+  MemoStatus,
+} from '~/types/memos'
 import { getMemos, insertMemo } from '~/models/memo.server'
 import { ErrorView } from '~/components/lib/error-view'
 import { MemoList } from '~/components/memo/memo-list'
@@ -32,10 +38,11 @@ export const action = withAuthentication(async ({ request, account }) => {
 
   const [title, ...content] = (data.content || '').split('\n')
   const newMemo = await insertMemo({
+    account_id: account.id,
     title: title,
     content: content.join('\n'),
+    status: data.status || MemoStatus.NOMAL,
     related_date: data.related_date?.toISOString() || null,
-    account_id: account.id,
   })
 
   return redirect(`/memos/${newMemo.id}`)
@@ -44,11 +51,25 @@ export const action = withAuthentication(async ({ request, account }) => {
 type LoaderData = {
   memoModels: MemoModels
   loadDate: string
+  requestSearchParams: URLSearchParams
 }
 
-export const loader = withAuthentication(async ({ account }) => {
-  const memoModels = await getMemos(account.id)
-  return json({ memoModels, loadDate: new Date().toISOString() })
+export const loader = withAuthentication(async ({ request, account }) => {
+  const url = new URL(request.url)
+  const searchParams = url.searchParams
+  const status = searchParams.get('status') as MemoStatus | null
+
+  const statuses =
+    status == MemoStatus.ARCHIVE
+      ? [MemoStatus.NOMAL, MemoStatus.ARCHIVE]
+      : [MemoStatus.NOMAL]
+
+  const memoModels = await getMemos(account.id, statuses)
+  return json({
+    memoModels,
+    loadDate: new Date().toISOString(),
+    requestSearchParams: searchParams,
+  })
 })
 
 export default function Layout() {
