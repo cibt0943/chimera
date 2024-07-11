@@ -54,9 +54,8 @@ export function MemoList({
   const [memos, setMemos] = React.useState(defaultMemos)
   const [memosLastLoadDate, setMemosLastLoadDate] =
     React.useState(memosLoadDate)
-  const [actionMemo, setActionMemo] = React.useState<Memo>() // 編集・削除するメモ
-  const [focusedMemo, setFocusedMemo] = React.useState<Memo>() // 一覧でフォーカスしているメモ
   const [filter, setFilter] = React.useState('') // フィルタリング文字列
+  const [actionMemo, setActionMemo] = React.useState<Memo>() // 編集・削除するメモ
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   const memosRefs = React.useRef<HTMLDivElement>(null)
@@ -78,6 +77,8 @@ export function MemoList({
   const selectedMemo = React.useMemo(() => {
     return memos.find((memo) => memo.id === showId)
   }, [memos, showId])
+
+  const [focusedMemo, setFocusedMemo] = React.useState(selectedMemo) // 一覧でフォーカスしているメモ
 
   // focusedMemoに合わせてフォーカスを設定
   React.useEffect(() => {
@@ -136,7 +137,7 @@ export function MemoList({
 
   // 上下キーによるフォーカス移動
   function keyUpDownMemoFocus(keys: readonly string[]) {
-    if (!dispMemos.length || !focusedMemo) return
+    if (!focusedMemo) return
     const isUp = keys?.includes('up')
     const nowIndex = dispMemos.findIndex((memo) => memo.id === focusedMemo.id)
     const toIndex = isUp ? nowIndex - 1 : nowIndex + 1
@@ -146,12 +147,18 @@ export function MemoList({
 
   // 上下キーによる表示順移動
   function keyUpDownMemoPosition(keys: readonly string[]) {
-    if (!dispMemos.length || !selectedMemo) return
+    if (!selectedMemo) return
     const isUp = keys?.includes('up')
-    const nowIndex = dispMemos.findIndex((memo) => memo.id === selectedMemo.id)
-    const toIndex = isUp ? nowIndex - 1 : nowIndex + 1
+    updateMemoPositionOneStep(selectedMemo, isUp)
+  }
+
+  // メモの表示順を1つ移動
+  function updateMemoPositionOneStep(targetMemo: Memo, isUp: boolean) {
+    // フィルタリング後のメモデータ(dispMemos)を元に表示順更新対象のメモを取得
+    const fromIndex = dispMemos.findIndex((memo) => targetMemo.id === memo.id)
+    const toIndex = isUp ? fromIndex - 1 : fromIndex + 1
     if (toIndex < 0 || toIndex >= dispMemos.length) return
-    updateMemoPosition(nowIndex, toIndex)
+    updateMemoPosition(targetMemo, dispMemos[toIndex])
   }
 
   // メモ削除確認ダイアログ表示
@@ -164,10 +171,11 @@ export function MemoList({
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     if (over && active.id !== over.id) {
-      // フィルタリング前のメモデータ(memos)を元に表示順更新対象のメモのインデックスを取得
-      const fromIndex = memos.findIndex((memo) => memo.id === active.id)
-      const toIndex = memos.findIndex((memo) => memo.id === over.id)
-      updateMemoPosition(fromIndex, toIndex)
+      // フィルタリング後のメモデータ(dispMemos)を元に表示順更新対象のメモを取得
+      const fromMemo = dispMemos.find((memo) => memo.id === active.id)
+      const toMemo = dispMemos.find((memo) => memo.id === over.id)
+      if (!fromMemo || !toMemo) return
+      updateMemoPosition(fromMemo, toMemo)
     }
   }
 
@@ -195,16 +203,16 @@ export function MemoList({
   }
 
   // メモの表示順を更新
-  function updateMemoPosition(fromIndex: number, toIndex: number) {
+  function updateMemoPosition(fromMemo: Memo, toMemo: Memo) {
     try {
-      // フィルタリング前のメモデータ(memos)を元に表示順更新対象のメモのインデックスを取得
-      const fromMemo = memos[fromIndex]
-      const toMemo = memos[toIndex]
       if (!fromMemo || !toMemo) {
         throw new Error('Failed to update position')
       }
 
       setMemos((prev) => {
+        // フィルタリング前のメモデータ(memos)からfromとtoのindexを取得し順番を入れ替える
+        const fromIndex = prev.findIndex((memo) => memo.id === fromMemo.id)
+        const toIndex = prev.findIndex((memo) => memo.id === toMemo.id)
         return arrayMove(prev, fromIndex, toIndex) //this is just a splice util
       })
 
@@ -268,6 +276,7 @@ export function MemoList({
                     actionComponent={
                       <MemoActions
                         memo={item}
+                        handleUpdateMemoPosition={updateMemoPositionOneStep}
                         handleDeleteMemo={openDeleteMemoDialog}
                       />
                     }
