@@ -1,10 +1,14 @@
 {
   "common": {
     "format": {
-      "date_format": "yyyy/MM/dd/",
+      "date_format": "yyyy/MM/dd",
+      "date_short_format": "MM/dd",
       "time_format": "HH:mm:ss",
-      "datetime_format": "yyyy/MM/dd HH:mm:ss",
-      "datetime_short_format": "yyyy/MM/dd HH:mm",
+      "time_short_format": "HH:mm",
+      "date_time_format": "yyyy/MM/dd HH:mm:ss",
+      "date_short_time_short_format": "MM/dd HH:mm",
+      "date_time_short_format": "yyyy/MM/dd HH:mm",
+      "date_short_time_format": "MM/dd HH:mm:ss",
       "hour": "時間",
       "o'clock": "時",
       "minute": "分",

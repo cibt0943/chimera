@@ -2,9 +2,13 @@
   "common": {
     "format": {
       "date_format": "MM/dd/yyyy",
+      "date_short_format": "MM/dd",
       "time_format": "HH:mm:ss",
-      "datetime_format": "MM/dd/yyyy HH:mm:ss",
-      "datetime_short_format": "MM/dd/yyyy HH:mm",
+      "time_short_format": "HH:mm",
+      "date_time_format": "MM/dd/yyyy HH:mm:ss",
+      "date_short_time_short_format": "MM/dd HH:mm",
+      "date_time_short_format": "MM/dd/yyyy HH:mm",
+      "date_short_time_format": "MM/dd HH:mm:ss",
       "hour": "hour",
       "o'clock": "o'clock",
       "minute": "minute",

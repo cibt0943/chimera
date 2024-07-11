@@ -1,3 +1,4 @@
+import { toDate } from 'date-fns'
 import type { MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
 import { useLoaderData, Outlet, useParams } from '@remix-run/react'
@@ -42,18 +43,20 @@ export const action = withAuthentication(async ({ request, account }) => {
 
 type LoaderData = {
   memoModels: MemoModels
+  loadDate: string
 }
 
 export const loader = withAuthentication(async ({ account }) => {
   const memoModels = await getMemos(account.id)
-  return json({ memoModels })
+  return json({ memoModels, loadDate: new Date().toISOString() })
 })
 
 export default function Layout() {
-  const { memoModels } = useLoaderData<LoaderData>()
-  const memos = memoModels.map<Memo>((value) => {
+  const { memoModels, loadDate } = useLoaderData<LoaderData>()
+  const loadMemos = memoModels.map<Memo>((value) => {
     return MemoModel2Memo(value)
   })
+
   const params = useParams()
   const { memoId } = params
 
@@ -61,7 +64,11 @@ export default function Layout() {
     <div className="p-4 h-screen">
       <ResizablePanelGroup direction="horizontal" className="border rounded-lg">
         <ResizablePanel defaultSize={30}>
-          <MemoList defaultMemos={memos} showId={memoId || ''} />
+          <MemoList
+            defaultMemos={loadMemos}
+            showId={memoId || ''}
+            memosLoadDate={toDate(loadDate)}
+          />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={70}>

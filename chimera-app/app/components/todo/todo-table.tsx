@@ -114,6 +114,7 @@ function DraggableRow({ row }: { row: Row<Task> }) {
 export function TodoTable({ tasks }: TodoTableProps<Task>) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const fetcher = useFetcher()
   const { toast } = useToast()
   const { enqueue } = useQueue()
   const isLoading = useIsLoading()
@@ -132,8 +133,6 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
   const [selectedTask, setSelectedTask] = React.useState<Task>() // 編集・削除するタスク
   const useTBodyRef = React.useRef<HTMLTableSectionElement>(null)
-
-  const fetcher = useFetcher()
 
   const table = useReactTable({
     data: tableData,
@@ -285,14 +284,14 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
 
   // タスクの表示順更新APIの呼び出し
   async function updateTaskPositionApi(fromTask: Task, toTask: Task) {
-    await fetch(`/todos/${fromTask.id}/position`, {
-      method: 'POST',
-      body: JSON.stringify({ toTaskId: toTask.id }),
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to update position api')
-      }
-    })
+    fetcher.submit(
+      { toTaskId: toTask.id },
+      {
+        action: `/todos/${fromTask.id}/position`,
+        method: 'post',
+        encType: 'application/json',
+      },
+    )
   }
 
   // タスクの表示順を更新
@@ -308,6 +307,7 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
         return arrayMove(tableData, fromIndex, toIndex) //this is just a splice util
       })
 
+      // これによりフォーカスがD&D用のつまみから行全体に移動する
       setRowSelection({ [fromTask.id]: true })
 
       // タスクの表示順を更新API
@@ -355,8 +355,6 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
     const toIndex = isUp ? targetIndex - 1 : targetIndex + 1
     const toRow = table.getRowModel().rows[toIndex]
     if (!toRow) return
-
-    // タスクの表示順を更新
     updateTaskPosition(targetRow.index, toRow.index)
   }
 
@@ -388,8 +386,8 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
       'up',
       'down',
       'mod+up',
-      'mod+down',
       'alt+up',
+      'mod+down',
       'alt+down',
       'mod+c',
       'alt+c',
@@ -458,8 +456,9 @@ export function TodoTable({ tasks }: TodoTableProps<Task>) {
 
   // タスクデータが変更されたらテーブルデータを更新
   React.useEffect(() => {
+    if (fetcher.state !== 'idle') return
     setTableData(tasks)
-  }, [tasks, table])
+  }, [tasks, fetcher.state])
 
   // 選択行が変更された時とモーダルを閉じた時にテーブルにフォーカスを移動
   React.useEffect(() => {
