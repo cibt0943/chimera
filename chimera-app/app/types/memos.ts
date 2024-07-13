@@ -3,7 +3,7 @@ import { toDate } from 'date-fns'
 
 export const MemoStatus = {
   NOMAL: 0,
-  ARCHIVE: 1,
+  ARCHIVED: 1,
 } as const
 export type MemoStatus = (typeof MemoStatus)[keyof typeof MemoStatus]
 
@@ -16,7 +16,7 @@ export const MemoStatusList = [
     color: '',
   },
   {
-    value: MemoStatus.ARCHIVE,
+    value: MemoStatus.ARCHIVED,
     label: 'task.model.status_list.archive',
     disp_order: 2,
     color: 'bg-violet-600',

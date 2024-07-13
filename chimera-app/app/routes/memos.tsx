@@ -4,6 +4,7 @@ import { useLoaderData, Outlet, useParams } from '@remix-run/react'
 import { toDate } from 'date-fns'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
+import { getStatusFilterFromParams, getSearchParams } from '~/lib/memo'
 import {
   Memo,
   MemoModels,
@@ -45,30 +46,20 @@ export const action = withAuthentication(async ({ request, account }) => {
     related_date: data.related_date?.toISOString() || null,
   })
 
-  return redirect(`/memos/${newMemo.id}`)
+  return redirect(`/memos/${newMemo.id}?${getSearchParams(request)}`)
 })
 
 type LoaderData = {
   memoModels: MemoModels
   loadDate: string
-  requestSearchParams: URLSearchParams
 }
 
 export const loader = withAuthentication(async ({ request, account }) => {
-  const url = new URL(request.url)
-  const searchParams = url.searchParams
-  const status = searchParams.get('status') as MemoStatus | null
-
-  const statuses =
-    status == MemoStatus.ARCHIVE
-      ? [MemoStatus.NOMAL, MemoStatus.ARCHIVE]
-      : [MemoStatus.NOMAL]
-
+  const statuses = getStatusFilterFromParams(request)
   const memoModels = await getMemos(account.id, statuses)
   return json({
     memoModels,
     loadDate: new Date().toISOString(),
-    requestSearchParams: searchParams,
   })
 })
 

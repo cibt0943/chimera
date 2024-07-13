@@ -420,8 +420,6 @@ export function TodoTable({
       'alt+up',
       'mod+down',
       'alt+down',
-      'mod+c',
-      'alt+c',
       'enter',
       'mod+enter',
       'alt+enter',
@@ -440,11 +438,10 @@ export function TodoTable({
             ? keyUpDownTaskPosition(handler.keys)
             : keyUpDownSelectedRow(handler.keys)
           break
-        case 'c':
-          keyUpdateTaskStatus(TaskStatus.DONE)
-          break
         case 'enter':
-          keyEditTask()
+          handler.mod || handler.alt
+            ? keyUpdateTaskStatus(TaskStatus.DONE)
+            : keyEditTask()
           break
         case 'delete':
         case 'backspace':

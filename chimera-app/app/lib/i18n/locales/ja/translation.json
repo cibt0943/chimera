@@ -138,7 +138,9 @@
       "set_memo_info": "メモの情報を設定してください。",
       "title_filter": "タイトルを検索",
       "show_archived": "アーカイブを表示",
-      "first_line_is_title": "1行目はタイトルとなります"
+      "first_line_is_title": "1行目はタイトルとなります",
+      "to_archive": "アーカイブする",
+      "un_archive": "アーカイブから戻す"
     }
   }
 }

@@ -1,12 +1,22 @@
-import { Form } from '@remix-run/react'
+import * as React from 'react'
+import { Form, useSearchParams, useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
+import { RxTrash } from 'react-icons/rx'
+import { RiInboxArchiveLine, RiInboxUnarchiveLine } from 'react-icons/ri'
 import { useForm, getFormProps, getTextareaProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip'
 import { FormItem, FormMessage, FormDescription } from '~/components/lib/form'
+import { Memo, MemoSchema, MemoSchemaType, MemoStatus } from '~/types/memos'
 import { MemoRelatedDateTimePicker } from './memo-related-date-time-picker'
-import { Memo, MemoSchema, MemoSchemaType } from '~/types/memos'
+import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 
 interface MemoFormProps {
   memo: Memo | undefined
@@ -14,8 +24,11 @@ interface MemoFormProps {
 
 export function MemoForm({ memo }: MemoFormProps) {
   const { t } = useTranslation()
+  const [searchParams] = useSearchParams()
 
-  const action = memo ? `/memos/${memo.id}` : '/memos'
+  const action = memo
+    ? `/memos/${memo.id}?${searchParams.toString()}`
+    : `/memos?${searchParams.toString()}`
 
   const defaultValue = {
     content:
@@ -55,18 +68,89 @@ export function MemoForm({ memo }: MemoFormProps) {
           <FormMessage message={fields.content.errors} />
         </FormItem>
         <div className="flex items-center justify-between">
-          <FormItem>
-            <MemoRelatedDateTimePicker
-              meta={fields.related_date}
-              divProps={{ className: 'w-64' }}
-            />
-            <FormMessage message={fields.related_date.errors} />
-          </FormItem>
-          <Button type="submit" className="w-32">
-            {t('common.message.save')}
-          </Button>
+          <ActionButtons memo={memo} />
+          <div className="flex items-center space-x-6">
+            <FormItem>
+              <MemoRelatedDateTimePicker
+                meta={fields.related_date}
+                divProps={{ className: 'w-64' }}
+              />
+              <FormMessage message={fields.related_date.errors} />
+            </FormItem>
+            <Button type="submit" className="w-32">
+              {t('common.message.save')}
+            </Button>
+          </div>
         </div>
       </Form>
+    </div>
+  )
+}
+
+function ActionButtons({ memo }: { memo: Memo | undefined }) {
+  const { t } = useTranslation()
+  const fetcher = useFetcher()
+  const [searchParams] = useSearchParams()
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
+
+  if (!memo) return <div></div> // memo がない場合はあえてdivタグのみを記載
+
+  const archiveMenu =
+    memo.status === MemoStatus.NOMAL
+      ? {
+          toStatus: MemoStatus.ARCHIVED,
+          icon: <RiInboxArchiveLine className="h-4 w-4" />,
+          caption: t('memo.message.to_archive'),
+        }
+      : {
+          toStatus: MemoStatus.NOMAL,
+          icon: <RiInboxUnarchiveLine className="h-4 w-4" />,
+          caption: t('memo.message.un_archive'),
+        }
+
+  return (
+    <div className="space-x-4">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                fetcher.submit(
+                  { status: archiveMenu.toStatus },
+                  {
+                    action: `/memos/${memo.id}/status?${searchParams}`,
+                    method: 'post',
+                  },
+                )
+              }}
+            >
+              {archiveMenu.icon}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{archiveMenu.caption}</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                setIsOpenDeleteDialog(true)
+              }}
+            >
+              <RxTrash className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t('common.message.delete')}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      <MemoDeleteConfirmDialog
+        memo={memo}
+        isOpenDialog={isOpenDeleteDialog}
+        setIsOpenDialog={setIsOpenDeleteDialog}
+      />
     </div>
   )
 }

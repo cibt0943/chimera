@@ -72,7 +72,10 @@ export function TodoTableRowActions({
         >
           <RxCheckCircled className="mr-2 h-4 w-4" />
           {t('task.message.to_complete')}
-          <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
+          <DropdownMenuShortcut>
+            ⌘
+            <RiCornerDownLeftLine className="h-3 w-3 inline" />
+          </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
@@ -82,7 +85,6 @@ export function TodoTableRowActions({
           <RxPencil1 className="mr-2 h-4 w-4" />
           {t('common.message.edit')}
           <DropdownMenuShortcut>
-            ⌘
             <RiCornerDownLeftLine className="h-3 w-3 inline" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>

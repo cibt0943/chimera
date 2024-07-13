@@ -1,7 +1,12 @@
 import * as React from 'react'
-import { RxPlus } from 'react-icons/rx'
-import { Form, useNavigate, useSearchParams } from '@remix-run/react'
+import {
+  Form,
+  useNavigate,
+  useSearchParams,
+  useFetcher,
+} from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
+import { RxPlus } from 'react-icons/rx'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
   DndContext,
@@ -21,12 +26,11 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
-import { Separator } from '~/components/ui/separator'
 import { Label } from '~/components/ui/label'
 import { Switch } from '~/components/ui/switch'
 import { useDebounce, useQueue } from '~/lib/utils'
-import { Memos, Memo } from '~/types/memos'
-import { ListIterm } from './memo-list-item'
+import { Memos, Memo, MemoStatus } from '~/types/memos'
+import { ListItem } from './memo-list-item'
 import { MemoActions } from './memo-actions'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 
@@ -46,6 +50,7 @@ export function MemoList({
   const { enqueue: positionEnqueue } = useQueue()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const fetcher = useFetcher()
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
@@ -93,16 +98,18 @@ export function MemoList({
   }, [focusedMemo])
 
   // キーボード操作
-  useHotkeys(
+  useHotkeys<HTMLDivElement>(
     [
       'up',
       'down',
-      'mod+i',
-      'alt+i',
       'mod+up',
       'alt+up',
       'mod+down',
       'alt+down',
+      'mod+i',
+      'alt+i',
+      'mod+enter',
+      'alt+enter',
       'mod+delete',
       'alt+delete',
       'mod+backspace',
@@ -121,6 +128,10 @@ export function MemoList({
         case 'i':
           addButtonRef.current?.click()
           break
+        // メモのアーカイブ
+        case 'enter':
+          keyUpdateMemoStatus(MemoStatus.ARCHIVED)
+          break
         // メモ削除
         case 'delete':
         case 'backspace':
@@ -128,6 +139,9 @@ export function MemoList({
           openDeleteMemoDialog(selectedMemo)
           break
       }
+    },
+    {
+      preventDefault: true,
     },
   )
 
@@ -165,6 +179,23 @@ export function MemoList({
     const toIndex = isUp ? fromIndex - 1 : fromIndex + 1
     if (toIndex < 0 || toIndex >= dispMemos.length) return
     updateMemoPosition(targetMemo, dispMemos[toIndex])
+  }
+
+  // 選択行をアーカイブさせる
+  function keyUpdateMemoStatus(status: MemoStatus) {
+    if (!selectedMemo) return
+    updateMemoStatus(selectedMemo, status)
+  }
+
+  // メモのステータスを更新
+  function updateMemoStatus(memo: Memo, status: MemoStatus) {
+    fetcher.submit(
+      { status: status },
+      {
+        action: `/memos/${memo.id}/status?${searchParams}`,
+        method: 'post',
+      },
+    )
   }
 
   // メモ削除確認ダイアログ表示
@@ -243,7 +274,7 @@ export function MemoList({
           className="h-8"
           id="memos-title-filter"
         />
-        <Form action={`/memos`} method="post">
+        <Form action={`/memos?${searchParams}`} method="post">
           <Button
             type="submit"
             variant="secondary"
@@ -274,7 +305,7 @@ export function MemoList({
             >
               {dispMemos.length ? (
                 dispMemos.map((item: Memo) => (
-                  <ListIterm
+                  <ListItem
                     key={item.id}
                     item={item}
                     setFocusedMemo={setFocusedMemo}
@@ -283,6 +314,7 @@ export function MemoList({
                       <MemoActions
                         memo={item}
                         handleUpdateMemoPosition={updateMemoPositionOneStep}
+                        handleUpdateMemoStatus={updateMemoStatus}
                         handleDeleteMemo={openDeleteMemoDialog}
                       />
                     }

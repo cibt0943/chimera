@@ -139,7 +139,9 @@
       "set_memo_info": "Set the memo information.",
       "title_filter": "Filter memos...",
       "show_archived": "Show Archived",
-      "first_line_is_title": "The first line is the title."
+      "first_line_is_title": "The first line is the title.",
+      "to_archive": "Archive",
+      "un_archive": "Unarchive"
     }
   }
 }
