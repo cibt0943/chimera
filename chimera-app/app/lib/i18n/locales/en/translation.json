@@ -93,9 +93,9 @@
       "id": "ID",
       "title": "Title",
       "memo": "Memo",
-      "status": "Status",
       "due_date": "Due date",
       "position": "Position",
+      "status": "Status",
       "status_list": {
         "new": "New",
         "done": "Done",
@@ -124,15 +124,24 @@
       "title": "Title",
       "content": "Content",
       "related_date": "Related date",
-      "position": "Position"
+      "position": "Position",
+      "status": "Status",
+      "status_list": {
+        "nomal": "",
+        "archive": "Archive"
+      }
     },
+
     "message": {
       "memo_creation": "Memo Creation",
       "memo_editing": "Memo Editing",
       "memo_deletion": "Memo Deletion",
       "set_memo_info": "Set the memo information.",
       "title_filter": "Filter memos...",
-      "first_line_is_title": "The first line is the title."
+      "show_archived": "Show Archived",
+      "first_line_is_title": "The first line is the title.",
+      "to_archive": "Archive",
+      "un_archive": "Unarchive"
     }
   }
 }

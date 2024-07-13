@@ -1,18 +1,32 @@
-import { format } from 'date-fns'
-import { NavLink } from '@remix-run/react'
+import { NavLink, useSearchParams } from '@remix-run/react'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
+import { RiArchiveLine } from 'react-icons/ri'
 import { CSS } from '@dnd-kit/utilities'
 import { useSortable } from '@dnd-kit/sortable'
 import { cn, useDateDiffFormat } from '~/lib/utils'
-import { Memo } from '~/types/memos'
+import { Memo, MemoStatus } from '~/types/memos'
 
-function NavLinkClassName({ isSelected }: { isSelected: boolean }) {
-  const className = isSelected ? 'bg-blue-100' : 'hover:bg-accent'
+function NavLinkClassName({
+  item,
+  isSelected,
+}: {
+  item: Memo
+  isSelected: boolean
+}) {
+  const selectedClassName = isSelected
+    ? 'bg-blue-100 dark:bg-slate-700'
+    : 'hover:bg-accent'
+
+  const archiveClassName =
+    item.status === MemoStatus.ARCHIVED ? 'text-muted-foreground' : ''
+
   return cn(
     'flex flex-col gap-2 rounded-lg border p-3 text-sm group',
     'focus-visible:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400',
-    className,
+    selectedClassName,
+    archiveClassName,
   )
 }
 
@@ -24,8 +38,9 @@ interface ListItemProps {
   actionComponent: React.ReactNode
 }
 
-export function ListIterm(props: ListItemProps) {
+export function ListItem(props: ListItemProps) {
   const { item, setFocusedMemo, isSelected, actionComponent } = props
+  const [searchParams] = useSearchParams()
 
   const { t } = useTranslation()
   const {
@@ -59,8 +74,8 @@ export function ListIterm(props: ListItemProps) {
     <ClientOnly>
       {() => (
         <NavLink
-          className={NavLinkClassName({ isSelected })}
-          to={`/memos/${item.id}`}
+          className={NavLinkClassName({ item, isSelected })}
+          to={`/memos/${item.id}?${searchParams.toString()}`}
           id={`memo-${item.id}`}
           onFocus={() => {
             setFocusedMemo(item)
@@ -79,12 +94,22 @@ export function ListIterm(props: ListItemProps) {
           <div className="line-clamp-2 text-xs text-muted-foreground">
             {item.content.substring(0, 300)}
           </div>
-          <div
-            className="ml-auto text-xs text-muted-foreground"
-            // 下記を表示するとエラーが発生する。サーバーサイドとクライアントで時間側が異なるためと思われる。
-            title={format(item.updated_at, t('common.format.date_time_format'))}
-          >
-            {updatedAtDiff}
+          <div className="flex justify-between items-center space-x-2">
+            <div>
+              {item.status === MemoStatus.ARCHIVED ? (
+                <RiArchiveLine className="mr-2 h-4 w-4" />
+              ) : null}
+            </div>
+            <div
+              className="ml-auto text-xs text-muted-foreground"
+              // 下記を表示するとエラーが発生する。サーバーサイドとクライアントで時間側が異なるためと思われる。
+              title={format(
+                item.updated_at,
+                t('common.format.date_time_format'),
+              )}
+            >
+              {updatedAtDiff}
+            </div>
           </div>
         </NavLink>
       )}

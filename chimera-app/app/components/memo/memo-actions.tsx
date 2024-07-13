@@ -1,4 +1,4 @@
-import { useNavigate } from '@remix-run/react'
+import { useNavigate, useSearchParams } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import {
   RxDotsHorizontal,
@@ -7,7 +7,12 @@ import {
   RxPencil1,
   RxTrash,
 } from 'react-icons/rx'
-import { RiDeleteBack2Line, RiCornerDownLeftLine } from 'react-icons/ri'
+import {
+  RiDeleteBack2Line,
+  RiCornerDownLeftLine,
+  RiInboxArchiveLine,
+  RiInboxUnarchiveLine,
+} from 'react-icons/ri'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
@@ -19,25 +24,45 @@ import {
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
 import { cn } from '~/lib/utils'
-import { Memo } from '~/types/memos'
+import { Memo, MemoStatus } from '~/types/memos'
 
 interface MemoActionsProps {
   memo: Memo
   handleUpdateMemoPosition: (memo: Memo, isUp: boolean) => void
+  handleUpdateMemoStatus: (memo: Memo, status: MemoStatus) => void
   handleDeleteMemo: (memo: Memo) => void
 }
 
 export function MemoActions(props: MemoActionsProps) {
-  const { memo, handleUpdateMemoPosition, handleDeleteMemo } = props
+  const {
+    memo,
+    handleUpdateMemoPosition,
+    handleUpdateMemoStatus,
+    handleDeleteMemo,
+  } = props
 
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const buttonClassName = cn(
     'flex h-6 w-6 p-0 data-[state=open]:bg-muted',
     'opacity-0 group-hover:opacity-100 group-focus:opacity-100 focus:opacity-100',
     'data-[state=open]:opacity-100',
   )
+
+  const archiveMenu =
+    memo.status === MemoStatus.NOMAL
+      ? {
+          toStatus: MemoStatus.ARCHIVED,
+          icon: <RiInboxArchiveLine className="mr-2 h-4 w-4" />,
+          caption: t('memo.message.to_archive'),
+        }
+      : {
+          toStatus: MemoStatus.NOMAL,
+          icon: <RiInboxUnarchiveLine className="mr-2 h-4 w-4" />,
+          caption: t('memo.message.un_archive'),
+        }
 
   return (
     <DropdownMenu>
@@ -72,7 +97,20 @@ export function MemoActions(props: MemoActionsProps) {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={(event) => {
-              navigate(`/memos/${memo.id}`)
+              handleUpdateMemoStatus(memo, archiveMenu.toStatus)
+              event.stopPropagation()
+            }}
+          >
+            {archiveMenu.icon}
+            {archiveMenu.caption}
+            <DropdownMenuShortcut>
+              ⌘
+              <RiCornerDownLeftLine className="h-3 w-3 inline" />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={(event) => {
+              navigate(`/memos/${memo.id}?${searchParams}`)
               event.stopPropagation()
             }}
           >

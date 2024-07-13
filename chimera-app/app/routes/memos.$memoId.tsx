@@ -4,6 +4,7 @@ import { useLoaderData } from '@remix-run/react'
 import { ClientOnly } from 'remix-utils/client-only'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
+import { getSearchParams } from '~/lib/memo'
 import { MemoSchema } from '~/types/memos'
 import { getMemo, updateMemo } from '~/models/memo.server'
 import { MemoForm } from '~/components/memo/memo-form'
@@ -37,7 +38,7 @@ export const action = withAuthentication(
       updated_at: new Date().toISOString(),
     })
 
-    return redirect('/memos/' + memo.id)
+    return redirect(`/memos/${memo.id}?${getSearchParams(request)}`)
   },
 )
 

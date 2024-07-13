@@ -47,11 +47,11 @@ export type Task = {
   created_at: Date
   updated_at: Date
   account_id: string
+  // position: number
   title: string
   memo: string
   status: TaskStatus
   due_date: Date | null
-  // position: number
 }
 
 export type Tasks = Task[]
@@ -61,11 +61,11 @@ export type TaskModel = {
   created_at: string
   updated_at: string
   account_id: string
+  position: number
   title: string
   memo: string
   status: number
   due_date: string | null
-  position: number
 }
 
 export type TaskModels = TaskModel[]
