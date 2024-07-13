@@ -47,7 +47,7 @@ export function MemoList({
 }: MemoListProps) {
   const { t } = useTranslation()
   const { enqueue: filterEnqueue } = useQueue()
-  const { enqueue: positionEnqueue } = useQueue()
+  const { enqueue: moveMemoEnqueue } = useQueue()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const fetcher = useFetcher()
@@ -116,13 +116,15 @@ export function MemoList({
       'alt+backspace',
     ],
     (_, handler) => {
+      // ダイアログが開いている場合は何もしない
+      if (isOpenDeleteDialog) return
       switch (handler.keys?.join('')) {
         // フォーカス移動
         case 'up':
         case 'down':
           handler.mod || handler.alt
-            ? keyUpDownMemoPosition(handler.keys)
-            : keyUpDownMemoFocus(handler.keys)
+            ? moveSelectedMemoOneStep(handler.keys.includes('up'))
+            : changeFocusedMemoOneStep(handler.keys.includes('up'))
           break
         // メモ追加
         case 'i':
@@ -130,7 +132,7 @@ export function MemoList({
           break
         // メモのアーカイブ
         case 'enter':
-          keyUpdateMemoStatus(MemoStatus.ARCHIVED)
+          updateSeletedMemoStatus(MemoStatus.ARCHIVED)
           break
         // メモ削除
         case 'delete':
@@ -153,11 +155,10 @@ export function MemoList({
     filterEnqueue(() => filterMemos(searchTerm))
   }, 300)
 
-  // 上下キーによるフォーカス移動
-  function keyUpDownMemoFocus(keys: readonly string[]) {
+  // フォーカスを1ステップ変更
+  function changeFocusedMemoOneStep(isUp: boolean) {
     let targetIndex = 0
     if (focusedMemo) {
-      const isUp = keys?.includes('up')
       const nowIndex = dispMemos.findIndex((memo) => memo.id === focusedMemo.id)
       targetIndex = isUp ? nowIndex - 1 : nowIndex + 1
     }
@@ -165,29 +166,28 @@ export function MemoList({
     setFocusedMemo(dispMemos[targetIndex])
   }
 
-  // 上下キーによる表示順移動
-  function keyUpDownMemoPosition(keys: readonly string[]) {
+  // 選択行の表示順を1ステップ変更
+  function moveSelectedMemoOneStep(isUp: boolean) {
     if (!selectedMemo) return
-    const isUp = keys?.includes('up')
-    updateMemoPositionOneStep(selectedMemo, isUp)
+    moveMemoOneStep(selectedMemo, isUp)
   }
 
-  // メモの表示順を1つ移動
-  function updateMemoPositionOneStep(targetMemo: Memo, isUp: boolean) {
+  // メモの表示順を1ステップ変更
+  function moveMemoOneStep(targetMemo: Memo, isUp: boolean) {
     // フィルタリング後のメモデータ(dispMemos)を元に表示順更新対象のメモを取得
     const fromIndex = dispMemos.findIndex((memo) => targetMemo.id === memo.id)
     const toIndex = isUp ? fromIndex - 1 : fromIndex + 1
     if (toIndex < 0 || toIndex >= dispMemos.length) return
-    updateMemoPosition(targetMemo, dispMemos[toIndex])
+    moveMemo(targetMemo, dispMemos[toIndex])
   }
 
-  // 選択行をアーカイブさせる
-  function keyUpdateMemoStatus(status: MemoStatus) {
+  // 選択行のステータスを変更
+  function updateSeletedMemoStatus(status: MemoStatus) {
     if (!selectedMemo) return
     updateMemoStatus(selectedMemo, status)
   }
 
-  // メモのステータスを更新
+  // メモのステータスを変更
   function updateMemoStatus(memo: Memo, status: MemoStatus) {
     fetcher.submit(
       { status: status },
@@ -198,13 +198,13 @@ export function MemoList({
     )
   }
 
-  // メモ削除確認ダイアログ表示
+  // メモ削除ダイアログを開く
   function openDeleteMemoDialog(memo: Memo) {
     setActionMemo(memo)
     setIsOpenDeleteDialog(true)
   }
 
-  // 行のドラッグ&ドロップによるメモの表示順変更
+  // ドラッグ&ドロップによるメモの表示順変更
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     if (over && active.id !== over.id) {
@@ -212,22 +212,22 @@ export function MemoList({
       const fromMemo = dispMemos.find((memo) => memo.id === active.id)
       const toMemo = dispMemos.find((memo) => memo.id === over.id)
       if (!fromMemo || !toMemo) return
-      updateMemoPosition(fromMemo, toMemo)
+      moveMemo(fromMemo, toMemo)
     }
   }
 
-  // メモの表示順を更新APIをdebounce
-  const updateMemoPositionApiDebounce = useDebounce((fromMemo, toMemo) => {
-    positionEnqueue(() =>
-      updateMemoPositionApi(fromMemo, toMemo).catch((error) => {
+  // メモの表示順変更APIをdebounce
+  const moveMemoApiDebounce = useDebounce((fromMemo, toMemo) => {
+    moveMemoEnqueue(() =>
+      moveMemoApi(fromMemo, toMemo).catch((error) => {
         alert(error.message)
         navigate('.', { replace: true })
       }),
     )
   }, 300)
 
-  // メモの表示順更新APIの呼び出し
-  async function updateMemoPositionApi(fromMemo: Memo, toMemo: Memo) {
+  // メモの表示順変更APIの呼び出し
+  async function moveMemoApi(fromMemo: Memo, toMemo: Memo) {
     // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
     await fetch(`/memos/${fromMemo.id}/position`, {
       method: 'POST',
@@ -239,13 +239,9 @@ export function MemoList({
     })
   }
 
-  // メモの表示順を更新
-  function updateMemoPosition(fromMemo: Memo, toMemo: Memo) {
+  // メモの表示順を変更
+  function moveMemo(fromMemo: Memo, toMemo: Memo) {
     try {
-      if (!fromMemo || !toMemo) {
-        throw new Error('Failed to update position')
-      }
-
       setMemos((prev) => {
         // フィルタリング前のメモデータ(memos)からfromとtoのindexを取得し順番を入れ替える
         const fromIndex = prev.findIndex((memo) => memo.id === fromMemo.id)
@@ -253,8 +249,8 @@ export function MemoList({
         return arrayMove(prev, fromIndex, toIndex) //this is just a splice util
       })
 
-      // メモの表示順を更新API
-      updateMemoPositionApiDebounce(fromMemo, toMemo)
+      // メモの表示順変更API
+      moveMemoApiDebounce(fromMemo, toMemo)
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error'
       alert(msg)
@@ -313,7 +309,7 @@ export function MemoList({
                     actionComponent={
                       <MemoActions
                         memo={item}
-                        handleUpdateMemoPosition={updateMemoPositionOneStep}
+                        handleMoveMemo={moveMemoOneStep}
                         handleUpdateMemoStatus={updateMemoStatus}
                         handleDeleteMemo={openDeleteMemoDialog}
                       />
@@ -342,8 +338,8 @@ export function MemoList({
       {actionMemo ? (
         <MemoDeleteConfirmDialog
           memo={actionMemo}
-          isOpenDialog={isOpenDeleteDialog}
-          setIsOpenDialog={setIsOpenDeleteDialog}
+          isOpen={isOpenDeleteDialog}
+          setIsOpen={setIsOpenDeleteDialog}
         />
       ) : null}
     </div>

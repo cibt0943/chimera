@@ -110,7 +110,7 @@ function ActionButtons({ memo }: { memo: Memo | undefined }) {
 
   return (
     <div className="space-x-4">
-      <TooltipProvider>
+      <TooltipProvider delayDuration={0}>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -148,8 +148,8 @@ function ActionButtons({ memo }: { memo: Memo | undefined }) {
       </TooltipProvider>
       <MemoDeleteConfirmDialog
         memo={memo}
-        isOpenDialog={isOpenDeleteDialog}
-        setIsOpenDialog={setIsOpenDeleteDialog}
+        isOpen={isOpenDeleteDialog}
+        setIsOpen={setIsOpenDeleteDialog}
       />
     </div>
   )

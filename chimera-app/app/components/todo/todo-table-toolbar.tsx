@@ -1,10 +1,8 @@
-import { RxCross2 } from 'react-icons/rx'
 import { useTranslation } from 'react-i18next'
+import { RxCross2 } from 'react-icons/rx'
 import { Table } from '@tanstack/react-table'
-
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
-
 import { TaskStatusListByDispOrder } from '~/types/tasks'
 import { TodoTableViewOptions } from './todo-table-view-options'
 import { TodoTableFacetedFilter } from './todo-table-faceted-filter'

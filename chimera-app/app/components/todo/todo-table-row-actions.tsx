@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { Row, Table } from '@tanstack/react-table'
 import {
   RxDotsHorizontal,
   RxArrowUp,
@@ -9,7 +8,7 @@ import {
   RxTrash,
 } from 'react-icons/rx'
 import { RiDeleteBack2Line, RiCornerDownLeftLine } from 'react-icons/ri'
-
+import { Row, Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
@@ -47,7 +46,7 @@ export function TodoTableRowActions({
       <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuItem
           onClick={() => {
-            table.options.meta?.updateTaskPosition(task, true)
+            table.options.meta?.moveTask(task, true)
           }}
         >
           <RxArrowUp className="mr-2 h-4 w-4" />
@@ -56,7 +55,7 @@ export function TodoTableRowActions({
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
-            table.options.meta?.updateTaskPosition(task, false)
+            table.options.meta?.moveTask(task, false)
           }}
         >
           <RxArrowDown className="mr-2 h-4 w-4" />
@@ -67,7 +66,8 @@ export function TodoTableRowActions({
         <DropdownMenuItem
           disabled={task.status === TaskStatus.DONE}
           onClick={() => {
-            table.options.meta?.updateTaskStatus(task, TaskStatus.DONE)
+            const upateTask = { ...task, status: TaskStatus.DONE }
+            table.options.meta?.updateTaskStatus(upateTask)
           }}
         >
           <RxCheckCircled className="mr-2 h-4 w-4" />

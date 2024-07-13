@@ -1,10 +1,10 @@
+import { NavLink } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { ColumnDef, Column, Row } from '@tanstack/react-table'
 import { useSortable } from '@dnd-kit/sortable'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
-
 import { Task, TaskStatusList } from '~/types/tasks'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
@@ -71,7 +71,11 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
       return ColumnHeader({ column, title: 'task.model.title' })
     },
     cell: ({ row }) => {
-      return <span className="truncate font-medium">{row.original.title}</span>
+      return (
+        <NavLink to={`/todos/${row.id}`} className="truncate font-medium">
+          {row.original.title}
+        </NavLink>
+      )
     },
   },
   {

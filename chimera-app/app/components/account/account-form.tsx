@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { Form } from '@remix-run/react'
+import { useTranslation } from 'react-i18next'
 import {
   useForm,
   getFormProps,
   getInputProps,
   getSelectProps,
 } from '@conform-to/react'
-import { useTranslation } from 'react-i18next'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
 import { Required } from '~/components/lib/required'
@@ -27,7 +27,7 @@ import {
   ThemeList,
 } from '~/types/accounts'
 
-const SelectLanguageItems = React.memo(() => {
+function SelectLanguageItems() {
   const { t } = useTranslation()
   return (
     <>
@@ -38,10 +38,9 @@ const SelectLanguageItems = React.memo(() => {
       ))}
     </>
   )
-})
-SelectLanguageItems.displayName = 'SelectLanguageItems'
+}
 
-const SelectThemeItems = React.memo(() => {
+function SelectThemeItems() {
   const { t } = useTranslation()
   return (
     <>
@@ -52,8 +51,7 @@ const SelectThemeItems = React.memo(() => {
       ))}
     </>
   )
-})
-SelectThemeItems.displayName = 'SelectThemeItems'
+}
 
 interface AccountFormProps {
   account: Account

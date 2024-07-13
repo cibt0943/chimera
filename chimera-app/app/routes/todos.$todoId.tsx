@@ -50,11 +50,7 @@ export const loader = withAuthentication(async ({ params, account }) => {
 
 export default function Todo() {
   const { task } = useLoaderData<typeof loader>()
-  const [isOpenDialog, setIsOpenDialog] = React.useState(false)
-
-  React.useEffect(() => {
-    setIsOpenDialog(true)
-  }, [])
+  const [isOpenDialog, setIsOpenDialog] = React.useState(true)
 
   return (
     <TaskFormDialog

@@ -8,14 +8,14 @@ import { Memo } from '~/types/memos'
 
 interface DeleteMemoConfirmDialogProps {
   memo: Memo
-  isOpenDialog: boolean
-  setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>
+  isOpen: boolean
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function MemoDeleteConfirmDialog({
   memo,
-  isOpenDialog,
-  setIsOpenDialog,
+  isOpen,
+  setIsOpen,
 }: DeleteMemoConfirmDialogProps) {
   const { t } = useTranslation()
   const [searchParams] = useSearchParams()
@@ -29,15 +29,15 @@ export function MemoDeleteConfirmDialog({
         '」' +
         t('common.message.confirm_deletion')
       }
-      isOpenDialog={isOpenDialog}
-      setIsOpenDialog={setIsOpenDialog}
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <Form
         action={`/memos/${memo.id}/delete?${searchParams.toString()}`}
         method="delete"
         onSubmit={() => {
-          setIsOpenDialog(false)
+          setIsOpen(false)
         }}
       >
         <Button type="submit" variant="destructive">
