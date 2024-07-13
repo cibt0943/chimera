@@ -1,6 +1,6 @@
 import { redirect } from '@remix-run/node'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { getSearchParams } from '~/lib/memo'
+import { getSearchParams } from '~/lib/memo.server'
 import { getMemo, deleteMemo } from '~/models/memo.server'
 
 export const action = withAuthentication(

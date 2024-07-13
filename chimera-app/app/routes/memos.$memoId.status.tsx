@@ -2,7 +2,7 @@ import * as zod from 'zod'
 import { redirect } from '@remix-run/node'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { getSearchParams } from '~/lib/memo'
+import { getSearchParams } from '~/lib/memo.server'
 import { MemoStatus } from '~/types/memos'
 import { getMemo, updateMemo } from '~/models/memo.server'
 

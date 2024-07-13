@@ -43,6 +43,7 @@ type LoaderData = {
 
 export const loader = withAuthentication(async ({ account }) => {
   const taskModels = await getTasks(account.id)
+
   return json({ taskModels, loadDate: new Date().toISOString() })
 })
 
