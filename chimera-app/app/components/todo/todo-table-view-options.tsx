@@ -1,15 +1,14 @@
-import { RxMixerHorizontal } from 'react-icons/rx'
 import { useTranslation } from 'react-i18next'
-import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
+import { RxMixerHorizontal } from 'react-icons/rx'
 import { Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
-
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 
 interface TodoTableViewOptionsProps<TData> {

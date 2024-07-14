@@ -5,12 +5,11 @@ import { getMemo, updateMemoPosition } from '~/models/memo.server'
 export const action = withAuthentication(
   async ({ params, request, account }) => {
     const fromMemo = await getMemo(params.memoId || '')
-    if (!fromMemo || fromMemo.account_id !== account.id)
-      throw new Error('erorr')
+    if (fromMemo.account_id !== account.id) throw new Error('erorr')
 
     const data = await request.json()
     const toMemo = await getMemo(data.toMemoId)
-    if (!toMemo || toMemo.account_id !== account.id) throw new Error('erorr')
+    if (toMemo.account_id !== account.id) throw new Error('erorr')
 
     const updatedMemo = await updateMemoPosition(fromMemo.id, toMemo.position)
 

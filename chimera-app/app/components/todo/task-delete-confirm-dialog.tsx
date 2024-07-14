@@ -6,34 +6,35 @@ import { Button } from '~/components/ui/button'
 import { DeleteConfirmDialog } from '~/components/lib/delete-confirm-dialog'
 import { Task } from '~/types/tasks'
 
-interface DeleteTaskConfirmDialogProps {
-  task: Task
-  isOpenDialog: boolean
-  setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>
+export interface TaskDeleteConfirmDialogProps {
+  task: Task | undefined
+  isOpen: boolean
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function TaskDeleteConfirmDialog({
   task,
-  isOpenDialog,
-  setIsOpenDialog,
-}: DeleteTaskConfirmDialogProps) {
+  isOpen,
+  setIsOpen,
+}: TaskDeleteConfirmDialogProps) {
   const { t } = useTranslation()
 
+  if (!task) return null
   return (
     <DeleteConfirmDialog
       title={t('task.message.task_deletion')}
       description={
         '「' + task.title + '」' + t('common.message.confirm_deletion')
       }
-      isOpenDialog={isOpenDialog}
-      setIsOpenDialog={setIsOpenDialog}
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <Form
         action={`/todos/${task.id}/delete`}
         method="delete"
         onSubmit={() => {
-          setIsOpenDialog(false)
+          setIsOpen(false)
         }}
       >
         <Button type="submit" variant="destructive">

@@ -5,13 +5,11 @@ import { getTask, updateTaskPosition } from '~/models/task.server'
 export const action = withAuthentication(
   async ({ params, request, account }) => {
     const fromTask = await getTask(params.todoId || '')
-    if (!fromTask || fromTask.account_id !== account.id)
-      throw new Error('erorr')
+    if (fromTask.account_id !== account.id) throw new Error('erorr')
 
     const data = await request.json()
-    const toTaskId = data.toTaskId
-    const toTask = await getTask(toTaskId)
-    if (!toTask || toTask.account_id !== account.id) throw new Error('erorr')
+    const toTask = await getTask(data.toTaskId)
+    if (toTask.account_id !== account.id) throw new Error('erorr')
 
     const updatedTask = await updateTaskPosition(fromTask.id, toTask.position)
 

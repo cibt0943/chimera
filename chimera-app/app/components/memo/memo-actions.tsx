@@ -28,18 +28,14 @@ import { Memo, MemoStatus } from '~/types/memos'
 
 interface MemoActionsProps {
   memo: Memo
-  handleUpdateMemoPosition: (memo: Memo, isUp: boolean) => void
+  handleMoveMemo: (memo: Memo, isUp: boolean) => void
   handleUpdateMemoStatus: (memo: Memo, status: MemoStatus) => void
   handleDeleteMemo: (memo: Memo) => void
 }
 
 export function MemoActions(props: MemoActionsProps) {
-  const {
-    memo,
-    handleUpdateMemoPosition,
-    handleUpdateMemoStatus,
-    handleDeleteMemo,
-  } = props
+  const { memo, handleMoveMemo, handleUpdateMemoStatus, handleDeleteMemo } =
+    props
 
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -76,7 +72,7 @@ export function MemoActions(props: MemoActionsProps) {
         <DropdownMenuContent align="end" className="w-52">
           <DropdownMenuItem
             onClick={(event) => {
-              handleUpdateMemoPosition(memo, true)
+              handleMoveMemo(memo, true)
               event.stopPropagation()
             }}
           >
@@ -86,7 +82,7 @@ export function MemoActions(props: MemoActionsProps) {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={(event) => {
-              handleUpdateMemoPosition(memo, false)
+              handleMoveMemo(memo, false)
               event.stopPropagation()
             }}
           >

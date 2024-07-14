@@ -1,7 +1,6 @@
 import type { MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
 import { useLoaderData, Outlet } from '@remix-run/react'
-import { ClientOnly } from 'remix-utils/client-only'
 import { toDate } from 'date-fns'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
@@ -43,6 +42,7 @@ type LoaderData = {
 
 export const loader = withAuthentication(async ({ account }) => {
   const taskModels = await getTasks(account.id)
+
   return json({ taskModels, loadDate: new Date().toISOString() })
 })
 
@@ -54,14 +54,7 @@ export default function Layout() {
 
   return (
     <div className="p-4">
-      <ClientOnly>
-        {() => (
-          <TodoTable
-            defaultTasks={loadTasks}
-            tasksLoadDate={toDate(loadDate)}
-          />
-        )}
-      </ClientOnly>
+      <TodoTable defaultTasks={loadTasks} tasksLoadDate={toDate(loadDate)} />
       <Outlet />
     </div>
   )

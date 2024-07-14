@@ -20,8 +20,8 @@ export function AccountDeleteConfirmDialog({
     <DeleteConfirmDialog
       title={t('account.message.account_deletion')}
       description={t('account.title') + t('common.message.confirm_deletion')}
-      isOpenDialog={isOpenDialog}
-      setIsOpenDialog={setIsOpenDialog}
+      isOpen={isOpenDialog}
+      setIsOpen={setIsOpenDialog}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <Form

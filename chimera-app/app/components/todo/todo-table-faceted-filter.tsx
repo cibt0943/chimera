@@ -1,8 +1,6 @@
-// import * as React from 'react'
-import { RxCheck, RxPlusCircled } from 'react-icons/rx'
 import { useTranslation } from 'react-i18next'
+import { RxCheck, RxPlusCircled } from 'react-icons/rx'
 import { Column } from '@tanstack/react-table'
-
 import { cn } from '~/lib/utils'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'

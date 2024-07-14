@@ -4,7 +4,7 @@ import { useLoaderData, Outlet, useParams } from '@remix-run/react'
 import { toDate } from 'date-fns'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { getStatusFilterFromParams, getSearchParams } from '~/lib/memo'
+import { getStatusFilterFromParams, getSearchParams } from '~/lib/memo.server'
 import {
   Memo,
   MemoModels,
@@ -57,6 +57,7 @@ type LoaderData = {
 export const loader = withAuthentication(async ({ request, account }) => {
   const statuses = getStatusFilterFromParams(request)
   const memoModels = await getMemos(account.id, statuses)
+
   return json({
     memoModels,
     loadDate: new Date().toISOString(),

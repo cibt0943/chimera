@@ -22,43 +22,38 @@ export const meta: MetaFunction = () => {
   return [{ title: 'Account settings | Kobushi' }]
 }
 
-export const action = withAuthentication(async ({ request, account: self }) => {
-  const accountModel = await getAccountBySub(self.sub)
-  if (!accountModel) {
-    throw new Error('Error: Account not found.')
-  }
+export const action = withAuthentication(async ({ request, account }) => {
+  const accountModel = await getAccountBySub(account.sub)
+  if (!accountModel) throw new Error('Error: Account not found.')
 
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: AccountSchema })
   // submission が成功しなかった場合、クライアントに送信結果を報告します。
-  if (submission.status !== 'success') {
+  if (submission.status !== 'success')
     throw new Error('Invalid submission data.')
-    // return json({ result: submission.reply() }, { status: 422 })
-  }
 
   const data = submission.value
 
   // Auth0のユーザー情報を更新
   if (data.name) {
-    self.name = data.name
+    account.name = data.name
     await updateAuth0User({
-      sub: self.sub,
-      name: self.name,
+      sub: account.sub,
+      name: account.name,
     })
   }
 
   // DBのアカウント情報を更新
-  accountModel.language = data.language ? data.language : accountModel.language
-  accountModel.theme = data.theme ? data.theme : accountModel.theme
+  accountModel.language = data.language || accountModel.language
+  accountModel.theme = data.theme || accountModel.theme
   await updateAccount(accountModel)
 
   // セッション情報を更新
   const session = await getSession(request.headers.get('cookie'))
   session.set(
     authenticator.sessionKey,
-    Auth0UserAndAccountModel2Account(self, accountModel),
+    Auth0UserAndAccountModel2Account(account, accountModel),
   )
-  // セッション情報を更新
   const encodedSession = await commitSession(session)
 
   return redirect('/account/settings', {
@@ -69,27 +64,17 @@ export const action = withAuthentication(async ({ request, account: self }) => {
   })
 })
 
-export const loader = withAuthentication(async ({ account: self }) => {
-  const accountModel = await getAccountBySub(self.sub)
-  if (!accountModel) {
-    throw new Error('Error: Account not found.')
-  }
-  return json({ self })
+export const loader = withAuthentication(async ({ account }) => {
+  const accountModel = await getAccountBySub(account.sub)
+  if (!accountModel) throw new Error('Error: Account not found.')
+
+  return json({ account })
 })
 
 export default function Profile() {
   const { t } = useTranslation()
-  const { self } = useLoaderData<typeof loader>()
+  const { account } = useLoaderData<typeof loader>()
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
-
-  function DeleteConfirmAccountDialog() {
-    return (
-      <AccountDeleteConfirmDialog
-        isOpenDialog={isOpenDeleteDialog}
-        setIsOpenDialog={setIsOpenDeleteDialog}
-      />
-    )
-  }
 
   return (
     <div className="space-y-6 w-[400px]">
@@ -100,12 +85,15 @@ export default function Profile() {
         </p>
       </div>
       <Separator />
-      <AccountForm account={self} />
+      <AccountForm account={account} />
       <Separator />
       <Button variant="destructive" onClick={() => setIsOpenDeleteDialog(true)}>
         {t('account.message.do_delete')}
       </Button>
-      <DeleteConfirmAccountDialog />
+      <AccountDeleteConfirmDialog
+        isOpenDialog={isOpenDeleteDialog}
+        setIsOpenDialog={setIsOpenDeleteDialog}
+      />
     </div>
   )
 }

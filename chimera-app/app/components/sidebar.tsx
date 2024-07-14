@@ -34,7 +34,7 @@ export function Sidebar() {
           <h1 className="p-4 text-2xl font-bold tracking-tight">
             <NavLink to="/" className="inline-flex items-center">
               kobushi
-              <PiHandFistBold className="ml-2" />
+              <PiHandFistBold className="ml-2 text-yellow-400" />
             </NavLink>
           </h1>
         </div>

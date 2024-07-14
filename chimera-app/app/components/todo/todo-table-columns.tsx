@@ -1,13 +1,14 @@
+import { NavLink } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { ColumnDef, Column, Row } from '@tanstack/react-table'
 import { useSortable } from '@dnd-kit/sortable'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
-
 import { Task, TaskStatusList } from '~/types/tasks'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
+import { ClientOnly } from 'remix-utils/client-only'
 
 // Cell Component
 function RowDragHandleCell({ rowId }: { rowId: string }) {
@@ -37,7 +38,13 @@ function DueDateCell({ row }: { row: Row<Task> }) {
   const { t } = useTranslation()
   const dateStr = row.original.due_date
   return dateStr ? (
-    <span>{format(dateStr, t('common.format.date_time_short_format'))}</span>
+    <ClientOnly>
+      {() => (
+        <span>
+          {format(dateStr, t('common.format.date_time_short_format'))}
+        </span>
+      )}
+    </ClientOnly>
   ) : (
     ''
   )
@@ -71,7 +78,11 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
       return ColumnHeader({ column, title: 'task.model.title' })
     },
     cell: ({ row }) => {
-      return <span className="truncate font-medium">{row.original.title}</span>
+      return (
+        <NavLink to={`/todos/${row.id}`} className="truncate font-medium">
+          {row.original.title}
+        </NavLink>
+      )
     },
   },
   {
