@@ -12,16 +12,17 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import { useAccount } from '~/components/account-provider'
+import { useAtomValue } from 'jotai'
+import { loginAccountAtom } from '~/lib/state'
 
 export function AccountMenu() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  // const { account, isLoading } = useAccount()
-  const { account } = useAccount()
   const fetcher = useFetcher()
 
-  if (!account) return null
+  // ログインユーザーのアカウント情報をグローバルステートから取得
+  const loginAccount = useAtomValue(loginAccountAtom)
+  if (!loginAccount) return null
 
   const handleLogoutClick = () => {
     fetcher.submit(
@@ -41,14 +42,14 @@ export function AccountMenu() {
           className="rounded-full py-6 w-full justify-normal"
         >
           <Avatar className="h-8 w-8">
-            <AvatarImage src={account.picture} />
-            <AvatarFallback>{account.name}</AvatarFallback>
+            <AvatarImage src={loginAccount.picture} />
+            <AvatarFallback>{loginAccount.name}</AvatarFallback>
           </Avatar>
-          <span className="pl-2 truncate">{account.name}</span>
+          <span className="pl-2 truncate">{loginAccount.name}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-52">
-        <DropdownMenuLabel>{account.name}</DropdownMenuLabel>
+        <DropdownMenuLabel>{loginAccount.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem

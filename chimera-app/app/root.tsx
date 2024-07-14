@@ -12,16 +12,16 @@ import {
   useLoaderData,
 } from '@remix-run/react'
 import { I18nextProvider } from 'react-i18next'
-
 import styles from '~/tailwind.css'
 import { authenticator } from '~/lib/auth.server'
 import { useTheme } from './lib/useTheme'
 import i18n from '~/lib/i18n/i18n'
 import { Theme } from '~/types/accounts'
 import { LoadingEffect } from '~/components/loading-effect'
-import { AccountProvider } from '~/components/account-provider'
 import { Sidebar } from '~/components/sidebar'
 import { Toaster } from '~/components/ui/toaster'
+import { useSetAtom, Provider } from 'jotai'
+import { loginAccountAtom } from '~/lib/state'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -61,6 +61,12 @@ export default function App() {
     i18n.changeLanguage(language)
   }, [language])
 
+  // ログインユーザーのアカウント情報をグローバルステートに保存
+  const setLoginAccount = useSetAtom(loginAccountAtom)
+  React.useEffect(() => {
+    setLoginAccount(account)
+  }, [account])
+
   return (
     <html lang={language} className={theme}>
       <head>
@@ -71,19 +77,17 @@ export default function App() {
       </head>
       <body>
         <I18nextProvider i18n={i18n}>
-          <AccountProvider account={account}>
-            <div className="flex">
-              <aside className="">
-                <Sidebar />
-              </aside>
-              <main className="grow h-screen overflow-auto">
-                <LoadingEffect>
-                  <Outlet />
-                </LoadingEffect>
-              </main>
-              <Toaster />
-            </div>
-          </AccountProvider>
+          <div className="flex">
+            <aside className="">
+              <Sidebar />
+            </aside>
+            <main className="grow h-screen overflow-auto">
+              <LoadingEffect>
+                <Outlet />
+              </LoadingEffect>
+            </main>
+            <Toaster />
+          </div>
         </I18nextProvider>
         <ScrollRestoration />
         <Scripts />
