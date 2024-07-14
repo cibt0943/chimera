@@ -8,6 +8,7 @@ import { Button } from '~/components/ui/button'
 import { Task, TaskStatusList } from '~/types/tasks'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
+import { ClientOnly } from 'remix-utils/client-only'
 
 // Cell Component
 function RowDragHandleCell({ rowId }: { rowId: string }) {
@@ -37,7 +38,13 @@ function DueDateCell({ row }: { row: Row<Task> }) {
   const { t } = useTranslation()
   const dateStr = row.original.due_date
   return dateStr ? (
-    <span>{format(dateStr, t('common.format.date_time_short_format'))}</span>
+    <ClientOnly>
+      {() => (
+        <span>
+          {format(dateStr, t('common.format.date_time_short_format'))}
+        </span>
+      )}
+    </ClientOnly>
   ) : (
     ''
   )

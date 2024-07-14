@@ -71,35 +71,33 @@ export function ListItem(props: ListItemProps) {
   const updatedAtDiff = useDateDiffFormat(item.updated_at)
 
   return (
-    <ClientOnly>
-      {() => (
-        <NavLink
-          className={NavLinkClassName({ item, isSelected })}
-          to={`/memos/${item.id}?${searchParams.toString()}`}
-          id={`memo-${item.id}`}
-          onFocus={() => {
-            setFocusedMemo(item)
-          }}
-          ref={setNodeRef}
-          style={style}
-          {...attributes}
-          {...listeners}
-        >
-          <div className="flex items-center">
-            <div className="line-clamp-1">
-              {item.title || t('memo.un_titled')}
-            </div>
-            <div className="ml-auto">{actionComponent}</div>
-          </div>
-          <div className="line-clamp-2 text-xs text-muted-foreground">
-            {item.content.substring(0, 300)}
-          </div>
-          <div className="flex justify-between items-center space-x-2">
-            <div>
-              {item.status === MemoStatus.ARCHIVED ? (
-                <RiArchiveLine className="mr-2 h-4 w-4" />
-              ) : null}
-            </div>
+    <NavLink
+      className={NavLinkClassName({ item, isSelected })}
+      to={`/memos/${item.id}?${searchParams.toString()}`}
+      id={`memo-${item.id}`}
+      onFocus={() => {
+        setFocusedMemo(item)
+      }}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+    >
+      <div className="flex items-center">
+        <div className="line-clamp-1">{item.title || t('memo.un_titled')}</div>
+        <div className="ml-auto">{actionComponent}</div>
+      </div>
+      <div className="line-clamp-2 text-xs text-muted-foreground">
+        {item.content.substring(0, 300)}
+      </div>
+      <div className="flex justify-between items-center space-x-2">
+        <div>
+          {item.status === MemoStatus.ARCHIVED ? (
+            <RiArchiveLine className="mr-2 h-4 w-4" />
+          ) : null}
+        </div>
+        <ClientOnly fallback={<div className="text-xs">&nbsp;</div>}>
+          {() => (
             <div
               className="ml-auto text-xs text-muted-foreground"
               // 下記を表示するとエラーが発生する。サーバーサイドとクライアントで時間側が異なるためと思われる。
@@ -110,9 +108,9 @@ export function ListItem(props: ListItemProps) {
             >
               {updatedAtDiff}
             </div>
-          </div>
-        </NavLink>
-      )}
-    </ClientOnly>
+          )}
+        </ClientOnly>
+      </div>
+    </NavLink>
   )
 }

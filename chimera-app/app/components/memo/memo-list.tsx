@@ -293,6 +293,7 @@ export function MemoList({
           modifiers={[restrictToVerticalAxis]}
           onDragEnd={handleDragEnd}
           sensors={sensors}
+          id="dnd-context-for-memos"
         >
           <div className="space-y-3 px-3" id="memos" ref={memosRefs}>
             <SortableContext
@@ -326,6 +327,7 @@ export function MemoList({
       <div className="flex items-center space-x-2 px-3">
         <Switch
           id="show-all-memo"
+          name="show-all-memo"
           checked={searchParams.get('status') == '1'}
           onCheckedChange={(isChecked) => {
             isChecked ? setSearchParams({ status: '1' }) : setSearchParams()

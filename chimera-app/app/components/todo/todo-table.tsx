@@ -435,6 +435,7 @@ export function TodoTable({
             clearSortToast()
           }}
           sensors={sensors}
+          id="dnd-context-for-todo-table"
         >
           <Table>
             <TableHeader>
