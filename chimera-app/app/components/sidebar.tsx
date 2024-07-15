@@ -28,13 +28,13 @@ function NavLinkClassName({ isActive, isPending }: NavLinkClassNameProps) {
 
 export function Sidebar() {
   return (
-    <div className="px-2 flex flex-col justify-between h-screen">
+    <div className="px-2 flex flex-col justify-between h-screen w-44">
       <div className="overflow-auto">
         <div className="bg-background sticky top-0">
-          <h1 className="p-4 text-2xl font-bold tracking-tight">
+          <h1 className="mx-2 my-4 text-2xl font-bold tracking-tight">
             <NavLink to="/" className="inline-flex items-center">
+              <PiHandFistBold className="mr-2 text-yellow-500" />
               kobushi
-              <PiHandFistBold className="ml-2 text-yellow-400" />
             </NavLink>
           </h1>
         </div>
@@ -61,7 +61,7 @@ export function Sidebar() {
           </NavLink>
         </div>
       </div>
-      <div className="px-px mb-4">
+      <div className="mx-2 mb-4">
         <AccountMenu />
       </div>
     </div>

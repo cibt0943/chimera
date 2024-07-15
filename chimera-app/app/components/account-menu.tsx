@@ -37,18 +37,12 @@ export function AccountMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="rounded-full py-6 w-full justify-normal"
-        >
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={loginAccount.picture} />
-            <AvatarFallback>{loginAccount.name}</AvatarFallback>
-          </Avatar>
-          <span className="pl-2 truncate">{loginAccount.name}</span>
-        </Button>
+        <Avatar className="h-8 w-8 cursor-pointer">
+          <AvatarImage src={loginAccount.picture} />
+          <AvatarFallback>{loginAccount.name}</AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-52">
+      <DropdownMenuContent>
         <DropdownMenuLabel>{loginAccount.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
