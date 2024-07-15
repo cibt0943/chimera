@@ -2,7 +2,7 @@ import { AccountModel } from '~/types/accounts'
 import { supabase } from '~/lib/supabase-client.server'
 
 // idからアカウント情報を取得
-export async function getAccount(account_id: number): Promise<AccountModel> {
+export async function getAccount(account_id: string): Promise<AccountModel> {
   const { data, error } = await supabase
     .from('accounts')
     .select()

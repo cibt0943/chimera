@@ -13,10 +13,7 @@ import { Separator } from '~/components/ui/separator'
 import { Button } from '~/components/ui/button'
 import { AccountForm } from '~/components/account/account-form'
 import { AccountDeleteConfirmDialog } from '~/components/account/account-delete-confirm-dialog'
-import {
-  AccountSchema,
-  Auth0UserAndAccountModel2Account,
-} from '~/types/accounts'
+import { AccountSchema, AccountModel2Account } from '~/types/accounts'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Account settings | Kobushi' }]
@@ -52,7 +49,7 @@ export const action = withAuthentication(async ({ request, account }) => {
   const session = await getSession(request.headers.get('cookie'))
   session.set(
     authenticator.sessionKey,
-    Auth0UserAndAccountModel2Account(account, accountModel),
+    AccountModel2Account(account, accountModel),
   )
   const encodedSession = await commitSession(session)
 
@@ -68,6 +65,8 @@ export const loader = withAuthentication(async ({ account }) => {
   const accountModel = await getAccountBySub(account.sub)
   if (!accountModel) throw new Error('Error: Account not found.')
 
+  // セッションに保存しているアカウント情報を返す
+  // セッションのaccountはaccountModelの値をすでにマージ済み
   return json({ account })
 })
 

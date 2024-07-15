@@ -85,15 +85,26 @@ export function Auth0UserAndAccountModel2Account(
   }
 }
 
-export function Account2AccountModel(account: Account): AccountModel {
+// 既存のAccountオブジェクトに対してDBのアカウント情報をマージ
+export function AccountModel2Account(
+  account: Account,
+  accountModel: AccountModel,
+): Account {
   return {
-    id: account.id,
-    created_at: account.created_at,
-    updated_at: account.updated_at,
-    sub: account.sub,
-    language: account.language,
-    timezone: account.timezone,
-    theme: account.theme,
+    id: accountModel.id,
+    created_at: accountModel.created_at,
+    updated_at:
+      accountModel.updated_at > account.updated_at
+        ? accountModel.updated_at
+        : account.updated_at,
+    sub: accountModel.sub,
+    name: account.name,
+    email: account.email,
+    email_verified: account.email_verified,
+    picture: account.picture,
+    language: accountModel.language,
+    timezone: accountModel.timezone,
+    theme: accountModel.theme,
   }
 }
 

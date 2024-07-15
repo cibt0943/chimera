@@ -20,7 +20,7 @@ import { Theme } from '~/types/accounts'
 import { LoadingEffect } from '~/components/loading-effect'
 import { Sidebar } from '~/components/sidebar'
 import { Toaster } from '~/components/ui/toaster'
-import { useSetAtom, Provider } from 'jotai'
+import { useSetAtom } from 'jotai'
 import { loginAccountAtom } from '~/lib/state'
 
 export const links: LinksFunction = () => [
