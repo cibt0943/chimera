@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
-import { json } from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -9,8 +8,8 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
 } from '@remix-run/react'
+import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { I18nextProvider } from 'react-i18next'
 import styles from '~/tailwind.css'
 import { authenticator } from '~/lib/auth.server'
@@ -21,39 +20,41 @@ import { LoadingEffect } from '~/components/loading-effect'
 import { Sidebar } from '~/components/sidebar'
 import { Toaster } from '~/components/ui/toaster'
 import { useSetAtom } from 'jotai'
-import { loginAccountAtom } from '~/lib/state'
+import { loginSessionAtom } from '~/lib/state'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ]
 
+function getLanguageFromHeader(request: Request) {
+  // リクエストヘッダから言語を取得
+  const cookieHeader = request.headers.get('Cookie')
+  const acceptLanguage = request.headers.get('Accept-Language')
+  if (cookieHeader?.includes('i18next=ja')) {
+    return 'ja'
+  } else if (acceptLanguage?.startsWith('ja')) {
+    return 'ja'
+  } else {
+    return 'en'
+  }
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
   // セッションから認証情報を取得
-  const account = await authenticator.isAuthenticated(request)
+  const loginSession = await authenticator.isAuthenticated(request)
 
   // 言語を変更
-  let language = (account && account.language) || 'auto'
-  if (language === 'auto') {
-    // リクエストヘッダから言語を取得
-    const cookieHeader = request.headers.get('Cookie')
-    const acceptLanguage = request.headers.get('Accept-Language')
-    if (cookieHeader && cookieHeader.includes('i18next=ja')) {
-      language = 'ja'
-    } else if (acceptLanguage && acceptLanguage.startsWith('ja')) {
-      language = 'ja'
-    } else {
-      language = 'en'
-    }
-  }
+  let language = loginSession?.account.language || 'auto'
+  language = language === 'auto' ? getLanguageFromHeader(request) : language
   i18n.changeLanguage(language)
 
-  return json({ account, language })
+  return typedjson({ loginSession, language })
 }
 
 export default function App() {
-  const { account, language } = useLoaderData<typeof loader>()
-  const theme = (account?.theme || Theme.SYSTEM) as Theme
+  const { loginSession, language } = useTypedLoaderData<typeof loader>()
+  const theme = (loginSession?.account.theme || Theme.SYSTEM) as Theme
   useTheme(theme)
 
   // クライアントサイドでの言語設定
@@ -62,10 +63,10 @@ export default function App() {
   }, [language])
 
   // ログインユーザーのアカウント情報をグローバルステートに保存
-  const setLoginAccount = useSetAtom(loginAccountAtom)
+  const setLoginAccount = useSetAtom(loginSessionAtom)
   React.useEffect(() => {
-    setLoginAccount(account)
-  }, [account])
+    setLoginAccount(loginSession)
+  }, [loginSession])
 
   return (
     <html lang={language} className={theme}>

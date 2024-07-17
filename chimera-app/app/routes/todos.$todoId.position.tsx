@@ -3,13 +3,14 @@ import { json } from '@remix-run/node'
 import { getTask, updateTaskPosition } from '~/models/task.server'
 
 export const action = withAuthentication(
-  async ({ params, request, account }) => {
+  async ({ params, request, loginSession }) => {
     const fromTask = await getTask(params.todoId || '')
-    if (fromTask.account_id !== account.id) throw new Error('erorr')
+    if (fromTask.account_id !== loginSession.account.id)
+      throw new Error('erorr')
 
     const data = await request.json()
     const toTask = await getTask(data.toTaskId)
-    if (toTask.account_id !== account.id) throw new Error('erorr')
+    if (toTask.account_id !== loginSession.account.id) throw new Error('erorr')
 
     const updatedTask = await updateTaskPosition(fromTask.id, toTask.position)
 

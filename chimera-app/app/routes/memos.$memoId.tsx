@@ -1,10 +1,11 @@
 import type { MetaFunction } from '@remix-run/node'
-import { json, redirect } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import { redirect } from '@remix-run/node'
+import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { ClientOnly } from 'remix-utils/client-only'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { getSearchParams } from '~/lib/memo.server'
+import type { Memo } from '~/types/memos'
 import { MemoSchema } from '~/types/memos'
 import { getMemo, updateMemo } from '~/models/memo.server'
 import { MemoForm } from '~/components/memo/memo-form'
@@ -14,9 +15,9 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 }
 
 export const action = withAuthentication(
-  async ({ params, request, account }) => {
+  async ({ params, request, loginSession }) => {
     const memo = await getMemo(params.memoId || '')
-    if (memo.account_id !== account.id) throw new Error('erorr')
+    if (memo.account_id !== loginSession.account.id) throw new Error('erorr')
 
     const formData = await request.formData()
     const submission = parseWithZod(formData, { schema: MemoSchema })
@@ -34,23 +35,21 @@ export const action = withAuthentication(
       title: title,
       content: content.join('\n'),
       related_date: data.related_date?.toISOString() || null,
-      account_id: account.id,
-      updated_at: new Date().toISOString(),
     })
 
     return redirect(`/memos/${memo.id}?${getSearchParams(request)}`)
   },
 )
 
-export const loader = withAuthentication(async ({ params, account }) => {
+export const loader = withAuthentication(async ({ params, loginSession }) => {
   const memo = await getMemo(params.memoId || '')
-  if (memo.account_id !== account.id) throw new Error('erorr')
+  if (memo.account_id !== loginSession.account.id) throw new Error('erorr')
 
-  return json({ memo })
+  return typedjson({ memo })
 })
 
 export default function Memo() {
-  const { memo } = useLoaderData<typeof loader>()
+  const { memo } = useTypedLoaderData<{ memo: Memo }>()
 
   return <ClientOnly>{() => <MemoForm memo={memo} />}</ClientOnly>
 }

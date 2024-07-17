@@ -1,21 +1,14 @@
 import type { MetaFunction } from '@remix-run/node'
-import { json, redirect } from '@remix-run/node'
-import { useLoaderData, Outlet, useParams } from '@remix-run/react'
-import { toDate } from 'date-fns'
+import { redirect } from '@remix-run/node'
+import { Outlet, useParams } from '@remix-run/react'
+import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { getStatusFilterFromParams, getSearchParams } from '~/lib/memo.server'
-import {
-  Memo,
-  MemoModels,
-  MemoModel2Memo,
-  MemoSchema,
-  MemoStatus,
-} from '~/types/memos'
+import { Memos, MemoSchema, MemoStatus } from '~/types/memos'
 import { getMemos, insertMemo } from '~/models/memo.server'
 import { ErrorView } from '~/components/lib/error-view'
 import { MemoList } from '~/components/memo/memo-list'
-
 import {
   ResizableHandle,
   ResizablePanel,
@@ -26,7 +19,7 @@ export const meta: MetaFunction = () => {
   return [{ title: 'Memos | Kobushi' }]
 }
 
-export const action = withAuthentication(async ({ request, account }) => {
+export const action = withAuthentication(async ({ request, loginSession }) => {
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: MemoSchema })
   // submission が成功しなかった場合、クライアントに送信結果を報告します。
@@ -39,10 +32,10 @@ export const action = withAuthentication(async ({ request, account }) => {
 
   const [title, ...content] = (data.content || '').split('\n')
   const newMemo = await insertMemo({
-    account_id: account.id,
+    account_id: loginSession.account.id,
     title: title,
     content: content.join('\n'),
-    status: data.status || MemoStatus.NOMAL,
+    status: MemoStatus.NOMAL,
     related_date: data.related_date?.toISOString() || null,
   })
 
@@ -50,25 +43,22 @@ export const action = withAuthentication(async ({ request, account }) => {
 })
 
 type LoaderData = {
-  memoModels: MemoModels
-  loadDate: string
+  memos: Memos
+  loadDate: Date
 }
 
-export const loader = withAuthentication(async ({ request, account }) => {
+export const loader = withAuthentication(async ({ request, loginSession }) => {
   const statuses = getStatusFilterFromParams(request)
-  const memoModels = await getMemos(account.id, statuses)
+  const memos = await getMemos(loginSession.account.id, statuses)
 
-  return json({
-    memoModels,
-    loadDate: new Date().toISOString(),
+  return typedjson({
+    memos,
+    loadDate: new Date(),
   })
 })
 
 export default function Layout() {
-  const { memoModels, loadDate } = useLoaderData<LoaderData>()
-  const loadMemos = memoModels.map<Memo>((value) => {
-    return MemoModel2Memo(value)
-  })
+  const { memos, loadDate } = useTypedLoaderData<LoaderData>()
 
   const params = useParams()
   const { memoId } = params
@@ -78,9 +68,9 @@ export default function Layout() {
       <ResizablePanelGroup direction="horizontal" className="border rounded-lg">
         <ResizablePanel defaultSize={30}>
           <MemoList
-            defaultMemos={loadMemos}
+            defaultMemos={memos}
             showId={memoId || ''}
-            memosLoadDate={toDate(loadDate)}
+            memosLoadDate={loadDate}
           />
         </ResizablePanel>
         <ResizableHandle withHandle />

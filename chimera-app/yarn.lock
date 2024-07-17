@@ -6397,6 +6397,11 @@ remix-auth@^3.6.0:
   dependencies:
     uuid "^8.3.2"
 
+remix-typedjson@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/remix-typedjson/-/remix-typedjson-0.4.1.tgz#548a68bb7a3520ce0fd8e9810cf96078e45b5c29"
+  integrity sha512-AL6LdNajqce1Exy6aB1bD6GYMk90S6H31e8kDCi6jLgBi4K82Ph604lqGGzalswaPPYckYK+NZzgvhWEY7JCDw==
+
 remix-utils@^7.5.0:
   version "7.6.0"
   resolved "https://registry.yarnpkg.com/remix-utils/-/remix-utils-7.6.0.tgz#831e7e75fd128ff7cd4eb1c3daad0d2d3ba176bb"

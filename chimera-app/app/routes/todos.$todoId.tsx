@@ -1,10 +1,10 @@
 import * as React from 'react'
 import type { MetaFunction } from '@remix-run/node'
-import { json, redirect } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import { redirect } from '@remix-run/node'
+import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { TaskSchema } from '~/types/tasks'
+import { Task, TaskSchema } from '~/types/tasks'
 import { getTask, updateTask } from '~/models/task.server'
 import { TaskFormDialog } from '~/components/todo/task-form-dialog'
 
@@ -13,9 +13,9 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 }
 
 export const action = withAuthentication(
-  async ({ params, request, account }) => {
+  async ({ params, request, loginSession }) => {
     const task = await getTask(params.todoId || '')
-    if (task.account_id !== account.id) throw new Error('erorr')
+    if (task.account_id !== loginSession.account.id) throw new Error('erorr')
 
     const formData = await request.formData()
     const submission = parseWithZod(formData, { schema: TaskSchema })
@@ -33,23 +33,21 @@ export const action = withAuthentication(
       memo: data.memo || '',
       status: data.status,
       due_date: data.due_date?.toISOString() || null,
-      account_id: account.id,
-      updated_at: new Date().toISOString(),
     })
 
     return redirect('/todos')
   },
 )
 
-export const loader = withAuthentication(async ({ params, account }) => {
+export const loader = withAuthentication(async ({ params, loginSession }) => {
   const task = await getTask(params.todoId || '')
-  if (task.account_id !== account.id) throw new Error('erorr')
+  if (task.account_id !== loginSession.account.id) throw new Error('erorr')
 
-  return json({ task })
+  return typedjson({ task })
 })
 
 export default function Todo() {
-  const { task } = useLoaderData<typeof loader>()
+  const { task } = useTypedLoaderData<{ task: Task }>()
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
 
   return (

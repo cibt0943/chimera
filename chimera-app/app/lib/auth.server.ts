@@ -2,15 +2,11 @@ import { Authenticator } from 'remix-auth'
 import { Auth0Strategy } from 'remix-auth-auth0'
 import { sessionStorage } from '~/lib/session.server'
 import { getOrInsertAccount } from '~/models/account.server'
-import {
-  Account,
-  Auth0User,
-  Auth0UserAndAccountModel2Account,
-} from '~/types/accounts'
+import { Auth0User, LoginSession } from '~/types/accounts'
 
-export const authenticator = new Authenticator<Account>(sessionStorage)
+export const authenticator = new Authenticator<LoginSession>(sessionStorage)
 
-const auth0Strategy = new Auth0Strategy<Account>(
+const auth0Strategy = new Auth0Strategy<LoginSession>(
   {
     callbackURL: process.env.AUTH0_CALLBACK_URL!,
     clientID: process.env.AUTH0_CLIENT_ID!,
@@ -23,10 +19,10 @@ const auth0Strategy = new Auth0Strategy<Account>(
     const auth0User = profile._json as Auth0User
 
     // DBからアカウント情報を取得または作成
-    const accountModel = await getOrInsertAccount({ sub: auth0User.sub })
+    const account = await getOrInsertAccount({ sub: auth0User.sub })
 
-    // アカウント情報を返す
-    return Auth0UserAndAccountModel2Account(auth0User, accountModel)
+    // Auth0Userの情報とDBにて独自に管理しているアカウント情報を返す(=セッションに保存される)
+    return { auth0User, account }
   },
 )
 

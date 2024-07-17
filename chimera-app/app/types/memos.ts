@@ -1,5 +1,6 @@
 import { toDate } from 'date-fns'
 import * as zod from 'zod'
+import type { Database } from '~/types/schema'
 
 export const MemoStatus = {
   NOMAL: 0,
@@ -23,12 +24,16 @@ export const MemoStatusList = [
   }, //bg-orange-500
 ]
 
+// DBのメモテーブルの型
+export type MemoModel = Database['public']['Tables']['memos']['Row']
+
+// メモの型
 export type Memo = {
   id: string
   created_at: Date
   updated_at: Date
   account_id: string
-  // position: number
+  position: number
   title: string
   content: string
   status: MemoStatus
@@ -37,26 +42,13 @@ export type Memo = {
 
 export type Memos = Memo[]
 
-export type MemoModel = {
-  id: string
-  created_at: string
-  updated_at: string
-  account_id: string
-  position: number
-  title: string
-  content: string
-  status: number
-  related_date: string | null
-}
-
-export type MemoModels = MemoModel[]
-
 export function MemoModel2Memo(memoModel: MemoModel): Memo {
   return {
     id: memoModel.id,
     created_at: toDate(memoModel.created_at),
     updated_at: toDate(memoModel.updated_at),
     account_id: memoModel.account_id,
+    position: memoModel.position,
     title: memoModel.title,
     content: memoModel.content,
     status: memoModel.status as MemoStatus,

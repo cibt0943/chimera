@@ -1,7 +1,6 @@
 import { useNavigate, useFetcher } from '@remix-run/react'
 import { RxGear, RxExit } from 'react-icons/rx'
 import { useTranslation } from 'react-i18next'
-import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +12,7 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { useAtomValue } from 'jotai'
-import { loginAccountAtom } from '~/lib/state'
+import { loginSessionAtom } from '~/lib/state'
 
 export function AccountMenu() {
   const { t } = useTranslation()
@@ -21,8 +20,8 @@ export function AccountMenu() {
   const fetcher = useFetcher()
 
   // ログインユーザーのアカウント情報をグローバルステートから取得
-  const loginAccount = useAtomValue(loginAccountAtom)
-  if (!loginAccount) return null
+  const loginSession = useAtomValue(loginSessionAtom)
+  if (!loginSession) return null
 
   const handleLogoutClick = () => {
     fetcher.submit(
@@ -38,12 +37,12 @@ export function AccountMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="h-8 w-8 cursor-pointer">
-          <AvatarImage src={loginAccount.picture} />
-          <AvatarFallback>{loginAccount.name}</AvatarFallback>
+          <AvatarImage src={loginSession.auth0User.picture} />
+          <AvatarFallback>{loginSession.auth0User.name}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>{loginAccount.name}</DropdownMenuLabel>
+        <DropdownMenuLabel>{loginSession.auth0User.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem
