@@ -276,11 +276,13 @@ export function TodoTable({
     const viewRows = table.getRowModel().rows
     // 表示順に並んでいるviewRowsの中から選択行のindexを取得
     // nowSelectedRow.indexの値は、ソート前のデータのindex
-    const fromRow = viewRows.find((data) => data.id === targetTask.id)
+    const fromIndex = viewRows.findIndex((data) => data.id === targetTask.id)
+    const fromRow = viewRows[fromIndex]
     if (!fromRow) return
-    const toIndex = isUp ? fromRow.index - 1 : fromRow.index + 1
-    const toRow = table.getRowModel().rows[toIndex]
-    toRow && moveTask(fromRow.original, toRow.original)
+    const toIndex = isUp ? fromIndex - 1 : fromIndex + 1
+    const toRow = viewRows[toIndex]
+    if (!toRow) return
+    moveTask(fromRow.original, toRow.original)
   }
 
   // 選択行の表示順を1ステップ変更
@@ -381,19 +383,8 @@ export function TodoTable({
     {
       preventDefault: true,
       ignoreEventWhen: (e) => {
-        const pressedKeys = e.key.toLowerCase()
         const target = e.target as HTMLElement
-        switch (pressedKeys) {
-          case 'enter':
-            return !['tr', 'body'].includes(target.tagName.toLowerCase())
-          case 'arrowup':
-          case 'arrowdown':
-            return !['tr', 'tbody', 'body'].includes(
-              target.tagName.toLowerCase(),
-            )
-          default:
-            return false
-        }
+        return !['tr', 'body'].includes(target.tagName.toLowerCase())
       },
     },
   )

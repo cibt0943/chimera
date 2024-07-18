@@ -1,10 +1,5 @@
 import * as React from 'react'
-import {
-  Form,
-  useNavigate,
-  useSearchParams,
-  useFetcher,
-} from '@remix-run/react'
+import { Form, useNavigate, useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { RxPlus } from 'react-icons/rx'
 import { useHotkeys } from 'react-hotkeys-hook'
@@ -33,6 +28,8 @@ import { Memos, Memo, MemoStatus } from '~/types/memos'
 import { ListItem } from './memo-list-item'
 import { MemoActions } from './memo-actions'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
+import { useAtomValue } from 'jotai'
+import { memoSettingsAtom } from '~/lib/state'
 
 interface MemoListProps {
   defaultMemos: Memos
@@ -49,7 +46,6 @@ export function MemoList({
   const { enqueue: filterEnqueue } = useQueue()
   const { enqueue: moveMemoEnqueue } = useQueue()
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
   const fetcher = useFetcher()
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -192,7 +188,7 @@ export function MemoList({
     fetcher.submit(
       { status: status },
       {
-        action: `/memos/${memo.id}/status?${searchParams}`,
+        action: `/memos/${memo.id}/status`,
         method: 'post',
       },
     )
@@ -270,7 +266,7 @@ export function MemoList({
           className="h-8"
           id="memos-title-filter"
         />
-        <Form action={`/memos?${searchParams}`} method="post">
+        <Form action={`/memos`} method="post">
           <Button
             type="submit"
             variant="secondary"
@@ -325,17 +321,7 @@ export function MemoList({
         </DndContext>
       </ScrollArea>
       <div className="flex items-center space-x-2 px-3">
-        <Switch
-          id="show-all-memo"
-          name="show-all-memo"
-          checked={searchParams.get('status') == '1'}
-          onCheckedChange={(isChecked) => {
-            isChecked ? setSearchParams({ status: '1' }) : setSearchParams()
-          }}
-        />
-        <Label htmlFor="show-all-memo" className="text-sm">
-          {t('memo.message.show_archived')}
-        </Label>
+        <StatusFilter />
       </div>
       {actionMemo ? (
         <MemoDeleteConfirmDialog
@@ -345,5 +331,50 @@ export function MemoList({
         />
       ) : null}
     </div>
+  )
+}
+
+function StatusFilter() {
+  const { t } = useTranslation()
+  const fetcher = useFetcher()
+  const memoSettings = useAtomValue(memoSettingsAtom)
+
+  // 表示するメモのフィルタ
+  function updateMemoSettingStatusFilter(statuses: MemoStatus[]) {
+    fetcher.submit(
+      {
+        list_filter: {
+          statuses: statuses,
+        },
+      },
+      {
+        action: `/account/memo/settings`,
+        method: 'post',
+        encType: 'application/json',
+      },
+    )
+  }
+
+  if (!memoSettings) return null
+
+  return (
+    <>
+      <Switch
+        id="show-all-memo"
+        name="show-all-memo"
+        defaultChecked={memoSettings?.list_filter.statuses.includes(1)}
+        // checked={memoSettings?.list_filter.statuses.includes(1)}
+        onCheckedChange={(isChecked) => {
+          const statuses = isChecked
+            ? [MemoStatus.NOMAL, MemoStatus.ARCHIVED]
+            : [MemoStatus.NOMAL]
+          console.log(statuses)
+          updateMemoSettingStatusFilter(statuses)
+        }}
+      />
+      <Label htmlFor="show-all-memo" className="text-sm">
+        {t('memo.message.show_archived')}
+      </Label>
+    </>
   )
 }

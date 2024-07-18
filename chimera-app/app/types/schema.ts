@@ -64,6 +64,36 @@ export type Database = {
         }
         Relationships: []
       }
+      memo_settings: {
+        Row: {
+          account_id: string
+          auto_save: boolean
+          created_at: string
+          id: string
+          list_display: Json
+          list_filter: Json
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          auto_save?: boolean
+          created_at?: string
+          id?: string
+          list_display?: Json
+          list_filter?: Json
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          auto_save?: boolean
+          created_at?: string
+          id?: string
+          list_display?: Json
+          list_filter?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       memos: {
         Row: {
           account_id: string

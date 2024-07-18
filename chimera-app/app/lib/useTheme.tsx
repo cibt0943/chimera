@@ -28,5 +28,5 @@ export function useTheme(theme: Theme) {
     }
     mediaQuery.addEventListener('change', handleChange)
     return () => mediaQuery.removeEventListener('change', handleChange)
-  })
+  }, [theme])
 }

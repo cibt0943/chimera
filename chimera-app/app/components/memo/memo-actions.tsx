@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from '@remix-run/react'
+import { useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import {
   RxDotsHorizontal,
@@ -39,7 +39,6 @@ export function MemoActions(props: MemoActionsProps) {
 
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
 
   const buttonClassName = cn(
     'flex h-6 w-6 p-0 data-[state=open]:bg-muted',
@@ -73,7 +72,7 @@ export function MemoActions(props: MemoActionsProps) {
           <DropdownMenuItem
             onClick={(event) => {
               handleMoveMemo(memo, true)
-              event.stopPropagation()
+              event.stopPropagation() // アンカータグのクリックイベントをキャンセル
             }}
           >
             <RxArrowUp className="mr-2 h-4 w-4" />
@@ -83,7 +82,7 @@ export function MemoActions(props: MemoActionsProps) {
           <DropdownMenuItem
             onClick={(event) => {
               handleMoveMemo(memo, false)
-              event.stopPropagation()
+              event.stopPropagation() // アンカータグのクリックイベントをキャンセル
             }}
           >
             <RxArrowDown className="mr-2 h-4 w-4" />
@@ -94,7 +93,7 @@ export function MemoActions(props: MemoActionsProps) {
           <DropdownMenuItem
             onClick={(event) => {
               handleUpdateMemoStatus(memo, archiveMenu.toStatus)
-              event.stopPropagation()
+              event.stopPropagation() // アンカータグのクリックイベントをキャンセル
             }}
           >
             {archiveMenu.icon}
@@ -106,8 +105,8 @@ export function MemoActions(props: MemoActionsProps) {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={(event) => {
-              navigate(`/memos/${memo.id}?${searchParams}`)
-              event.stopPropagation()
+              navigate(`/memos/${memo.id}`)
+              event.stopPropagation() // アンカータグのクリックイベントをキャンセル
             }}
           >
             <RxPencil1 className="mr-2 h-4 w-4" />
@@ -120,7 +119,7 @@ export function MemoActions(props: MemoActionsProps) {
           <DropdownMenuItem
             onClick={(event) => {
               handleDeleteMemo(memo)
-              event.stopPropagation()
+              event.stopPropagation() // アンカータグのクリックイベントをキャンセル
             }}
             className="text-red-600 focus:text-red-600"
           >

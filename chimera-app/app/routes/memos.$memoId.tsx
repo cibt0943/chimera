@@ -4,7 +4,6 @@ import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { ClientOnly } from 'remix-utils/client-only'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { getSearchParams } from '~/lib/memo.server'
 import type { Memo } from '~/types/memos'
 import { MemoSchema } from '~/types/memos'
 import { getMemo, updateMemo } from '~/models/memo.server'
@@ -37,7 +36,7 @@ export const action = withAuthentication(
       related_date: data.related_date?.toISOString() || null,
     })
 
-    return redirect(`/memos/${memo.id}?${getSearchParams(request)}`)
+    return redirect(`/memos/${memo.id}`)
   },
 )
 

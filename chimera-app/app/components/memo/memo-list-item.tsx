@@ -1,4 +1,4 @@
-import { NavLink, useSearchParams } from '@remix-run/react'
+import { NavLink } from '@remix-run/react'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
@@ -33,14 +33,13 @@ function NavLinkClassName({
 // Item Component
 interface ListItemProps {
   item: Memo
-  setFocusedMemo: (memo: Memo) => void
+  setFocusedMemo: React.Dispatch<React.SetStateAction<Memo | undefined>>
   isSelected: boolean
   actionComponent: React.ReactNode
 }
 
 export function ListItem(props: ListItemProps) {
   const { item, setFocusedMemo, isSelected, actionComponent } = props
-  const [searchParams] = useSearchParams()
 
   const { t } = useTranslation()
   const {
@@ -73,7 +72,7 @@ export function ListItem(props: ListItemProps) {
   return (
     <NavLink
       className={NavLinkClassName({ item, isSelected })}
-      to={`/memos/${item.id}?${searchParams.toString()}`}
+      to={`/memos/${item.id}`}
       id={`memo-${item.id}`}
       onFocus={() => {
         setFocusedMemo(item)

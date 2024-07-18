@@ -1,12 +1,14 @@
+import * as React from 'react'
 import type { MetaFunction } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { Outlet, useParams } from '@remix-run/react'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { getStatusFilterFromParams, getSearchParams } from '~/lib/memo.server'
 import { Memos, MemoSchema, MemoStatus } from '~/types/memos'
+import { MemoSettings } from '~/types/memo-settings'
 import { getMemos, insertMemo } from '~/models/memo.server'
+import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
 import { ErrorView } from '~/components/lib/error-view'
 import { MemoList } from '~/components/memo/memo-list'
 import {
@@ -14,6 +16,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from '~/components/ui/resizable'
+import { useSetAtom } from 'jotai'
+import { memoSettingsAtom } from '~/lib/state'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Memos | Kobushi' }]
@@ -39,26 +43,37 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
     related_date: data.related_date?.toISOString() || null,
   })
 
-  return redirect(`/memos/${newMemo.id}?${getSearchParams(request)}`)
+  return redirect(`/memos/${newMemo.id}`)
 })
 
 type LoaderData = {
   memos: Memos
   loadDate: Date
+  memoSettings: MemoSettings
 }
 
-export const loader = withAuthentication(async ({ request, loginSession }) => {
-  const statuses = getStatusFilterFromParams(request)
-  const memos = await getMemos(loginSession.account.id, statuses)
+export const loader = withAuthentication(async ({ loginSession }) => {
+  const memoSettings = await getOrInsertMemoSettings(loginSession.account.id)
+  const memos = await getMemos(
+    loginSession.account.id,
+    memoSettings.list_filter.statuses,
+  )
 
   return typedjson({
     memos,
     loadDate: new Date(),
+    memoSettings,
   })
 })
 
 export default function Layout() {
-  const { memos, loadDate } = useTypedLoaderData<LoaderData>()
+  const { memos, loadDate, memoSettings } = useTypedLoaderData<LoaderData>()
+
+  // ログインユーザーのアカウント情報をグローバルステートに保存
+  const setMemoSettings = useSetAtom(memoSettingsAtom)
+  React.useEffect(() => {
+    setMemoSettings(memoSettings)
+  }, [memoSettings])
 
   const params = useParams()
   const { memoId } = params

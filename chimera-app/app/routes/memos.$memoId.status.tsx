@@ -1,8 +1,7 @@
 import * as zod from 'zod'
-import { redirect } from '@remix-run/node'
+import { json } from '@remix-run/node'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { getSearchParams } from '~/lib/memo.server'
 import { MemoStatus } from '~/types/memos'
 import { getMemo, updateMemo } from '~/models/memo.server'
 
@@ -24,11 +23,11 @@ export const action = withAuthentication(
 
     const data = submission.value
 
-    await updateMemo({
+    const updatedMemo = await updateMemo({
       id: memo.id,
       status: data.status,
     })
 
-    return redirect(`/memos?${getSearchParams(request)}`)
+    return json({ success: true, memo: updatedMemo })
   },
 )
