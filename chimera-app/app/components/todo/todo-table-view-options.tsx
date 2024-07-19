@@ -38,10 +38,7 @@ export function TodoTableViewOptions<TData>({
         <DropdownMenuSeparator />
         {table
           .getAllColumns()
-          .filter(
-            (column) =>
-              typeof column.accessorFn !== 'undefined' && column.getCanHide(),
-          )
+          .filter((column) => typeof column.accessorFn !== 'undefined')
           .map((column) => {
             return (
               <DropdownMenuCheckboxItem
@@ -49,6 +46,7 @@ export function TodoTableViewOptions<TData>({
                 className="capitalize"
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                disabled={!column.getCanHide()}
               >
                 {t(`task.model.${column.id}`)}
               </DropdownMenuCheckboxItem>

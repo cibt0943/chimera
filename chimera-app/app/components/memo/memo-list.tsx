@@ -21,15 +21,12 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
-import { Label } from '~/components/ui/label'
-import { Switch } from '~/components/ui/switch'
 import { useDebounce, useQueue } from '~/lib/utils'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
 import { ListItem } from './memo-list-item'
 import { MemoActions } from './memo-actions'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
-import { useAtomValue } from 'jotai'
-import { memoSettingsAtom } from '~/lib/state'
+import { MemoSettings } from './memo-settings'
 
 interface MemoListProps {
   defaultMemos: Memos
@@ -94,7 +91,7 @@ export function MemoList({
   }, [focusedMemo])
 
   // キーボード操作
-  useHotkeys<HTMLDivElement>(
+  useHotkeys(
     [
       'up',
       'down',
@@ -128,7 +125,7 @@ export function MemoList({
           break
         // メモのアーカイブ
         case 'enter':
-          updateSeletedMemoStatus(MemoStatus.ARCHIVED)
+          updateSeletedMemoStatus()
           break
         // メモ削除
         case 'delete':
@@ -140,6 +137,10 @@ export function MemoList({
     },
     {
       preventDefault: true,
+      ignoreEventWhen: (e) => {
+        const target = e.target as HTMLElement
+        return !['a', 'body'].includes(target.tagName.toLowerCase())
+      },
     },
   )
 
@@ -164,8 +165,7 @@ export function MemoList({
 
   // 選択行の表示順を1ステップ変更
   function moveSelectedMemoOneStep(isUp: boolean) {
-    if (!selectedMemo) return
-    moveMemoOneStep(selectedMemo, isUp)
+    selectedMemo && moveMemoOneStep(selectedMemo, isUp)
   }
 
   // メモの表示順を1ステップ変更
@@ -178,8 +178,12 @@ export function MemoList({
   }
 
   // 選択行のステータスを変更
-  function updateSeletedMemoStatus(status: MemoStatus) {
+  function updateSeletedMemoStatus() {
     if (!selectedMemo) return
+    const status =
+      selectedMemo.status === MemoStatus.NOMAL
+        ? MemoStatus.ARCHIVED
+        : MemoStatus.NOMAL
     updateMemoStatus(selectedMemo, status)
   }
 
@@ -257,20 +261,11 @@ export function MemoList({
   return (
     <div className="space-y-4 px-1 py-4">
       <div className="flex items-center space-x-2 px-3">
-        <Input
-          type="search"
-          placeholder={t('memo.message.title_filter')}
-          onChange={(event) => {
-            filterMemosDebounce(event.target.value)
-          }}
-          className="h-8"
-          id="memos-title-filter"
-        />
         <Form action={`/memos`} method="post">
           <Button
             type="submit"
             variant="secondary"
-            className="h-8 px-2 lg:px-3"
+            className="h-8 px-2"
             ref={addButtonRef}
           >
             <RxPlus className="mr-2" />
@@ -282,8 +277,18 @@ export function MemoList({
             </p>
           </Button>
         </Form>
+        <Input
+          type="search"
+          placeholder={t('memo.message.title_filter')}
+          onChange={(event) => {
+            filterMemosDebounce(event.target.value)
+          }}
+          className="h-8"
+          id="memos-title-filter"
+        />
+        <MemoSettings />
       </div>
-      <ScrollArea className="h-[calc(100vh_-_145px)]">
+      <ScrollArea className="h-[calc(100vh_-_115px)]">
         <DndContext
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}
@@ -320,9 +325,6 @@ export function MemoList({
           </div>
         </DndContext>
       </ScrollArea>
-      <div className="flex items-center space-x-2 px-3">
-        <StatusFilter />
-      </div>
       {actionMemo ? (
         <MemoDeleteConfirmDialog
           memo={actionMemo}
@@ -331,50 +333,5 @@ export function MemoList({
         />
       ) : null}
     </div>
-  )
-}
-
-function StatusFilter() {
-  const { t } = useTranslation()
-  const fetcher = useFetcher()
-  const memoSettings = useAtomValue(memoSettingsAtom)
-
-  // 表示するメモのフィルタ
-  function updateMemoSettingStatusFilter(statuses: MemoStatus[]) {
-    fetcher.submit(
-      {
-        list_filter: {
-          statuses: statuses,
-        },
-      },
-      {
-        action: `/account/memo/settings`,
-        method: 'post',
-        encType: 'application/json',
-      },
-    )
-  }
-
-  if (!memoSettings) return null
-
-  return (
-    <>
-      <Switch
-        id="show-all-memo"
-        name="show-all-memo"
-        defaultChecked={memoSettings?.list_filter.statuses.includes(1)}
-        // checked={memoSettings?.list_filter.statuses.includes(1)}
-        onCheckedChange={(isChecked) => {
-          const statuses = isChecked
-            ? [MemoStatus.NOMAL, MemoStatus.ARCHIVED]
-            : [MemoStatus.NOMAL]
-          console.log(statuses)
-          updateMemoSettingStatusFilter(statuses)
-        }}
-      />
-      <Label htmlFor="show-all-memo" className="text-sm">
-        {t('memo.message.show_archived')}
-      </Label>
-    </>
   )
 }

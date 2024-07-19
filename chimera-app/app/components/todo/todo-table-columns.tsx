@@ -59,9 +59,9 @@ function StatusCell({ row }: { row: Row<Task> }) {
 export const TodoTableColumns: ColumnDef<Task>[] = [
   {
     id: 'drag-handle',
+    size: 40,
     header: '',
     cell: ({ row }) => <RowDragHandleCell rowId={row.original.id} />,
-    size: 40,
   },
   // {
   //   accessorKey: 'id',
@@ -74,6 +74,7 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
   {
     accessorKey: 'title',
     size: undefined,
+    enableHiding: false,
     header: ({ column }) => {
       return ColumnHeader({ column, title: 'task.model.title' })
     },

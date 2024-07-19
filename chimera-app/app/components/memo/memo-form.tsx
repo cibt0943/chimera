@@ -59,7 +59,7 @@ export function MemoForm({ memo }: MemoFormProps) {
           <Textarea
             {...getTextareaProps(fields.content)}
             key={fields.content.key}
-            className="resize-none bg-[#303841] text-white focus-visible:ring-0  h-[calc(100vh_-_160px)]"
+            className="resize-none bg-[#303841] text-white focus-visible:ring-0  h-[calc(100vh_-_155px)]"
             rows={15}
           />
           <FormMessage message={fields.content.errors} />

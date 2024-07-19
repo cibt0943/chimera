@@ -48,7 +48,7 @@ export function DateTimePicker({
           </Button>
         </PopoverTrigger>
         <PopoverTrigger asChild>
-          <div className="grow pl-3 cursor-pointer">
+          <div className="grow pl-2 cursor-pointer text-sm">
             {value ? (
               format(value, t('common.format.date_time_format'))
             ) : (

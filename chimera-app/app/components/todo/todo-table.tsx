@@ -307,7 +307,7 @@ export function TodoTable({
     }
 
     const nextSelectedRow = viewRows[nextSelectIndex]
-    nextSelectedRow && nextSelectedRow.toggleSelected(true)
+    nextSelectedRow?.toggleSelected(true)
   }
 
   // タスクのステータス変更APIの呼び出し
@@ -325,9 +325,9 @@ export function TodoTable({
   // 選択行のステータスを変更
   function updateSelectedTaskStatus(status: TaskStatus) {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
-    if (nowSelectedRow?.original.status === status) return
+    if (!nowSelectedRow || nowSelectedRow.original.status === status) return
     const updateTask = { ...nowSelectedRow.original, status }
-    nowSelectedRow && updateTaskStatusApi(updateTask)
+    updateTaskStatusApi(updateTask)
   }
 
   // 選択行を編集
@@ -360,8 +360,6 @@ export function TodoTable({
       'alt+backspace',
     ],
     (_, handler) => {
-      // ローディング中、ダイアログが開いている場合は何もしない
-      if (isLoading || isOpenAddDialog || isOpenDeleteDialog) return
       switch (handler.keys?.join('')) {
         case 'up':
         case 'down':
@@ -453,11 +451,7 @@ export function TodoTable({
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody
-              ref={useTBodyRef}
-              // tabIndex={0}
-              // className="focus:outline-none"
-            >
+            <TableBody ref={useTBodyRef}>
               <SortableContext
                 items={tableData}
                 strategy={verticalListSortingStrategy}

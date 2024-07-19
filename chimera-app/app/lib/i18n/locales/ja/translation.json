@@ -137,10 +137,17 @@
       "memo_deletion": "メモの削除",
       "set_memo_info": "メモの情報を設定してください。",
       "title_filter": "タイトルを検索",
-      "show_archived": "アーカイブを表示",
       "first_line_is_title": "1行目はタイトルとなります",
       "to_archive": "アーカイブする",
       "un_archive": "アーカイブから戻す"
+    }
+  },
+  "memo_settings": {
+    "title": "環境設定",
+    "message": {
+      "list_show_archived": "リストにアーカイブ済みのメモを表示する",
+      "list_show_content": "リストにメモ内容のプレビューを表示する",
+      "auto_save": "メモを自動的に保存する"
     }
   }
 }

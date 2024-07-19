@@ -143,5 +143,13 @@
       "to_archive": "Archive",
       "un_archive": "Unarchive"
     }
+  },
+  "memo_settings": {
+    "title": "Settings",
+    "message": {
+      "list_show_archived": "Show Archived Items in List",
+      "list_show_content": "Show Content Preview in List",
+      "auto_save": "Auto Save for Edits"
+    }
   }
 }
