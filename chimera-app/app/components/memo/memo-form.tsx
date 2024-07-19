@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { Form, useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { RxTrash } from 'react-icons/rx'
-import { RiInboxArchiveLine, RiInboxUnarchiveLine } from 'react-icons/ri'
+import {
+  RiDeleteBinLine,
+  RiInboxArchiveLine,
+  RiInboxUnarchiveLine,
+} from 'react-icons/ri'
 import { useForm, getFormProps, getTextareaProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
@@ -138,7 +141,7 @@ function ActionButtons({ memo }: { memo: Memo | undefined }) {
                 event.preventDefault()
               }}
             >
-              <RxTrash className="h-4 w-4" />
+              <RiDeleteBinLine className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>{t('common.message.delete')}</TooltipContent>

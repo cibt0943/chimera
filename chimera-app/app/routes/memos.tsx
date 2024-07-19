@@ -84,8 +84,8 @@ export default function Layout() {
         <ResizablePanel defaultSize={35}>
           <MemoList
             defaultMemos={memos}
-            showId={memoId || ''}
             memosLoadDate={loadDate}
+            showId={memoId || ''}
           />
         </ResizablePanel>
         <ResizableHandle withHandle />

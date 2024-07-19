@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { RxCaretSort } from 'react-icons/rx'
-import { RiSortAsc, RiSortDesc } from 'react-icons/ri'
+import { RiExpandUpDownLine, RiSortAsc, RiSortDesc } from 'react-icons/ri'
 import { Column } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import {
@@ -43,7 +42,7 @@ export function TodoTableColumnHeader<TData, TValue>({
             ) : column.getIsSorted() === 'asc' ? (
               <RiSortAsc className="ml-2 h-4 w-4" />
             ) : (
-              <RxCaretSort className="ml-2 h-4 w-4" />
+              <RiExpandUpDownLine className="ml-2 h-3 w-3" />
             )}
           </Button>
         </DropdownMenuTrigger>
@@ -64,7 +63,7 @@ export function TodoTableColumnHeader<TData, TValue>({
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => column.clearSorting()}>
-                <RxCaretSort className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                <RiExpandUpDownLine className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
                 {t('common.message.clear')}
               </DropdownMenuItem>
             </>

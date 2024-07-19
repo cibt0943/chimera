@@ -1,6 +1,6 @@
 import { useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { RxGear } from 'react-icons/rx'
+import { RiListSettingsLine } from 'react-icons/ri'
 import { Button } from '~/components/ui/button'
 import { Label } from '~/components/ui/label'
 import { Switch } from '~/components/ui/switch'
@@ -20,7 +20,7 @@ export function MemoSettings() {
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="px-2 hidden h-8 lg:flex">
-          <RxGear className="h-4 w-4" />
+          <RiListSettingsLine className="h-4 w-4 text-primary/80" />
           <span className="sr-only">{t('memo_settings.title')}</span>
         </Button>
       </PopoverTrigger>

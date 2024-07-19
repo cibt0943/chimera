@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Form, useNavigate, useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { RxPlus } from 'react-icons/rx'
+import { RiAddLine } from 'react-icons/ri'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
   DndContext,
@@ -30,14 +30,14 @@ import { MemoSettings } from './memo-settings'
 
 interface MemoListProps {
   defaultMemos: Memos
-  showId: string
   memosLoadDate: Date
+  showId: string
 }
 
 export function MemoList({
   defaultMemos,
-  showId,
   memosLoadDate,
+  showId,
 }: MemoListProps) {
   const { t } = useTranslation()
   const { enqueue: filterEnqueue } = useQueue()
@@ -95,27 +95,20 @@ export function MemoList({
     [
       'up',
       'down',
-      'mod+up',
       'alt+up',
-      'mod+down',
       'alt+down',
-      'mod+i',
-      'alt+i',
-      'mod+enter',
       'alt+enter',
-      'mod+delete',
       'alt+delete',
-      'mod+backspace',
       'alt+backspace',
     ],
     (_, handler) => {
       // ダイアログが開いている場合は何もしない
       if (isOpenDeleteDialog) return
       switch (handler.keys?.join('')) {
-        // フォーカス移動
+        // フォーカスの行移動
         case 'up':
         case 'down':
-          handler.mod || handler.alt
+          handler.alt
             ? moveSelectedMemoOneStep(handler.keys.includes('up'))
             : changeFocusedMemoOneStep(handler.keys.includes('up'))
           break
@@ -143,6 +136,11 @@ export function MemoList({
       },
     },
   )
+
+  // メモ追加
+  useHotkeys(['mod+i', 'alt+i'], () => {
+    addButtonRef.current?.click()
+  })
 
   // メモ一覧をフィルタリング
   async function filterMemos(searchTerm: string) {
@@ -268,11 +266,11 @@ export function MemoList({
             className="h-8 px-2"
             ref={addButtonRef}
           >
-            <RxPlus className="mr-2" />
+            <RiAddLine className="mr-2" />
             {t('common.message.add')}
-            <p className="text-[10px] text-muted-foreground ml-2">
-              <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 text-muted-foreground">
-                <span className="text-xs">⌘</span>i
+            <p className="text-xs text-muted-foreground ml-2">
+              <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
+                <span>⌘</span>i
               </kbd>
             </p>
           </Button>

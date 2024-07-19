@@ -107,7 +107,7 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
   },
   {
     id: 'actions',
-    size: 80,
+    size: 60,
     cell: ({ row, table }) => <TodoTableRowActions row={row} table={table} />,
   },
 ]

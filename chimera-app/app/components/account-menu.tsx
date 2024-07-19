@@ -1,5 +1,5 @@
 import { useNavigate, useFetcher } from '@remix-run/react'
-import { RxGear, RxExit } from 'react-icons/rx'
+import { RiUserSettingsLine, RiLogoutBoxRLine } from 'react-icons/ri'
 import { useTranslation } from 'react-i18next'
 import {
   DropdownMenu,
@@ -50,13 +50,13 @@ export function AccountMenu() {
               navigate(`/account/settings`)
             }}
           >
-            <RxGear className="mr-2 h-4 w-4" />
+            <RiUserSettingsLine className="mr-2 h-4 w-4" />
             {t('common.message.settings')}
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogoutClick}>
-          <RxExit className="mr-2 h-4 w-4" />
+          <RiLogoutBoxRLine className="mr-2 h-4 w-4" />
           {t('account.message.logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -1,6 +1,6 @@
 import type { MetaFunction } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
-import { Outlet } from '@remix-run/react'
+import { Outlet, useParams } from '@remix-run/react'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { toDate } from 'date-fns'
 import { parseWithZod } from '@conform-to/zod'
@@ -38,21 +38,28 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
 
 type LoaderData = {
   tasks: Tasks
-  loadDate: string
+  loadDate: Date
 }
 
 export const loader = withAuthentication(async ({ loginSession }) => {
   const tasks = await getTasks(loginSession.account.id)
 
-  return typedjson({ tasks, loadDate: new Date().toISOString() })
+  return typedjson({ tasks, loadDate: new Date() })
 })
 
 export default function Layout() {
   const { tasks, loadDate } = useTypedLoaderData<LoaderData>()
 
+  const params = useParams()
+  const { todoId } = params
+
   return (
     <div className="p-4">
-      <TodoTable defaultTasks={tasks} tasksLoadDate={toDate(loadDate)} />
+      <TodoTable
+        defaultTasks={tasks}
+        tasksLoadDate={loadDate}
+        showId={todoId || ''}
+      />
       <Outlet />
     </div>
   )

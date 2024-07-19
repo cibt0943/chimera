@@ -1,13 +1,14 @@
 import { useTranslation } from 'react-i18next'
 import {
-  RxDotsHorizontal,
-  RxArrowUp,
-  RxArrowDown,
-  RxCheckCircled,
-  RxPencil1,
-  RxTrash,
-} from 'react-icons/rx'
-import { RiDeleteBack2Line, RiCornerDownLeftLine } from 'react-icons/ri'
+  RiMoreLine,
+  RiArrowUpLine,
+  RiArrowDownLine,
+  RiCheckboxCircleLine,
+  RiEdit2Line,
+  RiDeleteBinLine,
+  RiDeleteBack2Line,
+  RiCornerDownLeftLine,
+} from 'react-icons/ri'
 import { Row, Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import {
@@ -39,7 +40,7 @@ export function TodoTableRowActions({
           variant="ghost"
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
         >
-          <RxDotsHorizontal className="h-4 w-4" />
+          <RiMoreLine className="h-4 w-4" />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
@@ -49,18 +50,18 @@ export function TodoTableRowActions({
             table.options.meta?.moveTask(task, true)
           }}
         >
-          <RxArrowUp className="mr-2 h-4 w-4" />
+          <RiArrowUpLine className="mr-2 h-4 w-4" />
           {t('common.message.position_up')}
-          <DropdownMenuShortcut>⌘↑</DropdownMenuShortcut>
+          <DropdownMenuShortcut>⌥ ↑</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             table.options.meta?.moveTask(task, false)
           }}
         >
-          <RxArrowDown className="mr-2 h-4 w-4" />
+          <RiArrowDownLine className="mr-2 h-4 w-4" />
           {t('common.message.position_down')}
-          <DropdownMenuShortcut>⌘↓</DropdownMenuShortcut>
+          <DropdownMenuShortcut>⌥ ↓</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -70,11 +71,10 @@ export function TodoTableRowActions({
             table.options.meta?.updateTaskStatus(upateTask)
           }}
         >
-          <RxCheckCircled className="mr-2 h-4 w-4" />
+          <RiCheckboxCircleLine className="mr-2 h-4 w-4" />
           {t('task.message.to_complete')}
           <DropdownMenuShortcut>
-            ⌘
-            <RiCornerDownLeftLine className="h-3 w-3 inline" />
+            ⌥ <RiCornerDownLeftLine className="h-3 w-3 inline" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -82,7 +82,7 @@ export function TodoTableRowActions({
             table.options.meta?.editTask(task)
           }}
         >
-          <RxPencil1 className="mr-2 h-4 w-4" />
+          <RiEdit2Line className="mr-2 h-4 w-4" />
           {t('common.message.edit')}
           <DropdownMenuShortcut>
             <RiCornerDownLeftLine className="h-3 w-3 inline" />
@@ -95,10 +95,10 @@ export function TodoTableRowActions({
           }}
           className="text-red-600 focus:text-red-600"
         >
-          <RxTrash className="mr-2 h-4 w-4" />
+          <RiDeleteBinLine className="mr-2 h-4 w-4" />
           {t('common.message.delete')}
           <DropdownMenuShortcut>
-            ⌘<RiDeleteBack2Line className="h-3 w-3 inline" />
+            ⌥ <RiDeleteBack2Line className="h-3 w-3 inline" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>

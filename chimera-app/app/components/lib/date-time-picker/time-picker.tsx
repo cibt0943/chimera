@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { RxClock } from 'react-icons/rx'
+import { RiTimeLine } from 'react-icons/ri'
 import { useTranslation } from 'react-i18next'
 import { Label } from '~/components/ui/label'
 import { TimePickerInput } from './time-picker-input'
@@ -55,7 +55,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
         />
       </div>
       <div className="flex h-10 items-center">
-        <RxClock className="ml-2 h-4 w-4" />
+        <RiTimeLine className="ml-2 h-4 w-4" />
       </div>
     </div>
   )

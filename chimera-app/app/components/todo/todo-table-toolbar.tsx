@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { RxCross2 } from 'react-icons/rx'
+import { RiCloseLine } from 'react-icons/ri'
 import { Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -45,7 +45,7 @@ export function TodoTableToolbar<TData>({
             size="sm"
           >
             {t('common.message.reset')}
-            <RxCross2 className="ml-2 h-3 w-3" />
+            <RiCloseLine className="ml-2 h-3 w-3" />
           </Button>
         )}
       </div>

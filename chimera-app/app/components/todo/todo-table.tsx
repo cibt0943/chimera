@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useNavigate, useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { RxPlus } from 'react-icons/rx'
+import { RiAddLine } from 'react-icons/ri'
 import {
   ColumnFiltersState,
   VisibilityState,
@@ -71,11 +71,13 @@ declare module '@tanstack/table-core' {
 interface TodoTableProps<TData extends RowData> {
   defaultTasks: TData[]
   tasksLoadDate: Date
+  showId: string
 }
 
 export function TodoTable({
   defaultTasks,
   tasksLoadDate,
+  showId,
 }: TodoTableProps<Task>) {
   const { t } = useTranslation()
   const { enqueue } = useQueue()
@@ -99,7 +101,10 @@ export function TodoTable({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
     { id: 'status', value: [0, 2] },
   ])
-  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
+
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({
+    [showId]: true,
+  })
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
 
@@ -343,32 +348,27 @@ export function TodoTable({
   }
 
   // キーボードショートカット
-  useHotkeys<HTMLTableElement>(
+  useHotkeys(
     [
       'up',
       'down',
-      'mod+up',
       'alt+up',
-      'mod+down',
       'alt+down',
       'enter',
-      'mod+enter',
       'alt+enter',
-      'mod+delete',
       'alt+delete',
-      'mod+backspace',
       'alt+backspace',
     ],
     (_, handler) => {
       switch (handler.keys?.join('')) {
         case 'up':
         case 'down':
-          handler.mod || handler.alt
+          handler.alt
             ? moveSelectedTaskOneStep(handler.keys.includes('up'))
             : changeSelectedRowOneStep(handler.keys.includes('up'))
           break
         case 'enter':
-          handler.mod || handler.alt
+          handler.alt
             ? updateSelectedTaskStatus(TaskStatus.DONE)
             : showSelectedTaskEdit()
           break
@@ -390,7 +390,7 @@ export function TodoTable({
   // タスク追加ダイアログを開く
   useHotkeys(['mod+i', 'alt+i'], () => {
     // ローディング中、ダイアログが開いている場合は何もしない
-    if (isLoading || isOpenAddDialog || isOpenDeleteDialog) return
+    if (isLoading || isOpenAddDialog || isOpenDeleteDialog || showId) return
     openAddTaskDialog()
   })
 
@@ -402,11 +402,11 @@ export function TodoTable({
           className="h-8 px-2 lg:px-3"
           onClick={() => openAddTaskDialog()}
         >
-          <RxPlus className="mr-2" />
+          <RiAddLine className="mr-2" />
           {t('common.message.add')}
-          <p className="text-[10px] text-muted-foreground ml-2">
-            <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 text-muted-foreground">
-              <span className="text-xs">⌘</span>i
+          <p className="text-xs text-muted-foreground ml-2">
+            <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
+              <span>⌘</span>i
             </kbd>
           </p>
         </Button>
