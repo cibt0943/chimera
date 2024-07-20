@@ -35,11 +35,12 @@ interface ListItemProps {
   item: Memo
   setFocusedMemo: React.Dispatch<React.SetStateAction<Memo | undefined>>
   isSelected: boolean
-  actionComponent: React.ReactNode
+  isDisplayPreview: boolean
+  children: React.ReactNode
 }
 
 export function ListItem(props: ListItemProps) {
-  const { item, setFocusedMemo, isSelected, actionComponent } = props
+  const { item, setFocusedMemo, isSelected, isDisplayPreview, children } = props
 
   const { t } = useTranslation()
   const {
@@ -84,16 +85,18 @@ export function ListItem(props: ListItemProps) {
     >
       <div className="flex items-center">
         <div className="line-clamp-1">{item.title || t('memo.un_titled')}</div>
-        <div className="ml-auto">{actionComponent}</div>
+        <div className="ml-auto">{children}</div>
       </div>
-      <div className="line-clamp-2 text-xs text-muted-foreground">
-        {item.content.substring(0, 300)}
-      </div>
+      {isDisplayPreview && (
+        <div className="line-clamp-2 text-xs text-muted-foreground">
+          {item.content.substring(0, 300)}
+        </div>
+      )}
       <div className="flex justify-between items-center space-x-2">
         <div>
-          {item.status === MemoStatus.ARCHIVED ? (
+          {item.status === MemoStatus.ARCHIVED && (
             <RiArchiveLine className="mr-2 h-4 w-4" />
-          ) : null}
+          )}
         </div>
         <ClientOnly fallback={<div className="text-xs">&nbsp;</div>}>
           {() => (

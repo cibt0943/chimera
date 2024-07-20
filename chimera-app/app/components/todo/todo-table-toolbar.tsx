@@ -22,13 +22,13 @@ export function TodoTableToolbar<TData>({
       <div className="flex flex-1 items-center space-x-2">
         <Input
           type="search"
-          placeholder={t('task.message.title_filter')}
+          placeholder={t('task.message.title_search')}
           value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
             table.getColumn('title')?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
-          id="tasks-title-filter"
+          id="tasks-title-search"
         />
         {table.getColumn('status') && (
           <TodoTableFacetedFilter

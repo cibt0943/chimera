@@ -109,7 +109,7 @@
       "task_deletion": "タスクの削除",
       "set_task_info": "タスクの情報を設定してください。",
       "select_task_status": "タスクの状態を選んでください。",
-      "title_filter": "タイトルを検索",
+      "title_search": "タイトルを検索",
       "status_filter": "状態",
       "to_complete": "完了する",
       "view_settings": "表示設定",
@@ -136,7 +136,7 @@
       "memo_editing": "メモの編集",
       "memo_deletion": "メモの削除",
       "set_memo_info": "メモの情報を設定してください。",
-      "title_filter": "タイトルを検索",
+      "title_search": "タイトルを検索",
       "first_line_is_title": "1行目はタイトルとなります",
       "to_archive": "アーカイブする",
       "un_archive": "アーカイブから戻す"

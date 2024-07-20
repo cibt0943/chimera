@@ -36,6 +36,11 @@ export function MemoSettingsModel2MemoSettings(
   }
 }
 
+export type UpdateParams = {
+  list_filter?: MemoSettings['list_filter']
+  list_display?: MemoSettings['list_display']
+}
+
 const ListFilterSchema = zod.object({
   statuses: zod.array(
     zod.nativeEnum(MemoStatus, {
@@ -44,8 +49,15 @@ const ListFilterSchema = zod.object({
   ),
 })
 
+const ListDisplaySchema = zod.object({
+  content: zod.boolean({
+    message: '不正な値が選択されています。',
+  }),
+})
+
 export const MemoSettingsSchema = zod.object({
-  list_filter: ListFilterSchema,
+  list_filter: ListFilterSchema.optional(),
+  list_display: ListDisplaySchema.optional(),
 })
 
 export type MemoSettingsSchemaType = zod.infer<typeof MemoSettingsSchema>

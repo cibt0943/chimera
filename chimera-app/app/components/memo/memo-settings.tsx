@@ -24,7 +24,7 @@ export function MemoSettings() {
           <span className="sr-only">{t('memo_settings.title')}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full space-y-4">
+      <PopoverContent className="w-[400px] space-y-4">
         <h4 className="font-medium">{t('memo_settings.title')}</h4>
         <ShowArchivedSwith />
         <ShowContentSwith />
@@ -38,13 +38,14 @@ function ShowArchivedSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
+  if (!memoSettings) return null
 
   // 表示するメモのフィルタ
   function updateMemoSettingStatusFilter(statuses: MemoStatus[]) {
     fetcher.submit(
       {
         list_filter: {
-          statuses: statuses,
+          statuses,
         },
       },
       {
@@ -55,19 +56,17 @@ function ShowArchivedSwith() {
     )
   }
 
-  if (!memoSettings) return null
-
   return (
     <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-      <div className="space-y-0.5">
-        <Label htmlFor="show-all-memo">
+      <div>
+        <Label htmlFor="show-archived">
           {t('memo_settings.message.list_show_archived')}
         </Label>
       </div>
       <div>
         <Switch
-          id="show-all-memo"
-          name="show-all-memo"
+          id="show-archived"
+          name="show-archived"
           defaultChecked={memoSettings.list_filter.statuses.includes(1)}
           // checked={memoSettings?.list_filter.statuses.includes(1)}
           onCheckedChange={(isChecked) => {
@@ -86,13 +85,14 @@ function ShowContentSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
+  if (!memoSettings) return null
 
   // 表示するメモのフィルタ
   function updateMemoSettingDisplayContent(isShow: boolean) {
     fetcher.submit(
       {
         list_display: {
-          isShow: isShow,
+          content: isShow,
         },
       },
       {
@@ -103,19 +103,17 @@ function ShowContentSwith() {
     )
   }
 
-  if (!memoSettings) return null
-
   return (
     <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-      <div className="space-y-0.5">
-        <Label htmlFor="show-all-memo">
+      <div>
+        <Label htmlFor="show-content">
           {t('memo_settings.message.list_show_content')}
         </Label>
       </div>
       <div>
         <Switch
-          id="show-all-memo"
-          name="show-all-memo"
+          id="show-content"
+          name="show-content"
           defaultChecked={memoSettings.list_display.content}
           onCheckedChange={(isChecked) => {
             updateMemoSettingDisplayContent(isChecked)
@@ -130,6 +128,7 @@ function AutoSaveSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
+  if (!memoSettings) return null
 
   // 表示するメモのフィルタ
   function updateMemoSettingAutoSave(isAutoSave: boolean) {
@@ -147,19 +146,17 @@ function AutoSaveSwith() {
     )
   }
 
-  if (!memoSettings) return null
-
   return (
     <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-      <div className="space-y-0.5">
-        <Label htmlFor="show-all-memo">
+      <div>
+        <Label htmlFor="auto-save">
           {t('memo_settings.message.auto_save')}
         </Label>
       </div>
       <div>
         <Switch
-          id="show-all-memo"
-          name="show-all-memo"
+          id="auto-save"
+          name="auto-save"
           defaultChecked={memoSettings.auto_save}
           onCheckedChange={(isChecked) => {
             updateMemoSettingAutoSave(isChecked)

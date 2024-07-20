@@ -4,7 +4,7 @@ import {
   getMemoSettings,
   updateMemoSettings,
 } from '~/models/memo-settings.server'
-import { MemoSettingsSchema } from '~/types/memo-settings'
+import { UpdateParams, MemoSettingsSchema } from '~/types/memo-settings'
 
 export const action = withAuthentication(async ({ request, loginSession }) => {
   const memoSettings = await getMemoSettings(loginSession.account.id)
@@ -14,12 +14,22 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
   const data = submission.data
 
   // アカウントのメモ設定情報を更新
-  const updatedMemoSettings = await updateMemoSettings({
-    id: memoSettings.id,
-    list_filter: {
+  const updateData: UpdateParams = {}
+  if (data.list_filter) {
+    updateData.list_filter = {
       ...memoSettings.list_filter,
       statuses: data.list_filter.statuses,
-    },
+    }
+  }
+  if (data.list_display) {
+    updateData.list_display = {
+      ...memoSettings.list_display,
+      content: data.list_display.content,
+    }
+  }
+  const updatedMemoSettings = await updateMemoSettings({
+    id: memoSettings.id,
+    ...updateData,
   })
 
   return json({ success: true, updatedMemoSettings })

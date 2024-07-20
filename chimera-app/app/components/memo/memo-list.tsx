@@ -27,6 +27,8 @@ import { ListItem } from './memo-list-item'
 import { MemoActions } from './memo-actions'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 import { MemoSettings } from './memo-settings'
+import { useAtomValue } from 'jotai'
+import { memoSettingsAtom } from '~/lib/state'
 
 interface MemoListProps {
   defaultMemos: Memos
@@ -40,7 +42,7 @@ export function MemoList({
   showId,
 }: MemoListProps) {
   const { t } = useTranslation()
-  const { enqueue: filterEnqueue } = useQueue()
+  const { enqueue: searchEnqueue } = useQueue()
   const { enqueue: moveMemoEnqueue } = useQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
@@ -53,10 +55,11 @@ export function MemoList({
     useSensor(TouchSensor, {}),
   )
 
+  const memoSettings = useAtomValue(memoSettingsAtom)
   const [memos, setMemos] = React.useState(defaultMemos)
   const [memosLastLoadDate, setMemosLastLoadDate] =
     React.useState(memosLoadDate)
-  const [filter, setFilter] = React.useState('') // フィルタリング文字列
+  const [searchTerm, setSearchTerm] = React.useState('') // 検索文字列
   const [actionMemo, setActionMemo] = React.useState<Memo>() // 編集・削除するメモ
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
@@ -71,9 +74,9 @@ export function MemoList({
 
   // フィルタリング後のメモ一覧データ更新（memosに依存した値なのでstateで持つ必要はないと考えメモ化した変数で対応）
   const dispMemos = React.useMemo(() => {
-    if (!filter) return memos
-    return memos.filter((memo) => memo.title.toLowerCase().includes(filter))
-  }, [memos, filter])
+    if (!searchTerm) return memos
+    return memos.filter((memo) => memo.title.toLowerCase().includes(searchTerm))
+  }, [memos, searchTerm])
 
   // 一覧で選択しているメモ（選択行はpropsのshowIdで特定されるためstateで持つ必要はないと考えメモ化した変数で対応）
   const selectedMemo = React.useMemo(() => {
@@ -142,12 +145,12 @@ export function MemoList({
     addButtonRef.current?.click()
   })
 
-  // メモ一覧をフィルタリング
-  async function filterMemos(searchTerm: string) {
-    setFilter(searchTerm.toLowerCase())
+  // メモ一覧を検索
+  async function searchMemos(searchTerm: string) {
+    setSearchTerm(searchTerm.toLowerCase())
   }
-  const filterMemosDebounce = useDebounce((searchTerm) => {
-    filterEnqueue(() => filterMemos(searchTerm))
+  const searchMemosDebounce = useDebounce((searchTerm) => {
+    searchEnqueue(() => searchMemos(searchTerm))
   }, 300)
 
   // フォーカスを1ステップ変更
@@ -277,12 +280,12 @@ export function MemoList({
         </Form>
         <Input
           type="search"
-          placeholder={t('memo.message.title_filter')}
+          placeholder={t('memo.message.title_search')}
           onChange={(event) => {
-            filterMemosDebounce(event.target.value)
+            searchMemosDebounce(event.target.value)
           }}
           className="h-8"
-          id="memos-title-filter"
+          id="memos-title-search"
         />
         <MemoSettings />
       </div>
@@ -306,15 +309,15 @@ export function MemoList({
                     item={item}
                     setFocusedMemo={setFocusedMemo}
                     isSelected={item.id === selectedMemo?.id}
-                    actionComponent={
-                      <MemoActions
-                        memo={item}
-                        handleMoveMemo={moveMemoOneStep}
-                        handleUpdateMemoStatus={updateMemoStatus}
-                        handleDeleteMemo={openDeleteMemoDialog}
-                      />
-                    }
-                  />
+                    isDisplayPreview={!!memoSettings?.list_display.content}
+                  >
+                    <MemoActions
+                      memo={item}
+                      handleMoveMemo={moveMemoOneStep}
+                      handleUpdateMemoStatus={updateMemoStatus}
+                      handleDeleteMemo={openDeleteMemoDialog}
+                    />
+                  </ListItem>
                 ))
               ) : (
                 <div className="text-sm">{t('common.message.no_data')}</div>
@@ -323,13 +326,13 @@ export function MemoList({
           </div>
         </DndContext>
       </ScrollArea>
-      {actionMemo ? (
+      {actionMemo && (
         <MemoDeleteConfirmDialog
           memo={actionMemo}
           isOpen={isOpenDeleteDialog}
           setIsOpen={setIsOpenDeleteDialog}
         />
-      ) : null}
+      )}
     </div>
   )
 }
