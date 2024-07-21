@@ -388,7 +388,7 @@ export function TodoTable({
   )
 
   // タスク追加ダイアログを開く
-  useHotkeys(['mod+i', 'alt+i'], () => {
+  useHotkeys(['alt+i'], () => {
     // ローディング中、ダイアログが開いている場合は何もしない
     if (isLoading || isOpenAddDialog || isOpenDeleteDialog || showId) return
     openAddTaskDialog()
@@ -406,7 +406,7 @@ export function TodoTable({
           {t('common.message.add')}
           <p className="text-xs text-muted-foreground ml-2">
             <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-              <span>⌘</span>i
+              <span>⌥</span>i
             </kbd>
           </p>
         </Button>

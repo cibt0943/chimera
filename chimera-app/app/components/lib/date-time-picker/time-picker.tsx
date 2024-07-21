@@ -54,7 +54,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
           onLeftFocus={() => minuteRef.current?.focus()}
         />
       </div>
-      <div className="flex h-10 items-center">
+      <div className="flex h-9 items-center">
         <RiTimeLine className="ml-2 h-4 w-4" />
       </div>
     </div>

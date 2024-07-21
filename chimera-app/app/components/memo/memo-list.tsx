@@ -141,7 +141,7 @@ export function MemoList({
   )
 
   // メモ追加
-  useHotkeys(['mod+i', 'alt+i'], () => {
+  useHotkeys(['alt+i'], () => {
     addButtonRef.current?.click()
   })
 
@@ -273,7 +273,7 @@ export function MemoList({
             {t('common.message.add')}
             <p className="text-xs text-muted-foreground ml-2">
               <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-                <span>⌘</span>i
+                <span>⌥</span>i
               </kbd>
             </p>
           </Button>
