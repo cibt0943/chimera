@@ -172,7 +172,7 @@ export function TodoTable({
       ?.querySelector<HTMLElement>(`#row-${nowSelectedRow.id}`)
       ?.focus()
     // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
-  }, [rowSelection])
+  }, [table, rowSelection])
 
   // タスク追加ダイアログを開く
   function openAddTaskDialog() {
