@@ -54,8 +54,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function App() {
   const { loginSession, language } = useTypedLoaderData<typeof loader>()
-  const theme = (loginSession?.account.theme || Theme.SYSTEM) as Theme
-  useTheme(theme)
+  const theme = loginSession?.account.theme || Theme.SYSTEM
+  useTheme(theme) // useEffectにてOSのテーマ設定に合わせてテーマを変更
 
   // クライアントサイドでの言語設定
   React.useEffect(() => {
@@ -66,7 +66,7 @@ export default function App() {
   const setLoginAccount = useSetAtom(loginSessionAtom)
   React.useEffect(() => {
     setLoginAccount(loginSession)
-  }, [loginSession])
+  }, [setLoginAccount, loginSession])
 
   return (
     <html lang={language} className={theme}>

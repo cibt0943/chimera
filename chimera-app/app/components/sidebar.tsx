@@ -39,23 +39,23 @@ export function Sidebar() {
           </h1>
         </div>
         <div className="grid gap-1 p-px">
-          <NavLink to="/todos" className={NavLinkClassName} reloadDocument>
+          <NavLink to="/todos" className={NavLinkClassName}>
             <RxCheck className="mr-2 h-5 w-5" />
             Todo
           </NavLink>
-          <NavLink to="/memos" className={NavLinkClassName} reloadDocument>
+          <NavLink to="/memos" className={NavLinkClassName}>
             <RxPencil2 className="mr-2 h-5 w-5" />
             Memo
           </NavLink>
-          <NavLink to="/events" className={NavLinkClassName} reloadDocument>
+          <NavLink to="/events" className={NavLinkClassName}>
             <RxCalendar className="mr-2 h-5 w-5" />
             Event
           </NavLink>
-          <NavLink to="/files" className={NavLinkClassName} reloadDocument>
+          <NavLink to="/files" className={NavLinkClassName}>
             <RxFile className="mr-2 h-5 w-5" />
             File
           </NavLink>
-          <NavLink to="/reminders" className={NavLinkClassName} reloadDocument>
+          <NavLink to="/reminders" className={NavLinkClassName}>
             <RxPaperPlane className="mr-2 h-5 w-5" />
             Reminder
           </NavLink>

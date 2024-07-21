@@ -18,7 +18,6 @@ import {
 } from '~/components/ui/resizable'
 import { useSetAtom } from 'jotai'
 import { memoSettingsAtom } from '~/lib/state'
-import { useHydrateAtoms } from 'jotai/utils'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Memos | Kobushi' }]
@@ -71,11 +70,10 @@ export default function Layout() {
   const { memos, loadDate, memoSettings } = useTypedLoaderData<LoaderData>()
 
   // ログインユーザーのアカウント情報をグローバルステートに保存
-  useHydrateAtoms([[memoSettingsAtom, memoSettings]])
   const setMemoSettings = useSetAtom(memoSettingsAtom)
   React.useEffect(() => {
     setMemoSettings(memoSettings)
-  }, [memoSettings])
+  }, [setMemoSettings, memoSettings])
 
   const params = useParams()
   const { memoId } = params
