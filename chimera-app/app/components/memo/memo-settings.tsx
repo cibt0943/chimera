@@ -36,7 +36,7 @@ export function MemoSettings() {
 
 function ShowArchivedSwith() {
   const { t } = useTranslation()
-  const fetcher = useFetcher()
+  const fetcher = useFetcher({ key: 'memo-settings' })
   const memoSettings = useAtomValue(memoSettingsAtom)
   if (!memoSettings) return null
 
@@ -67,8 +67,10 @@ function ShowArchivedSwith() {
         <Switch
           id="show-archived"
           name="show-archived"
-          defaultChecked={memoSettings.list_filter.statuses.includes(1)}
-          // checked={memoSettings?.list_filter.statuses.includes(1)}
+          defaultChecked={memoSettings.list_filter.statuses.includes(
+            MemoStatus.ARCHIVED,
+          )}
+          // checked={memoSettings?.list_filter.statuses.includes(MemoStatus.ARCHIVED)}
           onCheckedChange={(isChecked) => {
             const statuses = isChecked
               ? [MemoStatus.NOMAL, MemoStatus.ARCHIVED]
@@ -83,7 +85,7 @@ function ShowArchivedSwith() {
 
 function ShowContentSwith() {
   const { t } = useTranslation()
-  const fetcher = useFetcher()
+  const fetcher = useFetcher({ key: 'memo-settings' })
   const memoSettings = useAtomValue(memoSettingsAtom)
   if (!memoSettings) return null
 
@@ -126,7 +128,7 @@ function ShowContentSwith() {
 
 function AutoSaveSwith() {
   const { t } = useTranslation()
-  const fetcher = useFetcher()
+  const fetcher = useFetcher({ key: 'memo-settings' })
   const memoSettings = useAtomValue(memoSettingsAtom)
   if (!memoSettings) return null
 
@@ -134,9 +136,7 @@ function AutoSaveSwith() {
   function updateMemoSettingAutoSave(isAutoSave: boolean) {
     fetcher.submit(
       {
-        list_display: {
-          isAutoSave: isAutoSave,
-        },
+        auto_save: isAutoSave,
       },
       {
         action: `/account/memo/settings`,

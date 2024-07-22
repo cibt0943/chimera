@@ -231,7 +231,7 @@ export function TodoTable({
     enqueue(() =>
       moveTaskApi(fromTask, toTask).catch((error) => {
         alert(error.message)
-        navigate('.', { replace: true })
+        navigate('.?refresh=true', { replace: true })
       }),
     )
   }, 300)
@@ -267,7 +267,7 @@ export function TodoTable({
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error'
       alert(msg)
-      navigate('.', { replace: true })
+      navigate('.?refresh=true', { replace: true })
     }
   }
 

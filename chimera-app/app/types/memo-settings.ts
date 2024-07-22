@@ -39,6 +39,7 @@ export function MemoSettingsModel2MemoSettings(
 export type UpdateParams = {
   list_filter?: MemoSettings['list_filter']
   list_display?: MemoSettings['list_display']
+  auto_save?: boolean
 }
 
 const ListFilterSchema = zod.object({
@@ -58,6 +59,7 @@ const ListDisplaySchema = zod.object({
 export const MemoSettingsSchema = zod.object({
   list_filter: ListFilterSchema.optional(),
   list_display: ListDisplaySchema.optional(),
+  auto_save: zod.boolean().optional(),
 })
 
 export type MemoSettingsSchemaType = zod.infer<typeof MemoSettingsSchema>

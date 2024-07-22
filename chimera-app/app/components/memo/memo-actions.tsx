@@ -27,7 +27,7 @@ import { Memo, MemoStatus } from '~/types/memos'
 interface MemoActionsProps {
   memo: Memo
   handleMoveMemo: (memo: Memo, isUp: boolean) => void
-  handleUpdateMemoStatus: (memo: Memo, status: MemoStatus) => void
+  handleUpdateMemoStatus: (memo: Memo) => void
   handleDeleteMemo: (memo: Memo) => void
 }
 
@@ -90,7 +90,7 @@ export function MemoActions(props: MemoActionsProps) {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={(event) => {
-              handleUpdateMemoStatus(memo, archiveMenu.toStatus)
+              handleUpdateMemoStatus({ ...memo, status: archiveMenu.toStatus })
               event.stopPropagation() // アンカータグのクリックイベントをキャンセル
             }}
           >

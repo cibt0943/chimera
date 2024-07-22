@@ -26,6 +26,26 @@ function NavLinkClassName({ isActive, isPending }: NavLinkClassNameProps) {
   )
 }
 
+type CustomNavLinkProps = {
+  to: string
+  children: React.ReactNode
+}
+
+function CustomNavLink({ to, children }: CustomNavLinkProps) {
+  return (
+    <NavLink
+      to={to}
+      className={NavLinkClassName}
+      onClick={(event) => {
+        // NaviLinkに当たっているフォーカスを外す
+        event.currentTarget.blur()
+      }}
+    >
+      {children}
+    </NavLink>
+  )
+}
+
 export function Sidebar() {
   return (
     <div className="px-2 flex flex-col justify-between h-screen w-44">
@@ -39,26 +59,26 @@ export function Sidebar() {
           </h1>
         </div>
         <div className="grid gap-1 p-px">
-          <NavLink to="/todos" className={NavLinkClassName}>
+          <CustomNavLink to="/todos">
             <RxCheck className="mr-2 h-5 w-5" />
             Todo
-          </NavLink>
-          <NavLink to="/memos" className={NavLinkClassName}>
+          </CustomNavLink>
+          <CustomNavLink to="/memos">
             <RxPencil2 className="mr-2 h-5 w-5" />
             Memo
-          </NavLink>
-          <NavLink to="/events" className={NavLinkClassName}>
+          </CustomNavLink>
+          <CustomNavLink to="/events">
             <RxCalendar className="mr-2 h-5 w-5" />
             Event
-          </NavLink>
-          <NavLink to="/files" className={NavLinkClassName}>
+          </CustomNavLink>
+          <CustomNavLink to="/files">
             <RxFile className="mr-2 h-5 w-5" />
             File
-          </NavLink>
-          <NavLink to="/reminders" className={NavLinkClassName}>
+          </CustomNavLink>
+          <CustomNavLink to="/reminders">
             <RxPaperPlane className="mr-2 h-5 w-5" />
             Reminder
-          </NavLink>
+          </CustomNavLink>
         </div>
       </div>
       <div className="mx-2 mb-4">

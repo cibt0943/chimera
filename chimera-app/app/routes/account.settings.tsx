@@ -57,10 +57,9 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
 })
 
 export const loader = withAuthentication(async ({ loginSession }) => {
-  // const account = await getAccount(loginAccount.id)
-
   // セッションに保存しているアカウント情報を返す
-  // セッションのloginAccountはaccountの値をすでにマージ済み
+  // セッションのloginAccountはaccountの値をすでにマージ済みなので、↓DBから取得する必要はない
+  // const account = await getAccount(loginAccount.id)
   const accountSettings = {
     name: loginSession.auth0User.name,
     language: loginSession.account.language,

@@ -185,13 +185,13 @@ export function MemoList({
       selectedMemo.status === MemoStatus.NOMAL
         ? MemoStatus.ARCHIVED
         : MemoStatus.NOMAL
-    updateMemoStatus(selectedMemo, status)
+    updateMemoStatusApi({ ...selectedMemo, status })
   }
 
   // メモのステータスを変更
-  function updateMemoStatus(memo: Memo, status: MemoStatus) {
+  function updateMemoStatusApi(memo: Memo) {
     fetcher.submit(
-      { status: status },
+      { status: memo.status },
       {
         action: `/memos/${memo.id}/status`,
         method: 'post',
@@ -222,7 +222,7 @@ export function MemoList({
     moveMemoEnqueue(() =>
       moveMemoApi(fromMemo, toMemo).catch((error) => {
         alert(error.message)
-        navigate('.', { replace: true })
+        navigate('.?refresh=true', { replace: true })
       }),
     )
   }, 300)
@@ -255,7 +255,7 @@ export function MemoList({
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error'
       alert(msg)
-      navigate('.', { replace: true })
+      navigate('.?refresh=true', { replace: true })
     }
   }
 
@@ -314,7 +314,7 @@ export function MemoList({
                     <MemoActions
                       memo={item}
                       handleMoveMemo={moveMemoOneStep}
-                      handleUpdateMemoStatus={updateMemoStatus}
+                      handleUpdateMemoStatus={updateMemoStatusApi}
                       handleDeleteMemo={openDeleteMemoDialog}
                     />
                   </ListItem>
