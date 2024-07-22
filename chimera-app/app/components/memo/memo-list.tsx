@@ -32,15 +32,10 @@ import { memoSettingsAtom } from '~/lib/state'
 
 interface MemoListProps {
   defaultMemos: Memos
-  memosLoadDate: Date
   showId: string
 }
 
-export function MemoList({
-  defaultMemos,
-  memosLoadDate,
-  showId,
-}: MemoListProps) {
+export function MemoList({ defaultMemos, showId }: MemoListProps) {
   const { t } = useTranslation()
   const { enqueue: searchEnqueue } = useQueue()
   const { enqueue: moveMemoEnqueue } = useQueue()
@@ -57,8 +52,6 @@ export function MemoList({
 
   const memoSettings = useAtomValue(memoSettingsAtom)
   const [memos, setMemos] = React.useState(defaultMemos)
-  const [memosLastLoadDate, setMemosLastLoadDate] =
-    React.useState(memosLoadDate)
   const [searchTerm, setSearchTerm] = React.useState('') // 検索文字列
   const [actionMemo, setActionMemo] = React.useState<Memo>() // 編集・削除するメモ
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
@@ -68,9 +61,9 @@ export function MemoList({
 
   // フィルタリング前のメモ一覧データ更新
   React.useEffect(() => {
+    console.log('defaultMemos')
     setMemos(defaultMemos)
-    setMemosLastLoadDate(memosLoadDate)
-  }, [memosLoadDate > memosLastLoadDate])
+  }, [defaultMemos])
 
   // フィルタリング後のメモ一覧データ更新（memosに依存した値なのでstateで持つ必要はないと考えメモ化した変数で対応）
   const dispMemos = React.useMemo(() => {

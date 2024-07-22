@@ -70,15 +70,10 @@ declare module '@tanstack/table-core' {
 
 interface TodoTableProps<TData extends RowData> {
   defaultTasks: TData[]
-  tasksLoadDate: Date
   showId: string
 }
 
-export function TodoTable({
-  defaultTasks,
-  tasksLoadDate,
-  showId,
-}: TodoTableProps<Task>) {
+export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const { t } = useTranslation()
   const { enqueue } = useQueue()
   const navigate = useNavigate()
@@ -108,8 +103,6 @@ export function TodoTable({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
 
-  const [tasksLastLoadDate, setTasksLastLoadDate] =
-    React.useState(tasksLoadDate)
   const [actionTask, setActionTask] = React.useState<Task>() // 編集・削除するタスク
   const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
@@ -161,8 +154,7 @@ export function TodoTable({
   // タスクデータが変更されたらテーブルデータを更新
   React.useEffect(() => {
     setTableData(defaultTasks)
-    setTasksLastLoadDate(tasksLoadDate)
-  }, [tasksLoadDate > tasksLastLoadDate])
+  }, [defaultTasks])
 
   // 選択行にフォーカスを設定
   React.useEffect(() => {

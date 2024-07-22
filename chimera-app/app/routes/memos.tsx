@@ -48,7 +48,6 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
 
 type LoaderData = {
   memos: Memos
-  loadDate: Date
   memoSettings: MemoSettings
 }
 
@@ -61,13 +60,12 @@ export const loader = withAuthentication(async ({ loginSession }) => {
 
   return typedjson({
     memos,
-    loadDate: new Date(),
     memoSettings,
   })
 })
 
 export default function Layout() {
-  const { memos, loadDate, memoSettings } = useTypedLoaderData<LoaderData>()
+  const { memos, memoSettings } = useTypedLoaderData<LoaderData>()
 
   // ログインユーザーのアカウント情報をグローバルステートに保存
   const setMemoSettings = useSetAtom(memoSettingsAtom)
@@ -82,11 +80,7 @@ export default function Layout() {
     <div className="p-4 h-screen">
       <ResizablePanelGroup direction="horizontal" className="border rounded-lg">
         <ResizablePanel defaultSize={35}>
-          <MemoList
-            defaultMemos={memos}
-            memosLoadDate={loadDate}
-            showId={memoId || ''}
-          />
+          <MemoList defaultMemos={memos} showId={memoId || ''} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={70}>

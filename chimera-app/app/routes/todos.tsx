@@ -37,7 +37,6 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
 
 type LoaderData = {
   tasks: Tasks
-  loadDate: Date
 }
 
 export const loader = withAuthentication(async ({ loginSession }) => {
@@ -47,18 +46,14 @@ export const loader = withAuthentication(async ({ loginSession }) => {
 })
 
 export default function Layout() {
-  const { tasks, loadDate } = useTypedLoaderData<LoaderData>()
+  const { tasks } = useTypedLoaderData<LoaderData>()
 
   const params = useParams()
   const { todoId } = params
 
   return (
     <div className="p-4">
-      <TodoTable
-        defaultTasks={tasks}
-        tasksLoadDate={loadDate}
-        showId={todoId || ''}
-      />
+      <TodoTable defaultTasks={tasks} showId={todoId || ''} />
       <Outlet />
     </div>
   )
