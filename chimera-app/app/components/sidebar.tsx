@@ -40,6 +40,7 @@ function CustomNavLink({ to, children }: CustomNavLinkProps) {
         // NaviLinkに当たっているフォーカスを外す
         event.currentTarget.blur()
       }}
+      state={{ isLoadEffect: true }}
     >
       {children}
     </NavLink>

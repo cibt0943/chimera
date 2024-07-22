@@ -1,6 +1,6 @@
-import { useIsLoading } from '~/lib/utils'
+import { useIsLoadingEffect } from '~/lib/utils'
 
 export function LoadingEffect({ children }: { children: React.ReactNode }) {
-  const loadingCss = useIsLoading() ? 'opacity-40' : ''
+  const loadingCss = useIsLoadingEffect() ? 'opacity-40' : ''
   return <div className={loadingCss}>{children}</div>
 }

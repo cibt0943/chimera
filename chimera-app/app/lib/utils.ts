@@ -76,6 +76,11 @@ export function useIsLoading() {
   return ['loading', 'submitting'].includes(navigation.state)
 }
 
+export function useIsLoadingEffect() {
+  const navigation = useNavigation()
+  return useIsLoading() && navigation.location?.state?.isLoadEffect === true
+}
+
 // date-fnsのlocaleを取得
 export function getLocale(locale: string): Locale {
   return locales[locale as keyof typeof locales] || locales.ja

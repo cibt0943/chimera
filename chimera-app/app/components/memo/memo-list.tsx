@@ -61,7 +61,6 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
 
   // フィルタリング前のメモ一覧データ更新
   React.useEffect(() => {
-    console.log('defaultMemos')
     setMemos(defaultMemos)
   }, [defaultMemos])
 

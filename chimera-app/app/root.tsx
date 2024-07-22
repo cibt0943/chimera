@@ -16,7 +16,7 @@ import { authenticator } from '~/lib/auth.server'
 import { useTheme } from './lib/useTheme'
 import i18n from '~/lib/i18n/i18n'
 import { Theme } from '~/types/accounts'
-// import { LoadingEffect } from '~/components/loading-effect'
+import { LoadingEffect } from '~/components/loading-effect'
 import { Sidebar } from '~/components/sidebar'
 import { Toaster } from '~/components/ui/toaster'
 import { useSetAtom } from 'jotai'
@@ -83,9 +83,9 @@ export default function App() {
               <Sidebar />
             </aside>
             <main className="grow h-screen overflow-auto">
-              {/* <LoadingEffect> */}
-              <Outlet />
-              {/* </LoadingEffect> */}
+              <LoadingEffect>
+                <Outlet />
+              </LoadingEffect>
             </main>
             <Toaster />
           </div>
