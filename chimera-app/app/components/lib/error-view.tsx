@@ -1,5 +1,5 @@
 import { useRouteError } from '@remix-run/react'
-import { RxExclamationTriangle } from 'react-icons/rx'
+import { RiAlertLine } from 'react-icons/ri'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 
 export function ErrorView() {
@@ -9,7 +9,7 @@ export function ErrorView() {
 
   return (
     <Alert variant="destructive">
-      <RxExclamationTriangle className="h-4 w-4" />
+      <RiAlertLine className="h-4 w-4" />
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>{errMessage}</AlertDescription>
     </Alert>

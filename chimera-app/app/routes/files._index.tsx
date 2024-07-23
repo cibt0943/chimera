@@ -6,8 +6,8 @@ export const meta: MetaFunction = () => {
   return [{ title: 'Files | Kobushi' }]
 }
 
-export const loader = withAuthentication(async ({ account }) => {
-  return json({ account })
+export const loader = withAuthentication(async ({ loginSession }) => {
+  return json({ loginSession })
 })
 
 export default function Index() {

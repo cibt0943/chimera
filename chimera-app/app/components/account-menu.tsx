@@ -1,7 +1,6 @@
 import { useNavigate, useFetcher } from '@remix-run/react'
-import { RxGear, RxExit } from 'react-icons/rx'
+import { RiUserSettingsLine, RiLogoutBoxRLine } from 'react-icons/ri'
 import { useTranslation } from 'react-i18next'
-import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +12,7 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { useAtomValue } from 'jotai'
-import { loginAccountAtom } from '~/lib/state'
+import { loginSessionAtom } from '~/lib/state'
 
 export function AccountMenu() {
   const { t } = useTranslation()
@@ -21,8 +20,8 @@ export function AccountMenu() {
   const fetcher = useFetcher()
 
   // ログインユーザーのアカウント情報をグローバルステートから取得
-  const loginAccount = useAtomValue(loginAccountAtom)
-  if (!loginAccount) return null
+  const loginSession = useAtomValue(loginSessionAtom)
+  if (!loginSession) return null
 
   const handleLogoutClick = () => {
     fetcher.submit(
@@ -37,19 +36,13 @@ export function AccountMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="rounded-full py-6 w-full justify-normal"
-        >
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={loginAccount.picture} />
-            <AvatarFallback>{loginAccount.name}</AvatarFallback>
-          </Avatar>
-          <span className="pl-2 truncate">{loginAccount.name}</span>
-        </Button>
+        <Avatar className="h-8 w-8 cursor-pointer">
+          <AvatarImage src={loginSession.auth0User.picture} />
+          <AvatarFallback>{loginSession.auth0User.name}</AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-52">
-        <DropdownMenuLabel>{loginAccount.name}</DropdownMenuLabel>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>{loginSession.auth0User.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem
@@ -57,13 +50,13 @@ export function AccountMenu() {
               navigate(`/account/settings`)
             }}
           >
-            <RxGear className="mr-2 h-4 w-4" />
+            <RiUserSettingsLine className="mr-2 h-4 w-4" />
             {t('common.message.settings')}
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogoutClick}>
-          <RxExit className="mr-2 h-4 w-4" />
+          <RiLogoutBoxRLine className="mr-2 h-4 w-4" />
           {t('account.message.logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>

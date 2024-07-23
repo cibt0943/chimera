@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { RxCross2 } from 'react-icons/rx'
+import { RiCloseLine } from 'react-icons/ri'
 import { Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -22,13 +22,13 @@ export function TodoTableToolbar<TData>({
       <div className="flex flex-1 items-center space-x-2">
         <Input
           type="search"
-          placeholder={t('task.message.title_filter')}
+          placeholder={t('task.message.title_search')}
           value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
             table.getColumn('title')?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
-          id="tasks-title-filter"
+          id="tasks-title-search"
         />
         {table.getColumn('status') && (
           <TodoTableFacetedFilter
@@ -42,9 +42,10 @@ export function TodoTableToolbar<TData>({
             variant="ghost"
             onClick={() => table.resetColumnFilters()}
             className="h-8 px-2 lg:px-3"
+            size="sm"
           >
             {t('common.message.reset')}
-            <RxCross2 className="ml-2 h-3 w-3" />
+            <RiCloseLine className="ml-2 h-3 w-3" />
           </Button>
         )}
       </div>

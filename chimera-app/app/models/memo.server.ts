@@ -1,11 +1,17 @@
-import { MemoModel, MemoModels, MemoStatus } from '~/types/memos'
+import {
+  Memos,
+  Memo,
+  MemoModel,
+  MemoModel2Memo,
+  MemoStatus,
+} from '~/types/memos'
 import { supabase } from '~/lib/supabase-client.server'
 
 // メモ一覧を取得
 export async function getMemos(
   account_id: string,
   statuses: MemoStatus[],
-): Promise<MemoModels> {
+): Promise<Memos> {
   const { data, error } = await supabase
     .from('memos')
     .select()
@@ -15,11 +21,15 @@ export async function getMemos(
     .order('id')
   if (error) throw error
 
-  return data || []
+  const memos = data.map((memo) => {
+    return MemoModel2Memo(memo)
+  })
+
+  return memos
 }
 
 // メモを取得
-export async function getMemo(memoId: string): Promise<MemoModel> {
+export async function getMemo(memoId: string): Promise<Memo> {
   const { data, error } = await supabase
     .from('memos')
     .select()
@@ -27,7 +37,7 @@ export async function getMemo(memoId: string): Promise<MemoModel> {
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return data
+  return MemoModel2Memo(data)
 }
 
 // メモ情報の追加
@@ -39,7 +49,7 @@ interface insertMemoProps {
   related_date: string | null
 }
 
-export async function insertMemo(memo: insertMemoProps): Promise<MemoModel> {
+export async function insertMemo(memo: insertMemoProps): Promise<Memo> {
   const { data: maxMemo, error: errorMaxMemo } = await supabase
     .from('memos')
     .select()
@@ -57,14 +67,13 @@ export async function insertMemo(memo: insertMemoProps): Promise<MemoModel> {
     .single()
   if (errorNewMemo || !newMemo) throw errorNewMemo || new Error('erorr')
 
-  return newMemo
+  return MemoModel2Memo(newMemo)
 }
 
 // メモ情報の更新
 interface updateMemoProps {
   id: string
   updated_at?: string
-  account_id?: string
   position?: number
   title?: string
   content?: string
@@ -75,10 +84,8 @@ interface updateMemoProps {
 export async function updateMemo(
   memo: updateMemoProps,
   noUpdated = false,
-): Promise<MemoModel> {
-  if (!noUpdated) {
-    memo.updated_at = new Date().toISOString()
-  }
+): Promise<Memo> {
+  if (!noUpdated) memo.updated_at = new Date().toISOString()
 
   const { data, error } = await supabase
     .from('memos')
@@ -88,7 +95,7 @@ export async function updateMemo(
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return data
+  return MemoModel2Memo(data)
 }
 
 // メモ情報の削除
@@ -103,7 +110,7 @@ export async function deleteMemo(memoId: string): Promise<void> {
 export async function updateMemoPosition(
   memoId: string,
   position: number,
-): Promise<MemoModel> {
+): Promise<Memo> {
   const fromMemo = await getMemo(memoId)
 
   const isUp = fromMemo.position < position

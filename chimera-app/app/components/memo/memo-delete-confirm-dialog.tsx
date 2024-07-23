@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form, useSearchParams } from '@remix-run/react'
+import { Form } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { AlertDialogCancel } from '~/components/ui/alert-dialog'
 import { Button } from '~/components/ui/button'
@@ -18,7 +18,6 @@ export function MemoDeleteConfirmDialog({
   setIsOpen,
 }: DeleteMemoConfirmDialogProps) {
   const { t } = useTranslation()
-  const [searchParams] = useSearchParams()
 
   return (
     <DeleteConfirmDialog
@@ -34,10 +33,11 @@ export function MemoDeleteConfirmDialog({
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <Form
-        action={`/memos/${memo.id}/delete?${searchParams.toString()}`}
+        action={`/memos/${memo.id}/delete`}
         method="delete"
-        onSubmit={() => {
+        onSubmit={(event) => {
           setIsOpen(false)
+          event.stopPropagation()
         }}
       >
         <Button type="submit" variant="destructive">

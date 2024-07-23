@@ -26,42 +26,63 @@ function NavLinkClassName({ isActive, isPending }: NavLinkClassNameProps) {
   )
 }
 
+type CustomNavLinkProps = {
+  to: string
+  children: React.ReactNode
+}
+
+function CustomNavLink({ to, children }: CustomNavLinkProps) {
+  return (
+    <NavLink
+      to={to}
+      className={NavLinkClassName}
+      onClick={(event) => {
+        // NaviLinkに当たっているフォーカスを外す
+        event.currentTarget.blur()
+      }}
+      state={{ isLoadEffect: true }}
+    >
+      {children}
+    </NavLink>
+  )
+}
+
 export function Sidebar() {
   return (
-    <div className="px-2 flex flex-col justify-between h-screen">
+    <div className="px-2 flex flex-col justify-between h-screen w-44">
       <div className="overflow-auto">
         <div className="bg-background sticky top-0">
-          <h1 className="p-4 text-2xl font-bold tracking-tight">
+          <h1 className="mx-2 my-4 text-2xl font-bold tracking-tight">
             <NavLink to="/" className="inline-flex items-center">
+              <PiHandFistBold className="mr-2 text-yellow-500" />
               kobushi
-              <PiHandFistBold className="ml-2 text-yellow-400" />
             </NavLink>
           </h1>
         </div>
         <div className="grid gap-1 p-px">
-          <NavLink to="/todos" className={NavLinkClassName} reloadDocument>
+          <CustomNavLink to="/todos">
             <RxCheck className="mr-2 h-5 w-5" />
             Todo
-          </NavLink>
-          <NavLink to="/memos" className={NavLinkClassName} reloadDocument>
+          </CustomNavLink>
+          <CustomNavLink to="/memos">
             <RxPencil2 className="mr-2 h-5 w-5" />
             Memo
-          </NavLink>
-          <NavLink to="/events" className={NavLinkClassName} reloadDocument>
+          </CustomNavLink>
+          <CustomNavLink to="/events">
             <RxCalendar className="mr-2 h-5 w-5" />
             Event
-          </NavLink>
-          <NavLink to="/files" className={NavLinkClassName} reloadDocument>
+          </CustomNavLink>
+          <CustomNavLink to="/files">
             <RxFile className="mr-2 h-5 w-5" />
             File
-          </NavLink>
-          <NavLink to="/reminders" className={NavLinkClassName} reloadDocument>
+          </CustomNavLink>
+          <CustomNavLink to="/reminders">
             <RxPaperPlane className="mr-2 h-5 w-5" />
             Reminder
-          </NavLink>
+          </CustomNavLink>
         </div>
       </div>
-      <div className="px-px mb-4">
+      <div className="mx-2 mb-4">
         <AccountMenu />
       </div>
     </div>

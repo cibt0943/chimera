@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Form } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -20,9 +19,9 @@ import {
 } from '~/components/ui/select'
 import { FormItem, FormLabel, FormMessage } from '~/components/lib/form'
 import {
-  Account,
-  AccountSchema,
-  AccountSchemaType,
+  AccountSettings,
+  AccountSettingsSchema,
+  AccountSettingsSchemaType,
   LanguageList,
   ThemeList,
 } from '~/types/accounts'
@@ -54,19 +53,19 @@ function SelectThemeItems() {
 }
 
 interface AccountFormProps {
-  account: Account
+  accountSettings: AccountSettings
 }
 
-export function AccountForm({ account }: AccountFormProps) {
+export function AccountForm({ accountSettings }: AccountFormProps) {
   const { t } = useTranslation()
-  const defaultValue = account
+  const defaultValue = accountSettings
 
-  const [form, fields] = useForm<AccountSchemaType>({
+  const [form, fields] = useForm<AccountSettingsSchemaType>({
     id: 'account-form',
     defaultValue: defaultValue,
-    constraint: getZodConstraint(AccountSchema),
+    constraint: getZodConstraint(AccountSettingsSchema),
     onValidate: ({ formData }) => {
-      return parseWithZod(formData, { schema: AccountSchema })
+      return parseWithZod(formData, { schema: AccountSettingsSchema })
     },
   })
 

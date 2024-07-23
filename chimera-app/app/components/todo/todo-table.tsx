@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useNavigate, useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { RxPlus } from 'react-icons/rx'
+import { RiAddLine } from 'react-icons/ri'
 import {
   ColumnFiltersState,
   VisibilityState,
@@ -70,13 +70,10 @@ declare module '@tanstack/table-core' {
 
 interface TodoTableProps<TData extends RowData> {
   defaultTasks: TData[]
-  tasksLoadDate: Date
+  showId: string
 }
 
-export function TodoTable({
-  defaultTasks,
-  tasksLoadDate,
-}: TodoTableProps<Task>) {
+export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const { t } = useTranslation()
   const { enqueue } = useQueue()
   const navigate = useNavigate()
@@ -99,12 +96,13 @@ export function TodoTable({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
     { id: 'status', value: [0, 2] },
   ])
-  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
+
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({
+    [showId]: true,
+  })
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
 
-  const [tasksLastLoadDate, setTasksLastLoadDate] =
-    React.useState(tasksLoadDate)
   const [actionTask, setActionTask] = React.useState<Task>() // 編集・削除するタスク
   const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
@@ -156,8 +154,7 @@ export function TodoTable({
   // タスクデータが変更されたらテーブルデータを更新
   React.useEffect(() => {
     setTableData(defaultTasks)
-    setTasksLastLoadDate(tasksLoadDate)
-  }, [tasksLoadDate > tasksLastLoadDate])
+  }, [defaultTasks])
 
   // 選択行にフォーカスを設定
   React.useEffect(() => {
@@ -167,7 +164,7 @@ export function TodoTable({
       ?.querySelector<HTMLElement>(`#row-${nowSelectedRow.id}`)
       ?.focus()
     // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
-  }, [rowSelection])
+  }, [table, rowSelection])
 
   // タスク追加ダイアログを開く
   function openAddTaskDialog() {
@@ -226,7 +223,7 @@ export function TodoTable({
     enqueue(() =>
       moveTaskApi(fromTask, toTask).catch((error) => {
         alert(error.message)
-        navigate('.', { replace: true })
+        navigate('.?refresh=true', { replace: true })
       }),
     )
   }, 300)
@@ -262,7 +259,7 @@ export function TodoTable({
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error'
       alert(msg)
-      navigate('.', { replace: true })
+      navigate('.?refresh=true', { replace: true })
     }
   }
 
@@ -276,11 +273,13 @@ export function TodoTable({
     const viewRows = table.getRowModel().rows
     // 表示順に並んでいるviewRowsの中から選択行のindexを取得
     // nowSelectedRow.indexの値は、ソート前のデータのindex
-    const fromRow = viewRows.find((data) => data.id === targetTask.id)
+    const fromIndex = viewRows.findIndex((data) => data.id === targetTask.id)
+    const fromRow = viewRows[fromIndex]
     if (!fromRow) return
-    const toIndex = isUp ? fromRow.index - 1 : fromRow.index + 1
-    const toRow = table.getRowModel().rows[toIndex]
-    toRow && moveTask(fromRow.original, toRow.original)
+    const toIndex = isUp ? fromIndex - 1 : fromIndex + 1
+    const toRow = viewRows[toIndex]
+    if (!toRow) return
+    moveTask(fromRow.original, toRow.original)
   }
 
   // 選択行の表示順を1ステップ変更
@@ -305,7 +304,7 @@ export function TodoTable({
     }
 
     const nextSelectedRow = viewRows[nextSelectIndex]
-    nextSelectedRow && nextSelectedRow.toggleSelected(true)
+    nextSelectedRow?.toggleSelected(true)
   }
 
   // タスクのステータス変更APIの呼び出し
@@ -323,9 +322,9 @@ export function TodoTable({
   // 選択行のステータスを変更
   function updateSelectedTaskStatus(status: TaskStatus) {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
-    if (nowSelectedRow?.original.status === status) return
+    if (!nowSelectedRow || nowSelectedRow.original.status === status) return
     const updateTask = { ...nowSelectedRow.original, status }
-    nowSelectedRow && updateTaskStatusApi(updateTask)
+    updateTaskStatusApi(updateTask)
   }
 
   // 選択行を編集
@@ -341,34 +340,27 @@ export function TodoTable({
   }
 
   // キーボードショートカット
-  useHotkeys<HTMLTableElement>(
+  useHotkeys(
     [
       'up',
       'down',
-      'mod+up',
       'alt+up',
-      'mod+down',
       'alt+down',
       'enter',
-      'mod+enter',
       'alt+enter',
-      'mod+delete',
       'alt+delete',
-      'mod+backspace',
       'alt+backspace',
     ],
     (_, handler) => {
-      // ローディング中、ダイアログが開いている場合は何もしない
-      if (isLoading || isOpenAddDialog || isOpenDeleteDialog) return
       switch (handler.keys?.join('')) {
         case 'up':
         case 'down':
-          handler.mod || handler.alt
+          handler.alt
             ? moveSelectedTaskOneStep(handler.keys.includes('up'))
             : changeSelectedRowOneStep(handler.keys.includes('up'))
           break
         case 'enter':
-          handler.mod || handler.alt
+          handler.alt
             ? updateSelectedTaskStatus(TaskStatus.DONE)
             : showSelectedTaskEdit()
           break
@@ -381,27 +373,16 @@ export function TodoTable({
     {
       preventDefault: true,
       ignoreEventWhen: (e) => {
-        const pressedKeys = e.key.toLowerCase()
         const target = e.target as HTMLElement
-        switch (pressedKeys) {
-          case 'enter':
-            return !['tr', 'body'].includes(target.tagName.toLowerCase())
-          case 'arrowup':
-          case 'arrowdown':
-            return !['tr', 'tbody', 'body'].includes(
-              target.tagName.toLowerCase(),
-            )
-          default:
-            return false
-        }
+        return !['tr', 'body'].includes(target.tagName.toLowerCase())
       },
     },
   )
 
   // タスク追加ダイアログを開く
-  useHotkeys(['mod+i', 'alt+i'], () => {
+  useHotkeys(['alt+i'], () => {
     // ローディング中、ダイアログが開いている場合は何もしない
-    if (isLoading || isOpenAddDialog || isOpenDeleteDialog) return
+    if (isLoading || isOpenAddDialog || isOpenDeleteDialog || showId) return
     openAddTaskDialog()
   })
 
@@ -413,11 +394,11 @@ export function TodoTable({
           className="h-8 px-2 lg:px-3"
           onClick={() => openAddTaskDialog()}
         >
-          <RxPlus className="mr-2" />
+          <RiAddLine className="mr-2" />
           {t('common.message.add')}
-          <p className="text-[10px] text-muted-foreground ml-2">
-            <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 text-muted-foreground">
-              <span className="text-xs">⌘</span>i
+          <p className="text-xs text-muted-foreground ml-2">
+            <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
+              <span>⌥</span>i
             </kbd>
           </p>
         </Button>
@@ -462,11 +443,7 @@ export function TodoTable({
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody
-              ref={useTBodyRef}
-              // tabIndex={0}
-              // className="focus:outline-none"
-            >
+            <TableBody ref={useTBodyRef}>
               <SortableContext
                 items={tableData}
                 strategy={verticalListSortingStrategy}

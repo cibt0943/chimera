@@ -56,7 +56,9 @@
       "clear_filters": "Clear Filters",
       "position_up": "Move Up",
       "position_down": "Move Down",
-      "settings": "Settings"
+      "settings": "Settings",
+      "state_saved": "Saved",
+      "state_saving": "Saving..."
     }
   },
   "account": {
@@ -109,7 +111,7 @@
       "task_deletion": "Task Deletion",
       "set_task_info": "Set the task information.",
       "select_task_status": "Select the task status",
-      "title_filter": "Filter tasks...",
+      "title_search": "Search tasks...",
       "status_filter": "Status",
       "to_complete": "Complete",
       "view_settings": "View",
@@ -137,11 +139,19 @@
       "memo_editing": "Memo Editing",
       "memo_deletion": "Memo Deletion",
       "set_memo_info": "Set the memo information.",
-      "title_filter": "Filter memos...",
+      "title_search": "Search memos...",
       "show_archived": "Show Archived",
       "first_line_is_title": "The first line is the title.",
       "to_archive": "Archive",
       "un_archive": "Unarchive"
+    }
+  },
+  "memo_settings": {
+    "title": "Settings",
+    "message": {
+      "list_show_archived": "Show Archived Items in List",
+      "list_show_content": "Show Content Preview in List",
+      "auto_save": "Auto Save for Edits"
     }
   }
 }

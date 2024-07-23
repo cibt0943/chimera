@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { RxMixerHorizontal } from 'react-icons/rx'
+import { RiEqualizerLine } from 'react-icons/ri'
 import { Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import {
@@ -27,7 +27,7 @@ export function TodoTableViewOptions<TData>({
           size="sm"
           className="ml-auto hidden h-8 lg:flex"
         >
-          <RxMixerHorizontal className="mr-2 h-4 w-4" />
+          <RiEqualizerLine className="mr-2 h-4 w-4" />
           {t('task.message.view_settings')}
         </Button>
       </DropdownMenuTrigger>
@@ -38,10 +38,7 @@ export function TodoTableViewOptions<TData>({
         <DropdownMenuSeparator />
         {table
           .getAllColumns()
-          .filter(
-            (column) =>
-              typeof column.accessorFn !== 'undefined' && column.getCanHide(),
-          )
+          .filter((column) => typeof column.accessorFn !== 'undefined')
           .map((column) => {
             return (
               <DropdownMenuCheckboxItem
@@ -49,6 +46,7 @@ export function TodoTableViewOptions<TData>({
                 className="capitalize"
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                disabled={!column.getCanHide()}
               >
                 {t(`task.model.${column.id}`)}
               </DropdownMenuCheckboxItem>

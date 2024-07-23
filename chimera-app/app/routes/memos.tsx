@@ -1,32 +1,29 @@
+import * as React from 'react'
 import type { MetaFunction } from '@remix-run/node'
-import { json, redirect } from '@remix-run/node'
-import { useLoaderData, Outlet, useParams } from '@remix-run/react'
-import { toDate } from 'date-fns'
+import { redirect } from '@remix-run/node'
+import { Outlet, useParams } from '@remix-run/react'
+import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { getStatusFilterFromParams, getSearchParams } from '~/lib/memo.server'
-import {
-  Memo,
-  MemoModels,
-  MemoModel2Memo,
-  MemoSchema,
-  MemoStatus,
-} from '~/types/memos'
+import { Memos, MemoSchema, MemoStatus } from '~/types/memos'
+import { MemoSettings } from '~/types/memo-settings'
 import { getMemos, insertMemo } from '~/models/memo.server'
+import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
 import { ErrorView } from '~/components/lib/error-view'
 import { MemoList } from '~/components/memo/memo-list'
-
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from '~/components/ui/resizable'
+import { useSetAtom } from 'jotai'
+import { memoSettingsAtom } from '~/lib/state'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Memos | Kobushi' }]
 }
 
-export const action = withAuthentication(async ({ request, account }) => {
+export const action = withAuthentication(async ({ request, loginSession }) => {
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: MemoSchema })
   // submission が成功しなかった場合、クライアントに送信結果を報告します。
@@ -39,36 +36,42 @@ export const action = withAuthentication(async ({ request, account }) => {
 
   const [title, ...content] = (data.content || '').split('\n')
   const newMemo = await insertMemo({
-    account_id: account.id,
+    account_id: loginSession.account.id,
     title: title,
     content: content.join('\n'),
-    status: data.status || MemoStatus.NOMAL,
+    status: MemoStatus.NOMAL,
     related_date: data.related_date?.toISOString() || null,
   })
 
-  return redirect(`/memos/${newMemo.id}?${getSearchParams(request)}`)
+  return redirect(`/memos/${newMemo.id}`)
 })
 
 type LoaderData = {
-  memoModels: MemoModels
-  loadDate: string
+  memos: Memos
+  memoSettings: MemoSettings
 }
 
-export const loader = withAuthentication(async ({ request, account }) => {
-  const statuses = getStatusFilterFromParams(request)
-  const memoModels = await getMemos(account.id, statuses)
+export const loader = withAuthentication(async ({ loginSession }) => {
+  const memoSettings = await getOrInsertMemoSettings(loginSession.account.id)
+  const memos = await getMemos(
+    loginSession.account.id,
+    memoSettings.list_filter.statuses,
+  )
 
-  return json({
-    memoModels,
-    loadDate: new Date().toISOString(),
+  return typedjson({
+    memos,
+    memoSettings,
   })
 })
 
 export default function Layout() {
-  const { memoModels, loadDate } = useLoaderData<LoaderData>()
-  const loadMemos = memoModels.map<Memo>((value) => {
-    return MemoModel2Memo(value)
-  })
+  const { memos, memoSettings } = useTypedLoaderData<LoaderData>()
+
+  // ログインユーザーのアカウント情報をグローバルステートに保存
+  const setMemoSettings = useSetAtom(memoSettingsAtom)
+  React.useEffect(() => {
+    setMemoSettings(memoSettings)
+  }, [setMemoSettings, memoSettings])
 
   const params = useParams()
   const { memoId } = params
@@ -76,12 +79,8 @@ export default function Layout() {
   return (
     <div className="p-4 h-screen">
       <ResizablePanelGroup direction="horizontal" className="border rounded-lg">
-        <ResizablePanel defaultSize={30}>
-          <MemoList
-            defaultMemos={loadMemos}
-            showId={memoId || ''}
-            memosLoadDate={toDate(loadDate)}
-          />
+        <ResizablePanel defaultSize={35}>
+          <MemoList defaultMemos={memos} showId={memoId || ''} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={70}>

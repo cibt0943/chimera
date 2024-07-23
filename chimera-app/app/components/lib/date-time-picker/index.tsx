@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { RxCalendar, RxCross2 } from 'react-icons/rx'
+import { RiCloseLine } from 'react-icons/ri'
+import { RxCalendar } from 'react-icons/rx'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { cn, getLocale } from '~/lib/utils'
@@ -48,7 +49,7 @@ export function DateTimePicker({
           </Button>
         </PopoverTrigger>
         <PopoverTrigger asChild>
-          <div className="grow pl-3 cursor-pointer">
+          <div className="grow pl-2 cursor-pointer text-sm">
             {value ? (
               format(value, t('common.format.date_time_format'))
             ) : (
@@ -86,7 +87,7 @@ export function DateTimePicker({
           size="icon"
           onClick={() => handleChange(undefined)}
         >
-          <RxCross2 className="h-4 w-4 text-primary/30" />
+          <RiCloseLine className="h-4 w-4 text-primary/30" />
         </Button>
       )}
     </div>
