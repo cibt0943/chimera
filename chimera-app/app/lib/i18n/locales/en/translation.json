@@ -56,7 +56,9 @@
       "clear_filters": "Clear Filters",
       "position_up": "Move Up",
       "position_down": "Move Down",
-      "settings": "Settings"
+      "settings": "Settings",
+      "state_saved": "Saved",
+      "state_saving": "Saving..."
     }
   },
   "account": {

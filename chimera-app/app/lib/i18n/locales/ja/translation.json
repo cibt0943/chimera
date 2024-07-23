@@ -56,7 +56,9 @@
       "clear_filters": "フィルタをクリア",
       "position_up": "一つ上に移動",
       "position_down": "一つ下に移動",
-      "settings": "設定"
+      "settings": "設定",
+      "state_saved": "保存済み",
+      "state_saving": "保存中..."
     }
   },
   "account": {

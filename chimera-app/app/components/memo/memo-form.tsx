@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form, useFetcher } from '@remix-run/react'
+import { useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import {
   RiDeleteBinLine,
@@ -17,9 +17,12 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip'
 import { FormItem, FormMessage, FormDescription } from '~/components/lib/form'
+import { useDebounce, useQueue } from '~/lib/utils'
 import { Memo, MemoSchema, MemoSchemaType, MemoStatus } from '~/types/memos'
 import { MemoRelatedDateTimePicker } from './memo-related-date-time-picker'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
+import { useAtomValue } from 'jotai'
+import { memoSettingsAtom } from '~/lib/state'
 
 interface MemoFormProps {
   memo: Memo | undefined
@@ -27,6 +30,28 @@ interface MemoFormProps {
 
 export function MemoForm({ memo }: MemoFormProps) {
   const { t } = useTranslation()
+  const { enqueue } = useQueue()
+  const fetcher = useFetcher({ key: 'memo-form' })
+  const formRef = React.useRef<HTMLFormElement>(null)
+
+  const memoSettings = useAtomValue(memoSettingsAtom)
+
+  // memoの状態を変更して保存したかどうか（自動保存のために利用）
+  const [isChangedMemo, setIsChangedMemo] = React.useState(false)
+  React.useEffect(() => {
+    setIsChangedMemo(false)
+  }, [memo?.id])
+
+  // 自動保存の状態を保持(OFF→ONの切り替え時に自動保存を実行する)
+  const [isChangeAutoSave, setIsChangeAutoSave] = React.useState(
+    memoSettings?.auto_save,
+  )
+  React.useEffect(() => {
+    if (!isChangeAutoSave && memoSettings?.auto_save) {
+      saveMemoApi()
+    }
+    setIsChangeAutoSave(memoSettings?.auto_save)
+  }, [memoSettings?.auto_save])
 
   const action = memo ? `/memos/${memo.id}` : `/memos`
 
@@ -37,7 +62,6 @@ export function MemoForm({ memo }: MemoFormProps) {
         : '',
     related_date: memo ? memo.related_date : null,
   }
-
   const [form, fields] = useForm<MemoSchemaType>({
     id: `memo-form${memo ? `-${memo.id}` : ''}`,
     defaultValue: defaultValue,
@@ -47,13 +71,37 @@ export function MemoForm({ memo }: MemoFormProps) {
     },
   })
 
+  // メモを保存するAPI
+  async function saveMemoApi() {
+    fetcher.submit(formRef.current, {
+      action: action,
+      method: 'post',
+    })
+
+    setIsChangedMemo(false)
+  }
+
+  const saveMemoDebounce = useDebounce(() => {
+    enqueue(() => saveMemoApi())
+  }, 1000)
+
   return (
     <div className="m-4">
-      <Form
+      <fetcher.Form
+        ref={formRef}
         method="post"
         className="space-y-6"
         {...getFormProps(form)}
         action={action}
+        onChange={() => {
+          setIsChangedMemo(true)
+          if (!memoSettings?.auto_save) return
+          saveMemoDebounce()
+        }}
+        onSubmit={(event) => {
+          event.preventDefault()
+          saveMemoApi()
+        }}
       >
         <FormItem>
           <FormDescription>
@@ -74,15 +122,18 @@ export function MemoForm({ memo }: MemoFormProps) {
               <MemoRelatedDateTimePicker
                 meta={fields.related_date}
                 divProps={{ className: 'w-64' }}
+                onChange={() => {
+                  setIsChangedMemo(true)
+                  if (!memoSettings?.auto_save) return
+                  saveMemoDebounce()
+                }}
               />
               <FormMessage message={fields.related_date.errors} />
             </FormItem>
-            <Button type="submit" className="w-32">
-              {t('common.message.save')}
-            </Button>
+            <SaveButton isChangedMemo={isChangedMemo} />
           </div>
         </div>
-      </Form>
+      </fetcher.Form>
     </div>
   )
 }
@@ -153,5 +204,37 @@ function ActionButtons({ memo }: { memo: Memo | undefined }) {
         setIsOpen={setIsOpenDeleteDialog}
       />
     </div>
+  )
+}
+
+function SaveButton({ isChangedMemo }: { isChangedMemo: boolean }) {
+  const { t } = useTranslation()
+  const fetcher = useFetcher({ key: 'memo-form' })
+  const memoSettings = useAtomValue(memoSettingsAtom)
+
+  const isDisabled = memoSettings?.auto_save
+    ? true
+    : isChangedMemo
+      ? false
+      : true
+
+  let caption = t('common.message.save')
+  switch (fetcher.state) {
+    case 'submitting':
+      caption = t('common.message.state_saving')
+      break
+    default:
+      caption = memoSettings?.auto_save
+        ? isChangedMemo
+          ? t('common.message.state_saving')
+          : t('common.message.state_saved')
+        : t('common.message.save')
+      break
+  }
+
+  return (
+    <Button type="submit" className="w-32" disabled={isDisabled}>
+      {caption}
+    </Button>
   )
 }
