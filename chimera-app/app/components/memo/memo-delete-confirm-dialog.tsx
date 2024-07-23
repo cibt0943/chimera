@@ -35,8 +35,9 @@ export function MemoDeleteConfirmDialog({
       <Form
         action={`/memos/${memo.id}/delete`}
         method="delete"
-        onSubmit={() => {
+        onSubmit={(event) => {
           setIsOpen(false)
+          event.stopPropagation()
         }}
       >
         <Button type="submit" variant="destructive">

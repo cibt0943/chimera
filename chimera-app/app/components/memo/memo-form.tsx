@@ -47,7 +47,7 @@ export function MemoForm({ memo }: MemoFormProps) {
     memoSettings?.auto_save,
   )
   React.useEffect(() => {
-    if (!isChangeAutoSave && memoSettings?.auto_save) {
+    if (memo && !isChangeAutoSave && memoSettings?.auto_save) {
       saveMemoApi()
     }
     setIsChangeAutoSave(memoSettings?.auto_save)
