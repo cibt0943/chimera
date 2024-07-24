@@ -1,8 +1,10 @@
-# Kobushi is a Service with 5 functions
+## Kobushi is a Service with 5 functions
 
-We assume the following 5 functions.
+### プロダクトへのリンク
 
-## Todo
+このプロダクトは、[Kobushi](https://kobushi.fly.dev)で使用できます。
+
+### Todo
 
 - [x] ↑↓ キーで選択行を移動
 - [x] Option + ↑↓ キーで選択行の表示順移動
@@ -10,8 +12,7 @@ We assume the following 5 functions.
 - [x] Option + return キーで選択行の状態を完了
 - [x] Option + delete キーで選択行を削除
 
-
-## Memo
+### Memo
 
 - [x] ↑↓ キーでフォーカス行を移動
 - [x] Option + ↑↓ キーで選択行の表示順移動
@@ -22,25 +23,25 @@ We assume the following 5 functions.
 - [x] Option + → キーでメモ詳細のテキストエリアへフォーカス移動
 - [ ] メモには日付情報を持つ。デフォルトは作成日で変更可能
 - [ ] 日付情報で、カレンダーに表示
-- [ ] パブリックURLを作成したメモはログインしないで共同編集可能（リアルタイム編集にしようかな）
+- [ ] パブリック URL を作成したメモはログインしないで共同編集可能（リアルタイム編集にしようかな）
 - [ ] Undo Redo
 
-## Event
+### Event
 
 - カレンダーに Todo を表示
 - カレンダーに Memo を表示
 - カレンダーから Todo を作成
 
-## File
+### File
 
 何作るか決めてない  
 ストレージ機能は作らない
 
-## Reminder
+### Reminder
 
 携帯に Push 通知
 
-## Account
+### Account
 
 - [x] ダークモード
 - [x] 多言語対応
