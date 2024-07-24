@@ -9,7 +9,6 @@ import {
   getSelectProps,
 } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
-// import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import {
   Dialog,
@@ -35,7 +34,6 @@ import {
   FormMessage,
   FormDescription,
 } from '~/components/lib/form'
-import { TaskDueDateTimePicker } from './task-due-date-time-picker'
 import {
   Task,
   TaskStatus,
@@ -43,8 +41,9 @@ import {
   TaskSchemaType,
   TaskStatusListByDispOrder,
 } from '~/types/tasks'
+import { TaskDueDateTimePicker } from './task-due-date-time-picker'
 
-interface TaskFormDialogProps {
+export interface TaskFormDialogProps {
   task: Task | undefined
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -72,7 +71,7 @@ export function TaskFormDialog({
   }
 
   const [form, fields] = useForm<TaskSchemaType>({
-    id: `task-from${task ? `-${task.id}` : ''}`,
+    id: `task-form${task ? `-${task.id}` : ''}`,
     defaultValue: defaultValue,
     constraint: getZodConstraint(TaskSchema),
     onValidate: ({ formData }) => {

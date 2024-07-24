@@ -1,4 +1,6 @@
+import { toDate } from 'date-fns'
 import * as zod from 'zod'
+import type { Database } from '~/types/schema'
 
 export const Language = {
   AUTO: 'auto',
@@ -28,76 +30,57 @@ export const ThemeList = [
   { value: Theme.DARK, label: 'account.model.theme_list.dark' },
 ]
 
-export type AccountModel = {
-  id: number
-  sub: string
-  language: string
-  timezone: string
-  theme: string
-  created_at: string
-  updated_at: string
-}
+// DBのアカウントテーブルの型
+export type AccountModel = Database['public']['Tables']['accounts']['Row']
 
+// アカウントの型
 export type Account = {
-  id: number
+  id: string
+  created_at: Date
+  updated_at: Date
   sub: string
-  name: string
-  email: string
-  email_verified: boolean
-  picture: string
-  language: string
+  language: Language
   timezone: string
-  theme: string
-  created_at: string
-  updated_at: string
+  theme: Theme
 }
 
-export type Auth0User = {
-  sub: string
-  // nickname: string
-  name: string
-  email: string
-  email_verified: boolean
-  picture: string
-  updated_at: string
-}
-
-// Auth0のユーザー情報とDBのアカウント情報をマージしてAccountオブジェクトを生成
-export function Auth0UserAndAccountModel2Account(
-  auth0User: Auth0User,
-  accountModel: AccountModel,
-): Account {
+// 既存のAccountオブジェクトに対してDBのアカウント情報をマージ
+export function AccountModel2Account(accountModel: AccountModel): Account {
   return {
     id: accountModel.id,
+    created_at: toDate(accountModel.created_at),
+    updated_at: toDate(accountModel.updated_at),
     sub: accountModel.sub,
-    name: auth0User.name,
-    email: auth0User.email,
-    email_verified: auth0User.email_verified,
-    picture: auth0User.picture,
-    language: accountModel.language,
+    language: accountModel.language as Language,
     timezone: accountModel.timezone,
-    theme: accountModel.theme,
-    created_at: accountModel.created_at,
-    updated_at:
-      accountModel.updated_at > auth0User.updated_at
-        ? accountModel.updated_at
-        : auth0User.updated_at,
+    theme: accountModel.theme as Theme,
   }
 }
 
-export function Account2AccountModel(account: Account): AccountModel {
-  return {
-    id: account.id,
-    sub: account.sub,
-    language: account.language,
-    timezone: account.timezone,
-    theme: account.theme,
-    created_at: account.created_at,
-    updated_at: account.updated_at,
-  }
+// Auth0ユーザーの型
+export type Auth0User = {
+  updated_at: string
+  sub: string
+  name: string
+  email: string
+  email_verified: boolean
+  picture: string
 }
 
-export const AccountSchema = zod.object({
+// ログインセッションの型
+export type LoginSession = {
+  auth0User: Auth0User
+  account: Account
+}
+
+// アカウント設定の型
+export type AccountSettings = {
+  name: string
+  language: Language
+  theme: Theme
+}
+
+export const AccountSettingsSchema = zod.object({
   name: zod
     .string({ required_error: '必須項目です' })
     .max(255, { message: '255文字以内で入力してください' }),
@@ -109,4 +92,4 @@ export const AccountSchema = zod.object({
   }),
 })
 
-export type AccountSchemaType = zod.infer<typeof AccountSchema>
+export type AccountSettingsSchemaType = zod.infer<typeof AccountSettingsSchema>

@@ -1,8 +1,8 @@
-import { TaskModel, TaskModels } from '~/types/tasks'
+import { Tasks, Task, TaskModel, TaskModel2Task } from '~/types/tasks'
 import { supabase } from '~/lib/supabase-client.server'
 
 // タスク一覧を取得
-export async function getTasks(account_id: number): Promise<TaskModels> {
+export async function getTasks(account_id: string): Promise<Tasks> {
   const { data, error } = await supabase
     .from('tasks')
     .select()
@@ -11,11 +11,15 @@ export async function getTasks(account_id: number): Promise<TaskModels> {
     .order('id')
   if (error) throw error
 
-  return data || []
+  const tasks = data.map((task) => {
+    return TaskModel2Task(task)
+  })
+
+  return tasks
 }
 
 // タスクを取得
-export async function getTask(taskId: number): Promise<TaskModel> {
+export async function getTask(taskId: string): Promise<Task> {
   const { data, error } = await supabase
     .from('tasks')
     .select()
@@ -23,19 +27,19 @@ export async function getTask(taskId: number): Promise<TaskModel> {
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return data
+  return TaskModel2Task(data)
 }
 
 // タスク情報の追加
 interface insertTaskProps {
+  account_id: string
   title: string
   memo: string
   status: number
   due_date: string | null
-  account_id: number
 }
 
-export async function insertTask(task: insertTaskProps): Promise<TaskModel> {
+export async function insertTask(task: insertTaskProps): Promise<Task> {
   const { data: maxTask, error: errorMaxTask } = await supabase
     .from('tasks')
     .select()
@@ -53,27 +57,25 @@ export async function insertTask(task: insertTaskProps): Promise<TaskModel> {
     .single()
   if (errorNewTask || !newTask) throw errorNewTask || new Error('erorr')
 
-  return newTask
+  return TaskModel2Task(newTask)
 }
 
+// タスク情報の更新
 interface updateTaskProps {
-  id: number
+  id: string
+  updated_at?: string
   position?: number
   title?: string
   memo?: string
   status?: number
   due_date?: string | null
-  account_id?: number
-  updated_at?: string
 }
 
 export async function updateTask(
   task: updateTaskProps,
   noUpdated = false,
-): Promise<TaskModel> {
-  if (!noUpdated) {
-    task.updated_at = new Date().toISOString()
-  }
+): Promise<Task> {
+  if (!noUpdated) task.updated_at = new Date().toISOString()
 
   const { data, error } = await supabase
     .from('tasks')
@@ -83,10 +85,10 @@ export async function updateTask(
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return data
+  return TaskModel2Task(data)
 }
 
-export async function deleteTask(taskId: number): Promise<void> {
+export async function deleteTask(taskId: string): Promise<void> {
   const { error } = await supabase.from('tasks').delete().eq('id', taskId)
   if (error) throw error
 }
@@ -95,9 +97,9 @@ export async function deleteTask(taskId: number): Promise<void> {
 // taskIdにて指定されたタスクの位置をpositionに変更します。
 // この変更による他のタスクの位置の変更もあわせて行います。
 export async function updateTaskPosition(
-  taskId: number,
+  taskId: string,
   position: number,
-): Promise<TaskModel> {
+): Promise<Task> {
   const fromTask = await getTask(taskId)
 
   const isUp = fromTask.position < position

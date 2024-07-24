@@ -2,9 +2,13 @@
   "common": {
     "format": {
       "date_format": "MM/dd/yyyy",
+      "date_short_format": "MM/dd",
       "time_format": "HH:mm:ss",
-      "datetime_format": "MM/dd/yyyy HH:mm:ss",
-      "datetime_short_format": "MM/dd/yyyy HH:mm",
+      "time_short_format": "HH:mm",
+      "date_time_format": "MM/dd/yyyy HH:mm:ss",
+      "date_short_time_short_format": "MM/dd HH:mm",
+      "date_time_short_format": "MM/dd/yyyy HH:mm",
+      "date_short_time_format": "MM/dd HH:mm:ss",
       "hour": "hour",
       "o'clock": "o'clock",
       "minute": "minute",
@@ -52,7 +56,10 @@
       "clear_filters": "Clear Filters",
       "position_up": "Move Up",
       "position_down": "Move Down",
-      "settings": "Settings"
+      "settings": "Settings",
+      "state_save_wait": "Waiting to Save...",
+      "state_saved": "Saved",
+      "state_saving": "Saving..."
     }
   },
   "account": {
@@ -89,13 +96,13 @@
       "id": "ID",
       "title": "Title",
       "memo": "Memo",
-      "status": "Status",
       "due_date": "Due date",
       "position": "Position",
+      "status": "Status",
       "status_list": {
         "new": "New",
-        "done": "Done",
-        "doing": "Doing",
+        "done": "Completed",
+        "doing": "Progress",
         "pending": "Pending"
       }
     },
@@ -105,11 +112,50 @@
       "task_deletion": "Task Deletion",
       "set_task_info": "Set the task information.",
       "select_task_status": "Select the task status",
-      "title_filter": "Filter tasks...",
+      "title_search": "Search tasks...",
       "status_filter": "Status",
-      "to_complete": "Complete",
+      "to_new": "Set to New",
+      "to_doing": "Set to In Progress",
+      "to_done": "Set to Completed",
+      "to_pending": "Set to Pending",
       "view_settings": "View",
       "select_columns": "Select Columns"
+    }
+  },
+  "memo": {
+    "title": "Memo",
+    "un_titled": "Untitled",
+    "model": {
+      "id": "ID",
+      "title": "Title",
+      "content": "Content",
+      "related_date": "Related date",
+      "position": "Position",
+      "status": "Status",
+      "status_list": {
+        "nomal": "",
+        "archive": "Archive"
+      }
+    },
+
+    "message": {
+      "memo_creation": "Memo Creation",
+      "memo_editing": "Memo Editing",
+      "memo_deletion": "Memo Deletion",
+      "set_memo_info": "Set the memo information.",
+      "title_search": "Search memos...",
+      "show_archived": "Show Archived",
+      "first_line_is_title": "The first line is the title.",
+      "to_archive": "Archive",
+      "un_archive": "Unarchive"
+    }
+  },
+  "memo_settings": {
+    "title": "Settings",
+    "message": {
+      "list_show_archived": "Show Archived Items in List",
+      "list_show_content": "Show Content Preview in List",
+      "auto_save": "Auto Save for Edits"
     }
   }
 }

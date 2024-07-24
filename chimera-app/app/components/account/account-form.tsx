@@ -1,12 +1,11 @@
-import * as React from 'react'
 import { Form } from '@remix-run/react'
+import { useTranslation } from 'react-i18next'
 import {
   useForm,
   getFormProps,
   getInputProps,
   getSelectProps,
 } from '@conform-to/react'
-import { useTranslation } from 'react-i18next'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
 import { Required } from '~/components/lib/required'
@@ -20,14 +19,14 @@ import {
 } from '~/components/ui/select'
 import { FormItem, FormLabel, FormMessage } from '~/components/lib/form'
 import {
-  Account,
-  AccountSchema,
-  AccountSchemaType,
+  AccountSettings,
+  AccountSettingsSchema,
+  AccountSettingsSchemaType,
   LanguageList,
   ThemeList,
 } from '~/types/accounts'
 
-const SelectLanguageItems = React.memo(() => {
+function SelectLanguageItems() {
   const { t } = useTranslation()
   return (
     <>
@@ -38,10 +37,9 @@ const SelectLanguageItems = React.memo(() => {
       ))}
     </>
   )
-})
-SelectLanguageItems.displayName = 'SelectLanguageItems'
+}
 
-const SelectThemeItems = React.memo(() => {
+function SelectThemeItems() {
   const { t } = useTranslation()
   return (
     <>
@@ -52,28 +50,33 @@ const SelectThemeItems = React.memo(() => {
       ))}
     </>
   )
-})
-SelectThemeItems.displayName = 'SelectThemeItems'
-
-interface AccountFormProps {
-  account: Account
 }
 
-export function AccountForm({ account }: AccountFormProps) {
-  const { t } = useTranslation()
-  const defaultValue = account
+interface AccountFormProps {
+  accountSettings: AccountSettings
+}
 
-  const [form, fields] = useForm<AccountSchemaType>({
+export function AccountForm({ accountSettings }: AccountFormProps) {
+  const { t } = useTranslation()
+  const defaultValue = accountSettings
+
+  const [form, fields] = useForm<AccountSettingsSchemaType>({
     id: 'account-form',
     defaultValue: defaultValue,
-    constraint: getZodConstraint(AccountSchema),
+    constraint: getZodConstraint(AccountSettingsSchema),
     onValidate: ({ formData }) => {
-      return parseWithZod(formData, { schema: AccountSchema })
+      return parseWithZod(formData, { schema: AccountSettingsSchema })
     },
   })
 
   return (
-    <Form method="post" {...getFormProps(form)} className="space-y-6" action="">
+    <Form
+      method="post"
+      {...getFormProps(form)}
+      className="space-y-6"
+      action=""
+      state={{ isLoadEffect: true }}
+    >
       <FormItem>
         <FormLabel htmlFor={fields.name.id}>
           {t('account.model.name')}

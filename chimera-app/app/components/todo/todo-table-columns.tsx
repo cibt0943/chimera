@@ -1,16 +1,17 @@
+import { NavLink } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { ColumnDef, Column, Row } from '@tanstack/react-table'
 import { useSortable } from '@dnd-kit/sortable'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
-
 import { Task, TaskStatusList } from '~/types/tasks'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
+import { ClientOnly } from 'remix-utils/client-only'
 
 // Cell Component
-function RowDragHandleCell({ rowId }: { rowId: number }) {
+function RowDragHandleCell({ rowId }: { rowId: string }) {
   const { attributes, listeners } = useSortable({
     id: rowId,
   })
@@ -37,7 +38,13 @@ function DueDateCell({ row }: { row: Row<Task> }) {
   const { t } = useTranslation()
   const dateStr = row.original.due_date
   return dateStr ? (
-    <span>{format(dateStr, t('common.format.datetime_short_format'))}</span>
+    <ClientOnly>
+      {() => (
+        <span>
+          {format(dateStr, t('common.format.date_time_short_format'))}
+        </span>
+      )}
+    </ClientOnly>
   ) : (
     ''
   )
@@ -52,26 +59,31 @@ function StatusCell({ row }: { row: Row<Task> }) {
 export const TodoTableColumns: ColumnDef<Task>[] = [
   {
     id: 'drag-handle',
+    size: 40,
     header: '',
     cell: ({ row }) => <RowDragHandleCell rowId={row.original.id} />,
-    size: 40,
   },
-  {
-    accessorKey: 'id',
-    size: 65,
-    header: ({ column }) => {
-      return ColumnHeader({ column, title: 'task.model.id' })
-    },
-    cell: ({ row }) => <span className="">{row.original.id}</span>,
-  },
+  // {
+  //   accessorKey: 'id',
+  //   size: 65,
+  //   header: ({ column }) => {
+  //     return ColumnHeader({ column, title: 'task.model.id' })
+  //   },
+  //   cell: ({ row }) => <span className="">{row.original.id}</span>,
+  // },
   {
     accessorKey: 'title',
     size: undefined,
+    enableHiding: false,
     header: ({ column }) => {
       return ColumnHeader({ column, title: 'task.model.title' })
     },
     cell: ({ row }) => {
-      return <span className="truncate font-medium">{row.original.title}</span>
+      return (
+        <NavLink to={`/todos/${row.id}`} className="truncate font-medium">
+          {row.original.title}
+        </NavLink>
+      )
     },
   },
   {
@@ -95,7 +107,7 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
   },
   {
     id: 'actions',
-    size: 80,
+    size: 60,
     cell: ({ row, table }) => <TodoTableRowActions row={row} table={table} />,
   },
 ]

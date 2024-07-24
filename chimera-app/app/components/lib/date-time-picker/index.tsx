@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { RxCalendar, RxCross2 } from 'react-icons/rx'
+import { RiCloseLine } from 'react-icons/ri'
+import { RxCalendar } from 'react-icons/rx'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import { cn } from '~/lib/utils'
+import { cn, getLocale } from '~/lib/utils'
 import { Button } from '~/components/ui/button'
 import { Calendar } from '~/components/ui/calendar'
 import {
@@ -16,33 +17,31 @@ type DateTimePickerProps = {
   value: Date | undefined
   handleChange: (date: Date | undefined) => void
   triggerId?: string
-}
-
-// date-fnsのlocaleを動的に読み込む
-async function getLocale(locale: string) {
-  const locales = await import('date-fns/locale')
-  return locales[locale]
+  placeholder?: string
+  divProps?: React.ComponentProps<'div'>
 }
 
 export function DateTimePicker({
   value,
   handleChange,
   triggerId,
+  placeholder,
+  divProps,
 }: DateTimePickerProps) {
   const { t, i18n } = useTranslation()
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
-  const [locale, setLocale] = React.useState(undefined)
-
-  React.useEffect(() => {
-    getLocale(i18n.language).then(setLocale)
-  }, [i18n.language])
-
+  const locale = getLocale(i18n.language)
   const setDate = (date: Date | undefined) => {
     handleChange(date)
   }
 
+  const { className, ...props } = divProps || {}
+
   return (
-    <div className={cn('flex items-center rounded-md border')}>
+    <div
+      className={cn('flex items-center rounded-md border', className)}
+      {...props}
+    >
       <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
         <PopoverTrigger asChild>
           <Button variant="ghost" size="icon" id={triggerId}>
@@ -50,11 +49,11 @@ export function DateTimePicker({
           </Button>
         </PopoverTrigger>
         <PopoverTrigger asChild>
-          <div className="grow pl-3 cursor-pointer">
+          <div className="grow pl-2 cursor-pointer text-sm">
             {value ? (
-              format(value, t('common.format.datetime_format'))
+              format(value, t('common.format.date_time_format'))
             ) : (
-              <span className="opacity-50">Pick a date</span>
+              <span className="opacity-50">{placeholder || 'Pick a date'}</span>
             )}
           </div>
         </PopoverTrigger>
@@ -88,7 +87,7 @@ export function DateTimePicker({
           size="icon"
           onClick={() => handleChange(undefined)}
         >
-          <RxCross2 className={cn('h-4 w-4 text-primary/30')} />
+          <RiCloseLine className="h-4 w-4 text-primary/30" />
         </Button>
       )}
     </div>

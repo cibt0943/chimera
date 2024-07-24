@@ -6,22 +6,22 @@ import {
   redirect,
 } from '@remix-run/node'
 import { authenticator } from '~/lib/auth.server'
-import { Account } from '~/types/accounts'
+import { LoginSession } from '~/types/accounts'
 
-// 認証状態を検証し、未認証の場合は/loginへリダイレクト、認証済の場合はアカウント情報を取得する
+// 認証状態を検証し、未認証の場合は/loginへリダイレクト、認証済の場合はアカウント情報を取得
 export async function MyAuthenticated(request: Request) {
-  const account = await authenticator.isAuthenticated(request)
-  if (!account) throw redirect('/login')
+  const loginSession = await authenticator.isAuthenticated(request)
+  if (!loginSession) throw redirect('/login')
 
-  return account
+  return loginSession
 }
 
 export function withAuthentication<
   T extends LoaderFunction | ActionFunction,
   U extends LoaderFunctionArgs | ActionFunctionArgs,
->(handler: (args: U & { account: Account }) => ReturnType<T>) {
+>(handler: (args: U & { loginSession: LoginSession }) => ReturnType<T>) {
   return async (args: U) => {
-    const account = await MyAuthenticated(args.request)
-    return handler({ ...args, account })
+    const loginSession = await MyAuthenticated(args.request)
+    return handler({ ...args, loginSession })
   }
 }

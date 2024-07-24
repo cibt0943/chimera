@@ -1,3 +1,5 @@
+import { Auth0User } from '~/types/accounts'
+
 const apiDomain = `https://${process.env.AUTH0_DOMAIN}`
 const apiBaseUrl = `${apiDomain}/api/v2`
 
@@ -42,8 +44,39 @@ export async function getAuth0Token(): Promise<TokenResponse> {
   }
 }
 
+// Auth0ユーザーを取得
+export async function getAuth0User(sub: string) {
+  try {
+    // アクセストークンを取得
+    const tokenData = await getAuth0Token()
+
+    // ユーザーのPATCHリクエストを送信
+    const response = await fetch(`${apiBaseUrl}/users/${sub}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${tokenData.access_token}`,
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error('Error response from Auth0:', errorData)
+      throw new Error(errorData.message || 'Failed to retrieve Auth0User')
+    }
+    console.log('Auth0User retrieved successfully')
+
+    return await response.json()
+  } catch (error) {
+    console.error('Error retrieving Auth0User:', error)
+    throw error
+  }
+}
+
 // Auth0ユーザーを更新
-export async function updateAuth0User(auth0User: UpdateAuth0User) {
+export async function updateAuth0User(
+  auth0User: UpdateAuth0User,
+): Promise<Auth0User> {
   try {
     // アクセストークンを取得
     const tokenData = await getAuth0Token()
@@ -64,8 +97,18 @@ export async function updateAuth0User(auth0User: UpdateAuth0User) {
       console.error('Error response from Auth0:', errorData)
       throw new Error(errorData.message || 'Failed to update Auth0User')
     }
-
     console.log('Auth0User updated successfully')
+
+    // APIから返されたユーザー情報から必要な情報だけを抽出して返す
+    const auth0UserRes = await response.json()
+    return {
+      updated_at: auth0UserRes.updated_at,
+      sub: auth0UserRes.user_id,
+      name: auth0UserRes.name,
+      email: auth0UserRes.email,
+      email_verified: auth0UserRes.email_verified,
+      picture: auth0UserRes.picture,
+    }
   } catch (error) {
     console.error('Error updating Auth0User:', error)
     throw error

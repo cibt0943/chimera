@@ -1,5 +1,6 @@
-import * as zod from 'zod'
 import { toDate } from 'date-fns'
+import * as zod from 'zod'
+import type { Database } from '~/types/schema'
 
 export const TaskStatus = {
   NEW: 0,
@@ -32,7 +33,7 @@ export const TaskStatusList = [
   {
     value: TaskStatus.PENDING,
     label: 'task.model.status_list.pending',
-    disp_order: 4,
+    disp_order: 3,
     color: 'bg-gray-500',
   },
 ]
@@ -42,45 +43,34 @@ export const TaskStatusListByDispOrder = TaskStatusList.slice().sort(
   (a, b) => a.disp_order - b.disp_order,
 )
 
+// DBのタスクテーブルの型
+export type TaskModel = Database['public']['Tables']['tasks']['Row']
+
 export type Task = {
-  id: number
+  id: string
+  created_at: Date
+  updated_at: Date
+  account_id: string
+  position: number
   title: string
   memo: string
   status: TaskStatus
   due_date: Date | null
-  // position: number
-  account_id: number
-  created_at: Date
-  updated_at: Date
 }
 
 export type Tasks = Task[]
 
-export type TaskModel = {
-  id: number
-  title: string
-  memo: string
-  status: number
-  due_date: string | null
-  position: number
-  account_id: number
-  created_at: string
-  updated_at: string
-}
-
-export type TaskModels = TaskModel[]
-
 export function TaskModel2Task(taskModel: TaskModel): Task {
   return {
     id: taskModel.id,
+    created_at: toDate(taskModel.created_at),
+    updated_at: toDate(taskModel.updated_at),
+    account_id: taskModel.account_id,
+    position: taskModel.position,
     title: taskModel.title,
     memo: taskModel.memo,
     status: taskModel.status as TaskStatus,
     due_date: taskModel.due_date ? toDate(taskModel.due_date) : null,
-    // position: taskModel.position,
-    account_id: taskModel.account_id,
-    created_at: toDate(taskModel.created_at),
-    updated_at: toDate(taskModel.updated_at),
   }
 }
 

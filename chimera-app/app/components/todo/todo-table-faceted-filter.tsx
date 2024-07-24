@@ -1,8 +1,6 @@
-// import * as React from 'react'
-import { RxCheck, RxPlusCircled } from 'react-icons/rx'
 import { useTranslation } from 'react-i18next'
+import { RiCheckLine, RiAddCircleLine } from 'react-icons/ri'
 import { Column } from '@tanstack/react-table'
-
 import { cn } from '~/lib/utils'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
@@ -46,7 +44,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 border-dashed">
-          <RxPlusCircled className="mr-2 h-4 w-4" />
+          <RiAddCircleLine className="mr-2 h-4 w-4" />
           {title}
           {selectedValues?.size > 0 && (
             <>
@@ -115,7 +113,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
                           : 'opacity-50 [&_svg]:invisible',
                       )}
                     >
-                      <RxCheck className={cn('h-4 w-4')} />
+                      <RiCheckLine className={cn('h-4 w-4')} />
                     </div>
                     {/* {option.icon && (
                       <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />

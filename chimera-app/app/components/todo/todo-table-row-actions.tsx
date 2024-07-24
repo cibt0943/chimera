@@ -1,15 +1,18 @@
 import { useTranslation } from 'react-i18next'
-import { Row, Table } from '@tanstack/react-table'
 import {
-  RxDotsHorizontal,
-  RxArrowUp,
-  RxArrowDown,
-  RxCheckCircled,
-  RxPencil1,
-  RxTrash,
-} from 'react-icons/rx'
-import { RiDeleteBack2Line, RiCornerDownLeftLine } from 'react-icons/ri'
-
+  RiMoreLine,
+  RiArrowUpLine,
+  RiArrowDownLine,
+  RiCircleLine,
+  RiProgress4Line,
+  RiProgress8Line,
+  RiProhibited2Line,
+  RiEdit2Line,
+  RiDeleteBinLine,
+  RiDeleteBack2Line,
+  RiCornerDownLeftLine,
+} from 'react-icons/ri'
+import { Row, Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
@@ -19,17 +22,17 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
-import { TaskStatus } from '~/types/tasks'
+import { Task, TaskStatus } from '~/types/tasks'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
   table: Table<TData>
 }
 
-export function TodoTableRowActions<TData>({
+export function TodoTableRowActions({
   row,
   table,
-}: DataTableRowActionsProps<TData>) {
+}: DataTableRowActionsProps<Task>) {
   const { t } = useTranslation()
   const task = row.original
 
@@ -40,49 +43,82 @@ export function TodoTableRowActions<TData>({
           variant="ghost"
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
         >
-          <RxDotsHorizontal className="h-4 w-4" />
+          <RiMoreLine className="h-4 w-4" />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuItem
           onClick={() => {
-            table.options.meta?.updateTaskPosition(task, true)
+            table.options.meta?.moveTask(task, true)
           }}
         >
-          <RxArrowUp className="mr-2 h-4 w-4" />
+          <RiArrowUpLine className="mr-2 h-4 w-4" />
           {t('common.message.position_up')}
-          <DropdownMenuShortcut>⌘↑</DropdownMenuShortcut>
+          <DropdownMenuShortcut>⌥ ↑</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
-            table.options.meta?.updateTaskPosition(task, false)
+            table.options.meta?.moveTask(task, false)
           }}
         >
-          <RxArrowDown className="mr-2 h-4 w-4" />
+          <RiArrowDownLine className="mr-2 h-4 w-4" />
           {t('common.message.position_down')}
-          <DropdownMenuShortcut>⌘↓</DropdownMenuShortcut>
+          <DropdownMenuShortcut>⌥ ↓</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
+          disabled={task.status === TaskStatus.NEW}
           onClick={() => {
-            table.options.meta?.updateTaskStatus(task, TaskStatus.DONE)
+            const upateTask = { ...task, status: TaskStatus.NEW }
+            table.options.meta?.updateTaskStatus(upateTask)
           }}
         >
-          <RxCheckCircled className="mr-2 h-4 w-4" />
-          {t('task.message.to_complete')}
-          <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
+          <RiCircleLine className="mr-2 h-4 w-4" />
+          {t('task.message.to_new')}
+          <DropdownMenuShortcut>⌥ 1</DropdownMenuShortcut>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          disabled={task.status === TaskStatus.DOING}
+          onClick={() => {
+            const upateTask = { ...task, status: TaskStatus.DOING }
+            table.options.meta?.updateTaskStatus(upateTask)
+          }}
+        >
+          <RiProgress4Line className="mr-2 h-4 w-4" />
+          {t('task.message.to_doing')}
+          <DropdownMenuShortcut>⌥ 2</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          disabled={task.status === TaskStatus.DONE}
+          onClick={() => {
+            const upateTask = { ...task, status: TaskStatus.DONE }
+            table.options.meta?.updateTaskStatus(upateTask)
+          }}
+        >
+          <RiProgress8Line className="mr-2 h-4 w-4" />
+          {t('task.message.to_done')}
+          <DropdownMenuShortcut>⌥ 3</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          disabled={task.status === TaskStatus.PENDING}
+          onClick={() => {
+            const upateTask = { ...task, status: TaskStatus.PENDING }
+            table.options.meta?.updateTaskStatus(upateTask)
+          }}
+        >
+          <RiProhibited2Line className="mr-2 h-4 w-4" />
+          {t('task.message.to_pending')}
+          <DropdownMenuShortcut>⌥ 4</DropdownMenuShortcut>
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             table.options.meta?.editTask(task)
           }}
         >
-          <RxPencil1 className="mr-2 h-4 w-4" />
+          <RiEdit2Line className="mr-2 h-4 w-4" />
           {t('common.message.edit')}
           <DropdownMenuShortcut>
-            ⌘
             <RiCornerDownLeftLine className="h-3 w-3 inline" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -93,10 +129,10 @@ export function TodoTableRowActions<TData>({
           }}
           className="text-red-600 focus:text-red-600"
         >
-          <RxTrash className="mr-2 h-4 w-4" />
+          <RiDeleteBinLine className="mr-2 h-4 w-4" />
           {t('common.message.delete')}
           <DropdownMenuShortcut>
-            ⌘<RiDeleteBack2Line className="h-3 w-3 inline" />
+            ⌥ <RiDeleteBack2Line className="h-3 w-3 inline" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>

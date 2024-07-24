@@ -1,10 +1,14 @@
 {
   "common": {
     "format": {
-      "date_format": "yyyy/MM/dd/",
+      "date_format": "yyyy/MM/dd",
+      "date_short_format": "MM/dd",
       "time_format": "HH:mm:ss",
-      "datetime_format": "yyyy/MM/dd HH:mm:ss",
-      "datetime_short_format": "yyyy/MM/dd HH:mm",
+      "time_short_format": "HH:mm",
+      "date_time_format": "yyyy/MM/dd HH:mm:ss",
+      "date_short_time_short_format": "MM/dd HH:mm",
+      "date_time_short_format": "yyyy/MM/dd HH:mm",
+      "date_short_time_format": "MM/dd HH:mm:ss",
       "hour": "時間",
       "o'clock": "時",
       "minute": "分",
@@ -52,7 +56,10 @@
       "clear_filters": "フィルタをクリア",
       "position_up": "一つ上に移動",
       "position_down": "一つ下に移動",
-      "settings": "設定"
+      "settings": "設定",
+      "state_save_wait": "保存待ち...",
+      "state_saved": "保存済み",
+      "state_saving": "保存中..."
     }
   },
   "account": {
@@ -89,9 +96,9 @@
       "id": "ID",
       "title": "タイトル",
       "memo": "メモ",
-      "status": "状態",
       "due_date": "期限",
       "position": "表示位置",
+      "status": "状態",
       "status_list": {
         "new": "新規",
         "done": "完了",
@@ -105,11 +112,48 @@
       "task_deletion": "タスクの削除",
       "set_task_info": "タスクの情報を設定してください。",
       "select_task_status": "タスクの状態を選んでください。",
-      "title_filter": "タイトルを検索",
+      "title_search": "タイトルを検索",
       "status_filter": "状態",
-      "to_complete": "完了する",
+      "to_new": "新規に変更",
+      "to_doing": "進行中に変更",
+      "to_done": "完了に変更",
+      "to_pending": "保留に変更",
       "view_settings": "表示設定",
       "select_columns": "表示項目"
+    }
+  },
+  "memo": {
+    "title": "メモ",
+    "un_titled": "無題",
+    "model": {
+      "id": "ID",
+      "title": "タイトル",
+      "content": "本文",
+      "related_date": "関連日時",
+      "position": "表示位置",
+      "status": "状態",
+      "status_list": {
+        "nomal": "",
+        "archive": "アーカイブ"
+      }
+    },
+    "message": {
+      "memo_creation": "メモの作成",
+      "memo_editing": "メモの編集",
+      "memo_deletion": "メモの削除",
+      "set_memo_info": "メモの情報を設定してください。",
+      "title_search": "タイトルを検索",
+      "first_line_is_title": "1行目はタイトルとなります",
+      "to_archive": "アーカイブする",
+      "un_archive": "アーカイブから戻す"
+    }
+  },
+  "memo_settings": {
+    "title": "環境設定",
+    "message": {
+      "list_show_archived": "リストにアーカイブ済みのメモを表示する",
+      "list_show_content": "リストにメモ内容のプレビューを表示する",
+      "auto_save": "メモを自動的に保存する"
     }
   }
 }

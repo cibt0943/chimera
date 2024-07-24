@@ -1,6 +1,6 @@
 import { Form } from '@remix-run/react'
 import { Button } from '~/components/ui/button'
-import { RxEnter } from 'react-icons/rx'
+import { RiLoginBoxLine } from 'react-icons/ri'
 import { useTranslation } from 'react-i18next'
 
 export default function Login() {
@@ -12,7 +12,7 @@ export default function Login() {
       <div className="mt-4">
         <Form action="/auth/auth0" method="post">
           <Button>
-            <RxEnter className="mr-2 h-4 w-4" />
+            <RiLoginBoxLine className="mr-2 h-4 w-4" />
             {t('account.message.login')}
           </Button>
         </Form>

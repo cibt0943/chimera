@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import { NavLink } from '@remix-run/react'
 import { PiHandFistBold } from 'react-icons/pi'
 import {
@@ -17,52 +16,73 @@ type NavLinkClassNameProps = {
   isPending: boolean
 }
 
-export function Sidebar() {
-  const navLinkClassName = ({ isActive, isPending }: NavLinkClassNameProps) => {
-    const className = isActive ? 'font-bold' : isPending ? 'pending' : ''
-    return cn(
-      buttonVariants({
-        variant: isActive ? 'secondary' : 'ghost',
-        className: clsx('justify-start', className),
-      }),
-    )
-  }
+function NavLinkClassName({ isActive, isPending }: NavLinkClassNameProps) {
+  const className = isActive ? 'font-bold' : isPending ? 'pending' : ''
+  return cn(
+    buttonVariants({
+      variant: isActive ? 'secondary' : 'ghost',
+      className: cn('justify-start', className),
+    }),
+  )
+}
 
+type CustomNavLinkProps = {
+  to: string
+  children: React.ReactNode
+}
+
+function CustomNavLink({ to, children }: CustomNavLinkProps) {
   return (
-    <div className="px-2 flex flex-col justify-between h-screen">
+    <NavLink
+      to={to}
+      className={NavLinkClassName}
+      onClick={(event) => {
+        // NaviLinkに当たっているフォーカスを外す
+        event.currentTarget.blur()
+      }}
+      state={{ isLoadEffect: true }}
+    >
+      {children}
+    </NavLink>
+  )
+}
+
+export function Sidebar() {
+  return (
+    <div className="px-2 flex flex-col justify-between h-screen w-44">
       <div className="overflow-auto">
         <div className="bg-background sticky top-0">
-          <h1 className="p-4 text-2xl font-bold tracking-tight">
+          <h1 className="mx-2 my-4 text-2xl font-bold tracking-tight">
             <NavLink to="/" className="inline-flex items-center">
+              <PiHandFistBold className="mr-2 text-yellow-500" />
               kobushi
-              <PiHandFistBold className="ml-2" />
             </NavLink>
           </h1>
         </div>
         <div className="grid gap-1 p-px">
-          <NavLink to="/todos" className={navLinkClassName} reloadDocument>
+          <CustomNavLink to="/todos">
             <RxCheck className="mr-2 h-5 w-5" />
             Todo
-          </NavLink>
-          <NavLink to="/memos" className={navLinkClassName} reloadDocument>
+          </CustomNavLink>
+          <CustomNavLink to="/memos">
             <RxPencil2 className="mr-2 h-5 w-5" />
             Memo
-          </NavLink>
-          <NavLink to="/events" className={navLinkClassName} reloadDocument>
+          </CustomNavLink>
+          <CustomNavLink to="/events">
             <RxCalendar className="mr-2 h-5 w-5" />
             Event
-          </NavLink>
-          <NavLink to="/files" className={navLinkClassName} reloadDocument>
+          </CustomNavLink>
+          <CustomNavLink to="/files">
             <RxFile className="mr-2 h-5 w-5" />
             File
-          </NavLink>
-          <NavLink to="/reminders" className={navLinkClassName} reloadDocument>
+          </CustomNavLink>
+          <CustomNavLink to="/reminders">
             <RxPaperPlane className="mr-2 h-5 w-5" />
             Reminder
-          </NavLink>
+          </CustomNavLink>
         </div>
       </div>
-      <div className="px-px mb-4">
+      <div className="mx-2 mb-4">
         <AccountMenu />
       </div>
     </div>

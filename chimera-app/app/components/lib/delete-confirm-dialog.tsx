@@ -10,20 +10,20 @@ import {
 interface ConfirmDialogProps {
   title: string
   description: string
-  isOpenDialog: boolean
-  setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>
+  isOpen: boolean
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   children: React.ReactNode
 }
 
 export function DeleteConfirmDialog({
   title,
   description,
-  isOpenDialog,
-  setIsOpenDialog,
+  isOpen,
+  setIsOpen,
   children,
 }: ConfirmDialogProps) {
   return (
-    <AlertDialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
