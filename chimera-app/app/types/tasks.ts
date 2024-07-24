@@ -33,7 +33,7 @@ export const TaskStatusList = [
   {
     value: TaskStatus.PENDING,
     label: 'task.model.status_list.pending',
-    disp_order: 4,
+    disp_order: 3,
     color: 'bg-gray-500',
   },
 ]

@@ -341,27 +341,40 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   // キーボードショートカット
   useHotkeys(
     [
+      'enter',
       'up',
       'down',
       'alt+up',
       'alt+down',
-      'enter',
-      'alt+enter',
+      'alt+1',
+      'alt+2',
+      'alt+3',
+      'alt+4',
       'alt+delete',
       'alt+backspace',
     ],
     (_, handler) => {
       switch (handler.keys?.join('')) {
+        case 'enter':
+          showSelectedTaskEdit()
+          break
         case 'up':
         case 'down':
           handler.alt
             ? moveSelectedTaskOneStep(handler.keys.includes('up'))
             : changeSelectedRowOneStep(handler.keys.includes('up'))
           break
-        case 'enter':
-          handler.alt
-            ? updateSelectedTaskStatus(TaskStatus.DONE)
-            : showSelectedTaskEdit()
+        case '1':
+          updateSelectedTaskStatus(TaskStatus.NEW)
+          break
+        case '2':
+          updateSelectedTaskStatus(TaskStatus.DOING)
+          break
+        case '3':
+          updateSelectedTaskStatus(TaskStatus.DONE)
+          break
+        case '4':
+          updateSelectedTaskStatus(TaskStatus.PENDING)
           break
         case 'delete':
         case 'backspace':

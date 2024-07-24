@@ -3,7 +3,10 @@ import {
   RiMoreLine,
   RiArrowUpLine,
   RiArrowDownLine,
-  RiCheckboxCircleLine,
+  RiCircleLine,
+  RiProgress4Line,
+  RiProgress8Line,
+  RiProhibited2Line,
   RiEdit2Line,
   RiDeleteBinLine,
   RiDeleteBack2Line,
@@ -65,17 +68,48 @@ export function TodoTableRowActions({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
+          disabled={task.status === TaskStatus.NEW}
+          onClick={() => {
+            const upateTask = { ...task, status: TaskStatus.NEW }
+            table.options.meta?.updateTaskStatus(upateTask)
+          }}
+        >
+          <RiCircleLine className="mr-2 h-4 w-4" />
+          {t('task.message.to_new')}
+          <DropdownMenuShortcut>⌥ 1</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          disabled={task.status === TaskStatus.DOING}
+          onClick={() => {
+            const upateTask = { ...task, status: TaskStatus.DOING }
+            table.options.meta?.updateTaskStatus(upateTask)
+          }}
+        >
+          <RiProgress4Line className="mr-2 h-4 w-4" />
+          {t('task.message.to_doing')}
+          <DropdownMenuShortcut>⌥ 2</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem
           disabled={task.status === TaskStatus.DONE}
           onClick={() => {
             const upateTask = { ...task, status: TaskStatus.DONE }
             table.options.meta?.updateTaskStatus(upateTask)
           }}
         >
-          <RiCheckboxCircleLine className="mr-2 h-4 w-4" />
-          {t('task.message.to_complete')}
-          <DropdownMenuShortcut>
-            ⌥ <RiCornerDownLeftLine className="h-3 w-3 inline" />
-          </DropdownMenuShortcut>
+          <RiProgress8Line className="mr-2 h-4 w-4" />
+          {t('task.message.to_done')}
+          <DropdownMenuShortcut>⌥ 3</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          disabled={task.status === TaskStatus.PENDING}
+          onClick={() => {
+            const upateTask = { ...task, status: TaskStatus.PENDING }
+            table.options.meta?.updateTaskStatus(upateTask)
+          }}
+        >
+          <RiProhibited2Line className="mr-2 h-4 w-4" />
+          {t('task.message.to_pending')}
+          <DropdownMenuShortcut>⌥ 4</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
