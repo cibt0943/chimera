@@ -70,7 +70,13 @@ export function AccountForm({ accountSettings }: AccountFormProps) {
   })
 
   return (
-    <Form method="post" {...getFormProps(form)} className="space-y-6" action="">
+    <Form
+      method="post"
+      {...getFormProps(form)}
+      className="space-y-6"
+      action=""
+      state={{ isLoadEffect: true }}
+    >
       <FormItem>
         <FormLabel htmlFor={fields.name.id}>
           {t('account.model.name')}

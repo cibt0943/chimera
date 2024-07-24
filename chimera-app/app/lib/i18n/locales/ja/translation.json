@@ -114,7 +114,10 @@
       "select_task_status": "タスクの状態を選んでください。",
       "title_search": "タイトルを検索",
       "status_filter": "状態",
-      "to_complete": "完了する",
+      "to_new": "新規に変更",
+      "to_doing": "進行中に変更",
+      "to_done": "完了に変更",
+      "to_pending": "保留に変更",
       "view_settings": "表示設定",
       "select_columns": "表示項目"
     }
