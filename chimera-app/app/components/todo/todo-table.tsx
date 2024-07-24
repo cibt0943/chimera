@@ -96,7 +96,6 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
     { id: 'status', value: [0, 2] },
   ])
-
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({
     [showId]: true,
   })
@@ -218,29 +217,6 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     moveTask(fromTask, toTask)
   }
 
-  // タスクの表示順変更APIをdebounce
-  const moveTaskApiDebounce = useDebounce((fromTask, toTask) => {
-    enqueue(() =>
-      moveTaskApi(fromTask, toTask).catch((error) => {
-        alert(error.message)
-        navigate('.?refresh=true', { replace: true })
-      }),
-    )
-  }, 300)
-
-  // タスクの表示順変更APIの呼び出し
-  async function moveTaskApi(fromTask: Task, toTask: Task) {
-    // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
-    await fetch(`/todos/${fromTask.id}/position`, {
-      method: 'POST',
-      body: JSON.stringify({ toTaskId: toTask.id }),
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to update position api')
-      }
-    })
-  }
-
   // タスクの表示順を変更
   function moveTask(fromTask: Task, toTask: Task) {
     try {
@@ -262,6 +238,29 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
       navigate('.?refresh=true', { replace: true })
     }
   }
+
+  // タスクの表示順変更API呼び出し
+  async function moveTaskApi(fromTask: Task, toTask: Task) {
+    // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
+    await fetch(`/todos/${fromTask.id}/position`, {
+      method: 'POST',
+      body: JSON.stringify({ toTaskId: toTask.id }),
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to update position api')
+      }
+    })
+  }
+
+  // タスクの表示順変更APIをdebounce
+  const moveTaskApiDebounce = useDebounce((fromTask, toTask) => {
+    enqueue(() =>
+      moveTaskApi(fromTask, toTask).catch((error) => {
+        alert(error.message)
+        navigate('.?refresh=true', { replace: true })
+      }),
+    )
+  }, 300)
 
   // タスクの表示順を1ステップ変更
   function moveTaskOneStep(targetTask: Task, isUp: boolean) {
@@ -380,7 +379,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   )
 
   // タスク追加ダイアログを開く
-  useHotkeys(['alt+i'], () => {
+  useHotkeys(['alt+n'], () => {
     // ローディング中、ダイアログが開いている場合は何もしない
     if (isLoading || isOpenAddDialog || isOpenDeleteDialog || showId) return
     openAddTaskDialog()
@@ -398,7 +397,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.add')}
           <p className="text-xs text-muted-foreground ml-2">
             <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-              <span>⌥</span>i
+              <span>⌥</span>n
             </kbd>
           </p>
         </Button>

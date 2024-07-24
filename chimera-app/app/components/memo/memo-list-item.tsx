@@ -35,12 +35,12 @@ interface ListItemProps {
   item: Memo
   setFocusedMemo: React.Dispatch<React.SetStateAction<Memo | undefined>>
   isSelected: boolean
-  isDisplayPreview: boolean
+  isPreview: boolean
   children: React.ReactNode
 }
 
 export function ListItem(props: ListItemProps) {
-  const { item, setFocusedMemo, isSelected, isDisplayPreview, children } = props
+  const { item, setFocusedMemo, isSelected, isPreview, children } = props
 
   const { t } = useTranslation()
   const {
@@ -82,12 +82,13 @@ export function ListItem(props: ListItemProps) {
       style={style}
       {...attributes}
       {...listeners}
+      role="listitem"
     >
       <div className="flex items-center">
         <div className="line-clamp-1">{item.title || t('memo.un_titled')}</div>
         <div className="ml-auto">{children}</div>
       </div>
-      {isDisplayPreview && (
+      {isPreview && (
         <div className="line-clamp-2 text-xs text-muted-foreground">
           {item.content.substring(0, 300)}
         </div>

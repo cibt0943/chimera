@@ -51,18 +51,20 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   )
 
   const memoSettings = useAtomValue(memoSettingsAtom)
+
+  // メモ一覧データ
   const [memos, setMemos] = React.useState(defaultMemos)
-  const [searchTerm, setSearchTerm] = React.useState('') // 検索文字列
-  const [actionMemo, setActionMemo] = React.useState<Memo>() // 編集・削除するメモ
+
+  // 検索文字列
+  const [searchTerm, setSearchTerm] = React.useState('')
+
+  // 編集・削除するメモ
+  const [actionMemo, setActionMemo] = React.useState<Memo>()
+
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   const memosRefs = React.useRef<HTMLDivElement>(null)
   const addButtonRef = React.useRef<HTMLButtonElement>(null)
-
-  // フィルタリング前のメモ一覧データ更新
-  React.useEffect(() => {
-    setMemos(defaultMemos)
-  }, [defaultMemos])
 
   // フィルタリング後のメモ一覧データ更新（memosに依存した値なのでstateで持つ必要はないと考えメモ化した変数で対応）
   const dispMemos = React.useMemo(() => {
@@ -75,72 +77,26 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     return memos.find((memo) => memo.id === showId)
   }, [memos, showId])
 
-  const [focusedMemo, setFocusedMemo] = React.useState(selectedMemo) // 一覧でフォーカスしているメモ
+  // 一覧でフォーカスしているメモ
+  const [focusedMemo, setFocusedMemo] = React.useState(selectedMemo)
+
+  // フィルタリング前のメモ一覧データ更新
+  React.useEffect(() => {
+    setMemos(defaultMemos)
+  }, [defaultMemos])
 
   // focusedMemoに合わせてフォーカスを設定
   React.useEffect(() => {
     if (!focusedMemo) return
-    memosRefs.current
-      ?.querySelector<HTMLElement>(`#memo-${focusedMemo.id}`)
-      ?.focus()
+    setListFocus(focusedMemo)
   }, [focusedMemo])
 
-  // キーボード操作
-  useHotkeys(
-    [
-      'up',
-      'down',
-      'alt+up',
-      'alt+down',
-      'alt+enter',
-      'alt+delete',
-      'alt+backspace',
-    ],
-    (_, handler) => {
-      // ダイアログが開いている場合は何もしない
-      if (isOpenDeleteDialog) return
-      switch (handler.keys?.join('')) {
-        // フォーカスの行移動
-        case 'up':
-        case 'down':
-          handler.alt
-            ? moveSelectedMemoOneStep(handler.keys.includes('up'))
-            : changeFocusedMemoOneStep(handler.keys.includes('up'))
-          break
-        // メモ追加
-        case 'i':
-          addButtonRef.current?.click()
-          break
-        // メモのアーカイブ
-        case 'enter':
-          updateSeletedMemoStatus()
-          break
-        // メモ削除
-        case 'delete':
-        case 'backspace':
-          if (!selectedMemo) return
-          openDeleteMemoDialog(selectedMemo)
-          break
-      }
-    },
-    {
-      preventDefault: true,
-      ignoreEventWhen: (e) => {
-        const target = e.target as HTMLElement
-        return !['a', 'body'].includes(target.tagName.toLowerCase())
-      },
-    },
-  )
-
-  // メモ追加
-  useHotkeys(['alt+i'], () => {
-    addButtonRef.current?.click()
-  })
-
-  // メモ一覧を検索
+  // メモ一覧の検索
   async function searchMemos(searchTerm: string) {
     setSearchTerm(searchTerm.toLowerCase())
   }
+
+  // メモ一覧の検索をdebounce
   const searchMemosDebounce = useDebounce((searchTerm) => {
     searchEnqueue(() => searchMemos(searchTerm))
   }, 300)
@@ -209,29 +165,6 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     }
   }
 
-  // メモの表示順変更APIをdebounce
-  const moveMemoApiDebounce = useDebounce((fromMemo, toMemo) => {
-    moveMemoEnqueue(() =>
-      moveMemoApi(fromMemo, toMemo).catch((error) => {
-        alert(error.message)
-        navigate('.?refresh=true', { replace: true })
-      }),
-    )
-  }, 300)
-
-  // メモの表示順変更APIの呼び出し
-  async function moveMemoApi(fromMemo: Memo, toMemo: Memo) {
-    // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
-    await fetch(`/memos/${fromMemo.id}/position`, {
-      method: 'POST',
-      body: JSON.stringify({ toMemoId: toMemo.id }),
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to update position api')
-      }
-    })
-  }
-
   // メモの表示順を変更
   function moveMemo(fromMemo: Memo, toMemo: Memo) {
     try {
@@ -251,6 +184,98 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     }
   }
 
+  // メモの表示順変更API呼び出し
+  async function moveMemoApi(fromMemo: Memo, toMemo: Memo) {
+    // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
+    await fetch(`/memos/${fromMemo.id}/position`, {
+      method: 'POST',
+      body: JSON.stringify({ toMemoId: toMemo.id }),
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to update position api')
+      }
+    })
+  }
+
+  // メモの表示順変更APIをdebounce
+  const moveMemoApiDebounce = useDebounce((fromMemo, toMemo) => {
+    moveMemoEnqueue(() =>
+      moveMemoApi(fromMemo, toMemo).catch((error) => {
+        alert(error.message)
+        navigate('.?refresh=true', { replace: true })
+      }),
+    )
+  }, 300)
+
+  function setListFocus(memo: Memo) {
+    memosRefs.current?.querySelector<HTMLElement>(`#memo-${memo.id}`)?.focus()
+  }
+
+  // キーボード操作(スコープあり)
+  useHotkeys(
+    [
+      'up',
+      'down',
+      'alt+up',
+      'alt+down',
+      'alt+enter',
+      'alt+delete',
+      'alt+backspace',
+    ],
+    (_, handler) => {
+      switch (handler.keys?.join('')) {
+        // フォーカス上下or表示順上下の1ステップ移動
+        case 'up':
+        case 'down':
+          handler.alt
+            ? moveSelectedMemoOneStep(handler.keys.includes('up'))
+            : changeFocusedMemoOneStep(handler.keys.includes('up'))
+          break
+        // メモのアーカイブ
+        case 'enter':
+          updateSeletedMemoStatus()
+          break
+        // メモ削除
+        case 'delete':
+        case 'backspace':
+          if (!selectedMemo) return
+          openDeleteMemoDialog(selectedMemo)
+          break
+      }
+    },
+    {
+      preventDefault: true,
+      ignoreEventWhen: (event) => {
+        // ダイアログが開いている場合は何もしない
+        if (isOpenDeleteDialog) return true
+        const target = event.target as HTMLElement
+        const tagName = target.tagName.toLowerCase()
+        if (tagName === 'body') return false
+        return tagName !== 'a' || target.getAttribute('role') !== 'listitem'
+      },
+    },
+  )
+
+  // キーボード操作(スコープなし)
+  useHotkeys(
+    ['alt+n', 'alt+left'],
+    (_, handler) => {
+      switch (handler.keys?.join('')) {
+        // メモ追加
+        case 'n':
+          addButtonRef.current?.click()
+          break
+        // フォーカスを一覧へ移動
+        case 'left':
+          focusedMemo && setListFocus(focusedMemo)
+          break
+      }
+    },
+    {
+      enableOnFormTags: true, // テキストエリアにフォーカスがあってもフォーカス移動できるようにする
+    },
+  )
+
   return (
     <div className="space-y-4 px-1 py-4">
       <div className="flex items-center space-x-2 px-3">
@@ -265,7 +290,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
             {t('common.message.add')}
             <p className="text-xs text-muted-foreground ml-2">
               <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-                <span>⌥</span>i
+                <span>⌥</span>n
               </kbd>
             </p>
           </Button>
@@ -301,7 +326,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
                     item={item}
                     setFocusedMemo={setFocusedMemo}
                     isSelected={item.id === selectedMemo?.id}
-                    isDisplayPreview={!!memoSettings?.list_display.content}
+                    isPreview={!!memoSettings?.list_display.content}
                   >
                     <MemoActions
                       memo={item}

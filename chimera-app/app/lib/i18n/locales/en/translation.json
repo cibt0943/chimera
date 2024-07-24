@@ -57,6 +57,7 @@
       "position_up": "Move Up",
       "position_down": "Move Down",
       "settings": "Settings",
+      "state_save_wait": "Waiting to Save...",
       "state_saved": "Saved",
       "state_saving": "Saving..."
     }

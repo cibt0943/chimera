@@ -6,6 +6,7 @@ import {
   RiInboxArchiveLine,
   RiInboxUnarchiveLine,
 } from 'react-icons/ri'
+import { useHotkeys } from 'react-hotkeys-hook'
 import { useForm, getFormProps, getTextareaProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
@@ -30,24 +31,27 @@ interface MemoFormProps {
 
 export function MemoForm({ memo }: MemoFormProps) {
   const { t } = useTranslation()
+  const formRef = React.useRef<HTMLFormElement>(null)
   const { enqueue } = useQueue()
   const fetcher = useFetcher({ key: 'memo-form' })
-  const formRef = React.useRef<HTMLFormElement>(null)
 
   const memoSettings = useAtomValue(memoSettingsAtom)
 
-  // memoの状態を変更して保存したかどうか（自動保存のために利用）
+  // memoの状態を変更して保存したかどうか
   const [isChangedMemo, setIsChangedMemo] = React.useState(false)
-  React.useEffect(() => {
-    setIsChangedMemo(false)
-  }, [memo?.id])
 
   // 自動保存の状態を保持(OFF→ONの切り替え時に自動保存を実行する)
   const [isChangeAutoSave, setIsChangeAutoSave] = React.useState(
     memoSettings?.auto_save,
   )
+
   React.useEffect(() => {
-    if (memo && !isChangeAutoSave && memoSettings?.auto_save) {
+    setIsChangedMemo(false)
+  }, [memo?.id])
+
+  React.useEffect(() => {
+    // メモが存在し、メモが変更されている場合、自動保存がOFF→ONの切り替え時に自動保存を実行する
+    if (memo && isChangedMemo && !isChangeAutoSave && memoSettings?.auto_save) {
       saveMemoApi()
     }
     setIsChangeAutoSave(memoSettings?.auto_save)
@@ -62,6 +66,7 @@ export function MemoForm({ memo }: MemoFormProps) {
         : '',
     related_date: memo ? memo.related_date : null,
   }
+
   const [form, fields] = useForm<MemoSchemaType>({
     id: `memo-form${memo ? `-${memo.id}` : ''}`,
     defaultValue: defaultValue,
@@ -71,19 +76,43 @@ export function MemoForm({ memo }: MemoFormProps) {
     },
   })
 
-  // メモを保存するAPI
+  // メモの保存API呼び出し
   async function saveMemoApi() {
+    // メモが保存されたら、メモが変更されていない状態にする
+    setIsChangedMemo(false)
     fetcher.submit(formRef.current, {
       action: action,
       method: 'post',
     })
-
-    setIsChangedMemo(false)
   }
 
+  // メモの保存APIをdebounce
   const saveMemoDebounce = useDebounce(() => {
     enqueue(() => saveMemoApi())
   }, 1000)
+
+  function setTextAreaFocus() {
+    formRef.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus()
+  }
+
+  // キーボード操作
+  useHotkeys(
+    ['alt+s', 'alt+right'],
+    (event, handler) => {
+      switch (handler.keys?.join('')) {
+        case 's':
+          saveMemoApi()
+          break
+        case 'right':
+          setTextAreaFocus()
+          break
+      }
+    },
+    {
+      preventDefault: true, // テキストエリアにフォーカスがある時にalt+sを押すと変なドイツ語がテキストエリアに入力されるのを防ぐ
+      enableOnFormTags: true, // テキストエリアにフォーカスがあっても保存できるようにする
+    },
+  )
 
   return (
     <div className="m-4">
@@ -218,18 +247,37 @@ function SaveButton({ isChangedMemo }: { isChangedMemo: boolean }) {
       ? false
       : true
 
-  let caption = t('common.message.save')
+  let caption
   switch (fetcher.state) {
     case 'submitting':
       caption = t('common.message.state_saving')
       break
     default:
-      caption = memoSettings?.auto_save
-        ? isChangedMemo
-          ? t('common.message.state_saving')
-          : t('common.message.state_saved')
-        : t('common.message.save')
+      caption = memoSettings?.auto_save ? (
+        isChangedMemo ? (
+          t('common.message.state_save_wait')
+        ) : (
+          t('common.message.state_saved')
+        )
+      ) : (
+        <SaveHotkeyIcon />
+      )
       break
+  }
+
+  function SaveHotkeyIcon() {
+    if (memoSettings?.auto_save) return null
+
+    return (
+      <>
+        {t('common.message.save')}
+        <p className="text-xs ml-2">
+          <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
+            <span>⌥</span>s
+          </kbd>
+        </p>
+      </>
+    )
   }
 
   return (
