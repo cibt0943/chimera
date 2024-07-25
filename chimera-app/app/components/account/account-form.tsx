@@ -45,7 +45,10 @@ function SelectThemeItems() {
     <>
       {ThemeList.map((theme) => (
         <SelectItem key={theme.value} value={theme.value}>
-          {t(theme.label)}
+          <span className="flex items-center">
+            <theme.icon className="mr-2 h-4 w-4" />
+            {t(theme.label)}
+          </span>
         </SelectItem>
       ))}
     </>

@@ -76,9 +76,9 @@
         "ja": "日本語"
       },
       "theme_list": {
-        "system": "システム",
-        "light": "ライト",
-        "dark": "ダーク"
+        "system": "OSの設定に従う",
+        "light": "ライトモード",
+        "dark": "ダークモード"
       }
     },
     "message": {
