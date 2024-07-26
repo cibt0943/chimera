@@ -1,3 +1,4 @@
+import { RiSunLine, RiMoonClearFill, RiMacLine } from 'react-icons/ri'
 import { toDate } from 'date-fns'
 import * as zod from 'zod'
 import type { Database } from '~/types/schema'
@@ -25,9 +26,21 @@ export type Theme = (typeof Theme)[keyof typeof Theme]
 
 // 利用可能な言語リスト
 export const ThemeList = [
-  { value: Theme.SYSTEM, label: 'account.model.theme_list.system' },
-  { value: Theme.LIGHT, label: 'account.model.theme_list.light' },
-  { value: Theme.DARK, label: 'account.model.theme_list.dark' },
+  {
+    value: Theme.SYSTEM,
+    label: 'account.model.theme_list.system',
+    icon: RiMacLine,
+  },
+  {
+    value: Theme.LIGHT,
+    label: 'account.model.theme_list.light',
+    icon: RiSunLine,
+  },
+  {
+    value: Theme.DARK,
+    label: 'account.model.theme_list.dark',
+    icon: RiMoonClearFill,
+  },
 ]
 
 // DBのアカウントテーブルの型
@@ -78,6 +91,8 @@ export type AccountSettings = {
   name: string
   language: Language
   theme: Theme
+  lastLogin: Date
+  lastPasswordChange: Date
 }
 
 export const AccountSettingsSchema = zod.object({

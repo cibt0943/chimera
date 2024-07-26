@@ -14,7 +14,7 @@ import { I18nextProvider } from 'react-i18next'
 import styles from '~/tailwind.css'
 import { authenticator } from '~/lib/auth.server'
 import { useTheme } from './lib/useTheme'
-import i18n from '~/lib/i18n/i18n'
+import i18n, { useChangeLanguage } from '~/lib/i18n/i18n'
 import { Theme } from '~/types/accounts'
 import { LoadingEffect } from '~/components/loading-effect'
 import { Sidebar } from '~/components/sidebar'
@@ -55,13 +55,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function App() {
   const { loginSession, language } = useTypedLoaderData<typeof loader>()
   const theme = loginSession?.account.theme || Theme.SYSTEM
-  useTheme(theme) // useEffectにてOSのテーマ設定に合わせてテーマを変更
 
+  // useEffectにてOSのテーマ設定に合わせてテーマを変更
+  useTheme(theme)
   // クライアントサイドでの言語設定
-  React.useEffect(() => {
-    i18n.changeLanguage(language)
-  }, [language])
-
+  useChangeLanguage(language)
   // ログインユーザーのアカウント情報をグローバルステートに保存
   const setLoginAccount = useSetAtom(loginSessionAtom)
   React.useEffect(() => {

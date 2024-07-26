@@ -19,7 +19,9 @@ export function AccountDeleteConfirmDialog({
   return (
     <DeleteConfirmDialog
       title={t('account.message.account_deletion')}
-      description={t('account.title') + t('common.message.confirm_deletion')}
+      description={
+        t('account.title-account') + t('common.message.confirm_deletion')
+      }
       isOpen={isOpenDialog}
       setIsOpen={setIsOpenDialog}
     >

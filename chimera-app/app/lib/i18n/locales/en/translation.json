@@ -63,7 +63,8 @@
     }
   },
   "account": {
-    "title": "Account",
+    "title-account": "Account",
+    "title-password": "Password",
     "model": {
       "email": "Email",
       "name": "Name",
@@ -76,9 +77,9 @@
         "ja": "Japanese"
       },
       "theme_list": {
-        "system": "System",
-        "light": "Light",
-        "dark": "Dark"
+        "system": "Follow OS Setting",
+        "light": "Light Mode",
+        "dark": "Dark Mode"
       }
     },
     "message": {
@@ -86,8 +87,14 @@
       "login": "Log in",
       "logout": "Log out",
       "account_deletion": "Account Deletion",
-      "settings_info": "Update your account settings.",
-      "do_delete": "Delete your account."
+      "account_info": "Update your account settings.",
+      "password_info": "You can change your password.",
+      "do_delete": "Delete your account.",
+      "change_password": "Change Password",
+      "last_login": "Last Login Date",
+      "last_password_change": "Last Password Change Date",
+      "changed_password_info": "A password change email has been sent.",
+      "changed_password_description": "Please check your email. You can change your password using the URL provided in the email."
     }
   },
   "task": {

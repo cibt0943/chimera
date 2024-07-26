@@ -2,6 +2,8 @@ import { Auth0User } from '~/types/accounts'
 
 const apiDomain = `https://${process.env.AUTH0_DOMAIN}`
 const apiBaseUrl = `${apiDomain}/api/v2`
+const clientId = process.env.AUTH0_CLIENT_ID
+const clientSecret = process.env.AUTH0_CLIENT_SECRET
 
 interface TokenResponse {
   access_token: string
@@ -137,6 +139,39 @@ export async function deleteAuth0User(userId: string) {
     console.log('Auth0User deleted successfully')
   } catch (error) {
     console.error('Error deleting Auth0User:', error)
+    throw error
+  }
+}
+
+// Auth0ユーザーのパスワードを変更
+export async function changePasswordAuth0User(email: string) {
+  try {
+    // アクセストークンを取得
+    // const tokenData = await getAuth0Token()
+
+    // パスワードリセットリクエストを送信
+    const response = await fetch(`${apiDomain}/dbconnections/change_password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Authorization: `Bearer ${tokenData.access_token}`,
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        email: email,
+        connection: 'Username-Password-Authentication',
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Failed to change password')
+    }
+
+    console.log('Password changed successfully')
+  } catch (error) {
+    console.error('Error changing password:', error)
     throw error
   }
 }

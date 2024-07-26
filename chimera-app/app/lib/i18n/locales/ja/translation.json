@@ -63,7 +63,8 @@
     }
   },
   "account": {
-    "title": "アカウント",
+    "title-account": "アカウント",
+    "title-password": "パスワード",
     "model": {
       "email": "メールアドレス",
       "name": "名前",
@@ -76,9 +77,9 @@
         "ja": "日本語"
       },
       "theme_list": {
-        "system": "システム",
-        "light": "ライト",
-        "dark": "ダーク"
+        "system": "OSの設定に従う",
+        "light": "ライトモード",
+        "dark": "ダークモード"
       }
     },
     "message": {
@@ -86,8 +87,14 @@
       "login": "ログイン",
       "logout": "ログアウト",
       "account_deletion": "アカウントの削除",
-      "settings_info": "アカウントの情報を設定してください。",
-      "do_delete": "アカウントを削除する"
+      "account_info": "アカウントの情報を設定してください。",
+      "password_info": "パスワードを変更することができます。",
+      "do_delete": "アカウントを削除する",
+      "change_password": "パスワードを変更する",
+      "last_login": "最終ログイン日時",
+      "last_password_change": "最終パスワード変更日時",
+      "changed_password_title": "パスワード変更メールを送信しました。",
+      "changed_password_description": "メールを確認してください。メールに記載されたURLよりパスワード変更を行うことができます。"
     }
   },
   "task": {

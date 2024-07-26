@@ -1,10 +1,12 @@
+import * as React from 'react'
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import translationEn from '~/lib/i18n/locales/en/translation.json'
 import translationJa from '~/lib/i18n/locales/ja/translation.json'
 
-// eslint-disable-next-line import/no-named-as-default-member
+/* eslint import/no-named-as-default-member: 0 */
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -43,3 +45,9 @@ i18n
   })
 
 export default i18n
+
+export function useChangeLanguage(locale: string) {
+  React.useEffect(() => {
+    i18n.changeLanguage(locale)
+  }, [locale])
+}
