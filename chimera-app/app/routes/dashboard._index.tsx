@@ -10,7 +10,7 @@ export const loader = withAuthentication(async ({ loginSession }) => {
   return json({ loginSession })
 })
 
-export default function Dashboard() {
+export default function Index() {
   return (
     <div className="p-4">
       <h1 className="mb-4 text-xl font-bold">Dashboard</h1>

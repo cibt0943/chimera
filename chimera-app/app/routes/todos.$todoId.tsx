@@ -39,6 +39,10 @@ export const action = withAuthentication(
   },
 )
 
+type LoaderData = {
+  task: Task
+}
+
 export const loader = withAuthentication(async ({ params, loginSession }) => {
   const task = await getTask(params.todoId || '')
   if (task.account_id !== loginSession.account.id) throw new Error('erorr')
@@ -47,7 +51,7 @@ export const loader = withAuthentication(async ({ params, loginSession }) => {
 })
 
 export default function Todo() {
-  const { task } = useTypedLoaderData<{ task: Task }>()
+  const { task } = useTypedLoaderData<LoaderData>()
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
 
   return (

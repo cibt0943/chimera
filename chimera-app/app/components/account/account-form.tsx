@@ -17,7 +17,12 @@ import {
   SelectContent,
   SelectItem,
 } from '~/components/ui/select'
-import { FormItem, FormLabel, FormMessage } from '~/components/lib/form'
+import {
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormFooter,
+} from '~/components/lib/form'
 import {
   AccountSettings,
   AccountSettingsSchema,
@@ -85,7 +90,12 @@ export function AccountForm({ accountSettings }: AccountFormProps) {
           {t('account.model.name')}
           <Required />
         </FormLabel>
-        <Input {...getInputProps(fields.name, { type: 'text' })} />
+        <Input
+          {...getInputProps(fields.name, {
+            type: 'text',
+          })}
+          autoComplete="on"
+        />
         <FormMessage message={fields.name.errors} />
       </FormItem>
       <FormItem>
@@ -124,7 +134,9 @@ export function AccountForm({ accountSettings }: AccountFormProps) {
         </Select>
         <FormMessage message={fields.theme.errors} />
       </FormItem>
-      <Button type="submit">{t('common.message.save')}</Button>
+      <FormFooter>
+        <Button type="submit">{t('common.message.save')}</Button>
+      </FormFooter>
     </Form>
   )
 }

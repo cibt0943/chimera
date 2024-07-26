@@ -40,6 +40,10 @@ export const action = withAuthentication(
   },
 )
 
+type LoaderData = {
+  memo: Memo
+}
+
 export const loader = withAuthentication(async ({ params, loginSession }) => {
   const memo = await getMemo(params.memoId || '')
   if (memo.account_id !== loginSession.account.id) throw new Error('erorr')
@@ -48,7 +52,7 @@ export const loader = withAuthentication(async ({ params, loginSession }) => {
 })
 
 export default function Memo() {
-  const { memo } = useTypedLoaderData<{ memo: Memo }>()
+  const { memo } = useTypedLoaderData<LoaderData>()
 
   return <ClientOnly>{() => <MemoForm memo={memo} />}</ClientOnly>
 }

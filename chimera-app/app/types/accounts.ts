@@ -91,6 +91,8 @@ export type AccountSettings = {
   name: string
   language: Language
   theme: Theme
+  lastLogin: Date
+  lastPasswordChange: Date
 }
 
 export const AccountSettingsSchema = zod.object({
