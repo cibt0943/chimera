@@ -72,6 +72,10 @@ export default function App() {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
+        {/* FullCalendarにてエラーが出ないようにする対応 */}
+        {/* https://fullcalendar.io/docs/react */}
+        {/* https://github.com/fullcalendar/fullcalendar-examples/tree/main/remix */}
+        <style data-fullcalendar />
         <Links />
       </head>
       <body>
