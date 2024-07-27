@@ -14,7 +14,7 @@ export default function Index() {
   return (
     <div className="p-4">
       <h1 className="mb-4 text-xl font-bold">Dashboard</h1>
-      <div className="mb-8 text-l font-bold">
+      <div className="text-l mb-8 font-bold">
         This feature is under development. Please check back later.
       </div>
     </div>

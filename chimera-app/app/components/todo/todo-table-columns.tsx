@@ -1,4 +1,5 @@
 import { NavLink } from '@remix-run/react'
+import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { ColumnDef, Column, Row } from '@tanstack/react-table'
@@ -8,7 +9,6 @@ import { Button } from '~/components/ui/button'
 import { Task, TaskStatusList } from '~/types/tasks'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
-import { ClientOnly } from 'remix-utils/client-only'
 
 // Cell Component
 function RowDragHandleCell({ rowId }: { rowId: string }) {
@@ -17,7 +17,7 @@ function RowDragHandleCell({ rowId }: { rowId: string }) {
   })
   return (
     // Alternatively, you could set these attributes on the rows themselves
-    <Button variant="ghost" {...attributes} {...listeners} className=" h-8 w-8">
+    <Button variant="ghost" {...attributes} {...listeners} className="h-8 w-8">
       🟰
     </Button>
   )

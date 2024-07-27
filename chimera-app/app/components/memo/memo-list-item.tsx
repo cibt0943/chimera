@@ -93,13 +93,13 @@ export function ListItem(props: ListItemProps) {
           {item.content.substring(0, 300)}
         </div>
       )}
-      <div className="flex justify-between items-center space-x-2">
+      <div className="flex items-center justify-between space-x-2">
         <div>
           {item.status === MemoStatus.ARCHIVED && (
             <RiArchiveLine className="mr-2 h-4 w-4" />
           )}
         </div>
-        <ClientOnly fallback={<div className="text-xs">&nbsp;</div>}>
+        <ClientOnly fallback={<div>&nbsp;</div>}>
           {() => (
             <div
               className="ml-auto text-xs text-muted-foreground"

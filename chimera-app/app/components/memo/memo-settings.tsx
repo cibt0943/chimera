@@ -19,7 +19,7 @@ export function MemoSettings() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="px-2 hidden h-8 lg:flex">
+        <Button variant="outline" size="sm" className="hidden h-8 px-2 lg:flex">
           <RiListSettingsLine className="h-4 w-4 text-primary/80" />
           <span className="sr-only">{t('memo_settings.title')}</span>
         </Button>

@@ -42,7 +42,7 @@ type LoaderData = {
 export const loader = withAuthentication(async ({ loginSession }) => {
   const tasks = await getTasks(loginSession.account.id)
 
-  return typedjson({ tasks, loadDate: new Date() })
+  return typedjson({ tasks })
 })
 
 export default function Layout() {

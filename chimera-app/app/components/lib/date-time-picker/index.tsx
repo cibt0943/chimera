@@ -49,7 +49,7 @@ export function DateTimePicker({
           </Button>
         </PopoverTrigger>
         <PopoverTrigger asChild>
-          <div className="grow pl-2 cursor-pointer text-sm">
+          <div className="grow cursor-pointer pl-2 text-sm">
             {value ? (
               format(value, t('common.format.date_time_format'))
             ) : (
@@ -75,7 +75,7 @@ export function DateTimePicker({
             initialFocus
             locale={locale} // ここでlocaleを渡す
           />
-          <div className="p-3 border-t border-border">
+          <div className="border-t border-border p-3">
             <TimePicker date={value} setDate={setDate} />
           </div>
         </PopoverContent>

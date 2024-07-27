@@ -97,7 +97,7 @@ export function MemoActions(props: MemoActionsProps) {
             {archiveMenu.icon}
             {archiveMenu.caption}
             <DropdownMenuShortcut>
-              ⌥ <RiCornerDownLeftLine className="h-3 w-3 inline" />
+              ⌥ <RiCornerDownLeftLine className="inline h-3 w-3" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -109,7 +109,7 @@ export function MemoActions(props: MemoActionsProps) {
             <RiEdit2Line className="mr-2 h-4 w-4" />
             {t('common.message.edit')}
             <DropdownMenuShortcut>
-              <RiCornerDownLeftLine className="h-3 w-3 inline" />
+              <RiCornerDownLeftLine className="inline h-3 w-3" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -123,7 +123,7 @@ export function MemoActions(props: MemoActionsProps) {
             <RiDeleteBinLine className="mr-2 h-4 w-4" />
             {t('common.message.delete')}
             <DropdownMenuShortcut>
-              ⌥ <RiDeleteBack2Line className="h-3 w-3 inline" />
+              ⌥ <RiDeleteBack2Line className="inline h-3 w-3" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>

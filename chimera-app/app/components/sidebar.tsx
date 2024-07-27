@@ -49,9 +49,9 @@ function CustomNavLink({ to, children }: CustomNavLinkProps) {
 
 export function Sidebar() {
   return (
-    <div className="px-2 flex flex-col justify-between h-screen w-44">
+    <div className="flex h-screen w-44 flex-col justify-between px-2">
       <div className="overflow-auto">
-        <div className="bg-background sticky top-0">
+        <div className="sticky top-0 bg-background">
           <h1 className="mx-2 my-4 text-2xl font-bold tracking-tight">
             <NavLink to="/" className="inline-flex items-center">
               <PiHandFistBold className="mr-2 text-yellow-500" />

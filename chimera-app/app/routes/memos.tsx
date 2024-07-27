@@ -9,13 +9,13 @@ import { Memos, MemoSchema, MemoStatus } from '~/types/memos'
 import { MemoSettings } from '~/types/memo-settings'
 import { getMemos, insertMemo } from '~/models/memo.server'
 import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
-import { ErrorView } from '~/components/lib/error-view'
-import { MemoList } from '~/components/memo/memo-list'
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from '~/components/ui/resizable'
+import { ErrorView } from '~/components/lib/error-view'
+import { MemoList } from '~/components/memo/memo-list'
 import { useSetAtom } from 'jotai'
 import { memoSettingsAtom } from '~/lib/state'
 
@@ -77,8 +77,8 @@ export default function Layout() {
   const { memoId } = params
 
   return (
-    <div className="p-4 h-screen">
-      <ResizablePanelGroup direction="horizontal" className="border rounded-lg">
+    <div className="h-screen p-4">
+      <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
         <ResizablePanel defaultSize={35}>
           <MemoList defaultMemos={memos} showId={memoId || ''} />
         </ResizablePanel>

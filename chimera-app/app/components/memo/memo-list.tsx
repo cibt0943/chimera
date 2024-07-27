@@ -63,8 +63,8 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
 
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
-  const memosRefs = React.useRef<HTMLDivElement>(null)
-  const addButtonRef = React.useRef<HTMLButtonElement>(null)
+  const useMemosRef = React.useRef<HTMLDivElement>(null)
+  const useAddButtonRef = React.useRef<HTMLButtonElement>(null)
 
   // フィルタリング後のメモ一覧データ更新（memosに依存した値なのでstateで持つ必要はないと考えメモ化した変数で対応）
   const dispMemos = React.useMemo(() => {
@@ -208,7 +208,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   }, 300)
 
   function setListFocus(memo: Memo) {
-    memosRefs.current?.querySelector<HTMLElement>(`#memo-${memo.id}`)?.focus()
+    useMemosRef.current?.querySelector<HTMLElement>(`#memo-${memo.id}`)?.focus()
   }
 
   // キーボード操作(スコープあり)
@@ -263,7 +263,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
       switch (handler.keys?.join('')) {
         // メモ追加
         case 'n':
-          addButtonRef.current?.click()
+          useAddButtonRef.current?.click()
           break
         // フォーカスを一覧へ移動
         case 'left':
@@ -284,11 +284,11 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
             type="submit"
             variant="secondary"
             className="h-8 px-2"
-            ref={addButtonRef}
+            ref={useAddButtonRef}
           >
             <RiAddLine className="mr-2" />
             {t('common.message.add')}
-            <p className="text-xs text-muted-foreground ml-2">
+            <p className="ml-2 text-xs text-muted-foreground">
               <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
                 <span>⌥</span>n
               </kbd>
@@ -314,7 +314,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
           sensors={sensors}
           id="dnd-context-for-memos"
         >
-          <div className="space-y-3 px-3" id="memos" ref={memosRefs}>
+          <div className="space-y-3 px-3" id="memos" ref={useMemosRef}>
             <SortableContext
               items={dispMemos}
               strategy={verticalListSortingStrategy}

@@ -13,7 +13,7 @@ export function AccountTabs({ accountSettings }: AccountTabsProps) {
 
   return (
     <Tabs defaultValue="account" className="w-[400px]">
-      <TabsList className="grid w-full grid-cols-2 mb-4">
+      <TabsList className="mb-4 grid w-full grid-cols-2">
         <TabsTrigger value="account">{t('account.title-account')}</TabsTrigger>
         <TabsTrigger value="password">
           {t('account.title-password')}

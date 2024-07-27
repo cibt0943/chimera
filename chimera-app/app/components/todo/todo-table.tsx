@@ -159,10 +159,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   React.useEffect(() => {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
     if (!nowSelectedRow) return
-    useTBodyRef.current
-      ?.querySelector<HTMLElement>(`#row-${nowSelectedRow.id}`)
-      ?.focus()
-    // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
+    setListFocus(nowSelectedRow.original)
   }, [table, rowSelection])
 
   // タスク追加ダイアログを開く
@@ -338,6 +335,11 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     nowSelectedRow && openDeleteTaskDialog(nowSelectedRow.original)
   }
 
+  function setListFocus(task: Task) {
+    useTBodyRef.current?.querySelector<HTMLElement>(`#row-${task.id}`)?.focus()
+    // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
+  }
+
   // キーボードショートカット
   useHotkeys(
     [
@@ -408,7 +410,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         >
           <RiAddLine className="mr-2" />
           {t('common.message.add')}
-          <p className="text-xs text-muted-foreground ml-2">
+          <p className="ml-2 text-xs text-muted-foreground">
             <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
               <span>⌥</span>n
             </kbd>

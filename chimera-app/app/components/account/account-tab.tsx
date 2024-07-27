@@ -29,7 +29,7 @@ export function AccountTab({ accountSettings }: AccountTabProps) {
       <FormFooter>
         <Button
           variant="link"
-          className="text-destructive border-destructive/50"
+          className="border-destructive/50 text-destructive"
           onClick={() => setIsOpenDeleteDialog(true)}
         >
           {t('account.message.do_delete')}

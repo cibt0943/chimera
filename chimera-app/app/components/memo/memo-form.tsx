@@ -40,21 +40,18 @@ export function MemoForm({ memo }: MemoFormProps) {
   // memoの状態を変更して保存したかどうか
   const [isChangedMemo, setIsChangedMemo] = React.useState(false)
 
-  // 自動保存の状態を保持(OFF→ONの切り替え時に自動保存を実行する)
-  const [isChangeAutoSave, setIsChangeAutoSave] = React.useState(
-    memoSettings?.auto_save,
-  )
-
   React.useEffect(() => {
     setIsChangedMemo(false)
   }, [memo?.id])
 
   React.useEffect(() => {
     // メモが存在し、メモが変更されている場合、自動保存がOFF→ONの切り替え時に自動保存を実行する
-    if (memo && isChangedMemo && !isChangeAutoSave && memoSettings?.auto_save) {
+    if (memo && isChangedMemo && memoSettings?.auto_save) {
+      console.log('auto save')
       saveMemoApi()
     }
-    setIsChangeAutoSave(memoSettings?.auto_save)
+    // 以下のdisableを止める方法を検討したい。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [memoSettings?.auto_save])
 
   const action = memo ? `/memos/${memo.id}` : `/memos`
@@ -139,7 +136,7 @@ export function MemoForm({ memo }: MemoFormProps) {
           <Textarea
             {...getTextareaProps(fields.content)}
             key={fields.content.key}
-            className="resize-none bg-[#303841] text-white focus-visible:ring-0  h-[calc(100vh_-_155px)]"
+            className="h-[calc(100vh_-_155px)] resize-none bg-[#303841] text-white focus-visible:ring-0"
             rows={15}
           />
           <FormMessage message={fields.content.errors} />
@@ -271,7 +268,7 @@ function SaveButton({ isChangedMemo }: { isChangedMemo: boolean }) {
     return (
       <>
         {t('common.message.save')}
-        <p className="text-xs ml-2">
+        <p className="ml-2 text-xs">
           <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
             <span>⌥</span>s
           </kbd>

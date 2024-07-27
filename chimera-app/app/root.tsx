@@ -11,7 +11,7 @@ import {
 } from '@remix-run/react'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { I18nextProvider } from 'react-i18next'
-import styles from '~/tailwind.css'
+import styles from '~/styles/tailwind.css'
 import { authenticator } from '~/lib/auth.server'
 import { useTheme } from './lib/useTheme'
 import i18n, { useChangeLanguage } from '~/lib/i18n/i18n'
