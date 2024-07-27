@@ -46,13 +46,13 @@ export function MemoForm({ memo }: MemoFormProps) {
 
   React.useEffect(() => {
     // メモが存在し、メモが変更されている場合、自動保存がOFF→ONの切り替え時に自動保存を実行する
-    if (memo && isChangedMemo && memoSettings?.auto_save) {
+    if (memo && isChangedMemo && memoSettings?.autoSave) {
       console.log('auto save')
       saveMemoApi()
     }
     // 以下のdisableを止める方法を検討したい。
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [memoSettings?.auto_save])
+  }, [memoSettings?.autoSave])
 
   const action = memo ? `/memos/${memo.id}` : `/memos`
 
@@ -61,7 +61,7 @@ export function MemoForm({ memo }: MemoFormProps) {
       memo && memo.title + memo.content !== ''
         ? memo.title.concat('\n', memo.content)
         : '',
-    related_date: memo ? memo.related_date : null,
+    relatedDate: memo ? memo.relatedDate : null,
   }
 
   const [form, fields] = useForm<MemoSchemaType>({
@@ -121,7 +121,7 @@ export function MemoForm({ memo }: MemoFormProps) {
         action={action}
         onChange={() => {
           setIsChangedMemo(true)
-          if (!memoSettings?.auto_save) return
+          if (!memoSettings?.autoSave) return
           saveMemoDebounce()
         }}
         onSubmit={(event) => {
@@ -146,15 +146,15 @@ export function MemoForm({ memo }: MemoFormProps) {
           <div className="flex items-center space-x-6">
             <FormItem>
               <MemoRelatedDateTimePicker
-                meta={fields.related_date}
+                meta={fields.relatedDate}
                 divProps={{ className: 'w-64' }}
                 onChange={() => {
                   setIsChangedMemo(true)
-                  if (!memoSettings?.auto_save) return
+                  if (!memoSettings?.autoSave) return
                   saveMemoDebounce()
                 }}
               />
-              <FormMessage message={fields.related_date.errors} />
+              <FormMessage message={fields.relatedDate.errors} />
             </FormItem>
             <SaveButton isChangedMemo={isChangedMemo} />
           </div>
@@ -238,7 +238,7 @@ function SaveButton({ isChangedMemo }: { isChangedMemo: boolean }) {
   const fetcher = useFetcher({ key: 'memo-form' })
   const memoSettings = useAtomValue(memoSettingsAtom)
 
-  const isDisabled = memoSettings?.auto_save
+  const isDisabled = memoSettings?.autoSave
     ? true
     : isChangedMemo
       ? false
@@ -250,7 +250,7 @@ function SaveButton({ isChangedMemo }: { isChangedMemo: boolean }) {
       caption = t('common.message.state_saving')
       break
     default:
-      caption = memoSettings?.auto_save ? (
+      caption = memoSettings?.autoSave ? (
         isChangedMemo ? (
           t('common.message.state_save_wait')
         ) : (
@@ -263,7 +263,7 @@ function SaveButton({ isChangedMemo }: { isChangedMemo: boolean }) {
   }
 
   function SaveHotkeyIcon() {
-    if (memoSettings?.auto_save) return null
+    if (memoSettings?.autoSave) return null
 
     return (
       <>

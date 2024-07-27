@@ -44,7 +44,7 @@ function ShowArchivedSwith() {
   function updateMemoSettingStatusFilter(statuses: MemoStatus[]) {
     fetcher.submit(
       {
-        list_filter: {
+        listFilter: {
           statuses,
         },
       },
@@ -67,7 +67,7 @@ function ShowArchivedSwith() {
         <Switch
           id="show-archived"
           name="show-archived"
-          defaultChecked={memoSettings.list_filter.statuses.includes(
+          defaultChecked={memoSettings.listFilter.statuses.includes(
             MemoStatus.ARCHIVED,
           )}
           // checked={memoSettings?.list_filter.statuses.includes(MemoStatus.ARCHIVED)}
@@ -93,7 +93,7 @@ function ShowContentSwith() {
   function updateMemoSettingDisplayContent(isShow: boolean) {
     fetcher.submit(
       {
-        list_display: {
+        listDisplay: {
           content: isShow,
         },
       },
@@ -116,7 +116,7 @@ function ShowContentSwith() {
         <Switch
           id="show-content"
           name="show-content"
-          defaultChecked={memoSettings.list_display.content}
+          defaultChecked={memoSettings.listDisplay.content}
           onCheckedChange={(isChecked) => {
             updateMemoSettingDisplayContent(isChecked)
           }}
@@ -136,7 +136,7 @@ function AutoSaveSwith() {
   function updateMemoSettingAutoSave(isAutoSave: boolean) {
     fetcher.submit(
       {
-        auto_save: isAutoSave,
+        autoSave: isAutoSave,
       },
       {
         action: `/account/memo/settings`,
@@ -157,7 +157,7 @@ function AutoSaveSwith() {
         <Switch
           id="auto-save"
           name="auto-save"
-          defaultChecked={memoSettings.auto_save}
+          defaultChecked={memoSettings.autoSave}
           onCheckedChange={(isChecked) => {
             updateMemoSettingAutoSave(isChecked)
           }}

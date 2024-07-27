@@ -326,7 +326,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
                     item={item}
                     setFocusedMemo={setFocusedMemo}
                     isSelected={item.id === selectedMemo?.id}
-                    isPreview={!!memoSettings?.list_display.content}
+                    isPreview={!!memoSettings?.listDisplay.content}
                   >
                     <MemoActions
                       memo={item}

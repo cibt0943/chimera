@@ -19,9 +19,9 @@ export async function getEvents(account_id: string): Promise<Events> {
   const events = [
     {
       id: 'a',
-      created_at: new Date(),
-      updated_at: new Date(),
-      account_id: account_id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      accountId: account_id,
       title: 'my event',
       start: toDate('2024-07-29'),
       end: toDate('2024-07-29'),

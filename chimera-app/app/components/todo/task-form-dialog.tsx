@@ -122,11 +122,11 @@ export function TaskFormDialog({
             <FormMessage message={fields.memo.errors} />
           </FormItem>
           <FormItem className="flex flex-col">
-            <FormLabel htmlFor={fields.due_date.id}>
+            <FormLabel htmlFor={fields.dueDate.id}>
               {t('task.model.due_date')}
             </FormLabel>
-            <TaskDueDateTimePicker meta={fields.due_date} />
-            <FormMessage message={fields.due_date.errors} />
+            <TaskDueDateTimePicker meta={fields.dueDate} />
+            <FormMessage message={fields.dueDate.errors} />
           </FormItem>
           <FormItem>
             <FormLabel htmlFor={fields.status.id}>

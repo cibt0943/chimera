@@ -15,20 +15,20 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
 
   // アカウントのメモ設定情報を更新
   const updateData: UpdateParams = {}
-  if (data.list_filter !== undefined) {
+  if (data.listFilter !== undefined) {
     updateData.list_filter = {
-      ...memoSettings.list_filter,
-      statuses: data.list_filter.statuses,
+      ...memoSettings.listFilter,
+      statuses: data.listFilter.statuses,
     }
   }
-  if (data.list_display !== undefined) {
+  if (data.listDisplay !== undefined) {
     updateData.list_display = {
-      ...memoSettings.list_display,
-      content: data.list_display.content,
+      ...memoSettings.listDisplay,
+      content: data.listDisplay.content,
     }
   }
-  if (data.auto_save !== undefined) {
-    updateData.auto_save = data.auto_save
+  if (data.autoSave !== undefined) {
+    updateData.auto_save = data.autoSave
   }
 
   const updatedMemoSettings = await updateMemoSettings({

@@ -29,7 +29,7 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
     title: data.title,
     memo: data.memo || '',
     status: data.status,
-    due_date: data.due_date?.toISOString() || null,
+    due_date: data.dueDate?.toISOString() || null,
   })
 
   return redirect('/todos')

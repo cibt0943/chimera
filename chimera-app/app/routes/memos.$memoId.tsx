@@ -16,7 +16,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 export const action = withAuthentication(
   async ({ params, request, loginSession }) => {
     const memo = await getMemo(params.memoId || '')
-    if (memo.account_id !== loginSession.account.id) throw new Error('erorr')
+    if (memo.accountId !== loginSession.account.id) throw new Error('erorr')
 
     const formData = await request.formData()
     const submission = parseWithZod(formData, { schema: MemoSchema })
@@ -33,7 +33,7 @@ export const action = withAuthentication(
       id: memo.id,
       title: title,
       content: content.join('\n'),
-      related_date: data.related_date?.toISOString() || null,
+      related_date: data.relatedDate?.toISOString() || null,
     })
 
     return redirect(`/memos/${memo.id}`)
@@ -46,7 +46,7 @@ type LoaderData = {
 
 export const loader = withAuthentication(async ({ params, loginSession }) => {
   const memo = await getMemo(params.memoId || '')
-  if (memo.account_id !== loginSession.account.id) throw new Error('erorr')
+  if (memo.accountId !== loginSession.account.id) throw new Error('erorr')
 
   return typedjson({ memo })
 })

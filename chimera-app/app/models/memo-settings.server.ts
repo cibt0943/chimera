@@ -54,15 +54,15 @@ interface updateMemoSettingsProps {
 }
 
 export async function updateMemoSettings(
-  MemoSettings: updateMemoSettingsProps,
+  memoSettings: updateMemoSettingsProps,
   noUpdated = false,
 ): Promise<MemoSettings> {
-  if (!noUpdated) MemoSettings.updated_at = new Date().toISOString()
+  if (!noUpdated) memoSettings.updated_at = new Date().toISOString()
 
   const { data, error } = await supabase
     .from('memo_settings')
-    .update(MemoSettings)
-    .eq('id', MemoSettings.id)
+    .update(memoSettings)
+    .eq('id', memoSettings.id)
     .select()
     .single()
   if (error || !data) throw error || new Error('erorr')

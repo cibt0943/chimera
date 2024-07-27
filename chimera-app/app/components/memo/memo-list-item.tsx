@@ -68,7 +68,7 @@ export function ListItem(props: ListItemProps) {
     }),
   }
 
-  const updatedAtDiff = useDateDiffFormat(item.updated_at)
+  const updatedAtDiff = useDateDiffFormat(item.updatedAt)
 
   return (
     <NavLink
@@ -105,7 +105,7 @@ export function ListItem(props: ListItemProps) {
               className="ml-auto text-xs text-muted-foreground"
               // 下記を表示するとエラーが発生する。サーバーサイドとクライアントで時間側が異なるためと思われる。
               title={format(
-                item.updated_at,
+                item.updatedAt,
                 t('common.format.date_time_format'),
               )}
             >

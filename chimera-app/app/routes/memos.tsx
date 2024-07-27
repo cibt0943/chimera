@@ -40,7 +40,7 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
     title: title,
     content: content.join('\n'),
     status: MemoStatus.NOMAL,
-    related_date: data.related_date?.toISOString() || null,
+    related_date: data.relatedDate?.toISOString() || null,
   })
 
   return redirect(`/memos/${newMemo.id}`)
@@ -55,7 +55,7 @@ export const loader = withAuthentication(async ({ loginSession }) => {
   const memoSettings = await getOrInsertMemoSettings(loginSession.account.id)
   const memos = await getMemos(
     loginSession.account.id,
-    memoSettings.list_filter.statuses,
+    memoSettings.listFilter.statuses,
   )
 
   return typedjson({

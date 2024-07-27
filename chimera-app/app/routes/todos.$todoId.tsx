@@ -15,7 +15,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 export const action = withAuthentication(
   async ({ params, request, loginSession }) => {
     const task = await getTask(params.todoId || '')
-    if (task.account_id !== loginSession.account.id) throw new Error('erorr')
+    if (task.accountId !== loginSession.account.id) throw new Error('erorr')
 
     const formData = await request.formData()
     const submission = parseWithZod(formData, { schema: TaskSchema })
@@ -32,7 +32,7 @@ export const action = withAuthentication(
       title: data.title,
       memo: data.memo || '',
       status: data.status,
-      due_date: data.due_date?.toISOString() || null,
+      due_date: data.dueDate?.toISOString() || null,
     })
 
     return redirect('/todos')
@@ -45,7 +45,7 @@ type LoaderData = {
 
 export const loader = withAuthentication(async ({ params, loginSession }) => {
   const task = await getTask(params.todoId || '')
-  if (task.account_id !== loginSession.account.id) throw new Error('erorr')
+  if (task.accountId !== loginSession.account.id) throw new Error('erorr')
 
   return typedjson({ task })
 })

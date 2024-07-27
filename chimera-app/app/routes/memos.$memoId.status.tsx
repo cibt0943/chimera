@@ -8,7 +8,7 @@ import { getMemo, updateMemo } from '~/models/memo.server'
 export const action = withAuthentication(
   async ({ params, request, loginSession }) => {
     const memo = await getMemo(params.memoId || '')
-    if (memo.account_id !== loginSession.account.id) throw new Error('erorr')
+    if (memo.accountId !== loginSession.account.id) throw new Error('erorr')
 
     const formData = await request.formData()
     const submission = parseWithZod(formData, {

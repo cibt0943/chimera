@@ -36,7 +36,7 @@ function ColumnHeader({
 
 function DueDateCell({ row }: { row: Row<Task> }) {
   const { t } = useTranslation()
-  const dateStr = row.original.due_date
+  const dateStr = row.original.dueDate
   return dateStr ? (
     <ClientOnly>
       {() => (
@@ -58,7 +58,7 @@ function StatusCell({ row }: { row: Row<Task> }) {
 
 export const TodoTableColumns: ColumnDef<Task>[] = [
   {
-    id: 'drag-handle',
+    id: 'dragHandle',
     size: 40,
     header: '',
     cell: ({ row }) => <RowDragHandleCell rowId={row.original.id} />,

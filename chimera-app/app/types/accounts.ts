@@ -49,8 +49,8 @@ export type AccountModel = Database['public']['Tables']['accounts']['Row']
 // アカウントの型
 export type Account = {
   id: string
-  created_at: Date
-  updated_at: Date
+  createdAt: Date
+  updatedAt: Date
   sub: string
   language: Language
   timezone: string
@@ -61,8 +61,8 @@ export type Account = {
 export function AccountModel2Account(accountModel: AccountModel): Account {
   return {
     id: accountModel.id,
-    created_at: toDate(accountModel.created_at),
-    updated_at: toDate(accountModel.updated_at),
+    createdAt: toDate(accountModel.created_at),
+    updatedAt: toDate(accountModel.updated_at),
     sub: accountModel.sub,
     language: accountModel.language as Language,
     timezone: accountModel.timezone,

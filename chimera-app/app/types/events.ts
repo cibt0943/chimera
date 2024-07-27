@@ -1,8 +1,8 @@
 export type Event = {
   id: string
-  created_at: Date
-  updated_at: Date
-  account_id: string
+  createdAt: Date
+  updatedAt: Date
+  accountId: string
   title: string
   start: Date
   end: Date
