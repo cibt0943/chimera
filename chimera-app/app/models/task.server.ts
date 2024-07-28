@@ -2,11 +2,11 @@ import { Tasks, Task, TaskModel, TaskModel2Task } from '~/types/tasks'
 import { supabase } from '~/lib/supabase-client.server'
 
 // タスク一覧を取得
-export async function getTasks(account_id: string): Promise<Tasks> {
+export async function getTasks(accountId: string): Promise<Tasks> {
   const { data, error } = await supabase
     .from('tasks')
     .select()
-    .eq('account_id', account_id)
+    .eq('account_id', accountId)
     .order('position', { ascending: false })
     .order('id')
   if (error) throw error

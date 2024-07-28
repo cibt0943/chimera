@@ -7,11 +7,11 @@ import {
 import { supabase } from '~/lib/supabase-client.server'
 
 // idからアカウント情報を取得
-export async function getAccount(account_id: string): Promise<Account> {
+export async function getAccount(accountId: string): Promise<Account> {
   const { data, error } = await supabase
     .from('accounts')
     .select()
-    .eq('id', account_id)
+    .eq('id', accountId)
     .single()
   if (error || !data) throw error || new Error('erorr')
 
@@ -75,10 +75,7 @@ export async function updateAccount(
 }
 
 // アカウント情報の削除
-export async function deleteAccount(account_id: string): Promise<void> {
-  const { error } = await supabase
-    .from('accounts')
-    .delete()
-    .eq('id', account_id)
+export async function deleteAccount(accountId: string): Promise<void> {
+  const { error } = await supabase.from('accounts').delete().eq('id', accountId)
   if (error) throw error
 }

@@ -9,13 +9,13 @@ import { supabase } from '~/lib/supabase-client.server'
 
 // メモ一覧を取得
 export async function getMemos(
-  account_id: string,
+  accountId: string,
   statuses: MemoStatus[],
 ): Promise<Memos> {
   const { data, error } = await supabase
     .from('memos')
     .select()
-    .eq('account_id', account_id)
+    .eq('account_id', accountId)
     .in('status', statuses)
     .order('position', { ascending: false })
     .order('id')
