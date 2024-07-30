@@ -4,8 +4,12 @@ import type { Database } from '~/types/schema'
 import { Task } from '~/types/tasks'
 import { Memo } from '~/types/memos'
 
-// DBのタスクテーブルの型
+// DBのイベントテーブルの型
 export type EventModel = Database['public']['Tables']['events']['Row']
+export type InsertEventModel = Database['public']['Tables']['events']['Insert']
+type _UpdateEventModel = Database['public']['Tables']['events']['Update']
+export type UpdateEventModel = Required<Pick<_UpdateEventModel, 'id'>> &
+  Partial<Omit<_UpdateEventModel, 'id'>> // idを取り除いて必須で追加
 
 // イベントの型
 export type Event = {
@@ -42,8 +46,9 @@ export const EventSchema = zod.object({
   title: zod
     .string({ required_error: '必須項目です' })
     .max(255, { message: '255文字以内で入力してください' }),
-  start: zod.date(),
+  start: zod.date({ required_error: '必須項目です' }),
   end: zod.date().optional(),
+  allDay: zod.boolean().optional(),
   memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
   location: zod
     .string()
@@ -64,7 +69,6 @@ export type CalendarEventType =
 // FullCalendarのイベントの型
 export type CalendarEvent = {
   id: string
-  type: CalendarEventType
   title: string
   start: Date
   end?: Date
@@ -72,6 +76,9 @@ export type CalendarEvent = {
   className?: string
   backgroundColor: string
   borderColor: string
+  // 下記はFullCalendarには無い独自追加のプロパティ
+  type: CalendarEventType
+  srcObj: Event | Task | Memo
 }
 
 export type CalendarEvents = CalendarEvent[]
@@ -79,46 +86,53 @@ export type CalendarEvents = CalendarEvent[]
 export function Event2Calendar(event: Event): CalendarEvent {
   return {
     id: event.id,
-    type: CalendarEventType.EVENT,
     title: event.title,
     start: event.start,
     end: event.end || undefined,
     allDay: event.allDay,
     backgroundColor: '#BFDBFF',
     borderColor: '#BFDBFF',
+    type: CalendarEventType.EVENT,
+    srcObj: event,
   }
 }
 
-export function Task2Calendar(task: Task): CalendarEvent {
-  if (!task.dueDate) {
-    throw new Error('dueDate is required')
-  }
+// TaskのdueDateを必須に変更した型
+export type TaskWithNonNullableDueDate = Omit<Task, 'dueDate'> & {
+  dueDate: Date
+}
 
+export function Task2Calendar(task: TaskWithNonNullableDueDate): CalendarEvent {
   return {
     id: task.id,
-    type: CalendarEventType.TASK,
     title: task.title,
     start: task.dueDate,
     end: undefined,
     allDay: false,
     backgroundColor: '#F5D0FE',
     borderColor: '#F5D0FE',
+    type: CalendarEventType.TASK,
+    srcObj: task,
   }
 }
 
-export function Memo2Calendar(memo: Memo): CalendarEvent {
-  if (!memo.relatedDate) {
-    throw new Error('relatedDate is required')
-  }
+// MemoのrelatedDateを必須に変更した型
+export type MemoWithNonNullableRelatedDate = Omit<Memo, 'relatedDate'> & {
+  relatedDate: Date
+}
 
+export function Memo2Calendar(
+  memo: MemoWithNonNullableRelatedDate,
+): CalendarEvent {
   return {
     id: memo.id,
-    type: CalendarEventType.MEMO,
     title: memo.title,
     start: memo.relatedDate,
     end: undefined,
     allDay: false,
     backgroundColor: '#FEF08A',
     borderColor: '#FEF08A',
+    type: CalendarEventType.MEMO,
+    srcObj: memo,
   }
 }

@@ -162,5 +162,23 @@
       "list_show_content": "リストにメモ内容のプレビューを表示する",
       "auto_save": "メモを自動的に保存する"
     }
+  },
+  "event": {
+    "title": "イベント",
+    "model": {
+      "id": "ID",
+      "title": "タイトル",
+      "start": "開始",
+      "end": "終了",
+      "allDay": "終日",
+      "memo": "メモ",
+      "location": "場所"
+    },
+    "message": {
+      "event_creation": "イベントの作成",
+      "event_editing": "イベントの編集",
+      "event_deletion": "イベントの削除",
+      "set_event_info": "イベントの情報を設定してください。"
+    }
   }
 }

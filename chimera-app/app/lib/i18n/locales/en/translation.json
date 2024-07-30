@@ -164,5 +164,23 @@
       "list_show_content": "Show Content Preview in List",
       "auto_save": "Auto Save for Edits"
     }
+  },
+  "event": {
+    "title": "Event",
+    "model": {
+      "id": "ID",
+      "title": "Title",
+      "start": "Start",
+      "end": "End",
+      "allDay": "All Day",
+      "memo": "Memo",
+      "location": "Location"
+    },
+    "message": {
+      "event_creation": "Event Creation",
+      "event_editing": "Event Editing",
+      "event_deletion": "Event Deletion",
+      "set_event_info": "Set the event information."
+    }
   }
 }
