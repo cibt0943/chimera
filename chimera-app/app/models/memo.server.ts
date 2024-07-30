@@ -10,8 +10,9 @@ import { supabase } from '~/lib/supabase-client.server'
 // メモ一覧を取得
 export async function getMemos(
   accountId: string,
-  statuses: MemoStatus[],
+  statuses?: MemoStatus[],
 ): Promise<Memos> {
+  if (!statuses) statuses = [MemoStatus.NOMAL, MemoStatus.ARCHIVED]
   const { data, error } = await supabase
     .from('memos')
     .select()

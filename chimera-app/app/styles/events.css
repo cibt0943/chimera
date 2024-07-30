@@ -1,19 +1,7 @@
-.fc-col-header-cell {
-  @apply text-sm font-semibold !important;
-}
-
 .fc-toolbar-title {
   @apply text-lg font-semibold !important;
 }
 
-.fc-button-group {
-  @apply space-x-1 !important;
-}
-
 .fc-button.fc-button-primary {
   @apply inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md border-none bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground shadow-sm transition-colors hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 !important;
-}
-
-.fc-daygrid-day-number {
-  @apply text-sm !important;
 }

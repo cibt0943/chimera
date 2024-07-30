@@ -51,8 +51,9 @@ export function DateTimePicker({
         <PopoverTrigger asChild>
           <div className="grow cursor-pointer pl-2 text-sm">
             {value ? (
-              format(value, t('common.format.date_time_format'))
+              format(value, t('common.format.date_time_short_format'))
             ) : (
+              // format(value, t('common.format.date_time_format'))
               <span className="opacity-50">{placeholder || 'Pick a date'}</span>
             )}
           </div>
@@ -63,10 +64,14 @@ export function DateTimePicker({
             selected={value}
             onSelect={(selectedDay) => {
               if (selectedDay) {
-                const [hours, minutes, seconds] = value
-                  ? [value.getHours(), value.getMinutes(), value.getSeconds()]
-                  : [9, 0, 0]
-                selectedDay.setHours(hours, minutes, seconds, 0)
+                // const [hours, minutes, seconds] = value
+                //   ? [value.getHours(), value.getMinutes(), value.getSeconds()]
+                //   : [9, 0, 0]
+                // selectedDay.setHours(hours, minutes, seconds, 0)
+                const [hours, minutes] = value
+                  ? [value.getHours(), value.getMinutes()]
+                  : [9, 0]
+                selectedDay.setHours(hours, minutes, 0, 0)
               }
               handleChange(selectedDay)
               // setIsCalendarOpen(false)

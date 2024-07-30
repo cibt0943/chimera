@@ -13,7 +13,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
   const { t } = useTranslation()
   const hourRef = React.useRef<HTMLInputElement>(null)
   const minuteRef = React.useRef<HTMLInputElement>(null)
-  const secondRef = React.useRef<HTMLInputElement>(null)
+  // const secondRef = React.useRef<HTMLInputElement>(null)
 
   return (
     <div className="flex items-end gap-2">
@@ -39,10 +39,10 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
           setDate={setDate}
           ref={minuteRef}
           onLeftFocus={() => hourRef.current?.focus()}
-          onRightFocus={() => secondRef.current?.focus()}
+          // onRightFocus={() => secondRef.current?.focus()}
         />
       </div>
-      <div className="grid gap-1 text-center">
+      {/* <div className="grid gap-1 text-center">
         <Label htmlFor="seconds" className="text-xs">
           {t('common.format.second')}
         </Label>
@@ -53,7 +53,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
           ref={secondRef}
           onLeftFocus={() => minuteRef.current?.focus()}
         />
-      </div>
+      </div> */}
       <div className="flex h-9 items-center">
         <RiTimeLine className="ml-2 h-4 w-4" />
       </div>

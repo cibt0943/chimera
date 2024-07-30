@@ -64,6 +64,53 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          account_id: string
+          all_day: boolean
+          created_at: string
+          end: string | null
+          id: string
+          location: string
+          memo: string
+          start: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          all_day: boolean
+          created_at?: string
+          end?: string | null
+          id?: string
+          location?: string
+          memo?: string
+          start: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          all_day?: boolean
+          created_at?: string
+          end?: string | null
+          id?: string
+          location?: string
+          memo?: string
+          start?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memo_settings: {
         Row: {
           account_id: string
@@ -92,7 +139,15 @@ export type Database = {
           list_filter?: Json
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "memo_settings_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: true
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       memos: {
         Row: {
@@ -128,7 +183,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "memos_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tasks: {
         Row: {
@@ -164,7 +227,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tasks_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

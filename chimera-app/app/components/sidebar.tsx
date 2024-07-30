@@ -1,11 +1,11 @@
 import { NavLink } from '@remix-run/react'
 import { PiHandFistBold } from 'react-icons/pi'
 import {
-  RxCheck,
+  RxCheckCircled,
+  RxPencil2,
   RxCalendar,
   RxFile,
   RxPaperPlane,
-  RxPencil2,
 } from 'react-icons/rx'
 import { cn } from '~/lib/utils'
 import { buttonVariants } from '~/components/ui/button'
@@ -61,7 +61,7 @@ export function Sidebar() {
         </div>
         <div className="grid gap-1 p-px">
           <CustomNavLink to="/todos">
-            <RxCheck className="mr-2 h-5 w-5" />
+            <RxCheckCircled className="mr-2 h-5 w-5" />
             Todo
           </CustomNavLink>
           <CustomNavLink to="/memos">
