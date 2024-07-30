@@ -45,6 +45,10 @@ export const TaskStatusListByDispOrder = TaskStatusList.slice().sort(
 
 // DBのタスクテーブルの型
 export type TaskModel = Database['public']['Tables']['tasks']['Row']
+export type InsertTaskModel = Database['public']['Tables']['tasks']['Insert']
+type _UpdateTaskModel = Database['public']['Tables']['tasks']['Update']
+export type UpdateTaskModel = Required<Pick<_UpdateTaskModel, 'id'>> &
+  Partial<Omit<_UpdateTaskModel, 'id'>> // idを取り除いて必須で追加
 
 export type Task = {
   id: string
@@ -80,8 +84,6 @@ export const TaskSchema = zod.object({
     .max(255, { message: '255文字以内で入力してください' }),
   memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
   status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
-  // status: zod.nativeEnum(TaskStatus),
-  // due_date: zod.coerce.date().optional(),
   dueDate: zod.date().optional(),
 })
 

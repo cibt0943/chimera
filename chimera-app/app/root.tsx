@@ -84,7 +84,7 @@ export default function App() {
             <aside className="">
               <Sidebar />
             </aside>
-            <main className="grow h-screen overflow-auto">
+            <main className="h-screen grow overflow-auto">
               <LoadingEffect>
                 <Outlet />
               </LoadingEffect>

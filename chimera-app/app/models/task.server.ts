@@ -1,4 +1,11 @@
-import { Tasks, Task, TaskModel, TaskModel2Task } from '~/types/tasks'
+import {
+  Tasks,
+  Task,
+  TaskModel,
+  InsertTaskModel,
+  UpdateTaskModel,
+  TaskModel2Task,
+} from '~/types/tasks'
 import { supabase } from '~/lib/supabase-client.server'
 
 // タスク一覧を取得
@@ -30,16 +37,8 @@ export async function getTask(taskId: string): Promise<Task> {
   return TaskModel2Task(data)
 }
 
-// タスク情報の追加
-interface insertTaskProps {
-  account_id: string
-  title: string
-  memo: string
-  status: number
-  due_date: string | null
-}
-
-export async function insertTask(task: insertTaskProps): Promise<Task> {
+// タスクの追加
+export async function insertTask(task: InsertTaskModel): Promise<Task> {
   const { data: maxTask, error: errorMaxTask } = await supabase
     .from('tasks')
     .select()
@@ -60,19 +59,9 @@ export async function insertTask(task: insertTaskProps): Promise<Task> {
   return TaskModel2Task(newTask)
 }
 
-// タスク情報の更新
-interface updateTaskProps {
-  id: string
-  updated_at?: string
-  position?: number
-  title?: string
-  memo?: string
-  status?: number
-  due_date?: string | null
-}
-
+// タスクの更新
 export async function updateTask(
-  task: updateTaskProps,
+  task: UpdateTaskModel,
   noUpdated = false,
 ): Promise<Task> {
   if (!noUpdated) task.updated_at = new Date().toISOString()
@@ -88,6 +77,7 @@ export async function updateTask(
   return TaskModel2Task(data)
 }
 
+// タスクの削除
 export async function deleteTask(taskId: string): Promise<void> {
   const { error } = await supabase.from('tasks').delete().eq('id', taskId)
   if (error) throw error

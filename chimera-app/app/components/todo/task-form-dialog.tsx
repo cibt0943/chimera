@@ -71,7 +71,7 @@ export function TaskFormDialog({
   }
 
   const [form, fields] = useForm<TaskSchemaType>({
-    id: `task-form${task ? `-${task.id}` : ''}`,
+    id: `task-form${task ? `-${task.id}` : '-new'}`,
     defaultValue: defaultValue,
     constraint: getZodConstraint(TaskSchema),
     onValidate: ({ formData }) => {
@@ -87,9 +87,7 @@ export function TaskFormDialog({
       open={isOpen}
       onOpenChange={(open) => {
         setIsOpen(open)
-        if (!open && !location.pathname.match(/^\/todos\/?$/)) {
-          navigate('/todos')
-        }
+        if (!open) navigate('/todos')
       }}
     >
       <DialogContent className="sm:max-w-[425px]">

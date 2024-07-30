@@ -1,7 +1,6 @@
 import {
   Account,
-  Language,
-  Theme,
+  UpdateAccountModel,
   AccountModel2Account,
 } from '~/types/accounts'
 import { supabase } from '~/lib/supabase-client.server'
@@ -49,16 +48,8 @@ export async function getOrInsertAccount({
 }
 
 // アカウント情報の更新
-interface updateAccountProps {
-  id: string
-  updated_at?: string
-  language: Language
-  timezone: string
-  theme: Theme
-}
-
 export async function updateAccount(
-  account: updateAccountProps,
+  account: UpdateAccountModel,
   noUpdated = false,
 ): Promise<Account> {
   if (!noUpdated) account.updated_at = new Date().toISOString()

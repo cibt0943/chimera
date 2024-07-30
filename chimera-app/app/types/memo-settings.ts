@@ -6,6 +6,12 @@ import { MemoStatus } from '~/types/memos'
 // DBのアカウントメモ設定テーブルの型
 export type MemoSettingsModel =
   Database['public']['Tables']['memo_settings']['Row']
+type _UpdateMemoSettingsModel =
+  Database['public']['Tables']['memo_settings']['Update']
+export type UpdateMemoSettingsModel = Required<
+  Pick<_UpdateMemoSettingsModel, 'id'>
+> &
+  Partial<Omit<_UpdateMemoSettingsModel, 'id'>> // idを取り除いて必須で追加
 
 export type MemoSettings = {
   id: string

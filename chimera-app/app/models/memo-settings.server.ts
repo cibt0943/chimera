@@ -1,8 +1,8 @@
 import {
   MemoSettings,
+  UpdateMemoSettingsModel,
   MemoSettingsModel2MemoSettings,
 } from '~/types/memo-settings'
-import { MemoStatus } from '~/types/memos'
 import { supabase } from '~/lib/supabase-client.server'
 
 // アカウントのメモ設定情報を取得
@@ -41,20 +41,8 @@ export async function getOrInsertMemoSettings(
 }
 
 // アカウントのメモ設定情報の更新
-interface updateMemoSettingsProps {
-  id: string
-  updated_at?: string
-  list_filter?: {
-    statuses: MemoStatus[]
-  }
-  list_display?: {
-    content: boolean
-  }
-  auto_save?: boolean
-}
-
 export async function updateMemoSettings(
-  memoSettings: updateMemoSettingsProps,
+  memoSettings: UpdateMemoSettingsModel,
   noUpdated = false,
 ): Promise<MemoSettings> {
   if (!noUpdated) memoSettings.updated_at = new Date().toISOString()

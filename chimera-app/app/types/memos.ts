@@ -26,6 +26,10 @@ export const MemoStatusList = [
 
 // DBのメモテーブルの型
 export type MemoModel = Database['public']['Tables']['memos']['Row']
+export type InsertMemoModel = Database['public']['Tables']['memos']['Insert']
+type _UpdateMemoModel = Database['public']['Tables']['memos']['Update']
+export type UpdateMemoModel = Required<Pick<_UpdateMemoModel, 'id'>> &
+  Partial<Omit<_UpdateMemoModel, 'id'>> // idを取り除いて必須で追加
 
 // メモの型
 export type Memo = {
@@ -64,7 +68,6 @@ export const MemoSchema = zod.object({
   status: zod
     .preprocess((v) => Number(v), zod.nativeEnum(MemoStatus))
     .optional(),
-  // status: zod.nativeEnum(MemoStatus).optional(),
   relatedDate: zod.date().optional(),
 })
 

@@ -499,11 +499,16 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.next')}
         </Button>
       </div>
-      <AddTaskFormDialogMemo
-        task={undefined}
-        isOpen={isOpenAddDialog}
-        setIsOpen={setIsOpenAddDialog}
-      />
+      {
+        // コンポーネントを作り直さないと以前のデータが残る
+        isOpenAddDialog && (
+          <AddTaskFormDialogMemo
+            task={undefined}
+            isOpen={isOpenAddDialog}
+            setIsOpen={setIsOpenAddDialog}
+          />
+        )
+      }
       <DeleteConfirmTaskDialogMemo
         task={actionTask}
         isOpen={isOpenDeleteDialog}

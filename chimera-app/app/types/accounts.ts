@@ -45,6 +45,9 @@ export const ThemeList = [
 
 // DBのアカウントテーブルの型
 export type AccountModel = Database['public']['Tables']['accounts']['Row']
+type _UpdateAccountModel = Database['public']['Tables']['accounts']['Update']
+export type UpdateAccountModel = Required<Pick<_UpdateAccountModel, 'id'>> &
+  Partial<Omit<_UpdateAccountModel, 'id'>> // idを取り除いて必須で追加
 
 // アカウントの型
 export type Account = {

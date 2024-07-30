@@ -65,7 +65,7 @@ export function MemoForm({ memo }: MemoFormProps) {
   }
 
   const [form, fields] = useForm<MemoSchemaType>({
-    id: `memo-form${memo ? `-${memo.id}` : ''}`,
+    id: `memo-form${memo ? `-${memo.id}` : '-new'}`,
     defaultValue: defaultValue,
     constraint: getZodConstraint(MemoSchema),
     onValidate: ({ formData }) => {
