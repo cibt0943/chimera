@@ -1,28 +1,18 @@
 import { Form } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import {
-  useForm,
-  getFormProps,
-  getInputProps,
-  getSelectProps,
-} from '@conform-to/react'
+import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
-import { Required } from '~/components/lib/required'
-import { Input } from '~/components/ui/input'
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '~/components/ui/select'
+import { SelectItem } from '~/components/ui/select'
 import {
   FormItem,
   FormLabel,
   FormMessage,
   FormFooter,
 } from '~/components/lib/form'
+import { Required } from '~/components/lib/required'
+import { InputConform } from '~/components/lib/conform/input'
+import { SelectConform } from '~/components/lib/conform/select'
 import {
   AccountSettings,
   AccountSettingsSchema,
@@ -30,35 +20,6 @@ import {
   LanguageList,
   ThemeList,
 } from '~/types/accounts'
-
-function SelectLanguageItems() {
-  const { t } = useTranslation()
-  return (
-    <>
-      {LanguageList.map((language) => (
-        <SelectItem key={language.value} value={language.value.toString()}>
-          {t(language.label)}
-        </SelectItem>
-      ))}
-    </>
-  )
-}
-
-function SelectThemeItems() {
-  const { t } = useTranslation()
-  return (
-    <>
-      {ThemeList.map((theme) => (
-        <SelectItem key={theme.value} value={theme.value}>
-          <span className="flex items-center">
-            <theme.icon className="mr-2 h-4 w-4" />
-            {t(theme.label)}
-          </span>
-        </SelectItem>
-      ))}
-    </>
-  )
-}
 
 interface AccountFormProps {
   accountSettings: AccountSettings
@@ -90,12 +51,7 @@ export function AccountForm({ accountSettings }: AccountFormProps) {
           {t('account.model.name')}
           <Required />
         </FormLabel>
-        <Input
-          {...getInputProps(fields.name, {
-            type: 'text',
-          })}
-          autoComplete="on"
-        />
+        <InputConform meta={fields.name} type="text" autoComplete="on" />
         <FormMessage message={fields.name.errors} />
       </FormItem>
       <FormItem>
@@ -103,17 +59,12 @@ export function AccountForm({ accountSettings }: AccountFormProps) {
           {t('account.model.language')}
           <Required />
         </FormLabel>
-        <Select
-          {...getSelectProps(fields.language)}
-          defaultValue={fields.language.value}
+        <SelectConform
+          meta={fields.language}
+          placeholder="Select a language to display"
         >
-          <SelectTrigger id={fields.language.id}>
-            <SelectValue placeholder="Select a language to display" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectLanguageItems />
-          </SelectContent>
-        </Select>
+          <SelectLanguageItems />
+        </SelectConform>
         <FormMessage message={fields.language.errors} />
       </FormItem>
       <FormItem>
@@ -121,22 +72,46 @@ export function AccountForm({ accountSettings }: AccountFormProps) {
           {t('account.model.theme')}
           <Required />
         </FormLabel>
-        <Select
-          {...getSelectProps(fields.theme)}
-          defaultValue={fields.theme.value}
+        <SelectConform
+          meta={fields.theme}
+          placeholder="Select a theme to display"
         >
-          <SelectTrigger id={fields.theme.id}>
-            <SelectValue placeholder="Select a theme to display" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectThemeItems />
-          </SelectContent>
-        </Select>
+          <SelectThemeItems />
+        </SelectConform>
         <FormMessage message={fields.theme.errors} />
       </FormItem>
       <FormFooter>
         <Button type="submit">{t('common.message.save')}</Button>
       </FormFooter>
     </Form>
+  )
+}
+
+function SelectLanguageItems() {
+  const { t } = useTranslation()
+  return (
+    <>
+      {LanguageList.map((language) => (
+        <SelectItem key={language.value} value={language.value.toString()}>
+          {t(language.label)}
+        </SelectItem>
+      ))}
+    </>
+  )
+}
+
+function SelectThemeItems() {
+  const { t } = useTranslation()
+  return (
+    <>
+      {ThemeList.map((theme) => (
+        <SelectItem key={theme.value} value={theme.value}>
+          <span className="flex items-center">
+            <theme.icon className="mr-2 h-4 w-4" />
+            {t(theme.label)}
+          </span>
+        </SelectItem>
+      ))}
+    </>
   )
 }

@@ -41,6 +41,8 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
     content: content.join('\n'),
     status: MemoStatus.NOMAL,
     related_date: data.relatedDate?.toISOString() || null,
+    related_date_all_day:
+      data.relatedDateAllDay === undefined ? true : data.relatedDateAllDay,
   })
 
   return redirect(`/memos/${newMemo.id}`)

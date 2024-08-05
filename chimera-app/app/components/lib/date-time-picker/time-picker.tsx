@@ -1,26 +1,33 @@
 import * as React from 'react'
 import { RiTimeLine } from 'react-icons/ri'
-import { useTranslation } from 'react-i18next'
-import { Label } from '~/components/ui/label'
+import { cn } from '~/lib/utils'
 import { TimePickerInput } from './time-picker-input'
 
 interface TimePickerProps {
   date: Date | undefined
   setDate: (date: Date | undefined) => void
+  minuteStep?: number
 }
 
-export function TimePicker({ date, setDate }: TimePickerProps) {
-  const { t } = useTranslation()
+export function TimePicker({
+  date,
+  setDate,
+  minuteStep = 15,
+}: TimePickerProps) {
   const hourRef = React.useRef<HTMLInputElement>(null)
   const minuteRef = React.useRef<HTMLInputElement>(null)
-  // const secondRef = React.useRef<HTMLInputElement>(null)
 
   return (
-    <div className="flex items-end gap-2">
-      <div className="grid gap-1 text-center">
-        <Label htmlFor="hours" className="text-xs">
-          {t("common.format.o'clock")}
-        </Label>
+    <div
+      className={cn(
+        'flex items-center',
+        'gap-0.5 rounded-md border border-input bg-transparent p-px focus-within:outline-none focus-within:ring-1 focus-within:ring-ring',
+      )}
+    >
+      <div className="px-1">
+        <RiTimeLine className="h-4 w-4 text-muted-foreground" />
+      </div>
+      <div className="text-center">
         <TimePickerInput
           picker="hours"
           date={date}
@@ -29,33 +36,16 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
           onRightFocus={() => minuteRef.current?.focus()}
         />
       </div>
-      <div className="grid gap-1 text-center">
-        <Label htmlFor="minutes" className="text-xs">
-          {t('common.format.minute')}
-        </Label>
+      <div className="text-center">:</div>
+      <div className="text-center">
         <TimePickerInput
           picker="minutes"
           date={date}
           setDate={setDate}
           ref={minuteRef}
           onLeftFocus={() => hourRef.current?.focus()}
-          // onRightFocus={() => secondRef.current?.focus()}
+          step={minuteStep}
         />
-      </div>
-      {/* <div className="grid gap-1 text-center">
-        <Label htmlFor="seconds" className="text-xs">
-          {t('common.format.second')}
-        </Label>
-        <TimePickerInput
-          picker="seconds"
-          date={date}
-          setDate={setDate}
-          ref={secondRef}
-          onLeftFocus={() => minuteRef.current?.focus()}
-        />
-      </div> */}
-      <div className="flex h-9 items-center">
-        <RiTimeLine className="ml-2 h-4 w-4" />
       </div>
     </div>
   )

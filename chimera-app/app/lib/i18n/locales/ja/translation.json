@@ -59,7 +59,8 @@
       "settings": "設定",
       "state_save_wait": "保存待ち...",
       "state_saved": "保存済み",
-      "state_saving": "保存中..."
+      "state_saving": "保存中...",
+      "set_time": "時間を設定"
     }
   },
   "account": {
@@ -73,7 +74,7 @@
       "theme": "テーマ",
       "language_list": {
         "auto": "自動検出",
-        "en": "English",
+        "en-US": "English",
         "ja": "日本語"
       },
       "theme_list": {
@@ -170,7 +171,7 @@
       "title": "タイトル",
       "start": "開始",
       "end": "終了",
-      "allDay": "終日",
+      "all_day": "終日",
       "memo": "メモ",
       "location": "場所"
     },

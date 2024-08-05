@@ -30,9 +30,9 @@ export const action = withAuthentication(
     await updateEvent({
       id: event.id,
       title: data.title,
-      start: data.start.toISOString(),
-      end: data.end?.toISOString() || null,
-      all_day: data.allDay || false,
+      start_datetime: data.startDate.toISOString(),
+      end_datetime: data.endDate?.toISOString() || null,
+      all_day: !!data.allDay,
       memo: data.memo || '',
       location: data.location || '',
     })

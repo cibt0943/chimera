@@ -36,17 +36,21 @@ function ColumnHeader({
 
 function DueDateCell({ row }: { row: Row<Task> }) {
   const { t } = useTranslation()
-  const dateStr = row.original.dueDate
-  return dateStr ? (
+  const task = row.original
+  return (
     <ClientOnly>
       {() => (
         <span>
-          {format(dateStr, t('common.format.date_time_short_format'))}
+          {task.dueDate &&
+            format(
+              task.dueDate,
+              task.dueDateAllDay
+                ? t('common.format.date_format')
+                : t('common.format.date_time_short_format'),
+            )}
         </span>
       )}
     </ClientOnly>
-  ) : (
-    ''
   )
 }
 

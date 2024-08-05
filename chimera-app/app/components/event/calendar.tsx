@@ -10,7 +10,7 @@ import {
 } from '@fullcalendar/core'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction'
+import interactionPlugin from '@fullcalendar/interaction'
 import { Event, CalendarEvents, CalendarEventType } from '~/types/events'
 import { EventFormDialog, EventFormDialogProps } from './event-form-dialog'
 
@@ -26,6 +26,7 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
   const [isOpenEventFormDialog, setIsOpenEventFormDialog] =
     React.useState(false)
 
+  // イベントクリック
   function handleEventClick(arg: EventClickArg) {
     const type = arg.event.extendedProps.type
     const srcObj = arg.event.extendedProps.srcObj
@@ -41,17 +42,22 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
     }
   }
 
-  function handleDateClick(arg: DateClickArg) {
-    // alert('date click ' + arg.dateStr)
-  }
-
+  // イベント追加
   function handleSelect(arg: DateSelectArg) {
+    arg.start.setHours(9, 0)
+    arg.end.setDate(arg.end.getDate() - 1)
+    arg.end.setHours(9, 0)
+    const timeDiff = arg.end.getTime() - arg.start.getTime()
+    const dayDiff = timeDiff / (1000 * 3600 * 24)
+    const [startDate, endDate, allDay] =
+      dayDiff < 1 ? [arg.start, null, false] : [arg.start, arg.end, true]
+
     const event = {
       id: '',
+      startDate: startDate,
+      endDate: endDate,
+      allDay: allDay,
       title: '',
-      start: arg.start,
-      end: arg.end,
-      allDay: true,
       memo: '',
       location: '',
     } as Event
@@ -65,6 +71,8 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
           height={'100%'}
+          locales={allLocales}
+          locale={i18n.language}
           headerToolbar={{
             left: 'prev today next',
             center: 'title',
@@ -73,19 +81,7 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
           viewClassNames={['text-sm', 'text-muted-foreground']}
           editable={true}
           selectable={true}
-          events={defaultEvents}
-          eventContent={renderEventContent}
-          eventTimeFormat={{
-            hour: 'numeric',
-            minute: '2-digit',
-          }}
-          eventInteractive={true}
-          eventClassNames={(arg) => {
-            return ['text-primary']
-          }}
-          eventTextColor="black"
-          locales={allLocales}
-          locale={i18n.language}
+          select={handleSelect}
           dayHeaderClassNames={(arg) => {
             const result = ['font-normal']
             // switch (arg.date.getDay()) {
@@ -104,8 +100,17 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
           dayCellContent={(arg) => {
             return arg.dayNumberText.replace('日', '')
           }}
-          dateClick={handleDateClick}
-          select={handleSelect}
+          events={defaultEvents}
+          eventContent={renderEventContent}
+          eventTimeFormat={{
+            hour: 'numeric',
+            minute: '2-digit',
+          }}
+          eventInteractive={true}
+          eventClassNames={(arg) => {
+            return ['text-primary']
+          }}
+          eventTextColor="black"
           eventClick={handleEventClick}
         />
       </div>

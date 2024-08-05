@@ -7,10 +7,9 @@ import {
   RiInboxUnarchiveLine,
 } from 'react-icons/ri'
 import { useHotkeys } from 'react-hotkeys-hook'
-import { useForm, getFormProps, getTextareaProps } from '@conform-to/react'
+import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
-import { Textarea } from '~/components/ui/textarea'
 import {
   Tooltip,
   TooltipContent,
@@ -18,9 +17,10 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip'
 import { FormItem, FormMessage, FormDescription } from '~/components/lib/form'
+import { TextareaConform } from '~/components/lib/conform/textarea'
+import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
 import { useDebounce, useQueue } from '~/lib/utils'
 import { Memo, MemoSchema, MemoSchemaType, MemoStatus } from '~/types/memos'
-import { MemoRelatedDateTimePicker } from './memo-related-date-time-picker'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 import { useAtomValue } from 'jotai'
 import { memoSettingsAtom } from '~/lib/state'
@@ -47,7 +47,6 @@ export function MemoForm({ memo }: MemoFormProps) {
   React.useEffect(() => {
     // メモが存在し、メモが変更されている場合、自動保存がOFF→ONの切り替え時に自動保存を実行する
     if (memo && isChangedMemo && memoSettings?.autoSave) {
-      console.log('auto save')
       saveMemoApi()
     }
     // 以下のdisableを止める方法を検討したい。
@@ -55,22 +54,24 @@ export function MemoForm({ memo }: MemoFormProps) {
   }, [memoSettings?.autoSave])
 
   const action = memo ? `/memos/${memo.id}` : `/memos`
-
+  const formId = memo ? `memo-form-${memo.id}` : 'memo-form-new'
   const defaultValue = {
     content:
       memo && memo.title + memo.content !== ''
         ? memo.title.concat('\n', memo.content)
         : '',
     relatedDate: memo ? memo.relatedDate : null,
+    relatedDateAllDay: memo ? memo.relatedDateAllDay : true,
   }
 
   const [form, fields] = useForm<MemoSchemaType>({
-    id: `memo-form${memo ? `-${memo.id}` : '-new'}`,
+    id: formId,
     defaultValue: defaultValue,
     constraint: getZodConstraint(MemoSchema),
     onValidate: ({ formData }) => {
       return parseWithZod(formData, { schema: MemoSchema })
     },
+    shouldRevalidate: 'onInput',
   })
 
   // メモの保存API呼び出し
@@ -88,6 +89,13 @@ export function MemoForm({ memo }: MemoFormProps) {
     enqueue(() => saveMemoApi())
   }, 1000)
 
+  // メモ情報が更新されていた保存する
+  function handleChangeMemo() {
+    setIsChangedMemo(true)
+    if (!memoSettings?.autoSave) return
+    saveMemoDebounce()
+  }
+  // テキストエリアにフォーカス
   function setTextAreaFocus() {
     formRef.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus()
   }
@@ -119,11 +127,7 @@ export function MemoForm({ memo }: MemoFormProps) {
         className="space-y-6"
         {...getFormProps(form)}
         action={action}
-        onChange={() => {
-          setIsChangedMemo(true)
-          if (!memoSettings?.autoSave) return
-          saveMemoDebounce()
-        }}
+        onChange={handleChangeMemo}
         onSubmit={(event) => {
           event.preventDefault()
           saveMemoApi()
@@ -133,8 +137,8 @@ export function MemoForm({ memo }: MemoFormProps) {
           <FormDescription>
             {t('memo.message.first_line_is_title')}
           </FormDescription>
-          <Textarea
-            {...getTextareaProps(fields.content)}
+          <TextareaConform
+            meta={fields.content}
             key={fields.content.key}
             className="h-[calc(100vh_-_155px)] resize-none bg-[#303841] text-white focus-visible:ring-0"
             rows={15}
@@ -145,14 +149,15 @@ export function MemoForm({ memo }: MemoFormProps) {
           <ActionButtons memo={memo} />
           <div className="flex items-center space-x-6">
             <FormItem>
-              <MemoRelatedDateTimePicker
-                meta={fields.relatedDate}
-                divProps={{ className: 'w-64' }}
-                onChange={() => {
-                  setIsChangedMemo(true)
-                  if (!memoSettings?.autoSave) return
-                  saveMemoDebounce()
-                }}
+              <DateTimePickerConform
+                dateMeta={fields.relatedDate}
+                allDayMeta={fields.relatedDateAllDay}
+                defaultAllDay={true}
+                includeAllDayComponent={true}
+                onChangeData={handleChangeMemo}
+                onChangeAllDay={handleChangeMemo}
+                placeholder={t('memo.model.related_date')}
+                className="w-52"
               />
               <FormMessage message={fields.relatedDate.errors} />
             </FormItem>

@@ -26,7 +26,6 @@ import {
   TouchSensor,
   closestCenter,
   type DragEndEvent,
-  // type UniqueIdentifier,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'

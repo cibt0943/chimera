@@ -5,7 +5,7 @@ import type { Database } from '~/types/schema'
 
 export const Language = {
   AUTO: 'auto',
-  EN: 'en',
+  EN: 'en-US',
   JA: 'ja',
 } as const
 export type Language = (typeof Language)[keyof typeof Language]
@@ -13,7 +13,7 @@ export type Language = (typeof Language)[keyof typeof Language]
 // 利用可能な言語リスト
 export const LanguageList = [
   { value: Language.AUTO, label: 'account.model.language_list.auto' },
-  { value: Language.EN, label: 'account.model.language_list.en' },
+  { value: Language.EN, label: 'account.model.language_list.en-US' },
   { value: Language.JA, label: 'account.model.language_list.ja' },
 ]
 
@@ -45,9 +45,8 @@ export const ThemeList = [
 
 // DBのアカウントテーブルの型
 export type AccountModel = Database['public']['Tables']['accounts']['Row']
-type _UpdateAccountModel = Database['public']['Tables']['accounts']['Update']
-export type UpdateAccountModel = Required<Pick<_UpdateAccountModel, 'id'>> &
-  Partial<Omit<_UpdateAccountModel, 'id'>> // idを取り除いて必須で追加
+export type UpdateAccountModel =
+  Database['public']['Tables']['accounts']['Update'] & { id: string } // idを必須で上書き
 
 // アカウントの型
 export type Account = {

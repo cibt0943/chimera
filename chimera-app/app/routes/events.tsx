@@ -39,15 +39,15 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
 
   const newEvent = await insertEvent({
     account_id: loginSession.account.id,
+    start_datetime: data.startDate.toISOString(),
+    end_datetime: data.endDate?.toISOString() || null,
+    all_day: !!data.allDay,
     title: data.title,
-    start: data.start.toISOString(),
-    end: data.end?.toISOString() || null,
-    all_day: data.allDay || false,
     memo: data.memo || '',
     location: data.location || '',
   })
 
-  return redirect('/events?day=' + newEvent.start.toISOString())
+  return redirect('/events?day=' + newEvent.startDate.toISOString())
 })
 
 type LoaderData = {

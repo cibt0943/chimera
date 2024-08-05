@@ -26,10 +26,11 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
 
   await insertTask({
     account_id: loginSession.account.id,
+    status: data.status,
     title: data.title,
     memo: data.memo || '',
-    status: data.status,
     due_date: data.dueDate?.toISOString() || null,
+    due_date_all_day: !!data.dueDateAllDay,
   })
 
   return redirect('/todos')

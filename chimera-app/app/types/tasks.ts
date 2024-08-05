@@ -46,20 +46,20 @@ export const TaskStatusListByDispOrder = TaskStatusList.slice().sort(
 // DBのタスクテーブルの型
 export type TaskModel = Database['public']['Tables']['tasks']['Row']
 export type InsertTaskModel = Database['public']['Tables']['tasks']['Insert']
-type _UpdateTaskModel = Database['public']['Tables']['tasks']['Update']
-export type UpdateTaskModel = Required<Pick<_UpdateTaskModel, 'id'>> &
-  Partial<Omit<_UpdateTaskModel, 'id'>> // idを取り除いて必須で追加
+export type UpdateTaskModel =
+  Database['public']['Tables']['tasks']['Update'] & { id: string } // idを必須で上書き
 
 export type Task = {
   id: string
   createdAt: Date
   updatedAt: Date
   accountId: string
+  status: TaskStatus
   position: number
   title: string
   memo: string
-  status: TaskStatus
   dueDate: Date | null
+  dueDateAllDay: boolean
 }
 
 export type Tasks = Task[]
@@ -70,21 +70,23 @@ export function TaskModel2Task(taskModel: TaskModel): Task {
     createdAt: toDate(taskModel.created_at),
     updatedAt: toDate(taskModel.updated_at),
     accountId: taskModel.account_id,
+    status: taskModel.status as TaskStatus,
     position: taskModel.position,
     title: taskModel.title,
     memo: taskModel.memo,
-    status: taskModel.status as TaskStatus,
     dueDate: taskModel.due_date ? toDate(taskModel.due_date) : null,
+    dueDateAllDay: taskModel.due_date_all_day,
   }
 }
 
 export const TaskSchema = zod.object({
+  status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
   title: zod
     .string({ required_error: '必須項目です' })
     .max(255, { message: '255文字以内で入力してください' }),
   memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
-  status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
   dueDate: zod.date().optional(),
+  dueDateAllDay: zod.boolean().optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
 })
 
 export type TaskSchemaType = zod.infer<typeof TaskSchema>

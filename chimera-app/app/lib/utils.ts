@@ -83,6 +83,7 @@ export function useIsLoadingEffect() {
 
 // date-fnsのlocaleを取得
 export function getLocale(locale: string): Locale {
+  locale = locale.replaceAll('-', '')
   return locales[locale as keyof typeof locales] || locales.ja
 }
 

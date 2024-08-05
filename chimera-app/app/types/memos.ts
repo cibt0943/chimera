@@ -27,9 +27,8 @@ export const MemoStatusList = [
 // DBのメモテーブルの型
 export type MemoModel = Database['public']['Tables']['memos']['Row']
 export type InsertMemoModel = Database['public']['Tables']['memos']['Insert']
-type _UpdateMemoModel = Database['public']['Tables']['memos']['Update']
-export type UpdateMemoModel = Required<Pick<_UpdateMemoModel, 'id'>> &
-  Partial<Omit<_UpdateMemoModel, 'id'>> // idを取り除いて必須で追加
+export type UpdateMemoModel =
+  Database['public']['Tables']['memos']['Update'] & { id: string } // idを必須で上書き
 
 // メモの型
 export type Memo = {
@@ -37,11 +36,12 @@ export type Memo = {
   createdAt: Date
   updatedAt: Date
   accountId: string
+  status: MemoStatus
   position: number
   title: string
   content: string
-  status: MemoStatus
   relatedDate: Date | null
+  relatedDateAllDay: boolean
 }
 
 export type Memos = Memo[]
@@ -52,11 +52,12 @@ export function MemoModel2Memo(memoModel: MemoModel): Memo {
     createdAt: toDate(memoModel.created_at),
     updatedAt: toDate(memoModel.updated_at),
     accountId: memoModel.account_id,
+    status: memoModel.status as MemoStatus,
     position: memoModel.position,
     title: memoModel.title,
     content: memoModel.content,
-    status: memoModel.status as MemoStatus,
     relatedDate: memoModel.related_date ? toDate(memoModel.related_date) : null,
+    relatedDateAllDay: memoModel.related_date_all_day,
   }
 }
 
@@ -65,10 +66,8 @@ export const MemoSchema = zod.object({
     .string()
     .max(60000, '60000文字以内で入力してください')
     .optional(),
-  status: zod
-    .preprocess((v) => Number(v), zod.nativeEnum(MemoStatus))
-    .optional(),
   relatedDate: zod.date().optional(),
+  relatedDateAllDay: zod.boolean().optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
 })
 
 export type MemoSchemaType = zod.infer<typeof MemoSchema>

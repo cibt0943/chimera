@@ -29,10 +29,11 @@ export const action = withAuthentication(
 
     await updateTask({
       id: task.id,
+      status: data.status,
       title: data.title,
       memo: data.memo || '',
-      status: data.status,
       due_date: data.dueDate?.toISOString() || null,
+      due_date_all_day: !!data.dueDateAllDay,
     })
 
     return redirect('/todos')

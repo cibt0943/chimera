@@ -34,6 +34,7 @@ export const action = withAuthentication(
       title: title,
       content: content.join('\n'),
       related_date: data.relatedDate?.toISOString() || null,
+      related_date_all_day: !!data.relatedDateAllDay,
     })
 
     return redirect(`/memos/${memo.id}`)

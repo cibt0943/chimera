@@ -59,7 +59,8 @@
       "settings": "Settings",
       "state_save_wait": "Waiting to Save...",
       "state_saved": "Saved",
-      "state_saving": "Saving..."
+      "state_saving": "Saving...",
+      "set_time": "Set Time"
     }
   },
   "account": {
@@ -73,7 +74,7 @@
       "theme": "Theme",
       "language_list": {
         "auto": "Auto detect",
-        "en": "English",
+        "en-US": "English",
         "ja": "Japanese"
       },
       "theme_list": {
@@ -172,7 +173,7 @@
       "title": "Title",
       "start": "Start",
       "end": "End",
-      "allDay": "All Day",
+      "all_day": "All Day",
       "memo": "Memo",
       "location": "Location"
     },

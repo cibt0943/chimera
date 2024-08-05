@@ -17,7 +17,7 @@ export default function Index() {
       <div className="text-l mb-8 font-bold">
         This feature is under development. Please check back later.
       </div>
-      何作るか決めてない
+      Linuxコマンド操作を主としたファイラー機能にしようかと思っています
     </div>
   )
 }
