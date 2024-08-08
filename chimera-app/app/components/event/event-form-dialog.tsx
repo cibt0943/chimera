@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
+import { RiDeleteBinLine } from 'react-icons/ri'
+import { Button } from '~/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -8,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog'
+import { EventDeleteConfirmDialog } from './event-delete-confirm-dialog'
 import { Event } from '~/types/events'
 import { EventForm } from './event-form'
 
@@ -24,7 +27,9 @@ export function EventFormDialog({
 }: EventFormDialogProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
+  // 新規作成時であってもeventに初期値を埋めて送られてくるため、idがあるかどうかで判定
   const title = event?.id
     ? t('event.message.event_editing')
     : t('event.message.event_creation')
@@ -43,12 +48,28 @@ export function EventFormDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <EventForm
+        <EventForm event={event} onSubmit={() => setIsOpen(false)}>
+          {event?.id && (
+            <Button
+              type="button"
+              variant="link"
+              className="border-destructive/50 px-0 text-destructive"
+              onClick={() => setIsOpenDeleteDialog(true)}
+            >
+              <RiDeleteBinLine className="mr-1 h-4 w-4" />
+              {t('common.message.delete')}
+            </Button>
+          )}
+        </EventForm>
+        <EventDeleteConfirmDialog
           event={event}
-          handleSubmit={() => {
+          isOpen={isOpenDeleteDialog}
+          setIsOpen={setIsOpenDeleteDialog}
+          onSubmit={() => {
+            setIsOpenDeleteDialog(false)
             setIsOpen(false)
           }}
-        ></EventForm>
+        />
       </DialogContent>
     </Dialog>
   )

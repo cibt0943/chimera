@@ -27,10 +27,11 @@ import {
 
 export interface TaskFormProps {
   task: Task | undefined
-  handleSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  children?: React.ReactNode
 }
 
-export function TaskForm({ task, handleSubmit }: TaskFormProps) {
+export function TaskForm({ task, onSubmit, children }: TaskFormProps) {
   const { t } = useTranslation()
 
   const action = task ? `/todos/${task.id}` : '/todos'
@@ -51,7 +52,7 @@ export function TaskForm({ task, handleSubmit }: TaskFormProps) {
       return parseWithZod(formData, { schema: TaskSchema })
     },
     shouldRevalidate: 'onInput',
-    onSubmit: handleSubmit,
+    onSubmit: onSubmit,
   })
 
   return (
@@ -99,7 +100,8 @@ export function TaskForm({ task, handleSubmit }: TaskFormProps) {
         </FormDescription>
         <FormMessage message={fields.status.errors} />
       </FormItem>
-      <FormFooter>
+      <FormFooter className="sm:justify-between">
+        {children || <div>&nbsp;</div>}
         <Button type="submit">{t('common.message.save')}</Button>
       </FormFooter>
     </Form>

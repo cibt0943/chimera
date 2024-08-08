@@ -26,17 +26,17 @@ export function AccountDeleteConfirmDialog({
       setIsOpen={setIsOpenDialog}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
+      <Button type="submit" variant="destructive" form="delete-account-form">
+        {t('common.message.delete')}
+      </Button>
       <Form
+        id="delete-account-form"
         action={`/account/delete`}
         method="delete"
         onSubmit={() => {
           setIsOpenDialog(false)
         }}
-      >
-        <Button type="submit" variant="destructive">
-          {t('common.message.delete')}
-        </Button>
-      </Form>
+      />
     </DeleteConfirmDialog>
   )
 }

@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Separator } from '~/components/ui/separator'
 import { Button } from '~/components/ui/button'
-import { FormFooter } from '~/components/lib/form'
+import { Separator } from '~/components/ui/separator'
 import { AccountForm } from '~/components/account/account-form'
 import { AccountDeleteConfirmDialog } from '~/components/account/account-delete-confirm-dialog'
 import type { AccountSettings } from '~/types/accounts'
@@ -24,17 +23,16 @@ export function AccountTab({ accountSettings }: AccountTabProps) {
         </p>
       </div>
       <Separator />
-      <AccountForm accountSettings={accountSettings} />
-      <Separator />
-      <FormFooter>
+      <AccountForm accountSettings={accountSettings}>
         <Button
+          type="button"
           variant="link"
-          className="border-destructive/50 text-destructive"
+          className="border-destructive/50 px-0 text-destructive"
           onClick={() => setIsOpenDeleteDialog(true)}
         >
           {t('account.message.do_delete')}
         </Button>
-      </FormFooter>
+      </AccountForm>
       <AccountDeleteConfirmDialog
         isOpenDialog={isOpenDeleteDialog}
         setIsOpenDialog={setIsOpenDeleteDialog}

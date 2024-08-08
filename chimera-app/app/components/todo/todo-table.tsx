@@ -355,6 +355,9 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
       'alt+backspace',
     ],
     (_, handler) => {
+      // ローディング中、ダイアログが開いている場合は何もしない
+      if (isLoading || isOpenAddDialog || isOpenDeleteDialog || showId) return
+
       switch (handler.keys?.join('')) {
         case 'enter':
           showSelectedTaskEdit()
@@ -396,6 +399,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   useHotkeys(['alt+n'], () => {
     // ローディング中、ダイアログが開いている場合は何もしない
     if (isLoading || isOpenAddDialog || isOpenDeleteDialog || showId) return
+
     openAddTaskDialog()
   })
 
@@ -498,20 +502,18 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.next')}
         </Button>
       </div>
-      {
-        // コンポーネントを作り直さないと以前のデータが残る
-        isOpenAddDialog && (
-          <AddTaskFormDialogMemo
-            task={undefined}
-            isOpen={isOpenAddDialog}
-            setIsOpen={setIsOpenAddDialog}
-          />
-        )
-      }
-      <DeleteConfirmTaskDialogMemo
+      <TaskFormDialogMemo
+        task={undefined}
+        isOpen={isOpenAddDialog}
+        setIsOpen={setIsOpenAddDialog}
+      />
+      <TaskDeleteConfirmDialogMemo
         task={actionTask}
         isOpen={isOpenDeleteDialog}
         setIsOpen={setIsOpenDeleteDialog}
+        handleSubmit={() => {
+          setIsOpenDeleteDialog(false)
+        }}
       />
     </div>
   )
@@ -543,7 +545,6 @@ function DraggableRow({ row }: { row: Row<Task> }) {
       tabIndex={0}
       id={`row-${row.id}`}
       className="outline-none data-[state=selected]:bg-blue-100 dark:data-[state=selected]:bg-slate-700"
-      // className="outline-none"
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>
@@ -555,15 +556,15 @@ function DraggableRow({ row }: { row: Row<Task> }) {
 }
 
 // タスク追加ダイアログのメモ化
-const AddTaskFormDialogMemo = React.memo((props: TaskFormDialogProps) => {
+const TaskFormDialogMemo = React.memo((props: TaskFormDialogProps) => {
   return <TaskFormDialog {...props} />
 })
-AddTaskFormDialogMemo.displayName = 'AddTaskFormDialogMemo'
+TaskFormDialogMemo.displayName = 'TaskFormDialogMemo'
 
 // タスク削除ダイアログのメモ化
-const DeleteConfirmTaskDialogMemo = React.memo(
+const TaskDeleteConfirmDialogMemo = React.memo(
   (props: TaskDeleteConfirmDialogProps) => {
     return <TaskDeleteConfirmDialog {...props} />
   },
 )
-DeleteConfirmTaskDialogMemo.displayName = 'DeleteConfirmTaskDialogMemo'
+TaskDeleteConfirmDialogMemo.displayName = 'TaskDeleteConfirmDialogMemo'

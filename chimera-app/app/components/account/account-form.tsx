@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Form } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { useForm, getFormProps } from '@conform-to/react'
@@ -23,12 +24,13 @@ import {
 
 interface AccountFormProps {
   accountSettings: AccountSettings
+  children?: React.ReactNode
 }
 
-export function AccountForm({ accountSettings }: AccountFormProps) {
+export function AccountForm({ accountSettings, children }: AccountFormProps) {
   const { t } = useTranslation()
-  const defaultValue = accountSettings
 
+  const defaultValue = accountSettings
   const [form, fields] = useForm<AccountSettingsSchemaType>({
     id: 'account-form',
     defaultValue: defaultValue,
@@ -36,6 +38,7 @@ export function AccountForm({ accountSettings }: AccountFormProps) {
     onValidate: ({ formData }) => {
       return parseWithZod(formData, { schema: AccountSettingsSchema })
     },
+    shouldRevalidate: 'onInput',
   })
 
   return (
@@ -80,7 +83,8 @@ export function AccountForm({ accountSettings }: AccountFormProps) {
         </SelectConform>
         <FormMessage message={fields.theme.errors} />
       </FormItem>
-      <FormFooter>
+      <FormFooter className="flex sm:justify-between">
+        {children || <div>&nbsp;</div>}
         <Button type="submit">{t('common.message.save')}</Button>
       </FormFooter>
     </Form>

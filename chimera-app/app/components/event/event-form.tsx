@@ -27,14 +27,20 @@ type useInputControlType = ReturnType<typeof useInputControl<string>>
 
 export interface EventFormProps {
   event: Event | undefined
-  handleSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  children?: React.ReactNode
 }
 
-export function EventForm({ event, handleSubmit }: EventFormProps) {
+export function EventForm({ event, onSubmit, children }: EventFormProps) {
   const { t } = useTranslation()
 
-  const action = event?.id ? `/events/${event.id}` : '/events'
-  const formId = event?.id ? `event-form-${event.id}` : 'event-form-new'
+  // 新規作成時であってもeventに初期値を埋めて送られてくるため、idがあるかどうかで判定
+  function isNew(event: Event | undefined): event is undefined {
+    return !event?.id
+  }
+
+  const action = isNew(event) ? '/events' : `/events/${event.id}`
+  const formId = isNew(event) ? 'event-form-new' : `event-form-${event.id}`
   const defaultValue = event
 
   const [form, fields] = useForm<EventSchemaType>({
@@ -45,14 +51,14 @@ export function EventForm({ event, handleSubmit }: EventFormProps) {
       return parseWithZod(formData, { schema: EventSchema })
     },
     shouldRevalidate: 'onInput',
-    onSubmit: handleSubmit,
+    onSubmit: onSubmit,
   })
 
   const startDateControl = useInputControl(fields.startDate)
   const endDateControl = useInputControl(fields.endDate)
   const allDayControl = useInputControl(fields.allDay)
 
-  const handleAllDayCheckedChange = React.useCallback(
+  const handleCheckedChangeAllDay = React.useCallback(
     (checked: boolean) => {
       allDayControl.change(checked ? 'on' : '')
 
@@ -97,6 +103,7 @@ export function EventForm({ event, handleSubmit }: EventFormProps) {
           <div className="basis-1/2">
             <DateTimePickerField
               label={t('event.model.start')}
+              qequired={true}
               fieldMeta={fields.startDate}
               control={startDateControl}
               allDay={fields.allDay.value === 'on'}
@@ -105,6 +112,7 @@ export function EventForm({ event, handleSubmit }: EventFormProps) {
           <div className="basis-1/2">
             <DateTimePickerField
               label={t('event.model.end')}
+              qequired={false}
               fieldMeta={fields.endDate}
               control={endDateControl}
               allDay={fields.allDay.value === 'on'}
@@ -115,7 +123,7 @@ export function EventForm({ event, handleSubmit }: EventFormProps) {
           <Checkbox
             id={fields.allDay.id}
             checked={fields.allDay.value === 'on'}
-            onCheckedChange={handleAllDayCheckedChange}
+            onCheckedChange={handleCheckedChangeAllDay}
             name={fields.allDay.id}
           />
           <FormLabel htmlFor={fields.allDay.id} className="ml-2">
@@ -136,7 +144,8 @@ export function EventForm({ event, handleSubmit }: EventFormProps) {
         <InputConform meta={fields.location} type="text" />
         <FormMessage message={fields.location.errors} />
       </FormItem>
-      <FormFooter>
+      <FormFooter className="sm:justify-between">
+        {children || <div>&nbsp;</div>}
         <Button type="submit">{t('common.message.save')}</Button>
       </FormFooter>
     </Form>
@@ -145,6 +154,7 @@ export function EventForm({ event, handleSubmit }: EventFormProps) {
 
 interface DateTimePickerFieldProps {
   label: string
+  qequired: boolean
   fieldMeta: FieldMetadata<Date | undefined>
   control: useInputControlType
   allDay: boolean
@@ -152,6 +162,7 @@ interface DateTimePickerFieldProps {
 
 function DateTimePickerField({
   label,
+  qequired,
   fieldMeta,
   control,
   allDay,
@@ -164,7 +175,10 @@ function DateTimePickerField({
 
   return (
     <FormItem>
-      <FormLabel htmlFor={fieldMeta.id}>{label}</FormLabel>
+      <FormLabel htmlFor={fieldMeta.id}>
+        {label}
+        {qequired && <Required />}
+      </FormLabel>
       <DateTimePicker
         date={date}
         allDay={allDay}

@@ -10,16 +10,21 @@ export interface TaskDeleteConfirmDialogProps {
   task: Task | undefined
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  onSubmit: () => void
 }
 
 export function TaskDeleteConfirmDialog({
   task,
   isOpen,
   setIsOpen,
+  onSubmit,
 }: TaskDeleteConfirmDialogProps) {
   const { t } = useTranslation()
 
   if (!task) return null
+
+  const action = `/todos/${task.id}/delete`
+
   return (
     <DeleteConfirmDialog
       title={t('task.message.task_deletion')}
@@ -30,17 +35,16 @@ export function TaskDeleteConfirmDialog({
       setIsOpen={setIsOpen}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
+      {/* レスポンシブ対応のためにFormでButtonを囲まない */}
+      <Button type="submit" variant="destructive" form="delete-task-form">
+        {t('common.message.delete')}
+      </Button>
       <Form
-        action={`/todos/${task.id}/delete`}
+        id="delete-task-form"
+        action={action}
         method="delete"
-        onSubmit={() => {
-          setIsOpen(false)
-        }}
-      >
-        <Button type="submit" variant="destructive">
-          {t('common.message.delete')}
-        </Button>
-      </Form>
+        onSubmit={onSubmit}
+      />
     </DeleteConfirmDialog>
   )
 }

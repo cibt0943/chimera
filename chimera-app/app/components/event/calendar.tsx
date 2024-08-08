@@ -26,7 +26,7 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
   const [isOpenEventFormDialog, setIsOpenEventFormDialog] =
     React.useState(false)
 
-  // イベントクリック
+  // イベント編集
   function handleEventClick(arg: EventClickArg) {
     const type = arg.event.extendedProps.type
     const srcObj = arg.event.extendedProps.srcObj
@@ -111,19 +111,15 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
             return ['text-primary']
           }}
           eventTextColor="black"
+          displayEventEnd={true}
           eventClick={handleEventClick}
         />
       </div>
-      {
-        // コンポーネントを作り直さないと以前のデータが残る
-        isOpenEventFormDialog && (
-          <EventFormDialogMemo
-            event={actionEvent}
-            isOpen={isOpenEventFormDialog}
-            setIsOpen={setIsOpenEventFormDialog}
-          />
-        )
-      }
+      <EventFormDialogMemo
+        event={actionEvent}
+        isOpen={isOpenEventFormDialog}
+        setIsOpen={setIsOpenEventFormDialog}
+      />
     </>
   )
 }
@@ -154,15 +150,16 @@ function isListItemDisplay(eventContent: EventContentArg) {
 }
 
 function EventTypeIcon({ type }: { type: CalendarEventType }) {
+  const className = 'ml-2 h-4 w-4'
   switch (type) {
     case CalendarEventType.EVENT:
-      return <RxCalendar className="ml-2 h-4 w-4" />
+      return <RxCalendar className={className} />
     case CalendarEventType.TASK:
-      return <RxCheckCircled className="ml-2 h-4 w-4" />
+      return <RxCheckCircled className={className} />
     case CalendarEventType.MEMO:
-      return <RxPencil2 className="ml-2 h-4 w-4" />
+      return <RxPencil2 className={className} />
     default:
-      return <RxCalendar className="ml-2 h-4 w-4" />
+      return <RxCalendar className={className} />
   }
 }
 

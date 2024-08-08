@@ -14,15 +14,39 @@ import {
 import { Toggle } from '~/components/ui/toggle'
 import { TimePicker } from './time-picker'
 
-export interface DateTimePickerProps extends React.ComponentProps<'div'> {
+export interface DatePickerProps extends React.ComponentProps<'div'> {
   date: Date | undefined
+  onChangeDate: (date: Date | undefined) => void
+  triggerId?: string
+  placeholder?: string
+}
+
+export function DatePicker({
+  date,
+  onChangeDate,
+  triggerId,
+  placeholder = '',
+  ...divProps
+}: DatePickerProps) {
+  return (
+    <DateTimePicker
+      date={date}
+      allDay={true}
+      defaultAllDay={true}
+      includeAllDayComponent={false}
+      onChangeDate={onChangeDate}
+      triggerId={triggerId}
+      placeholder={placeholder}
+      {...divProps}
+    />
+  )
+}
+
+export interface DateTimePickerProps extends DatePickerProps {
   allDay: boolean
   defaultAllDay: boolean
   includeAllDayComponent: boolean
-  onChangeDate: (date: Date | undefined) => void
   onChangeAllDay?: (allDay: boolean) => void
-  triggerId?: string
-  placeholder?: string
 }
 
 export function DateTimePicker({

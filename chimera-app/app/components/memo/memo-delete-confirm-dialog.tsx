@@ -32,18 +32,18 @@ export function MemoDeleteConfirmDialog({
       setIsOpen={setIsOpen}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
+      <Button type="submit" variant="destructive" form="delete-memo-form">
+        {t('common.message.delete')}
+      </Button>
       <Form
+        id="delete-memo-form"
         action={`/memos/${memo.id}/delete`}
         method="delete"
         onSubmit={(event) => {
           setIsOpen(false)
           event.stopPropagation()
         }}
-      >
-        <Button type="submit" variant="destructive">
-          {t('common.message.delete')}
-        </Button>
-      </Form>
+      />
     </DeleteConfirmDialog>
   )
 }
