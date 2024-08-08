@@ -106,13 +106,26 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
             hour: 'numeric',
             minute: '2-digit',
           }}
+          displayEventEnd={true}
           eventInteractive={true}
           eventClassNames={(arg) => {
             return ['text-primary']
           }}
           eventTextColor="black"
-          displayEventEnd={true}
           eventClick={handleEventClick}
+          eventDataTransform={(eventData) => {
+            // fullcalendarは終日の場合、バーが1日前までしか光れないので終了日を1日後に設定
+            // しかも2回呼び出されるので、_transformedフラグで2回目の呼び出しをスキップ
+            if (!eventData._transformed) {
+              const end = eventData.end as Date
+              if (eventData.allDay && eventData.end) {
+                end.setDate(end.getDate() + 1)
+                eventData.end = end
+              }
+              eventData._transformed = true
+            }
+            return eventData
+          }}
         />
       </div>
       <EventFormDialogMemo
