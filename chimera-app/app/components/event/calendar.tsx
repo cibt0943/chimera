@@ -11,6 +11,7 @@ import {
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
+import listPlugin from '@fullcalendar/list'
 import { Event, CalendarEvents, CalendarEventType } from '~/types/events'
 import { EventFormDialog, EventFormDialogProps } from './event-form-dialog'
 
@@ -69,14 +70,14 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
     <>
       <div className="h-[calc(100vh_-_50px)]">
         <FullCalendar
-          plugins={[dayGridPlugin, interactionPlugin]}
+          plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
           height={'100%'}
           locales={allLocales}
           locale={i18n.language}
           headerToolbar={{
             left: 'prev today next',
             center: 'title',
-            right: 'dayGridMonth dayGridWeek',
+            right: 'dayGridMonth dayGridWeek listMonth',
           }}
           viewClassNames={['text-sm', 'text-muted-foreground']}
           editable={true}
@@ -106,7 +107,7 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
             hour: 'numeric',
             minute: '2-digit',
           }}
-          displayEventEnd={true}
+          // displayEventEnd={true}
           eventInteractive={true}
           eventClassNames={(arg) => {
             return ['text-primary']
@@ -140,39 +141,34 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
 // a custom render function
 function renderEventContent(eventContent: EventContentArg) {
   const { timeText } = eventContent
-  const { allDay, title } = eventContent.event
-  const backgroundColor = eventContent.event.backgroundColor
-  const isListItem = isListItemDisplay(eventContent)
+  const { title } = eventContent.event
+  const { type } = eventContent.event.extendedProps
+
+  const Icon = EventTypeIcon({ type })
 
   return (
-    <div className="flex items-center">
-      {isListItem && <span style={{ color: backgroundColor }}>⚫️</span>}
-      {!allDay && <span className="ml-1">{timeText}</span>}
-      <span className="ml-1">{title}</span>
-      <EventTypeIcon type={eventContent.event.extendedProps.type} />
+    <div className="flex items-center truncate">
+      <div>
+        <Icon className="ml-1 h-4 w-4" />
+      </div>
+      {timeText && <div className="ml-1">{timeText}</div>}
+      <div className="ml-1 font-semibold" title={title}>
+        {title}
+      </div>
     </div>
   )
 }
 
-function isListItemDisplay(eventContent: EventContentArg) {
-  const event = eventContent.event
-
-  if (event.display === 'list-item') return true
-  if (event.allDay) return false
-  return !event.end || event.start?.toDateString() === event.end.toDateString()
-}
-
 function EventTypeIcon({ type }: { type: CalendarEventType }) {
-  const className = 'ml-2 h-4 w-4'
   switch (type) {
     case CalendarEventType.EVENT:
-      return <RxCalendar className={className} />
+      return RxCalendar
     case CalendarEventType.TASK:
-      return <RxCheckCircled className={className} />
+      return RxCheckCircled
     case CalendarEventType.MEMO:
-      return <RxPencil2 className={className} />
+      return RxPencil2
     default:
-      return <RxCalendar className={className} />
+      return RxCalendar
   }
 }
 
