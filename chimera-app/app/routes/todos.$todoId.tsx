@@ -1,8 +1,8 @@
 import * as React from 'react'
-import type { MetaFunction } from '@remix-run/node'
-import { redirect } from '@remix-run/node'
+import { MetaFunction, redirect } from '@remix-run/node'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
+import { TODO_URL } from '~/constants'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { Task, TaskSchema } from '~/types/tasks'
 import { getTask, updateTask } from '~/models/task.server'
@@ -19,7 +19,7 @@ export const action = withAuthentication(
 
     const formData = await request.formData()
     const submission = parseWithZod(formData, { schema: TaskSchema })
-    // submission が成功しなかった場合、クライアントに送信結果を報告します。
+    // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
     if (submission.status !== 'success') {
       throw new Error('Invalid submission data.')
       // return json({ result: submission.reply() }, { status: 422 })
@@ -36,7 +36,7 @@ export const action = withAuthentication(
       due_date_all_day: !!data.dueDateAllDay,
     })
 
-    return redirect('/todos')
+    return redirect(data.returnUrl || TODO_URL)
   },
 )
 

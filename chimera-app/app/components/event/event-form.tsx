@@ -98,7 +98,7 @@ export function EventForm({ event, onSubmit, children }: EventFormProps) {
         <InputConform meta={fields.title} type="text" />
         <FormMessage message={fields.title.errors} />
       </FormItem>
-      <div className="space-y-3">
+      <FormItem>
         <div className="flex flex-row space-x-6">
           <div className="basis-1/2">
             <DateTimePickerField
@@ -131,10 +131,10 @@ export function EventForm({ event, onSubmit, children }: EventFormProps) {
           </FormLabel>
         </div>
         <FormMessage message={fields.allDay.errors} />
-      </div>
+      </FormItem>
       <FormItem>
         <FormLabel htmlFor={fields.memo.id}>{t('event.model.memo')}</FormLabel>
-        <TextareaConform meta={fields.memo} className="resize-none" />
+        <TextareaConform meta={fields.memo} className="resize-none" rows={4} />
         <FormMessage message={fields.memo.errors} />
       </FormItem>
       <FormItem>

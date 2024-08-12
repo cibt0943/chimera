@@ -3,6 +3,7 @@ import { Form } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { AlertDialogCancel } from '~/components/ui/alert-dialog'
 import { Button } from '~/components/ui/button'
+import { TODO_URL } from '~/constants'
 import { DeleteConfirmDialog } from '~/components/lib/delete-confirm-dialog'
 import { Task } from '~/types/tasks'
 
@@ -10,7 +11,8 @@ export interface TaskDeleteConfirmDialogProps {
   task: Task | undefined
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  onSubmit: () => void
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  returnUrl?: string
 }
 
 export function TaskDeleteConfirmDialog({
@@ -18,12 +20,13 @@ export function TaskDeleteConfirmDialog({
   isOpen,
   setIsOpen,
   onSubmit,
+  returnUrl = TODO_URL,
 }: TaskDeleteConfirmDialogProps) {
   const { t } = useTranslation()
 
   if (!task) return null
 
-  const action = `/todos/${task.id}/delete`
+  const action = [TODO_URL, task.id, 'delete'].join('/')
 
   return (
     <DeleteConfirmDialog
@@ -44,7 +47,9 @@ export function TaskDeleteConfirmDialog({
         action={action}
         method="delete"
         onSubmit={onSubmit}
-      />
+      >
+        <input type="hidden" name="returnUrl" value={returnUrl} />
+      </Form>
     </DeleteConfirmDialog>
   )
 }

@@ -5,6 +5,7 @@ import { useNavigation } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import {
   formatDistanceToNowStrict,
+  differenceInSeconds,
   Locale,
   format,
   isSameDay,
@@ -88,8 +89,14 @@ export function getLocale(locale: string): Locale {
 }
 
 export function useAgoFormat(date: Date): string {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const local = getLocale(i18n.language)
+
+  const seconds = differenceInSeconds(new Date(), date)
+  if (seconds < 60) {
+    return t('common.format.less_than_1_minute')
+  }
+
   return formatDistanceToNowStrict(date, { locale: local, addSuffix: true })
 }
 

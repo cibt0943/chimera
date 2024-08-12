@@ -12,7 +12,8 @@
       "hour": "hour",
       "o'clock": "o'clock",
       "minute": "minute",
-      "second": "second"
+      "second": "second",
+      "less_than_1_minute": "less than a minute"
     },
     "message": {
       "ok": "OK",

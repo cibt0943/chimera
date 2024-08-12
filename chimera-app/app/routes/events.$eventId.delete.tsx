@@ -1,4 +1,5 @@
 import { redirect } from '@remix-run/node'
+import { EVENT_URL } from '~/constants'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { getEvent, deleteEvent } from '~/models/event.server'
 
@@ -8,5 +9,5 @@ export const action = withAuthentication(async ({ params, loginSession }) => {
 
   await deleteEvent(event.id)
 
-  return redirect(`/events`)
+  return redirect(EVENT_URL)
 })

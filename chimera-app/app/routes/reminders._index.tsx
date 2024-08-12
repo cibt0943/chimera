@@ -1,5 +1,4 @@
-import type { MetaFunction } from '@remix-run/node'
-import { json } from '@remix-run/node'
+import { MetaFunction, json } from '@remix-run/node'
 import { withAuthentication } from '~/lib/auth-middleware'
 
 export const meta: MetaFunction = () => {

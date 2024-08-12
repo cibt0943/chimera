@@ -7,8 +7,9 @@ import {
   RxFile,
   RxPaperPlane,
 } from 'react-icons/rx'
-import { cn } from '~/lib/utils'
 import { buttonVariants } from '~/components/ui/button'
+import { TODO_URL, MEMO_URL, EVENT_URL } from '~/constants'
+import { cn } from '~/lib/utils'
 import { AccountMenu } from '~/components/account-menu'
 
 type NavLinkClassNameProps = {
@@ -60,15 +61,15 @@ export function Sidebar() {
           </h1>
         </div>
         <div className="grid gap-1 p-px">
-          <CustomNavLink to="/todos">
+          <CustomNavLink to={TODO_URL}>
             <RxCheckCircled className="mr-2 h-5 w-5" />
             Todo
           </CustomNavLink>
-          <CustomNavLink to="/memos">
+          <CustomNavLink to={MEMO_URL}>
             <RxPencil2 className="mr-2 h-5 w-5" />
             Memo
           </CustomNavLink>
-          <CustomNavLink to="/events">
+          <CustomNavLink to={EVENT_URL}>
             <RxCalendar className="mr-2 h-5 w-5" />
             Event
           </CustomNavLink>

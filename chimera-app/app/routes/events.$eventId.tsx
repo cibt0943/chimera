@@ -1,8 +1,8 @@
 import * as React from 'react'
-import type { MetaFunction } from '@remix-run/node'
-import { redirect } from '@remix-run/node'
+import { MetaFunction, redirect } from '@remix-run/node'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
+import { EVENT_URL } from '~/constants'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { Event, EventSchema } from '~/types/events'
 import { getEvent, updateEvent } from '~/models/event.server'
@@ -37,7 +37,7 @@ export const action = withAuthentication(
       location: data.location || '',
     })
 
-    return redirect('/events')
+    return redirect(EVENT_URL)
   },
 )
 

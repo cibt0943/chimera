@@ -21,10 +21,11 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
+import { MEMO_URL } from '~/constants'
 import { useDebounce, useQueue } from '~/lib/utils'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
 import { ListItem } from './memo-list-item'
-import { MemoActions } from './memo-actions'
+import { MemoActionMenu } from './memo-action-menu'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 import { MemoSettings } from './memo-settings'
 import { useAtomValue } from 'jotai'
@@ -279,7 +280,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   return (
     <div className="space-y-4 px-1 py-4">
       <div className="flex items-center space-x-2 px-3">
-        <Form action={`/memos`} method="post">
+        <Form action={MEMO_URL} method="post">
           <Button
             type="submit"
             variant="secondary"
@@ -328,7 +329,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
                     isSelected={item.id === selectedMemo?.id}
                     isPreview={!!memoSettings?.listDisplay.content}
                   >
-                    <MemoActions
+                    <MemoActionMenu
                       memo={item}
                       handleMoveMemo={moveMemoOneStep}
                       handleUpdateMemoStatus={updateMemoStatusApi}
@@ -343,13 +344,15 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
           </div>
         </DndContext>
       </ScrollArea>
-      {actionMemo && (
-        <MemoDeleteConfirmDialog
-          memo={actionMemo}
-          isOpen={isOpenDeleteDialog}
-          setIsOpen={setIsOpenDeleteDialog}
-        />
-      )}
+      <MemoDeleteConfirmDialog
+        memo={actionMemo}
+        isOpen={isOpenDeleteDialog}
+        setIsOpen={setIsOpenDeleteDialog}
+        onSubmit={(event) => {
+          event.stopPropagation()
+          setIsOpenDeleteDialog(false)
+        }}
+      />
     </div>
   )
 }

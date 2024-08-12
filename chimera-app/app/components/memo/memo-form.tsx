@@ -1,27 +1,17 @@
 import * as React from 'react'
 import { useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import {
-  RiDeleteBinLine,
-  RiInboxArchiveLine,
-  RiInboxUnarchiveLine,
-} from 'react-icons/ri'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '~/components/ui/tooltip'
+import { MEMO_URL } from '~/constants'
 import { FormItem, FormMessage, FormDescription } from '~/components/lib/form'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
 import { useDebounce, useQueue } from '~/lib/utils'
-import { Memo, MemoSchema, MemoSchemaType, MemoStatus } from '~/types/memos'
-import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
+import { Memo, MemoSchema, MemoSchemaType } from '~/types/memos'
+import { MemoActionButton } from '~/components/memo/memo-action-button'
 import { useAtomValue } from 'jotai'
 import { memoSettingsAtom } from '~/lib/state'
 
@@ -53,7 +43,7 @@ export function MemoForm({ memo }: MemoFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [memoSettings?.autoSave])
 
-  const action = memo ? `/memos/${memo.id}` : `/memos`
+  const action = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
   const formId = memo ? `memo-form-${memo.id}` : 'memo-form-new'
   const defaultValue = {
     content:
@@ -72,6 +62,10 @@ export function MemoForm({ memo }: MemoFormProps) {
       return parseWithZod(formData, { schema: MemoSchema })
     },
     shouldRevalidate: 'onInput',
+    onSubmit: (event) => {
+      event.preventDefault()
+      saveMemoApi()
+    },
   })
 
   // メモの保存API呼び出し
@@ -95,6 +89,7 @@ export function MemoForm({ memo }: MemoFormProps) {
     if (!memoSettings?.autoSave) return
     saveMemoDebounce()
   }
+
   // テキストエリアにフォーカス
   function setTextAreaFocus() {
     formRef.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus()
@@ -128,10 +123,6 @@ export function MemoForm({ memo }: MemoFormProps) {
         {...getFormProps(form)}
         action={action}
         onChange={handleChangeMemo}
-        onSubmit={(event) => {
-          event.preventDefault()
-          saveMemoApi()
-        }}
       >
         <FormItem>
           <FormDescription>
@@ -141,12 +132,11 @@ export function MemoForm({ memo }: MemoFormProps) {
             meta={fields.content}
             key={fields.content.key}
             className="h-[calc(100vh_-_155px)] resize-none bg-[#303841] text-white focus-visible:ring-0"
-            rows={15}
           />
           <FormMessage message={fields.content.errors} />
         </FormItem>
         <div className="flex items-center justify-between">
-          <ActionButtons memo={memo} />
+          {memo?.id ? <MemoActionButton memo={memo} /> : <div>&nbsp;</div>}
           <div className="flex items-center space-x-6">
             <FormItem>
               <DateTimePickerConform
@@ -165,75 +155,6 @@ export function MemoForm({ memo }: MemoFormProps) {
           </div>
         </div>
       </fetcher.Form>
-    </div>
-  )
-}
-
-function ActionButtons({ memo }: { memo: Memo | undefined }) {
-  const { t } = useTranslation()
-  const fetcher = useFetcher()
-  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
-
-  if (!memo) return <div></div> // memo がない場合はあえてdivタグのみを記載
-
-  const archiveMenu =
-    memo.status === MemoStatus.NOMAL
-      ? {
-          toStatus: MemoStatus.ARCHIVED,
-          icon: <RiInboxArchiveLine className="h-4 w-4" />,
-          caption: t('memo.message.to_archive'),
-        }
-      : {
-          toStatus: MemoStatus.NOMAL,
-          icon: <RiInboxUnarchiveLine className="h-4 w-4" />,
-          caption: t('memo.message.un_archive'),
-        }
-
-  return (
-    <div className="space-x-4">
-      <TooltipProvider delayDuration={0}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={(event) => {
-                fetcher.submit(
-                  { status: archiveMenu.toStatus },
-                  {
-                    action: `/memos/${memo.id}/status`,
-                    method: 'post',
-                  },
-                )
-                event.preventDefault()
-              }}
-            >
-              {archiveMenu.icon}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{archiveMenu.caption}</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={(event) => {
-                setIsOpenDeleteDialog(true)
-                event.preventDefault()
-              }}
-            >
-              <RiDeleteBinLine className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{t('common.message.delete')}</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-      <MemoDeleteConfirmDialog
-        memo={memo}
-        isOpen={isOpenDeleteDialog}
-        setIsOpen={setIsOpenDeleteDialog}
-      />
     </div>
   )
 }

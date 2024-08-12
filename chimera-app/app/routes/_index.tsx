@@ -1,5 +1,6 @@
 import type { MetaFunction } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
+import { TODO_URL } from '~/constants'
 
 export const meta: MetaFunction = () => {
   return [
@@ -9,5 +10,5 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader() {
-  return redirect('/todos')
+  return redirect(TODO_URL)
 }

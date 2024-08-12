@@ -28,6 +28,6 @@ export const action = withAuthentication(
       status: data.status,
     })
 
-    return json({ success: true, memo: updatedMemo })
+    return json({ memo: updatedMemo })
   },
 )

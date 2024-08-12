@@ -1,5 +1,5 @@
-import { withAuthentication } from '~/lib/auth-middleware'
 import { json } from '@remix-run/node'
+import { withAuthentication } from '~/lib/auth-middleware'
 import { getTask, updateTaskPosition } from '~/models/task.server'
 
 export const action = withAuthentication(
@@ -13,6 +13,6 @@ export const action = withAuthentication(
 
     const updatedTask = await updateTaskPosition(fromTask.id, toTask.position)
 
-    return json({ success: true, task: updatedTask })
+    return json({ task: updatedTask })
   },
 )

@@ -13,6 +13,6 @@ export const action = withAuthentication(
 
     const updatedMemo = await updateMemoPosition(fromMemo.id, toMemo.position)
 
-    return json({ success: true, memo: updatedMemo })
+    return json({ memo: updatedMemo })
   },
 )

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { RiDeleteBinLine } from 'react-icons/ri'
 import { Button } from '~/components/ui/button'
@@ -26,7 +25,6 @@ export function EventFormDialog({
   setIsOpen,
 }: EventFormDialogProps) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   // 新規作成時であってもeventに初期値を埋めて送られてくるため、idがあるかどうかで判定
@@ -36,13 +34,7 @@ export function EventFormDialog({
   const description = t('event.message.set_event_info')
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open)
-        if (!open) navigate('/events')
-      }}
-    >
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[490px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

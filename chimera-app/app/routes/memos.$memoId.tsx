@@ -1,5 +1,4 @@
-import type { MetaFunction } from '@remix-run/node'
-import { redirect } from '@remix-run/node'
+import { MetaFunction, json } from '@remix-run/node'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { ClientOnly } from 'remix-utils/client-only'
 import { parseWithZod } from '@conform-to/zod'
@@ -29,7 +28,7 @@ export const action = withAuthentication(
     const data = submission.value
 
     const [title, ...content] = (data.content || '').split('\n')
-    await updateMemo({
+    const updatedMemo = await updateMemo({
       id: memo.id,
       title: title,
       content: content.join('\n'),
@@ -37,7 +36,7 @@ export const action = withAuthentication(
       related_date_all_day: !!data.relatedDateAllDay,
     })
 
-    return redirect(`/memos/${memo.id}`)
+    return json({ memo: updatedMemo })
   },
 )
 

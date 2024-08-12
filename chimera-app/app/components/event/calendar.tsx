@@ -1,5 +1,4 @@
 import * as React from 'react'
-// import type { LinksFunction } from '@remix-run/node'
 import { useTranslation } from 'react-i18next'
 import { RxCheckCircled, RxPencil2, RxCalendar } from 'react-icons/rx'
 import allLocales from '@fullcalendar/core/locales-all'
@@ -13,7 +12,17 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
 import { Event, CalendarEvents, CalendarEventType } from '~/types/events'
+import { Task } from '~/types/tasks'
+import { Memo } from '~/types/memos'
 import { EventFormDialog, EventFormDialogProps } from './event-form-dialog'
+import {
+  TaskFormDialog,
+  TaskFormDialogProps,
+} from '~/components/todo/task-form-dialog'
+import {
+  MemoFormDialog,
+  MemoFormDialogProps,
+} from '~/components/memo/memo-form-dialog'
 
 interface CalendarProps {
   defaultEvents: CalendarEvents
@@ -23,22 +32,27 @@ interface CalendarProps {
 export function Calendar({ defaultEvents, showId }: CalendarProps) {
   const { i18n } = useTranslation()
 
-  const [actionEvent, setActionEvent] = React.useState<Event>() // 編集・削除するイベント
-  const [isOpenEventFormDialog, setIsOpenEventFormDialog] =
-    React.useState(false)
+  const [actionObj, setActionObj] = React.useState<Event | Task | Memo>() // 編集・削除するイベント
+  const [isOpenEventDialog, setIsOpenEventDialog] = React.useState(false)
+  const [isOpenTaskDialog, setIsOpenTaskDialog] = React.useState(false)
+  const [isOpenMemoDialog, setIsOpenMemoDialog] = React.useState(false)
 
   // イベント編集
   function handleEventClick(arg: EventClickArg) {
     const type = arg.event.extendedProps.type
     const srcObj = arg.event.extendedProps.srcObj
+
+    setActionObj(srcObj)
+
     switch (type) {
       case CalendarEventType.EVENT:
-        setActionEvent(srcObj as Event)
-        setIsOpenEventFormDialog(true)
+        setIsOpenEventDialog(true)
         break
       case CalendarEventType.TASK:
+        setIsOpenTaskDialog(true)
         break
       case CalendarEventType.MEMO:
+        setIsOpenMemoDialog(true)
         break
     }
   }
@@ -62,8 +76,8 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
       memo: '',
       location: '',
     } as Event
-    setActionEvent(event)
-    setIsOpenEventFormDialog(true)
+    setActionObj(event)
+    setIsOpenEventDialog(true)
   }
 
   return (
@@ -130,9 +144,21 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
         />
       </div>
       <EventFormDialogMemo
-        event={actionEvent}
-        isOpen={isOpenEventFormDialog}
-        setIsOpen={setIsOpenEventFormDialog}
+        event={actionObj as Event}
+        isOpen={isOpenEventDialog}
+        setIsOpen={setIsOpenEventDialog}
+      />
+      <TaskFormDialogMemo
+        task={actionObj as Task}
+        isOpen={isOpenTaskDialog}
+        setIsOpen={setIsOpenTaskDialog}
+        returnUrl="/events"
+      />
+      <MemoFormDialogMemo
+        memo={actionObj as Memo}
+        isOpen={isOpenMemoDialog}
+        setIsOpen={setIsOpenMemoDialog}
+        returnUrl="/events"
       />
     </>
   )
@@ -147,14 +173,12 @@ function renderEventContent(eventContent: EventContentArg) {
   const Icon = EventTypeIcon({ type })
 
   return (
-    <div className="flex items-center truncate">
+    <div className="flex items-center truncate" title={title}>
       <div>
         <Icon className="ml-1 h-4 w-4" />
       </div>
       {timeText && <div className="ml-1">{timeText}</div>}
-      <div className="ml-1 font-semibold" title={title}>
-        {title}
-      </div>
+      <div className="ml-1 font-semibold">{title}</div>
     </div>
   )
 }
@@ -177,3 +201,15 @@ const EventFormDialogMemo = React.memo((props: EventFormDialogProps) => {
   return <EventFormDialog {...props} />
 })
 EventFormDialogMemo.displayName = 'EventFormDialogMemo'
+
+// タスクフォームダイアログのメモ化
+const TaskFormDialogMemo = React.memo((props: TaskFormDialogProps) => {
+  return <TaskFormDialog {...props} />
+})
+TaskFormDialogMemo.displayName = 'TaskFormDialogMemo'
+
+// メモフォームダイアログのメモ化
+const MemoFormDialogMemo = React.memo((props: MemoFormDialogProps) => {
+  return <MemoFormDialog {...props} />
+})
+MemoFormDialogMemo.displayName = 'MemoFormDialogMemo'

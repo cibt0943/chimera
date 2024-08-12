@@ -87,6 +87,7 @@ export const TaskSchema = zod.object({
   memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
   dueDate: zod.date().optional(),
   dueDateAllDay: zod.boolean().optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
+  returnUrl: zod.string().optional(),
 })
 
 export type TaskSchemaType = zod.infer<typeof TaskSchema>

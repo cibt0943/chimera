@@ -6,6 +6,7 @@ import { ColumnDef, Column, Row } from '@tanstack/react-table'
 import { useSortable } from '@dnd-kit/sortable'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
+import { TODO_URL } from '~/constants'
 import { Task, TaskStatusList } from '~/types/tasks'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
@@ -84,7 +85,10 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
     },
     cell: ({ row }) => {
       return (
-        <NavLink to={`/todos/${row.id}`} className="truncate font-medium">
+        <NavLink
+          to={[TODO_URL, row.id].join('/')}
+          className="truncate font-medium"
+        >
           {row.original.title}
         </NavLink>
       )

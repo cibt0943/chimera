@@ -5,7 +5,8 @@ import { format } from 'date-fns'
 import { RiArchiveLine } from 'react-icons/ri'
 import { CSS } from '@dnd-kit/utilities'
 import { useSortable } from '@dnd-kit/sortable'
-import { cn, useDateDiffFormat } from '~/lib/utils'
+// import { cn, useDateDiffFormat } from '~/lib/utils'
+import { cn, useAgoFormat } from '~/lib/utils'
 import { Memo, MemoStatus } from '~/types/memos'
 
 function NavLinkClassName({
@@ -68,7 +69,8 @@ export function ListItem(props: ListItemProps) {
     }),
   }
 
-  const updatedAtDiff = useDateDiffFormat(item.updatedAt)
+  // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
+  const updatedAtDiff = useAgoFormat(item.updatedAt)
 
   return (
     <NavLink

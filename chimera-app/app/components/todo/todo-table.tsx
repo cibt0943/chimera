@@ -48,6 +48,7 @@ import {
 import { Button } from '~/components/ui/button'
 import { ToastAction } from '~/components/ui/toast'
 import { useToast } from '~/components/ui/use-toast'
+import { TODO_URL } from '~/constants'
 import { useDebounce, useQueue, useIsLoading } from '~/lib/utils'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
@@ -237,8 +238,9 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   // タスクの表示順変更API呼び出し
   async function moveTaskApi(fromTask: Task, toTask: Task) {
-    // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
-    await fetch(`/todos/${fromTask.id}/position`, {
+    // fetcher.submitを利用すると自動でタスクデータを再取得してしまうのであえてfetchを利用
+    const url = [TODO_URL, fromTask.id, 'position'].join('/')
+    await fetch(url, {
       method: 'POST',
       body: JSON.stringify({ toTaskId: toTask.id }),
     }).then((response) => {
@@ -308,7 +310,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     fetcher.submit(
       { status: updateTask.status },
       {
-        action: `/todos/${updateTask.id}/status`,
+        action: [TODO_URL, updateTask.id, 'status'].join('/'),
         method: 'post',
       },
     )
@@ -511,7 +513,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         task={actionTask}
         isOpen={isOpenDeleteDialog}
         setIsOpen={setIsOpenDeleteDialog}
-        handleSubmit={() => {
+        onSubmit={() => {
           setIsOpenDeleteDialog(false)
         }}
       />

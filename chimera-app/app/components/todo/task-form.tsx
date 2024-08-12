@@ -5,6 +5,7 @@ import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
 import { SelectItem } from '~/components/ui/select'
+import { TODO_URL } from '~/constants'
 import {
   FormItem,
   FormLabel,
@@ -28,13 +29,20 @@ import {
 export interface TaskFormProps {
   task: Task | undefined
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  returnUrl?: string
   children?: React.ReactNode
 }
 
-export function TaskForm({ task, onSubmit, children }: TaskFormProps) {
+export function TaskForm({
+  task,
+  onSubmit,
+  returnUrl = TODO_URL,
+  children,
+}: TaskFormProps) {
   const { t } = useTranslation()
 
-  const action = task ? `/todos/${task.id}` : '/todos'
+  const action = task ? [TODO_URL, task.id].join('/') : TODO_URL
+
   const formId = task ? `task-form-${task.id}` : 'task-form-new'
   const defaultValue = task || {
     title: '',
@@ -72,7 +80,7 @@ export function TaskForm({ task, onSubmit, children }: TaskFormProps) {
       </FormItem>
       <FormItem>
         <FormLabel htmlFor={fields.memo.id}>{t('task.model.memo')}</FormLabel>
-        <TextareaConform meta={fields.memo} className="resize-none" />
+        <TextareaConform meta={fields.memo} className="resize-none" rows={4} />
         <FormMessage message={fields.memo.errors} />
       </FormItem>
       <FormItem>
@@ -104,6 +112,7 @@ export function TaskForm({ task, onSubmit, children }: TaskFormProps) {
         {children || <div>&nbsp;</div>}
         <Button type="submit">{t('common.message.save')}</Button>
       </FormFooter>
+      <input type="hidden" name="returnUrl" value={returnUrl} />
     </Form>
   )
 }

@@ -3,7 +3,6 @@ import { RiCloseLine } from 'react-icons/ri'
 import { RxCalendar } from 'react-icons/rx'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import { cn, getLocale } from '~/lib/utils'
 import { Button } from '~/components/ui/button'
 import { Calendar } from '~/components/ui/calendar'
 import {
@@ -12,6 +11,7 @@ import {
   PopoverTrigger,
 } from '~/components/ui/popover'
 import { Toggle } from '~/components/ui/toggle'
+import { cn, getLocale } from '~/lib/utils'
 import { TimePicker } from './time-picker'
 
 export interface DatePickerProps extends React.ComponentProps<'div'> {

@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog'
+import { TODO_URL } from '~/constants'
 import { TaskDeleteConfirmDialog } from './task-delete-confirm-dialog'
 import { Task } from '~/types/tasks'
 import { TaskForm } from './task-form'
@@ -18,12 +19,14 @@ export interface TaskFormDialogProps {
   task: Task | undefined
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  returnUrl?: string
 }
 
 export function TaskFormDialog({
   task,
   isOpen,
   setIsOpen,
+  returnUrl = TODO_URL,
 }: TaskFormDialogProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -39,7 +42,7 @@ export function TaskFormDialog({
       open={isOpen}
       onOpenChange={(open) => {
         setIsOpen(open)
-        if (!open) navigate('/todos')
+        if (!open) navigate(returnUrl)
       }}
     >
       <DialogContent className="sm:max-w-[425px]">
@@ -47,8 +50,13 @@ export function TaskFormDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <TaskForm task={task} onSubmit={() => setIsOpen(false)}>
+        <TaskForm
+          task={task}
+          onSubmit={() => setIsOpen(false)}
+          returnUrl={returnUrl}
+        >
           {task && (
+            // 削除ボタン
             <Button
               type="button"
               variant="link"
@@ -64,10 +72,8 @@ export function TaskFormDialog({
           task={task}
           isOpen={isOpenDeleteDialog}
           setIsOpen={setIsOpenDeleteDialog}
-          onSubmit={() => {
-            setIsOpenDeleteDialog(false)
-            setIsOpen(false)
-          }}
+          onSubmit={() => setIsOpen(false)}
+          returnUrl={returnUrl}
         />
       </DialogContent>
     </Dialog>

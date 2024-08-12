@@ -1,8 +1,8 @@
-import type { MetaFunction, LinksFunction } from '@remix-run/node'
-import { redirect } from '@remix-run/node'
+import { MetaFunction, LinksFunction, redirect } from '@remix-run/node'
 import { Outlet, useParams } from '@remix-run/react'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
+import { EVENT_URL } from '~/constants'
 import { withAuthentication } from '~/lib/auth-middleware'
 import {
   CalendarEvents,
@@ -47,7 +47,7 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
     location: data.location || '',
   })
 
-  return redirect('/events?day=' + newEvent.startDate.toISOString())
+  return redirect(EVENT_URL + '?day=' + newEvent.startDate.toISOString())
 })
 
 type LoaderData = {

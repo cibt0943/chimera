@@ -12,7 +12,8 @@
       "hour": "時間",
       "o'clock": "時",
       "minute": "分",
-      "second": "秒"
+      "second": "秒",
+      "less_than_1_minute": "1分未満"
     },
     "message": {
       "ok": "OK",
