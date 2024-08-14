@@ -2,33 +2,40 @@ import * as React from 'react'
 import { useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from 'react-hotkeys-hook'
-import { useForm, getFormProps } from '@conform-to/react'
-import { parseWithZod, getZodConstraint } from '@conform-to/zod'
+import { getFormProps } from '@conform-to/react'
 import { Button } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
-import { FormItem, FormMessage, FormDescription } from '~/components/lib/form'
+import {
+  FormItem,
+  FormMessage,
+  FormDescription,
+  FormFooter,
+} from '~/components/lib/form'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
 import { useDebounce, useQueue } from '~/lib/utils'
-import { Memo, MemoSchema, MemoSchemaType } from '~/types/memos'
-import { MemoActionButton } from '~/components/memo/memo-action-button'
+import { Memo } from '~/types/memos'
+import { useMemoConform } from './memo-conform'
+import { MemoActionButton } from './memo-action-button'
+import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 import { useAtomValue } from 'jotai'
 import { memoSettingsAtom } from '~/lib/state'
 
-interface MemoFormProps {
+interface MemoFormViewProps {
   memo: Memo | undefined
 }
 
-export function MemoForm({ memo }: MemoFormProps) {
+export function MemoFormView({ memo }: MemoFormViewProps) {
   const { t } = useTranslation()
   const formRef = React.useRef<HTMLFormElement>(null)
   const { enqueue } = useQueue()
-  const fetcher = useFetcher({ key: 'memo-form' })
+  const memoFormFetcher = useFetcher({ key: 'memo-form' })
 
   const memoSettings = useAtomValue(memoSettingsAtom)
-
   // memoの状態を変更して保存したかどうか
   const [isChangedMemo, setIsChangedMemo] = React.useState(false)
+  // メモ削除ダイアログの表示状態
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   React.useEffect(() => {
     setIsChangedMemo(false)
@@ -43,39 +50,11 @@ export function MemoForm({ memo }: MemoFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [memoSettings?.autoSave])
 
-  const action = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
-  const formId = memo ? `memo-form-${memo.id}` : 'memo-form-new'
-  const defaultValue = {
-    content:
-      memo && memo.title + memo.content !== ''
-        ? memo.title.concat('\n', memo.content)
-        : '',
-    relatedDate: memo ? memo.relatedDate : null,
-    relatedDateAllDay: memo ? memo.relatedDateAllDay : true,
-  }
-
-  const [form, fields] = useForm<MemoSchemaType>({
-    id: formId,
-    defaultValue: defaultValue,
-    constraint: getZodConstraint(MemoSchema),
-    onValidate: ({ formData }) => {
-      return parseWithZod(formData, { schema: MemoSchema })
-    },
-    shouldRevalidate: 'onInput',
-    onSubmit: (event) => {
-      event.preventDefault()
-      saveMemoApi()
-    },
-  })
-
   // メモの保存API呼び出し
   async function saveMemoApi() {
     // メモが保存されたら、メモが変更されていない状態にする
     setIsChangedMemo(false)
-    fetcher.submit(formRef.current, {
-      action: action,
-      method: 'post',
-    })
+    memoFormFetcher.submit(formRef.current)
   }
 
   // メモの保存APIをdebounce
@@ -114,9 +93,12 @@ export function MemoForm({ memo }: MemoFormProps) {
     },
   )
 
+  const { form, fields } = useMemoConform({ memo, onSubmit: saveMemoApi })
+  const action = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
+
   return (
     <div className="m-4">
-      <fetcher.Form
+      <memoFormFetcher.Form
         ref={formRef}
         method="post"
         className="space-y-6"
@@ -131,47 +113,58 @@ export function MemoForm({ memo }: MemoFormProps) {
           <TextareaConform
             meta={fields.content}
             key={fields.content.key}
-            className="h-[calc(100vh_-_155px)] resize-none bg-[#303841] text-white focus-visible:ring-0"
+            className="h-[calc(100vh_-_216px)] resize-none bg-[#303841] text-white focus-visible:ring-0"
           />
           <FormMessage message={fields.content.errors} />
         </FormItem>
-        <div className="flex items-center justify-between">
-          {memo?.id ? <MemoActionButton memo={memo} /> : <div>&nbsp;</div>}
-          <div className="flex items-center space-x-6">
-            <FormItem>
-              <DateTimePickerConform
-                dateMeta={fields.relatedDate}
-                allDayMeta={fields.relatedDateAllDay}
-                defaultAllDay={true}
-                includeAllDayComponent={true}
-                onChangeData={handleChangeMemo}
-                onChangeAllDay={handleChangeMemo}
-                placeholder={t('memo.model.related_date')}
-                className="w-52"
-              />
-              <FormMessage message={fields.relatedDate.errors} />
-            </FormItem>
-            <SaveButton isChangedMemo={isChangedMemo} />
-          </div>
-        </div>
-      </fetcher.Form>
+        <FormItem>
+          <DateTimePickerConform
+            dateMeta={fields.relatedDate}
+            allDayMeta={fields.relatedDateAllDay}
+            defaultAllDay={true}
+            includeAllDayComponent={true}
+            onChangeData={handleChangeMemo}
+            onChangeAllDay={handleChangeMemo}
+            placeholder={t('memo.model.related_date')}
+            className="w-52"
+          />
+          <FormMessage message={fields.relatedDate.errors} />
+        </FormItem>
+        <input type="hidden" name="returnUrl" value={action} />
+        <FormFooter className="sm:justify-between">
+          {memo ? (
+            <MemoActionButton
+              memo={memo}
+              handleDeleteMemo={() => setIsOpenDeleteDialog(true)}
+            />
+          ) : (
+            <div>&nbsp;</div>
+          )}
+          <SaveButton isChangedMemo={isChangedMemo} />
+        </FormFooter>
+      </memoFormFetcher.Form>
+      <MemoDeleteConfirmDialog
+        memo={memo}
+        isOpen={isOpenDeleteDialog}
+        setIsOpen={setIsOpenDeleteDialog}
+        onSubmit={() => {
+          setIsOpenDeleteDialog(false)
+        }}
+        returnUrl={MEMO_URL}
+      />
     </div>
   )
 }
 
 function SaveButton({ isChangedMemo }: { isChangedMemo: boolean }) {
   const { t } = useTranslation()
-  const fetcher = useFetcher({ key: 'memo-form' })
+  const memoFormFetcher = useFetcher({ key: 'memo-form' })
   const memoSettings = useAtomValue(memoSettingsAtom)
 
-  const isDisabled = memoSettings?.autoSave
-    ? true
-    : isChangedMemo
-      ? false
-      : true
+  const isDisabled = memoSettings?.autoSave || !isChangedMemo
 
   let caption
-  switch (fetcher.state) {
+  switch (memoFormFetcher.state) {
     case 'submitting':
       caption = t('common.message.state_saving')
       break
@@ -204,7 +197,7 @@ function SaveButton({ isChangedMemo }: { isChangedMemo: boolean }) {
   }
 
   return (
-    <Button type="submit" className="w-32" disabled={isDisabled}>
+    <Button type="submit" className="sm:w-32" disabled={isDisabled}>
       {caption}
     </Button>
   )

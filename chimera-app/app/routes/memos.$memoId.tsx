@@ -1,12 +1,13 @@
-import { MetaFunction, json } from '@remix-run/node'
+import { MetaFunction, redirect } from '@remix-run/node'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { ClientOnly } from 'remix-utils/client-only'
 import { parseWithZod } from '@conform-to/zod'
+import { MEMO_URL } from '~/constants'
 import { withAuthentication } from '~/lib/auth-middleware'
 import type { Memo } from '~/types/memos'
 import { MemoSchema } from '~/types/memos'
 import { getMemo, updateMemo } from '~/models/memo.server'
-import { MemoForm } from '~/components/memo/memo-form'
+import { MemoFormView } from '~/components/memo/memo-form-view'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: 'Memo ' + data?.memo.id + ' | Kobushi' }]
@@ -28,7 +29,7 @@ export const action = withAuthentication(
     const data = submission.value
 
     const [title, ...content] = (data.content || '').split('\n')
-    const updatedMemo = await updateMemo({
+    await updateMemo({
       id: memo.id,
       title: title,
       content: content.join('\n'),
@@ -36,7 +37,7 @@ export const action = withAuthentication(
       related_date_all_day: !!data.relatedDateAllDay,
     })
 
-    return json({ memo: updatedMemo })
+    return redirect(data.returnUrl || [MEMO_URL, memo.id].join('/'))
   },
 )
 
@@ -54,5 +55,5 @@ export const loader = withAuthentication(async ({ params, loginSession }) => {
 export default function Memo() {
   const { memo } = useTypedLoaderData<LoaderData>()
 
-  return <ClientOnly>{() => <MemoForm memo={memo} />}</ClientOnly>
+  return <ClientOnly>{() => <MemoFormView memo={memo} />}</ClientOnly>
 }

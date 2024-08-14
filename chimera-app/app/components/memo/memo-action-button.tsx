@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -15,38 +14,25 @@ import {
 } from '~/components/ui/tooltip'
 import { MEMO_URL } from '~/constants'
 import { Memo, MemoStatus } from '~/types/memos'
-import { MemoDeleteConfirmDialog } from '~/components/memo/memo-delete-confirm-dialog'
 
 interface MemoActionButtonProps {
   memo: Memo | undefined
-  returnUrl?: string
+  handleDeleteMemo: (memo: Memo) => void
 }
 
 export function MemoActionButton({
   memo,
-  returnUrl = MEMO_URL,
+  handleDeleteMemo,
 }: MemoActionButtonProps) {
   const { t } = useTranslation()
   const fetcher = useFetcher()
-  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   if (!memo) return null
 
-  const archiveMenu =
-    memo.status === MemoStatus.NOMAL
-      ? {
-          toStatus: MemoStatus.ARCHIVED,
-          icon: <RiInboxArchiveLine className="h-4 w-4" />,
-          caption: t('memo.message.to_archive'),
-        }
-      : {
-          toStatus: MemoStatus.NOMAL,
-          icon: <RiInboxUnarchiveLine className="h-4 w-4" />,
-          caption: t('memo.message.un_archive'),
-        }
+  const archiveMenu = ArchiveMenu(memo.status)
 
   return (
-    <div className="space-x-4">
+    <div className="mt-2 space-x-4 sm:mt-0">
       <TooltipProvider delayDuration={0}>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -76,7 +62,7 @@ export function MemoActionButton({
               size="icon"
               onClick={(event) => {
                 event.preventDefault()
-                setIsOpenDeleteDialog(true)
+                handleDeleteMemo(memo)
               }}
             >
               <RiDeleteBinLine className="h-4 w-4" />
@@ -85,16 +71,22 @@ export function MemoActionButton({
           <TooltipContent>{t('common.message.delete')}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <MemoDeleteConfirmDialog
-        memo={memo}
-        isOpen={isOpenDeleteDialog}
-        setIsOpen={setIsOpenDeleteDialog}
-        onSubmit={(event) => {
-          event.stopPropagation()
-          setIsOpenDeleteDialog(false)
-        }}
-        returnUrl={returnUrl}
-      />
     </div>
   )
+}
+
+function ArchiveMenu(status: MemoStatus) {
+  const { t } = useTranslation()
+
+  return status === MemoStatus.NOMAL
+    ? {
+        toStatus: MemoStatus.ARCHIVED,
+        icon: <RiInboxArchiveLine className="h-4 w-4" />,
+        caption: t('memo.message.to_archive'),
+      }
+    : {
+        toStatus: MemoStatus.NOMAL,
+        icon: <RiInboxUnarchiveLine className="h-4 w-4" />,
+        caption: t('memo.message.un_archive'),
+      }
 }

@@ -45,7 +45,7 @@ export function EventFormDialog({
             <Button
               type="button"
               variant="link"
-              className="border-destructive/50 px-0 text-destructive"
+              className="mt-2 border-destructive/50 px-0 text-destructive sm:mt-0"
               onClick={() => setIsOpenDeleteDialog(true)}
             >
               <RiDeleteBinLine className="mr-1 h-4 w-4" />

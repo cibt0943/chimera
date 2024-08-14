@@ -14,6 +14,7 @@ import { TODO_URL } from '~/constants'
 import { TaskDeleteConfirmDialog } from './task-delete-confirm-dialog'
 import { Task } from '~/types/tasks'
 import { TaskForm } from './task-form'
+import { sleep } from '~/lib/utils'
 
 export interface TaskFormDialogProps {
   task: Task | undefined
@@ -40,9 +41,12 @@ export function TaskFormDialog({
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={(open) => {
+      onOpenChange={async (open) => {
         setIsOpen(open)
-        if (!open) navigate(returnUrl)
+        if (!open) {
+          await sleep(200) // ダイアログが閉じるアニメーションが終わるまで待機
+          navigate(returnUrl)
+        }
       }}
     >
       <DialogContent className="sm:max-w-[425px]">
@@ -60,7 +64,7 @@ export function TaskFormDialog({
             <Button
               type="button"
               variant="link"
-              className="border-destructive/50 px-0 text-destructive"
+              className="mt-2 border-destructive/50 px-0 text-destructive sm:mt-0"
               onClick={() => setIsOpenDeleteDialog(true)}
             >
               <RiDeleteBinLine className="mr-1 h-4 w-4" />
