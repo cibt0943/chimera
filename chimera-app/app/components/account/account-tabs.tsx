@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
-import { AccountTab } from '~/components/account/account-tab'
-import { PasswordTab } from '~/components/account/password-tab'
 import type { AccountSettings } from '~/types/accounts'
+import { AccountTab } from './account-tab'
+import { PasswordTab } from './password-tab'
 
 interface AccountTabsProps {
   accountSettings: AccountSettings

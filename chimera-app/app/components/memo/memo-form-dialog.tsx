@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form } from '@remix-run/react'
+import { useNavigate, Form } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { getFormProps } from '@conform-to/react'
 import { Button } from '~/components/ui/button'
@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog'
 import { MEMO_URL } from '~/constants'
+import { sleep } from '~/lib/utils'
 import {
   FormItem,
   FormMessage,
@@ -22,7 +23,6 @@ import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker
 import { Memo } from '~/types/memos'
 import { useMemoConform } from './memo-conform'
 import { MemoActionButton } from './memo-action-button'
-import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 
 export interface MemoFormDialogProps {
   memo: Memo | undefined
@@ -38,34 +38,34 @@ export function MemoFormDialog({
   returnUrl = MEMO_URL,
 }: MemoFormDialogProps) {
   const { t } = useTranslation()
-
-  // メモ削除ダイアログの表示状態
-  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
+  const navigate = useNavigate()
 
   const title = memo
     ? t('memo.message.memo_editing')
     : t('memo.message.memo_creation')
-  const description = t('memo.message.set_memo_info')
+  const desc = t('memo.message.set_memo_info')
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={async (open) => {
+        setIsOpen(open)
+        if (!open) {
+          await sleep(200) // ダイアログが閉じるアニメーションが終わるまで待機
+          navigate(returnUrl)
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-[620px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogDescription>{desc}</DialogDescription>
         </DialogHeader>
         <MemoForm
           memo={memo}
           onSubmit={() => setIsOpen(false)}
-          handleDeleteMemo={() => setIsOpenDeleteDialog(true)}
-          returnUrl={returnUrl}
-        />
-        <MemoDeleteConfirmDialog
-          memo={memo}
-          isOpen={isOpenDeleteDialog}
-          setIsOpen={setIsOpenDeleteDialog}
-          onSubmit={() => {
-            setIsOpenDeleteDialog(false)
+          onDeleteSubmit={(event) => {
+            event.stopPropagation()
             setIsOpen(false)
           }}
           returnUrl={returnUrl}
@@ -77,15 +77,15 @@ export function MemoFormDialog({
 
 interface MemoFormProps {
   memo: Memo | undefined
-  onSubmit: () => void
-  handleDeleteMemo: () => void
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
+  onDeleteSubmit: (event: React.FormEvent<HTMLFormElement>) => void
   returnUrl: string
 }
 
 function MemoForm({
   memo,
   onSubmit,
-  handleDeleteMemo,
+  onDeleteSubmit,
   returnUrl,
 }: MemoFormProps) {
   const { t } = useTranslation()
@@ -125,7 +125,11 @@ function MemoForm({
       <input type="hidden" name="returnUrl" value={returnUrl} />
       <FormFooter className="sm:justify-between">
         {memo ? (
-          <MemoActionButton memo={memo} handleDeleteMemo={handleDeleteMemo} />
+          <MemoActionButton
+            memo={memo}
+            onDeleteSubmit={onDeleteSubmit}
+            returnUrl={returnUrl}
+          />
         ) : (
           <div>&nbsp;</div>
         )}

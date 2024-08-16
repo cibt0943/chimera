@@ -102,9 +102,7 @@ export function useAgoFormat(date: Date): string {
 
 export function useDateDiffFormat(targetDate: Date, baseDate?: Date): string {
   const { t } = useTranslation()
-  if (!baseDate) {
-    baseDate = new Date()
-  }
+  baseDate = baseDate || new Date()
 
   if (isSameDay(baseDate, targetDate)) {
     return format(targetDate, t('common.format.time_short_format'))

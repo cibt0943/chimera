@@ -1,18 +1,22 @@
 import * as React from 'react'
 import { Form } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { AlertDialogCancel } from '~/components/ui/alert-dialog'
-import { Button } from '~/components/ui/button'
+import {
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '~/components/ui/alert-dialog'
+import { buttonVariants } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
-import { DeleteConfirmDialog } from '~/components/lib/delete-confirm-dialog'
+import { ConfirmDialog } from '~/components/lib/confirm-dialog'
 import { Memo } from '~/types/memos'
 
 export interface DeleteMemoConfirmDialogProps {
   memo: Memo | undefined
-  isOpen: boolean
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  isOpen?: boolean
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
   returnUrl?: string
+  children?: React.ReactNode
 }
 
 export function MemoDeleteConfirmDialog({
@@ -21,28 +25,36 @@ export function MemoDeleteConfirmDialog({
   setIsOpen,
   onSubmit,
   returnUrl = MEMO_URL,
+  children,
 }: DeleteMemoConfirmDialogProps) {
   const { t } = useTranslation()
 
   if (!memo) return null
 
   const action = [MEMO_URL, memo.id, 'delete'].join('/')
-  const memoTitle = memo.title || t('memo.un_titled')
+  const desc =
+    '「' +
+    (memo.title || t('memo.un_titled')) +
+    '」' +
+    t('common.message.confirm_deletion')
 
   return (
-    <DeleteConfirmDialog
+    <ConfirmDialog
       title={t('memo.message.memo_deletion')}
-      description={
-        '「' + memoTitle + '」' + t('common.message.confirm_deletion')
-      }
+      description={desc}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
+      torigger={children}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       {/* レスポンシブ対応のためにFormでButtonを囲まない */}
-      <Button type="submit" variant="destructive" form="delete-memo-form">
+      <AlertDialogAction
+        type="submit"
+        className={buttonVariants({ variant: 'destructive' })}
+        form="delete-memo-form"
+      >
         {t('common.message.delete')}
-      </Button>
+      </AlertDialogAction>
       <Form
         id="delete-memo-form"
         action={action}
@@ -51,6 +63,6 @@ export function MemoDeleteConfirmDialog({
       >
         <input type="hidden" name="returnUrl" value={returnUrl} />
       </Form>
-    </DeleteConfirmDialog>
+    </ConfirmDialog>
   )
 }

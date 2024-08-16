@@ -4,7 +4,8 @@ import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
 import { EVENT_URL } from '~/constants'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { Event, EventSchema } from '~/types/events'
+import type { Event } from '~/types/events'
+import { EventSchema } from '~/types/events'
 import { getEvent, updateEvent } from '~/models/event.server'
 import { EventFormDialog } from '~/components/event/event-form-dialog'
 
@@ -52,7 +53,7 @@ export const loader = withAuthentication(async ({ params, loginSession }) => {
   return typedjson({ event })
 })
 
-export default function Todo() {
+export default function Event() {
   const { event } = useTypedLoaderData<LoaderData>()
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
 

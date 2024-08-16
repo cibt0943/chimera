@@ -42,7 +42,6 @@ export function TaskForm({
   const { t } = useTranslation()
 
   const action = task ? [TODO_URL, task.id].join('/') : TODO_URL
-
   const formId = task ? `task-form-${task.id}` : 'task-form-new'
   const defaultValue = task || {
     title: '',
@@ -108,11 +107,11 @@ export function TaskForm({
         </FormDescription>
         <FormMessage message={fields.status.errors} />
       </FormItem>
+      <input type="hidden" name="returnUrl" value={returnUrl} />
       <FormFooter className="sm:justify-between">
         {children || <div>&nbsp;</div>}
         <Button type="submit">{t('common.message.save')}</Button>
       </FormFooter>
-      <input type="hidden" name="returnUrl" value={returnUrl} />
     </Form>
   )
 }

@@ -1,8 +1,6 @@
 import * as React from 'react'
 import { useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { RiDeleteBinLine } from 'react-icons/ri'
-import { Button } from '~/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -11,10 +9,10 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog'
 import { TODO_URL } from '~/constants'
-import { TaskDeleteConfirmDialog } from './task-delete-confirm-dialog'
+import { sleep } from '~/lib/utils'
 import { Task } from '~/types/tasks'
 import { TaskForm } from './task-form'
-import { sleep } from '~/lib/utils'
+import { TaskDeleteButton } from './task-delete-button'
 
 export interface TaskFormDialogProps {
   task: Task | undefined
@@ -31,12 +29,11 @@ export function TaskFormDialog({
 }: TaskFormDialogProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   const title = task
     ? t('task.message.task_editing')
     : t('task.message.task_creation')
-  const description = t('task.message.set_task_info')
+  const desc = t('task.message.set_task_info')
 
   return (
     <Dialog
@@ -52,33 +49,22 @@ export function TaskFormDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogDescription>{desc}</DialogDescription>
         </DialogHeader>
         <TaskForm
           task={task}
           onSubmit={() => setIsOpen(false)}
           returnUrl={returnUrl}
         >
-          {task && (
-            // 削除ボタン
-            <Button
-              type="button"
-              variant="link"
-              className="mt-2 border-destructive/50 px-0 text-destructive sm:mt-0"
-              onClick={() => setIsOpenDeleteDialog(true)}
-            >
-              <RiDeleteBinLine className="mr-1 h-4 w-4" />
-              {t('common.message.delete')}
-            </Button>
-          )}
+          <TaskDeleteButton
+            task={task}
+            onSubmit={(event) => {
+              event.stopPropagation()
+              setIsOpen(false)
+            }}
+            returnUrl={returnUrl}
+          />
         </TaskForm>
-        <TaskDeleteConfirmDialog
-          task={task}
-          isOpen={isOpenDeleteDialog}
-          setIsOpen={setIsOpenDeleteDialog}
-          onSubmit={() => setIsOpen(false)}
-          returnUrl={returnUrl}
-        />
       </DialogContent>
     </Dialog>
   )

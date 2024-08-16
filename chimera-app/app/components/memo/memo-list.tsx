@@ -348,10 +348,6 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
         memo={actionMemo}
         isOpen={isOpenDeleteDialog}
         setIsOpen={setIsOpenDeleteDialog}
-        onSubmit={(event) => {
-          event.stopPropagation()
-          setIsOpenDeleteDialog(false)
-        }}
       />
     </div>
   )

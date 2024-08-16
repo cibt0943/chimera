@@ -17,7 +17,6 @@ import { useDebounce, useQueue } from '~/lib/utils'
 import { Memo } from '~/types/memos'
 import { useMemoConform } from './memo-conform'
 import { MemoActionButton } from './memo-action-button'
-import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 import { useAtomValue } from 'jotai'
 import { memoSettingsAtom } from '~/lib/state'
 
@@ -34,8 +33,6 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
   const memoSettings = useAtomValue(memoSettingsAtom)
   // memoの状態を変更して保存したかどうか
   const [isChangedMemo, setIsChangedMemo] = React.useState(false)
-  // メモ削除ダイアログの表示状態
-  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   React.useEffect(() => {
     setIsChangedMemo(false)
@@ -135,7 +132,9 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
           {memo ? (
             <MemoActionButton
               memo={memo}
-              handleDeleteMemo={() => setIsOpenDeleteDialog(true)}
+              onDeleteSubmit={(event) => {
+                event.stopPropagation()
+              }}
             />
           ) : (
             <div>&nbsp;</div>
@@ -143,15 +142,6 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
           <SaveButton isChangedMemo={isChangedMemo} />
         </FormFooter>
       </memoFormFetcher.Form>
-      <MemoDeleteConfirmDialog
-        memo={memo}
-        isOpen={isOpenDeleteDialog}
-        setIsOpen={setIsOpenDeleteDialog}
-        onSubmit={() => {
-          setIsOpenDeleteDialog(false)
-        }}
-        returnUrl={MEMO_URL}
-      />
     </div>
   )
 }

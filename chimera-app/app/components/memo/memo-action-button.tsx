@@ -14,15 +14,18 @@ import {
 } from '~/components/ui/tooltip'
 import { MEMO_URL } from '~/constants'
 import { Memo, MemoStatus } from '~/types/memos'
+import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 
 interface MemoActionButtonProps {
   memo: Memo | undefined
-  handleDeleteMemo: (memo: Memo) => void
+  onDeleteSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  returnUrl?: string
 }
 
 export function MemoActionButton({
   memo,
-  handleDeleteMemo,
+  onDeleteSubmit,
+  returnUrl = MEMO_URL,
 }: MemoActionButtonProps) {
   const { t } = useTranslation()
   const fetcher = useFetcher()
@@ -56,18 +59,17 @@ export function MemoActionButton({
           <TooltipContent>{archiveMenu.caption}</TooltipContent>
         </Tooltip>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={(event) => {
-                event.preventDefault()
-                handleDeleteMemo(memo)
-              }}
-            >
-              <RiDeleteBinLine className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
+          <MemoDeleteConfirmDialog
+            memo={memo}
+            onSubmit={onDeleteSubmit}
+            returnUrl={returnUrl}
+          >
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="icon">
+                <RiDeleteBinLine className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+          </MemoDeleteConfirmDialog>
           <TooltipContent>{t('common.message.delete')}</TooltipContent>
         </Tooltip>
       </TooltipProvider>

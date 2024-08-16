@@ -10,6 +10,8 @@ import {
 } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
+import { Checkbox } from '~/components/ui/checkbox'
+import { EVENT_URL } from '~/constants'
 import {
   FormItem,
   FormLabel,
@@ -20,7 +22,6 @@ import { Required } from '~/components/lib/required'
 import { InputConform } from '~/components/lib/conform/input'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePicker } from '~/components/lib/date-time-picker'
-import { Checkbox } from '~/components/ui/checkbox'
 import { Event, EventSchema, EventSchemaType } from '~/types/events'
 
 type useInputControlType = ReturnType<typeof useInputControl<string>>
@@ -39,7 +40,7 @@ export function EventForm({ event, onSubmit, children }: EventFormProps) {
     return !event?.id
   }
 
-  const action = isNew(event) ? '/events' : `/events/${event.id}`
+  const action = isNew(event) ? EVENT_URL : [EVENT_URL, event.id].join('/')
   const formId = isNew(event) ? 'event-form-new' : `event-form-${event.id}`
   const defaultValue = event
 

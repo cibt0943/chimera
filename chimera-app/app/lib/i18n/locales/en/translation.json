@@ -75,7 +75,7 @@
       "theme": "Theme",
       "language_list": {
         "auto": "Auto detect",
-        "en-US": "English",
+        "en": "English",
         "ja": "Japanese"
       },
       "theme_list": {

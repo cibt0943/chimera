@@ -238,7 +238,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   // タスクの表示順変更API呼び出し
   async function moveTaskApi(fromTask: Task, toTask: Task) {
-    // fetcher.submitを利用すると自動でタスクデータを再取得してしまうのであえてfetchを利用
+    // useFetcherのsubmitを利用すると自動でタスクデータを再取得してしまうのであえてfetchを利用
     const url = [TODO_URL, fromTask.id, 'position'].join('/')
     await fetch(url, {
       method: 'POST',
@@ -513,9 +513,6 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         task={actionTask}
         isOpen={isOpenDeleteDialog}
         setIsOpen={setIsOpenDeleteDialog}
-        onSubmit={() => {
-          setIsOpenDeleteDialog(false)
-        }}
       />
     </div>
   )

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import { RxCheckCircled, RxPencil2, RxCalendar } from 'react-icons/rx'
 import allLocales from '@fullcalendar/core/locales-all'
@@ -11,18 +12,9 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
+import { EVENT_URL } from '~/constants'
 import { Event, CalendarEvents, CalendarEventType } from '~/types/events'
-import { Task } from '~/types/tasks'
-import { Memo } from '~/types/memos'
 import { EventFormDialog, EventFormDialogProps } from './event-form-dialog'
-import {
-  TaskFormDialog,
-  TaskFormDialogProps,
-} from '~/components/todo/task-form-dialog'
-import {
-  MemoFormDialog,
-  MemoFormDialogProps,
-} from '~/components/memo/memo-form-dialog'
 
 interface CalendarProps {
   defaultEvents: CalendarEvents
@@ -31,28 +23,24 @@ interface CalendarProps {
 
 export function Calendar({ defaultEvents, showId }: CalendarProps) {
   const { i18n } = useTranslation()
-
-  const [actionObj, setActionObj] = React.useState<Event | Task | Memo>() // 編集・削除するイベント
+  const navigate = useNavigate()
+  const [actionEvent, setActionEvent] = React.useState<Event>() // イベント作成用
   const [isOpenEventDialog, setIsOpenEventDialog] = React.useState(false)
-  const [isOpenTaskDialog, setIsOpenTaskDialog] = React.useState(false)
-  const [isOpenMemoDialog, setIsOpenMemoDialog] = React.useState(false)
 
   // イベント編集
   function handleEventClick(arg: EventClickArg) {
     const type = arg.event.extendedProps.type
     const srcObj = arg.event.extendedProps.srcObj
 
-    setActionObj(srcObj)
-
     switch (type) {
       case CalendarEventType.EVENT:
-        setIsOpenEventDialog(true)
+        navigate([EVENT_URL, srcObj.id].join('/'))
         break
       case CalendarEventType.TASK:
-        setIsOpenTaskDialog(true)
+        navigate([EVENT_URL, 'todos', srcObj.id].join('/'))
         break
       case CalendarEventType.MEMO:
-        setIsOpenMemoDialog(true)
+        navigate([EVENT_URL, 'memos', srcObj.id].join('/'))
         break
     }
   }
@@ -76,7 +64,7 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
       memo: '',
       location: '',
     } as Event
-    setActionObj(event)
+    setActionEvent(event)
     setIsOpenEventDialog(true)
   }
 
@@ -144,21 +132,9 @@ export function Calendar({ defaultEvents, showId }: CalendarProps) {
         />
       </div>
       <EventFormDialogMemo
-        event={actionObj as Event}
+        event={actionEvent}
         isOpen={isOpenEventDialog}
         setIsOpen={setIsOpenEventDialog}
-      />
-      <TaskFormDialogMemo
-        task={actionObj as Task}
-        isOpen={isOpenTaskDialog}
-        setIsOpen={setIsOpenTaskDialog}
-        returnUrl="/events"
-      />
-      <MemoFormDialogMemo
-        memo={actionObj as Memo}
-        isOpen={isOpenMemoDialog}
-        setIsOpen={setIsOpenMemoDialog}
-        returnUrl="/events"
       />
     </>
   )
@@ -201,15 +177,3 @@ const EventFormDialogMemo = React.memo((props: EventFormDialogProps) => {
   return <EventFormDialog {...props} />
 })
 EventFormDialogMemo.displayName = 'EventFormDialogMemo'
-
-// タスクフォームダイアログのメモ化
-const TaskFormDialogMemo = React.memo((props: TaskFormDialogProps) => {
-  return <TaskFormDialog {...props} />
-})
-TaskFormDialogMemo.displayName = 'TaskFormDialogMemo'
-
-// メモフォームダイアログのメモ化
-const MemoFormDialogMemo = React.memo((props: MemoFormDialogProps) => {
-  return <MemoFormDialog {...props} />
-})
-MemoFormDialogMemo.displayName = 'MemoFormDialogMemo'

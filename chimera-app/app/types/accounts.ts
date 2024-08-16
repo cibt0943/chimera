@@ -6,14 +6,14 @@ import type { Database } from '~/types/schema'
 export const Language = {
   AUTO: 'auto',
   EN: 'en-US',
-  JA: 'ja',
+  JA: 'ja-JP',
 } as const
 export type Language = (typeof Language)[keyof typeof Language]
 
 // 利用可能な言語リスト
 export const LanguageList = [
   { value: Language.AUTO, label: 'account.model.language_list.auto' },
-  { value: Language.EN, label: 'account.model.language_list.en-US' },
+  { value: Language.EN, label: 'account.model.language_list.en' },
   { value: Language.JA, label: 'account.model.language_list.ja' },
 ]
 

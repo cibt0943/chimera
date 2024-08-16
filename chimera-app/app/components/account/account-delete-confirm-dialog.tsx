@@ -1,42 +1,41 @@
 import * as React from 'react'
 import { Form } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { AlertDialogCancel } from '~/components/ui/alert-dialog'
-import { Button } from '~/components/ui/button'
-import { DeleteConfirmDialog } from '~/components/lib/delete-confirm-dialog'
+import {
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '~/components/ui/alert-dialog'
+import { buttonVariants } from '~/components/ui/button'
+import { ACCOUNT_URL } from '~/constants'
+import { ConfirmDialog } from '~/components/lib/confirm-dialog'
 
 interface DeleteAccountConfirmDialogProps {
-  isOpenDialog: boolean
-  setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>
+  children: React.ReactNode
 }
 
 export function AccountDeleteConfirmDialog({
-  isOpenDialog,
-  setIsOpenDialog,
+  children,
 }: DeleteAccountConfirmDialogProps) {
   const { t } = useTranslation()
 
+  const action = [ACCOUNT_URL, 'delete'].join('/')
+  const desc = t('account.title-account') + t('common.message.confirm_deletion')
+
   return (
-    <DeleteConfirmDialog
+    <ConfirmDialog
       title={t('account.message.account_deletion')}
-      description={
-        t('account.title-account') + t('common.message.confirm_deletion')
-      }
-      isOpen={isOpenDialog}
-      setIsOpen={setIsOpenDialog}
+      description={desc}
+      torigger={children}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
-      <Button type="submit" variant="destructive" form="delete-account-form">
+      <AlertDialogAction
+        type="submit"
+        className={buttonVariants({ variant: 'destructive' })}
+        form="delete-account-form"
+      >
         {t('common.message.delete')}
-      </Button>
-      <Form
-        id="delete-account-form"
-        action={`/account/delete`}
-        method="delete"
-        onSubmit={() => {
-          setIsOpenDialog(false)
-        }}
-      />
-    </DeleteConfirmDialog>
+      </AlertDialogAction>
+      <Form id="delete-account-form" action={action} method="delete" />
+    </ConfirmDialog>
   )
 }
