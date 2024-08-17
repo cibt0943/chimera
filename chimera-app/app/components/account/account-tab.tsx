@@ -1,11 +1,8 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Separator } from '~/components/ui/separator'
-import { Button } from '~/components/ui/button'
-import { FormFooter } from '~/components/lib/form'
-import { AccountForm } from '~/components/account/account-form'
-import { AccountDeleteConfirmDialog } from '~/components/account/account-delete-confirm-dialog'
 import type { AccountSettings } from '~/types/accounts'
+import { AccountForm } from './account-form'
+import { AccounyDeleteButton } from './account-delete-button'
 
 interface AccountTabProps {
   accountSettings: AccountSettings
@@ -13,7 +10,6 @@ interface AccountTabProps {
 
 export function AccountTab({ accountSettings }: AccountTabProps) {
   const { t } = useTranslation()
-  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   return (
     <div className="space-y-6">
@@ -24,21 +20,9 @@ export function AccountTab({ accountSettings }: AccountTabProps) {
         </p>
       </div>
       <Separator />
-      <AccountForm accountSettings={accountSettings} />
-      <Separator />
-      <FormFooter>
-        <Button
-          variant="link"
-          className="text-destructive border-destructive/50"
-          onClick={() => setIsOpenDeleteDialog(true)}
-        >
-          {t('account.message.do_delete')}
-        </Button>
-      </FormFooter>
-      <AccountDeleteConfirmDialog
-        isOpenDialog={isOpenDeleteDialog}
-        setIsOpenDialog={setIsOpenDeleteDialog}
-      />
+      <AccountForm accountSettings={accountSettings}>
+        <AccounyDeleteButton />
+      </AccountForm>
     </div>
   )
 }

@@ -1,5 +1,5 @@
-import { MemoForm } from '~/components/memo/memo-form'
+import { MemoFormView } from '~/components/memo/memo-form-view'
 
 export default function Index() {
-  return <MemoForm memo={undefined} />
+  return <MemoFormView memo={undefined} />
 }

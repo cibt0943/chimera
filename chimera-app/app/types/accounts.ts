@@ -5,8 +5,8 @@ import type { Database } from '~/types/schema'
 
 export const Language = {
   AUTO: 'auto',
-  EN: 'en',
-  JA: 'ja',
+  EN: 'en-US',
+  JA: 'ja-JP',
 } as const
 export type Language = (typeof Language)[keyof typeof Language]
 
@@ -45,12 +45,14 @@ export const ThemeList = [
 
 // DBのアカウントテーブルの型
 export type AccountModel = Database['public']['Tables']['accounts']['Row']
+export type UpdateAccountModel =
+  Database['public']['Tables']['accounts']['Update'] & { id: string } // idを必須で上書き
 
 // アカウントの型
 export type Account = {
   id: string
-  created_at: Date
-  updated_at: Date
+  createdAt: Date
+  updatedAt: Date
   sub: string
   language: Language
   timezone: string
@@ -61,8 +63,8 @@ export type Account = {
 export function AccountModel2Account(accountModel: AccountModel): Account {
   return {
     id: accountModel.id,
-    created_at: toDate(accountModel.created_at),
-    updated_at: toDate(accountModel.updated_at),
+    createdAt: toDate(accountModel.created_at),
+    updatedAt: toDate(accountModel.updated_at),
     sub: accountModel.sub,
     language: accountModel.language as Language,
     timezone: accountModel.timezone,

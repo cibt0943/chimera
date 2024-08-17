@@ -5,6 +5,7 @@ import { useNavigation } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import {
   formatDistanceToNowStrict,
+  differenceInSeconds,
   Locale,
   format,
   isSameDay,
@@ -83,20 +84,25 @@ export function useIsLoadingEffect() {
 
 // date-fnsのlocaleを取得
 export function getLocale(locale: string): Locale {
+  locale = locale.replaceAll('-', '')
   return locales[locale as keyof typeof locales] || locales.ja
 }
 
 export function useAgoFormat(date: Date): string {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const local = getLocale(i18n.language)
+
+  const seconds = differenceInSeconds(new Date(), date)
+  if (seconds < 60) {
+    return t('common.format.less_than_1_minute')
+  }
+
   return formatDistanceToNowStrict(date, { locale: local, addSuffix: true })
 }
 
 export function useDateDiffFormat(targetDate: Date, baseDate?: Date): string {
   const { t } = useTranslation()
-  if (!baseDate) {
-    baseDate = new Date()
-  }
+  baseDate = baseDate || new Date()
 
   if (isSameDay(baseDate, targetDate)) {
     return format(targetDate, t('common.format.time_short_format'))

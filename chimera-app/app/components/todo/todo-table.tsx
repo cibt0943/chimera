@@ -26,7 +26,6 @@ import {
   TouchSensor,
   closestCenter,
   type DragEndEvent,
-  // type UniqueIdentifier,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
@@ -49,6 +48,7 @@ import {
 import { Button } from '~/components/ui/button'
 import { ToastAction } from '~/components/ui/toast'
 import { useToast } from '~/components/ui/use-toast'
+import { TODO_URL } from '~/constants'
 import { useDebounce, useQueue, useIsLoading } from '~/lib/utils'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
@@ -159,10 +159,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   React.useEffect(() => {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
     if (!nowSelectedRow) return
-    useTBodyRef.current
-      ?.querySelector<HTMLElement>(`#row-${nowSelectedRow.id}`)
-      ?.focus()
-    // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
+    setListFocus(nowSelectedRow.original)
   }, [table, rowSelection])
 
   // タスク追加ダイアログを開く
@@ -241,8 +238,9 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   // タスクの表示順変更API呼び出し
   async function moveTaskApi(fromTask: Task, toTask: Task) {
-    // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
-    await fetch(`/todos/${fromTask.id}/position`, {
+    // useFetcherのsubmitを利用すると自動でタスクデータを再取得してしまうのであえてfetchを利用
+    const url = [TODO_URL, fromTask.id, 'position'].join('/')
+    await fetch(url, {
       method: 'POST',
       body: JSON.stringify({ toTaskId: toTask.id }),
     }).then((response) => {
@@ -312,7 +310,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     fetcher.submit(
       { status: updateTask.status },
       {
-        action: `/todos/${updateTask.id}/status`,
+        action: [TODO_URL, updateTask.id, 'status'].join('/'),
         method: 'post',
       },
     )
@@ -338,6 +336,11 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     nowSelectedRow && openDeleteTaskDialog(nowSelectedRow.original)
   }
 
+  function setListFocus(task: Task) {
+    useTBodyRef.current?.querySelector<HTMLElement>(`#row-${task.id}`)?.focus()
+    // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
+  }
+
   // キーボードショートカット
   useHotkeys(
     [
@@ -354,6 +357,9 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
       'alt+backspace',
     ],
     (_, handler) => {
+      // ローディング中、ダイアログが開いている場合は何もしない
+      if (isLoading || isOpenAddDialog || isOpenDeleteDialog || showId) return
+
       switch (handler.keys?.join('')) {
         case 'enter':
           showSelectedTaskEdit()
@@ -395,6 +401,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   useHotkeys(['alt+n'], () => {
     // ローディング中、ダイアログが開いている場合は何もしない
     if (isLoading || isOpenAddDialog || isOpenDeleteDialog || showId) return
+
     openAddTaskDialog()
   })
 
@@ -408,7 +415,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         >
           <RiAddLine className="mr-2" />
           {t('common.message.add')}
-          <p className="text-xs text-muted-foreground ml-2">
+          <p className="ml-2 text-xs text-muted-foreground">
             <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
               <span>⌥</span>n
             </kbd>
@@ -497,12 +504,12 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.next')}
         </Button>
       </div>
-      <AddTaskFormDialogMemo
+      <TaskFormDialogMemo
         task={undefined}
         isOpen={isOpenAddDialog}
         setIsOpen={setIsOpenAddDialog}
       />
-      <DeleteConfirmTaskDialogMemo
+      <TaskDeleteConfirmDialogMemo
         task={actionTask}
         isOpen={isOpenDeleteDialog}
         setIsOpen={setIsOpenDeleteDialog}
@@ -537,7 +544,6 @@ function DraggableRow({ row }: { row: Row<Task> }) {
       tabIndex={0}
       id={`row-${row.id}`}
       className="outline-none data-[state=selected]:bg-blue-100 dark:data-[state=selected]:bg-slate-700"
-      // className="outline-none"
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>
@@ -549,15 +555,15 @@ function DraggableRow({ row }: { row: Row<Task> }) {
 }
 
 // タスク追加ダイアログのメモ化
-const AddTaskFormDialogMemo = React.memo((props: TaskFormDialogProps) => {
+const TaskFormDialogMemo = React.memo((props: TaskFormDialogProps) => {
   return <TaskFormDialog {...props} />
 })
-AddTaskFormDialogMemo.displayName = 'AddTaskFormDialogMemo'
+TaskFormDialogMemo.displayName = 'TaskFormDialogMemo'
 
 // タスク削除ダイアログのメモ化
-const DeleteConfirmTaskDialogMemo = React.memo(
+const TaskDeleteConfirmDialogMemo = React.memo(
   (props: TaskDeleteConfirmDialogProps) => {
     return <TaskDeleteConfirmDialog {...props} />
   },
 )
-DeleteConfirmTaskDialogMemo.displayName = 'DeleteConfirmTaskDialogMemo'
+TaskDeleteConfirmDialogMemo.displayName = 'TaskDeleteConfirmDialogMemo'

@@ -1,5 +1,5 @@
+import { jsonWithSuccess } from 'remix-toast'
 import * as zod from 'zod'
-import { redirect } from '@remix-run/node'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { TaskStatus } from '~/types/tasks'
@@ -8,7 +8,7 @@ import { getTask, updateTask } from '~/models/task.server'
 export const action = withAuthentication(
   async ({ params, request, loginSession }) => {
     const task = await getTask(params.todoId || '')
-    if (task.account_id !== loginSession.account.id) throw new Error('erorr')
+    if (task.accountId !== loginSession.account.id) throw new Error('erorr')
 
     const formData = await request.formData()
     const submission = parseWithZod(formData, {
@@ -23,11 +23,12 @@ export const action = withAuthentication(
 
     const data = submission.value
 
-    await updateTask({
+    const updatedTask = await updateTask({
       id: task.id,
       status: data.status,
     })
 
-    return redirect('/todos')
+    const toastMsg = 'task.message.changed_status'
+    return jsonWithSuccess({ task: updatedTask }, toastMsg)
   },
 )

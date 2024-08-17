@@ -2,6 +2,8 @@ import {
   Memos,
   Memo,
   MemoModel,
+  InsertMemoModel,
+  UpdateMemoModel,
   MemoModel2Memo,
   MemoStatus,
 } from '~/types/memos'
@@ -9,13 +11,14 @@ import { supabase } from '~/lib/supabase-client.server'
 
 // メモ一覧を取得
 export async function getMemos(
-  account_id: string,
-  statuses: MemoStatus[],
+  accountId: string,
+  statuses?: MemoStatus[],
 ): Promise<Memos> {
+  if (!statuses) statuses = [MemoStatus.NOMAL, MemoStatus.ARCHIVED]
   const { data, error } = await supabase
     .from('memos')
     .select()
-    .eq('account_id', account_id)
+    .eq('account_id', accountId)
     .in('status', statuses)
     .order('position', { ascending: false })
     .order('id')
@@ -40,16 +43,8 @@ export async function getMemo(memoId: string): Promise<Memo> {
   return MemoModel2Memo(data)
 }
 
-// メモ情報の追加
-interface insertMemoProps {
-  account_id: string
-  title: string
-  content: string
-  status: number
-  related_date: string | null
-}
-
-export async function insertMemo(memo: insertMemoProps): Promise<Memo> {
+// メモの追加
+export async function insertMemo(memo: InsertMemoModel): Promise<Memo> {
   const { data: maxMemo, error: errorMaxMemo } = await supabase
     .from('memos')
     .select()
@@ -70,19 +65,9 @@ export async function insertMemo(memo: insertMemoProps): Promise<Memo> {
   return MemoModel2Memo(newMemo)
 }
 
-// メモ情報の更新
-interface updateMemoProps {
-  id: string
-  updated_at?: string
-  position?: number
-  title?: string
-  content?: string
-  status?: number
-  related_date?: string | null
-}
-
+// メモの更新
 export async function updateMemo(
-  memo: updateMemoProps,
+  memo: UpdateMemoModel,
   noUpdated = false,
 ): Promise<Memo> {
   if (!noUpdated) memo.updated_at = new Date().toISOString()
@@ -98,7 +83,7 @@ export async function updateMemo(
   return MemoModel2Memo(data)
 }
 
-// メモ情報の削除
+// メモの削除
 export async function deleteMemo(memoId: string): Promise<void> {
   const { error } = await supabase.from('memos').delete().eq('id', memoId)
   if (error) throw error

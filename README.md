@@ -1,8 +1,10 @@
-## Kobushi is a Service with 5 functions
+## Chimera is a service with five functions
 
-### プロダクトへのリンク
+Chimera is the development code and the service name is 「Kobushi」.
 
-このプロダクトは、[Kobushi](https://kobushi.fly.dev)で使用できます。
+### Link to product
+
+This product can be used on [Kobushi](https://kobushi.fly.dev).
 
 ### Todo
 
@@ -14,8 +16,8 @@
 
 ### Memo
 
-使い方として終わったものはタグをつけてアーカイブしておく。
-日々確認したり見たりしているファイルのも一覧い置いておく。
+使い方として終わったものはタグをつけてアーカイブしておく。<br>
+日々確認したり見たりしているファイルのも一覧い置いておく。<br>
 必要になった時にアーカイブ済みのファイルからタグを元に検索して取り出す。
 
 - [x] ↑↓ キーでフォーカス行を移動
@@ -32,21 +34,25 @@
 
 ### Event
 
-- カレンダーに Todo を表示
-- カレンダーに Memo を表示
-- カレンダーから Todo を作成
+- [x] カレンダーへ イベントの追加、編集、削除が行える
+- [x] カレンダーから Todo の参照、追加、編集、削除が行える
+- [x] カレンダーから Memo の参照、追加、編集、削除が行える
 
 ### File
 
-何作るか決めてない  
-ストレージ機能は作らない
+Linux コマンド操作を主としたファイラー機能にしようかと思っています
 
 ### Reminder
 
-携帯に Push 通知
+Push 通知を受け取るためだけのモバイルアプリを作ってみようかな
 
 ### Account
 
+アカウント管理およびに認証、認可には Auth0 を利用しています。
+
+- [x] サインアップ、サインイン、サインアウト
 - [x] ダークモード
 - [x] 多言語対応
 - [ ] タイムゾーン対応
+- [x] パスワード再設定
+- [ ] メールアドレス変更

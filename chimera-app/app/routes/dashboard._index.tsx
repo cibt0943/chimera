@@ -1,5 +1,4 @@
-import type { MetaFunction } from '@remix-run/node'
-import { json } from '@remix-run/node'
+import { MetaFunction, json } from '@remix-run/node'
 import { withAuthentication } from '~/lib/auth-middleware'
 
 export const meta: MetaFunction = () => {
@@ -14,7 +13,7 @@ export default function Index() {
   return (
     <div className="p-4">
       <h1 className="mb-4 text-xl font-bold">Dashboard</h1>
-      <div className="mb-8 text-l font-bold">
+      <div className="text-l mb-8 font-bold">
         This feature is under development. Please check back later.
       </div>
     </div>

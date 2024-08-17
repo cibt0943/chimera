@@ -6,19 +6,21 @@ import { MemoStatus } from '~/types/memos'
 // DBのアカウントメモ設定テーブルの型
 export type MemoSettingsModel =
   Database['public']['Tables']['memo_settings']['Row']
+export type UpdateMemoSettingsModel =
+  Database['public']['Tables']['memo_settings']['Update'] & { id: string } // idを必須で上書き
 
 export type MemoSettings = {
   id: string
-  created_at: Date
-  updated_at: Date
-  account_id: string
-  list_filter: {
+  createdAt: Date
+  updatedAt: Date
+  accountId: string
+  listFilter: {
     statuses: MemoStatus[]
   }
-  list_display: {
+  listDisplay: {
     content: boolean
   }
-  auto_save: boolean
+  autoSave: boolean
 }
 
 export function MemoSettingsModel2MemoSettings(
@@ -26,19 +28,18 @@ export function MemoSettingsModel2MemoSettings(
 ): MemoSettings {
   return {
     id: MemoSettingsModel.id,
-    created_at: toDate(MemoSettingsModel.created_at),
-    updated_at: toDate(MemoSettingsModel.updated_at),
-    account_id: MemoSettingsModel.account_id,
-    list_filter: MemoSettingsModel.list_filter as MemoSettings['list_filter'],
-    list_display:
-      MemoSettingsModel.list_display as MemoSettings['list_display'],
-    auto_save: MemoSettingsModel.auto_save,
+    createdAt: toDate(MemoSettingsModel.created_at),
+    updatedAt: toDate(MemoSettingsModel.updated_at),
+    accountId: MemoSettingsModel.account_id,
+    listFilter: MemoSettingsModel.list_filter as MemoSettings['listFilter'],
+    listDisplay: MemoSettingsModel.list_display as MemoSettings['listDisplay'],
+    autoSave: MemoSettingsModel.auto_save,
   }
 }
 
 export type UpdateParams = {
-  list_filter?: MemoSettings['list_filter']
-  list_display?: MemoSettings['list_display']
+  list_filter?: MemoSettings['listFilter']
+  list_display?: MemoSettings['listDisplay']
   auto_save?: boolean
 }
 
@@ -57,9 +58,9 @@ const ListDisplaySchema = zod.object({
 })
 
 export const MemoSettingsSchema = zod.object({
-  list_filter: ListFilterSchema.optional(),
-  list_display: ListDisplaySchema.optional(),
-  auto_save: zod.boolean().optional(),
+  listFilter: ListFilterSchema.optional(),
+  listDisplay: ListDisplaySchema.optional(),
+  autoSave: zod.boolean().optional(),
 })
 
 export type MemoSettingsSchemaType = zod.infer<typeof MemoSettingsSchema>

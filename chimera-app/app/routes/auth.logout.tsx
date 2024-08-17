@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs, ActionFunctionArgs } from '@remix-run/node'
+import { LoaderFunctionArgs, ActionFunctionArgs } from '@remix-run/node'
 import { authenticator } from '~/lib/auth.server'
 // import { getSession, destroySession } from '~/lib/session.server'
 

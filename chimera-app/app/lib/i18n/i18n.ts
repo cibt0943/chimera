@@ -12,16 +12,17 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: {
+      'en-US': {
         translation: translationEn,
       },
-      ja: {
+      'ja-JP': {
         translation: translationJa,
       },
     },
     // debug: true, // 開発モードでデバッグログを出力
-    fallbackLng: 'en', // 言語が見つからなかった場合のフォールバック
-    supportedLngs: ['en', 'ja'], // サポートする言語
+    fallbackLng: 'en-US', // 言語が見つからなかった場合のフォールバック
+    supportedLngs: ['en-US', 'ja-JP'], // サポートする言語
+    load: 'currentOnly',
     interpolation: {
       escapeValue: false, // ReactはXSS対策を既に行っているため
     },

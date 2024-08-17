@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from '@remix-run/node'
+import { LoaderFunctionArgs } from '@remix-run/node'
 import { authenticator } from '~/lib/auth.server'
 
 // Auth0から認証成功した際に呼び出されるページ

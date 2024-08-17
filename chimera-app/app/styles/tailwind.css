@@ -49,6 +49,7 @@
   }
 }
 
+/* ダークモード対応 */
 @layer base {
   * {
     @apply border-border;

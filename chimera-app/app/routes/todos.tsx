@@ -1,8 +1,8 @@
-import type { MetaFunction } from '@remix-run/node'
-import { redirect } from '@remix-run/node'
+import { MetaFunction, redirect } from '@remix-run/node'
 import { Outlet, useParams } from '@remix-run/react'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
+import { TODO_URL } from '~/constants'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { Tasks, TaskSchema } from '~/types/tasks'
 import { getTasks, insertTask } from '~/models/task.server'
@@ -16,23 +16,23 @@ export const meta: MetaFunction = () => {
 export const action = withAuthentication(async ({ request, loginSession }) => {
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: TaskSchema })
-  // submission が成功しなかった場合、クライアントに送信結果を報告します。
+  // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
   if (submission.status !== 'success') {
     throw new Error('Invalid submission data.')
-    // return json({ result: submission.reply() }, { status: 422 })
   }
 
   const data = submission.value
 
   await insertTask({
     account_id: loginSession.account.id,
+    status: data.status,
     title: data.title,
     memo: data.memo || '',
-    status: data.status,
-    due_date: data.due_date?.toISOString() || null,
+    due_date: data.dueDate?.toISOString() || null,
+    due_date_all_day: !!data.dueDateAllDay,
   })
 
-  return redirect('/todos')
+  return redirect(TODO_URL)
 })
 
 type LoaderData = {
@@ -41,8 +41,7 @@ type LoaderData = {
 
 export const loader = withAuthentication(async ({ loginSession }) => {
   const tasks = await getTasks(loginSession.account.id)
-
-  return typedjson({ tasks, loadDate: new Date() })
+  return typedjson({ tasks })
 })
 
 export default function Layout() {

@@ -1,5 +1,5 @@
-import type { MetaFunction } from '@remix-run/node'
-import { redirect } from '@remix-run/node'
+import { MetaFunction } from '@remix-run/node'
+import { redirectWithSuccess } from 'remix-toast'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
@@ -44,7 +44,8 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
   session.set(authenticator.sessionKey, { ...loginSession })
   const encodedSession = await commitSession(session)
 
-  return redirect('/account/settings', {
+  const toastMsg = 'account.message.updated'
+  return redirectWithSuccess('/account/settings', toastMsg, {
     headers: {
       // 新しいセッション情報をクッキーとして設定するように指示
       'Set-Cookie': encodedSession,
