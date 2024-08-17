@@ -54,6 +54,7 @@
     "i18next-browser-languagedetector": "^8.0.0",
     "isbot": "^3.6.8",
     "jotai": "^2.9.0",
+    "next-themes": "^0.3.0",
     "react": "^18.2.0",
     "react-day-picker": "^8.10.0",
     "react-dom": "^18.2.0",
@@ -63,8 +64,10 @@
     "react-resizable-panels": "^2.0.19",
     "remix-auth": "^3.6.0",
     "remix-auth-auth0": "^1.9.0",
+    "remix-toast": "^1.2.1",
     "remix-typedjson": "^0.4.1",
     "remix-utils": "^7.5.0",
+    "sonner": "^1.5.0",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4"

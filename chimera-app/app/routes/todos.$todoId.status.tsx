@@ -1,5 +1,5 @@
+import { jsonWithSuccess } from 'remix-toast'
 import * as zod from 'zod'
-import { json } from '@remix-run/node'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { TaskStatus } from '~/types/tasks'
@@ -28,6 +28,7 @@ export const action = withAuthentication(
       status: data.status,
     })
 
-    return json({ task: updatedTask })
+    const toastMsg = 'task.message.changed_status'
+    return jsonWithSuccess({ task: updatedTask }, toastMsg)
   },
 )

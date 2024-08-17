@@ -1,8 +1,6 @@
 import * as React from 'react'
 import { useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { RiDeleteBinLine } from 'react-icons/ri'
-import { Button } from '~/components/ui/button'
 import {
   Dialog,
   DialogContent,

@@ -50,7 +50,7 @@
       "confirm_deletion": "を削除します。よろしいですか？",
       "sort_asc": "昇順",
       "sort_desc": "降順",
-      "order_cannot_changed_sorting": "ソート中は並び順を変更することはできません。",
+      "order_cannot_changed_sorting": "ソート中は並び順を変更することはできません",
       "clear_sort?": "ソートをクリアしますか？",
       "clear_sorting": "ソートをクリアする",
       "clear_filters?": "フィルタをクリアしますか？",
@@ -85,18 +85,19 @@
       }
     },
     "message": {
-      "need_login": "この機能を利用するにはログインする必要があります。",
+      "need_login": "この機能を利用するにはログインする必要があります",
       "login": "ログイン",
       "logout": "ログアウト",
       "account_deletion": "アカウントの削除",
-      "account_info": "アカウントの情報を設定してください。",
-      "password_info": "パスワードを変更することができます。",
+      "account_info": "アカウントの情報を設定してください",
+      "password_info": "パスワードを変更することができます",
       "do_delete": "アカウントを削除する",
       "change_password": "パスワードを変更する",
       "last_login": "最終ログイン日時",
       "last_password_change": "最終パスワード変更日時",
-      "changed_password_title": "パスワード変更メールを送信しました。",
-      "changed_password_description": "メールを確認してください。メールに記載されたURLよりパスワード変更を行うことができます。"
+      "changed_password_title": "パスワード変更メールを送信しました",
+      "changed_password_description": "メールを確認してください。メールに記載されたURLよりパスワード変更を行うことができます。",
+      "updated": "アカウントを更新しました"
     }
   },
   "task": {
@@ -119,8 +120,8 @@
       "task_creation": "タスクの作成",
       "task_editing": "タスクの編集",
       "task_deletion": "タスクの削除",
-      "set_task_info": "タスクの情報を設定してください。",
-      "select_task_status": "タスクの状態を選んでください。",
+      "set_task_info": "タスクの情報を設定してください",
+      "select_task_status": "タスクの状態を選んでください",
       "title_search": "タイトルを検索",
       "status_filter": "状態",
       "to_new": "新規に変更",
@@ -128,7 +129,8 @@
       "to_done": "完了に変更",
       "to_pending": "保留に変更",
       "view_settings": "表示設定",
-      "select_columns": "表示項目"
+      "select_columns": "表示項目",
+      "changed_status": "状態を変更しました"
     }
   },
   "memo": {
@@ -150,11 +152,13 @@
       "memo_creation": "メモの作成",
       "memo_editing": "メモの編集",
       "memo_deletion": "メモの削除",
-      "set_memo_info": "メモの情報を設定してください。",
+      "set_memo_info": "メモの情報を設定してください",
       "title_search": "タイトルを検索",
       "first_line_is_title": "1行目はタイトルとなります",
       "to_archive": "アーカイブする",
-      "un_archive": "アーカイブから戻す"
+      "un_archive": "アーカイブから戻す",
+      "archived": "アーカイブしました",
+      "un_archived": "アーカイブから戻しました"
     }
   },
   "memo_settings": {
@@ -180,7 +184,7 @@
       "event_creation": "イベントの作成",
       "event_editing": "イベントの編集",
       "event_deletion": "イベントの削除",
-      "set_event_info": "イベントの情報を設定してください。"
+      "set_event_info": "イベントの情報を設定してください"
     }
   }
 }

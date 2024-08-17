@@ -1,5 +1,5 @@
+import { jsonWithSuccess } from 'remix-toast'
 import * as zod from 'zod'
-import { json } from '@remix-run/node'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { MemoStatus } from '~/types/memos'
@@ -28,6 +28,10 @@ export const action = withAuthentication(
       status: data.status,
     })
 
-    return json({ memo: updatedMemo })
+    const toastMsg =
+      updatedMemo.status === MemoStatus.ARCHIVED
+        ? 'memo.message.archived'
+        : 'memo.message.un_archived'
+    return jsonWithSuccess({ memo: updatedMemo }, toastMsg)
   },
 )

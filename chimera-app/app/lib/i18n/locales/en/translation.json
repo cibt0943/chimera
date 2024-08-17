@@ -50,7 +50,7 @@
       "confirm_deletion": " will be deleted. Are you sure?",
       "sort_asc": "Asc",
       "sort_desc": "Desc",
-      "order_cannot_changed_sorting": "The order cannot be changed during sorting.",
+      "order_cannot_changed_sorting": "The order cannot be changed during sorting",
       "clear_sort?": "Clear sort?",
       "clear_sorting": "Clear sorting",
       "clear_filters?": "Do you want to clear the filters?",
@@ -85,18 +85,19 @@
       }
     },
     "message": {
-      "need_login": "You must be logged in to use this feature.",
+      "need_login": "You must be logged in to use this feature",
       "login": "Log in",
       "logout": "Log out",
       "account_deletion": "Account Deletion",
-      "account_info": "Update your account settings.",
-      "password_info": "You can change your password.",
-      "do_delete": "Delete your account.",
+      "account_info": "Update your account settings",
+      "password_info": "You can change your password",
+      "do_delete": "Delete your account",
       "change_password": "Change Password",
       "last_login": "Last Login Date",
       "last_password_change": "Last Password Change Date",
-      "changed_password_info": "A password change email has been sent.",
-      "changed_password_description": "Please check your email. You can change your password using the URL provided in the email."
+      "changed_password_info": "A password change email has been sent",
+      "changed_password_description": "Please check your email. You can change your password using the URL provided in the email.",
+      "updated": "Your account has been updated"
     }
   },
   "task": {
@@ -119,7 +120,7 @@
       "task_creation": "Task Creation",
       "task_editing": "Task Editing",
       "task_deletion": "Task Deletion",
-      "set_task_info": "Set the task information.",
+      "set_task_info": "Set the task information",
       "select_task_status": "Select the task status",
       "title_search": "Search tasks...",
       "status_filter": "Status",
@@ -128,7 +129,8 @@
       "to_done": "Set to Completed",
       "to_pending": "Set to Pending",
       "view_settings": "View",
-      "select_columns": "Select Columns"
+      "select_columns": "Select Columns",
+      "changed_status": "Status changed"
     }
   },
   "memo": {
@@ -151,12 +153,14 @@
       "memo_creation": "Memo Creation",
       "memo_editing": "Memo Editing",
       "memo_deletion": "Memo Deletion",
-      "set_memo_info": "Set the memo information.",
+      "set_memo_info": "Set the memo information",
       "title_search": "Search memos...",
       "show_archived": "Show Archived",
-      "first_line_is_title": "The first line is the title.",
+      "first_line_is_title": "The first line is the title",
       "to_archive": "Archive",
-      "un_archive": "Unarchive"
+      "un_archive": "Unarchive",
+      "archived": "Archived",
+      "un_archived": "Unarchived"
     }
   },
   "memo_settings": {
@@ -182,7 +186,7 @@
       "event_creation": "Event Creation",
       "event_editing": "Event Editing",
       "event_deletion": "Event Deletion",
-      "set_event_info": "Set the event information."
+      "set_event_info": "Set the event information"
     }
   }
 }
