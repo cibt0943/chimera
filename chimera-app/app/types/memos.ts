@@ -71,7 +71,6 @@ export const MemoSchema = zod.object({
     .optional(),
   relatedDate: zod.date().optional(),
   relatedDateAllDay: zod.boolean().optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
-  returnUrl: zod.string().optional(),
 })
 
 export type MemoSchemaType = zod.infer<typeof MemoSchema>

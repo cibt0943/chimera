@@ -89,6 +89,7 @@ export type CalendarEvent = {
   type: CalendarEventType
   srcObj: Event | Task | Memo
   className?: string
+  durationEditable?: boolean
 }
 
 export type CalendarEvents = CalendarEvent[]
@@ -104,6 +105,7 @@ export function Event2Calendar(event: Event): CalendarEvent {
     borderColor: '#BFDBFF',
     type: CalendarEventType.EVENT,
     srcObj: event,
+    durationEditable: true,
   }
 }
 
@@ -121,6 +123,7 @@ export function Task2Calendar(task: TaskWithNonNullableDueDate): CalendarEvent {
     borderColor: '#F5D0FE',
     type: CalendarEventType.TASK,
     srcObj: task,
+    durationEditable: false,
   }
 }
 
@@ -140,5 +143,6 @@ export function Memo2Calendar(
     borderColor: '#FEF08A',
     type: CalendarEventType.MEMO,
     srcObj: memo,
+    durationEditable: false,
   }
 }

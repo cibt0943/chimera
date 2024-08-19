@@ -2,7 +2,7 @@ import { jsonWithSuccess } from 'remix-toast'
 import * as zod from 'zod'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { MemoStatus } from '~/types/memos'
+import { MemoStatus, UpdateMemoModel } from '~/types/memos'
 import { getMemo, updateMemo } from '~/models/memo.server'
 
 export const action = withAuthentication(
@@ -13,7 +13,11 @@ export const action = withAuthentication(
     const formData = await request.formData()
     const submission = parseWithZod(formData, {
       schema: zod.object({
-        status: zod.preprocess((v) => Number(v), zod.nativeEnum(MemoStatus)),
+        status: zod
+          .preprocess((v) => Number(v), zod.nativeEnum(MemoStatus))
+          .optional(),
+        relatedDate: zod.date().optional(),
+        relatedDateAllDay: zod.boolean().optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
       }),
     })
     // submission が成功しなかった場合、クライアントに送信結果を報告します。
@@ -23,15 +27,22 @@ export const action = withAuthentication(
 
     const data = submission.value
 
-    const updatedMemo = await updateMemo({
-      id: memo.id,
-      status: data.status,
-    })
+    let toastMsg = ''
+    const values: UpdateMemoModel = { id: memo.id }
+    if (data.status !== undefined) {
+      values.status = data.status
+      toastMsg =
+        data.status === MemoStatus.ARCHIVED
+          ? 'memo.message.archived'
+          : 'memo.message.un_archived'
+    }
+    if (data.relatedDate !== undefined) {
+      values.related_date = data.relatedDate?.toISOString() || null
+      values.related_date_all_day = !!data.relatedDateAllDay
+    }
 
-    const toastMsg =
-      updatedMemo.status === MemoStatus.ARCHIVED
-        ? 'memo.message.archived'
-        : 'memo.message.un_archived'
+    const updatedMemo = await updateMemo(values)
+
     return jsonWithSuccess({ memo: updatedMemo }, toastMsg)
   },
 )

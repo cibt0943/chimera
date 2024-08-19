@@ -22,7 +22,6 @@ export const action = withAuthentication(
     // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
     if (submission.status !== 'success') {
       throw new Error('Invalid submission data.')
-      // return json({ result: submission.reply() }, { status: 422 })
     }
 
     const data = submission.value
@@ -36,7 +35,8 @@ export const action = withAuthentication(
       due_date_all_day: !!data.dueDateAllDay,
     })
 
-    return redirect(data.returnUrl || TODO_URL)
+    const redirectUrl = (formData.get('returnUrl') as string) || TODO_URL
+    return redirect(redirectUrl)
   },
 )
 

@@ -56,14 +56,16 @@ export function TaskFormDialog({
           onSubmit={() => setIsOpen(false)}
           returnUrl={returnUrl}
         >
-          <TaskDeleteButton
-            task={task}
-            onSubmit={(event) => {
-              event.stopPropagation()
-              setIsOpen(false)
-            }}
-            returnUrl={returnUrl}
-          />
+          {task && (
+            <TaskDeleteButton
+              task={task}
+              onSubmit={(event) => {
+                event.stopPropagation()
+                setIsOpen(false)
+              }}
+              returnUrl={returnUrl}
+            />
+          )}
         </TaskForm>
       </DialogContent>
     </Dialog>

@@ -2,7 +2,7 @@ import { jsonWithSuccess } from 'remix-toast'
 import * as zod from 'zod'
 import { parseWithZod } from '@conform-to/zod'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { TaskStatus } from '~/types/tasks'
+import { TaskStatus, UpdateTaskModel } from '~/types/tasks'
 import { getTask, updateTask } from '~/models/task.server'
 
 export const action = withAuthentication(
@@ -13,7 +13,11 @@ export const action = withAuthentication(
     const formData = await request.formData()
     const submission = parseWithZod(formData, {
       schema: zod.object({
-        status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
+        status: zod
+          .preprocess((v) => Number(v), zod.nativeEnum(TaskStatus))
+          .optional(),
+        dueDate: zod.date().optional(),
+        dueDateAllDay: zod.boolean().optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
       }),
     })
     // submission が成功しなかった場合、クライアントに送信結果を報告します。
@@ -23,12 +27,19 @@ export const action = withAuthentication(
 
     const data = submission.value
 
-    const updatedTask = await updateTask({
-      id: task.id,
-      status: data.status,
-    })
+    let toastMsg = ''
+    const values: UpdateTaskModel = { id: task.id }
+    if (data.status !== undefined) {
+      values.status = data.status
+      toastMsg = 'task.message.changed_status'
+    }
+    if (data.dueDate !== undefined) {
+      values.due_date = data.dueDate?.toISOString() || null
+      values.due_date_all_day = !!data.dueDateAllDay
+    }
 
-    const toastMsg = 'task.message.changed_status'
+    const updatedTask = await updateTask(values)
+
     return jsonWithSuccess({ task: updatedTask }, toastMsg)
   },
 )
