@@ -9,16 +9,18 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react'
+import { I18nextProvider, useTranslation } from 'react-i18next'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
-import { I18nextProvider } from 'react-i18next'
-import styles from '~/tailwind.css'
+import { getToast } from 'remix-toast'
+import { Toaster as Sonner, toast as notify } from 'sonner'
+import { Toaster } from '~/components/ui/toaster'
+import styles from '~/styles/tailwind.css'
+import i18n, { useChangeLanguage } from '~/lib/i18n/i18n'
 import { authenticator } from '~/lib/auth.server'
 import { useTheme } from './lib/useTheme'
-import i18n from '~/lib/i18n/i18n'
-import { Theme } from '~/types/accounts'
+import { Theme, Language } from '~/types/accounts'
 import { LoadingEffect } from '~/components/loading-effect'
 import { Sidebar } from '~/components/sidebar'
-import { Toaster } from '~/components/ui/toaster'
 import { useSetAtom } from 'jotai'
 import { loginSessionAtom } from '~/lib/state'
 
@@ -32,11 +34,11 @@ function getLanguageFromHeader(request: Request) {
   const cookieHeader = request.headers.get('Cookie')
   const acceptLanguage = request.headers.get('Accept-Language')
   if (cookieHeader?.includes('i18next=ja')) {
-    return 'ja'
+    return Language.JA
   } else if (acceptLanguage?.startsWith('ja')) {
-    return 'ja'
+    return Language.JA
   } else {
-    return 'en'
+    return Language.EN
   }
 }
 
@@ -49,18 +51,22 @@ export async function loader({ request }: LoaderFunctionArgs) {
   language = language === 'auto' ? getLanguageFromHeader(request) : language
   i18n.changeLanguage(language)
 
-  return typedjson({ loginSession, language })
+  // トーストメッセージを取得
+  const { toast, headers } = await getToast(request)
+
+  return typedjson({ loginSession, language, toast }, { headers })
 }
 
 export default function App() {
-  const { loginSession, language } = useTypedLoaderData<typeof loader>()
+  const { loginSession, language, toast } = useTypedLoaderData<typeof loader>()
   const theme = loginSession?.account.theme || Theme.SYSTEM
-  useTheme(theme) // useEffectにてOSのテーマ設定に合わせてテーマを変更
+  const { t } = useTranslation()
+
+  // useEffectにてOSのテーマ設定に合わせてテーマを変更
+  useTheme(theme)
 
   // クライアントサイドでの言語設定
-  React.useEffect(() => {
-    i18n.changeLanguage(language)
-  }, [language])
+  useChangeLanguage(language)
 
   // ログインユーザーのアカウント情報をグローバルステートに保存
   const setLoginAccount = useSetAtom(loginSessionAtom)
@@ -68,12 +74,27 @@ export default function App() {
     setLoginAccount(loginSession)
   }, [setLoginAccount, loginSession])
 
+  // トーストメッセージを表示
+  React.useEffect(() => {
+    if (toast && toast.message !== '') {
+      if (toast.type === 'success') {
+        notify.success(t(toast.message))
+      } else {
+        notify.info(t(toast.message))
+      }
+    }
+  }, [toast, t])
+
   return (
     <html lang={language} className={theme}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
+        {/* FullCalendarにてエラーが出ないようにする対応 */}
+        {/* https://fullcalendar.io/docs/react */}
+        {/* https://github.com/fullcalendar/fullcalendar-examples/tree/main/remix */}
+        <style data-fullcalendar />
         <Links />
       </head>
       <body>
@@ -82,12 +103,13 @@ export default function App() {
             <aside className="">
               <Sidebar />
             </aside>
-            <main className="grow h-screen overflow-auto">
+            <main className="h-screen grow overflow-auto">
               <LoadingEffect>
                 <Outlet />
               </LoadingEffect>
             </main>
             <Toaster />
+            <Sonner closeButton />
           </div>
         </I18nextProvider>
         <ScrollRestoration />

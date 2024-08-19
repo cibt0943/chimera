@@ -67,11 +67,12 @@ export function getValidArrowNumber(
   { min, max, step }: GetValidArrowNumberConfig,
 ) {
   let numericValue = parseInt(value, 10)
-  if (!isNaN(numericValue)) {
-    numericValue += step
-    return getValidNumber(String(numericValue), { min, max, loop: true })
-  }
-  return '00'
+  if (isNaN(numericValue)) return '00'
+
+  numericValue = numericValue == 0 && step < 0 ? max : numericValue
+  numericValue = Math.floor(numericValue / step) * step
+  numericValue += step
+  return getValidNumber(String(numericValue), { min, max, loop: true })
 }
 
 export function getValidArrowHour(value: string, step: number) {

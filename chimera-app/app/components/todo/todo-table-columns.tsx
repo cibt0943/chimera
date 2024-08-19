@@ -1,14 +1,15 @@
 import { NavLink } from '@remix-run/react'
+import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { ColumnDef, Column, Row } from '@tanstack/react-table'
 import { useSortable } from '@dnd-kit/sortable'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
+import { TODO_URL } from '~/constants'
 import { Task, TaskStatusList } from '~/types/tasks'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
-import { ClientOnly } from 'remix-utils/client-only'
 
 // Cell Component
 function RowDragHandleCell({ rowId }: { rowId: string }) {
@@ -17,7 +18,7 @@ function RowDragHandleCell({ rowId }: { rowId: string }) {
   })
   return (
     // Alternatively, you could set these attributes on the rows themselves
-    <Button variant="ghost" {...attributes} {...listeners} className=" h-8 w-8">
+    <Button variant="ghost" {...attributes} {...listeners} className="h-8 w-8">
       🟰
     </Button>
   )
@@ -36,17 +37,21 @@ function ColumnHeader({
 
 function DueDateCell({ row }: { row: Row<Task> }) {
   const { t } = useTranslation()
-  const dateStr = row.original.due_date
-  return dateStr ? (
+  const task = row.original
+  return (
     <ClientOnly>
       {() => (
         <span>
-          {format(dateStr, t('common.format.date_time_short_format'))}
+          {task.dueDate &&
+            format(
+              task.dueDate,
+              task.dueDateAllDay
+                ? t('common.format.date_format')
+                : t('common.format.date_time_short_format'),
+            )}
         </span>
       )}
     </ClientOnly>
-  ) : (
-    ''
   )
 }
 
@@ -58,7 +63,7 @@ function StatusCell({ row }: { row: Row<Task> }) {
 
 export const TodoTableColumns: ColumnDef<Task>[] = [
   {
-    id: 'drag-handle',
+    id: 'dragHandle',
     size: 40,
     header: '',
     cell: ({ row }) => <RowDragHandleCell rowId={row.original.id} />,
@@ -80,7 +85,10 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
     },
     cell: ({ row }) => {
       return (
-        <NavLink to={`/todos/${row.id}`} className="truncate font-medium">
+        <NavLink
+          to={[TODO_URL, row.id].join('/')}
+          className="truncate font-medium"
+        >
           {row.original.title}
         </NavLink>
       )

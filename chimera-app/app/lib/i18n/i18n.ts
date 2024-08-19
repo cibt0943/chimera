@@ -1,25 +1,28 @@
+import * as React from 'react'
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import translationEn from '~/lib/i18n/locales/en/translation.json'
 import translationJa from '~/lib/i18n/locales/ja/translation.json'
 
-// eslint-disable-next-line import/no-named-as-default-member
+/* eslint import/no-named-as-default-member: 0 */
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
-      en: {
+      'en-US': {
         translation: translationEn,
       },
-      ja: {
+      'ja-JP': {
         translation: translationJa,
       },
     },
     // debug: true, // 開発モードでデバッグログを出力
-    fallbackLng: 'en', // 言語が見つからなかった場合のフォールバック
-    supportedLngs: ['en', 'ja'], // サポートする言語
+    fallbackLng: 'en-US', // 言語が見つからなかった場合のフォールバック
+    supportedLngs: ['en-US', 'ja-JP'], // サポートする言語
+    load: 'currentOnly',
     interpolation: {
       escapeValue: false, // ReactはXSS対策を既に行っているため
     },
@@ -43,3 +46,9 @@ i18n
   })
 
 export default i18n
+
+export function useChangeLanguage(locale: string) {
+  React.useEffect(() => {
+    i18n.changeLanguage(locale)
+  }, [locale])
+}

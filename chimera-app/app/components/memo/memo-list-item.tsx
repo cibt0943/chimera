@@ -5,7 +5,8 @@ import { format } from 'date-fns'
 import { RiArchiveLine } from 'react-icons/ri'
 import { CSS } from '@dnd-kit/utilities'
 import { useSortable } from '@dnd-kit/sortable'
-import { cn, useDateDiffFormat } from '~/lib/utils'
+// import { cn, useDateDiffFormat } from '~/lib/utils'
+import { cn, useAgoFormat } from '~/lib/utils'
 import { Memo, MemoStatus } from '~/types/memos'
 
 function NavLinkClassName({
@@ -68,7 +69,8 @@ export function ListItem(props: ListItemProps) {
     }),
   }
 
-  const updatedAtDiff = useDateDiffFormat(item.updated_at)
+  // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
+  const updatedAtDiff = useAgoFormat(item.updatedAt)
 
   return (
     <NavLink
@@ -93,19 +95,19 @@ export function ListItem(props: ListItemProps) {
           {item.content.substring(0, 300)}
         </div>
       )}
-      <div className="flex justify-between items-center space-x-2">
+      <div className="flex items-center justify-between space-x-2">
         <div>
           {item.status === MemoStatus.ARCHIVED && (
             <RiArchiveLine className="mr-2 h-4 w-4" />
           )}
         </div>
-        <ClientOnly fallback={<div className="text-xs">&nbsp;</div>}>
+        <ClientOnly fallback={<div>&nbsp;</div>}>
           {() => (
             <div
               className="ml-auto text-xs text-muted-foreground"
               // 下記を表示するとエラーが発生する。サーバーサイドとクライアントで時間側が異なるためと思われる。
               title={format(
-                item.updated_at,
+                item.updatedAt,
                 t('common.format.date_time_format'),
               )}
             >

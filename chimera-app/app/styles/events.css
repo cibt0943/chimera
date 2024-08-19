@@ -1,0 +1,11 @@
+.fc-header-toolbar {
+  @apply mb-4 !important;
+}
+
+.fc-toolbar-title {
+  @apply text-lg font-semibold !important;
+}
+
+.fc-button.fc-button-primary {
+  @apply inline-flex h-8 items-center justify-center whitespace-nowrap rounded-md border-none bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground shadow-sm transition-colors hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 !important;
+}

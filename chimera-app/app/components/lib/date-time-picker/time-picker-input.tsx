@@ -1,6 +1,6 @@
-import { cn } from '~/lib/utils'
 import React from 'react'
 import { Input } from '~/components/ui/input'
+import { cn } from '~/lib/utils'
 import {
   TimePickerType,
   getArrowByType,
@@ -13,8 +13,9 @@ export interface TimePickerInputProps
   picker: TimePickerType
   date: Date | undefined
   setDate: (date: Date | undefined) => void
-  onRightFocus?: () => void
   onLeftFocus?: () => void
+  onRightFocus?: () => void
+  step?: number
 }
 
 const TimePickerInput = React.forwardRef<
@@ -35,6 +36,7 @@ const TimePickerInput = React.forwardRef<
       picker,
       onLeftFocus,
       onRightFocus,
+      step = 1,
       ...props
     },
     ref,
@@ -60,13 +62,13 @@ const TimePickerInput = React.forwardRef<
       [date, picker],
     )
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
       if (e.key === 'Tab') return
       e.preventDefault()
       if (e.key === 'ArrowRight') onRightFocus?.()
       if (e.key === 'ArrowLeft') onLeftFocus?.()
       if (['ArrowUp', 'ArrowDown'].includes(e.key)) {
-        const step = e.key === 'ArrowUp' ? 1 : -1
+        step = e.key === 'ArrowUp' ? step : step * -1
         const newValue = getArrowByType(calculatedValue, step, picker)
         if (flag) setFlag(false)
         const tempDate = new Date(date)
@@ -89,7 +91,7 @@ const TimePickerInput = React.forwardRef<
         id={id || picker}
         name={name || picker}
         className={cn(
-          'w-[48px] text-center tabular-nums caret-transparent focus:bg-accent focus:text-accent-foreground [&::-webkit-inner-spin-button]:appearance-none',
+          'h-8 w-[30px] border-0 p-0 text-center tabular-nums caret-transparent focus:bg-accent focus:text-accent-foreground focus-visible:ring-0 [&::-webkit-inner-spin-button]:appearance-none',
           className,
         )}
         value={value || calculatedValue}

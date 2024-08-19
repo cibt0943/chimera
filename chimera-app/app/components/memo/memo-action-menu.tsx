@@ -21,17 +21,18 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
+import { MEMO_URL } from '~/constants'
 import { cn } from '~/lib/utils'
 import { Memo, MemoStatus } from '~/types/memos'
 
-interface MemoActionsProps {
+interface MemoActionMenuProps {
   memo: Memo
   handleMoveMemo: (memo: Memo, isUp: boolean) => void
   handleUpdateMemoStatus: (memo: Memo) => void
   handleDeleteMemo: (memo: Memo) => void
 }
 
-export function MemoActions(props: MemoActionsProps) {
+export function MemoActionMenu(props: MemoActionMenuProps) {
   const { memo, handleMoveMemo, handleUpdateMemoStatus, handleDeleteMemo } =
     props
 
@@ -69,8 +70,8 @@ export function MemoActions(props: MemoActionsProps) {
         <DropdownMenuContent align="end" className="w-52">
           <DropdownMenuItem
             onClick={(event) => {
-              handleMoveMemo(memo, true)
               event.stopPropagation() // アンカータグのクリックイベントをキャンセル
+              handleMoveMemo(memo, true)
             }}
           >
             <RiArrowUpLine className="mr-2 h-4 w-4" />
@@ -79,8 +80,8 @@ export function MemoActions(props: MemoActionsProps) {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={(event) => {
-              handleMoveMemo(memo, false)
               event.stopPropagation() // アンカータグのクリックイベントをキャンセル
+              handleMoveMemo(memo, false)
             }}
           >
             <RiArrowDownLine className="mr-2 h-4 w-4" />
@@ -90,40 +91,40 @@ export function MemoActions(props: MemoActionsProps) {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={(event) => {
-              handleUpdateMemoStatus({ ...memo, status: archiveMenu.toStatus })
               event.stopPropagation() // アンカータグのクリックイベントをキャンセル
+              handleUpdateMemoStatus({ ...memo, status: archiveMenu.toStatus })
             }}
           >
             {archiveMenu.icon}
             {archiveMenu.caption}
             <DropdownMenuShortcut>
-              ⌥ <RiCornerDownLeftLine className="h-3 w-3 inline" />
+              ⌥ <RiCornerDownLeftLine className="inline h-3 w-3" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={(event) => {
-              navigate(`/memos/${memo.id}`)
               event.stopPropagation() // アンカータグのクリックイベントをキャンセル
+              navigate([MEMO_URL, memo.id].join('/'))
             }}
           >
             <RiEdit2Line className="mr-2 h-4 w-4" />
             {t('common.message.edit')}
             <DropdownMenuShortcut>
-              <RiCornerDownLeftLine className="h-3 w-3 inline" />
+              <RiCornerDownLeftLine className="inline h-3 w-3" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={(event) => {
-              handleDeleteMemo(memo)
               event.stopPropagation() // アンカータグのクリックイベントをキャンセル
+              handleDeleteMemo(memo)
             }}
             className="text-red-600 focus:text-red-600"
           >
             <RiDeleteBinLine className="mr-2 h-4 w-4" />
             {t('common.message.delete')}
             <DropdownMenuShortcut>
-              ⌥ <RiDeleteBack2Line className="h-3 w-3 inline" />
+              ⌥ <RiDeleteBack2Line className="inline h-3 w-3" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>

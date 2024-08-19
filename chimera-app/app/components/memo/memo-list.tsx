@@ -21,10 +21,11 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
+import { API_URL, MEMO_URL } from '~/constants'
 import { useDebounce, useQueue } from '~/lib/utils'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
 import { ListItem } from './memo-list-item'
-import { MemoActions } from './memo-actions'
+import { MemoActionMenu } from './memo-action-menu'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 import { MemoSettings } from './memo-settings'
 import { useAtomValue } from 'jotai'
@@ -63,8 +64,8 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
 
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
-  const memosRefs = React.useRef<HTMLDivElement>(null)
-  const addButtonRef = React.useRef<HTMLButtonElement>(null)
+  const useMemosRef = React.useRef<HTMLDivElement>(null)
+  const useAddButtonRef = React.useRef<HTMLButtonElement>(null)
 
   // フィルタリング後のメモ一覧データ更新（memosに依存した値なのでstateで持つ必要はないと考えメモ化した変数で対応）
   const dispMemos = React.useMemo(() => {
@@ -141,7 +142,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     fetcher.submit(
       { status: memo.status },
       {
-        action: `/memos/${memo.id}/status`,
+        action: [API_URL, MEMO_URL, '/' + memo.id].join(''),
         method: 'post',
       },
     )
@@ -187,7 +188,8 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   // メモの表示順変更API呼び出し
   async function moveMemoApi(fromMemo: Memo, toMemo: Memo) {
     // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
-    await fetch(`/memos/${fromMemo.id}/position`, {
+    const url = [MEMO_URL, fromMemo.id, 'position'].join('/')
+    await fetch(url, {
       method: 'POST',
       body: JSON.stringify({ toMemoId: toMemo.id }),
     }).then((response) => {
@@ -208,7 +210,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   }, 300)
 
   function setListFocus(memo: Memo) {
-    memosRefs.current?.querySelector<HTMLElement>(`#memo-${memo.id}`)?.focus()
+    useMemosRef.current?.querySelector<HTMLElement>(`#memo-${memo.id}`)?.focus()
   }
 
   // キーボード操作(スコープあり)
@@ -263,7 +265,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
       switch (handler.keys?.join('')) {
         // メモ追加
         case 'n':
-          addButtonRef.current?.click()
+          useAddButtonRef.current?.click()
           break
         // フォーカスを一覧へ移動
         case 'left':
@@ -279,16 +281,16 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   return (
     <div className="space-y-4 px-1 py-4">
       <div className="flex items-center space-x-2 px-3">
-        <Form action={`/memos`} method="post">
+        <Form action={MEMO_URL} method="post">
           <Button
             type="submit"
             variant="secondary"
             className="h-8 px-2"
-            ref={addButtonRef}
+            ref={useAddButtonRef}
           >
             <RiAddLine className="mr-2" />
             {t('common.message.add')}
-            <p className="text-xs text-muted-foreground ml-2">
+            <p className="ml-2 text-xs text-muted-foreground">
               <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
                 <span>⌥</span>n
               </kbd>
@@ -314,7 +316,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
           sensors={sensors}
           id="dnd-context-for-memos"
         >
-          <div className="space-y-3 px-3" id="memos" ref={memosRefs}>
+          <div className="space-y-3 px-3" id="memos" ref={useMemosRef}>
             <SortableContext
               items={dispMemos}
               strategy={verticalListSortingStrategy}
@@ -326,9 +328,9 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
                     item={item}
                     setFocusedMemo={setFocusedMemo}
                     isSelected={item.id === selectedMemo?.id}
-                    isPreview={!!memoSettings?.list_display.content}
+                    isPreview={!!memoSettings?.listDisplay.content}
                   >
-                    <MemoActions
+                    <MemoActionMenu
                       memo={item}
                       handleMoveMemo={moveMemoOneStep}
                       handleUpdateMemoStatus={updateMemoStatusApi}
@@ -343,13 +345,11 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
           </div>
         </DndContext>
       </ScrollArea>
-      {actionMemo && (
-        <MemoDeleteConfirmDialog
-          memo={actionMemo}
-          isOpen={isOpenDeleteDialog}
-          setIsOpen={setIsOpenDeleteDialog}
-        />
-      )}
+      <MemoDeleteConfirmDialog
+        memo={actionMemo}
+        isOpen={isOpenDeleteDialog}
+        setIsOpen={setIsOpenDeleteDialog}
+      />
     </div>
   )
 }

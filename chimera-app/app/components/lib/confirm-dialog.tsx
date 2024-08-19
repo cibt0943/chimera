@@ -1,5 +1,6 @@
 import {
   AlertDialog,
+  AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -10,13 +11,15 @@ import {
 interface ConfirmDialogProps {
   title: string
   description: string
-  isOpen: boolean
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  children: React.ReactNode
+  isOpen?: boolean
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  torigger?: React.ReactNode
+  children?: React.ReactNode
 }
 
-export function DeleteConfirmDialog({
+export function ConfirmDialog({
   title,
+  torigger,
   description,
   isOpen,
   setIsOpen,
@@ -24,6 +27,7 @@ export function DeleteConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      <AlertDialogTrigger asChild>{torigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>

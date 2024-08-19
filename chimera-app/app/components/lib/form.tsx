@@ -1,12 +1,9 @@
 import * as React from 'react'
 import { cn } from '~/lib/utils'
 import { Label } from '~/components/ui/label'
+import { DialogFooter } from '~/components/ui/dialog'
 
-interface FormItemProps {
-  children?: React.ReactNode
-  className?: string
-  props?: React.ComponentProps<'div'>
-}
+export interface FormItemProps extends React.ComponentProps<'div'> {}
 
 export function FormItem({ children, className, ...props }: FormItemProps) {
   return (
@@ -16,10 +13,8 @@ export function FormItem({ children, className, ...props }: FormItemProps) {
   )
 }
 
-interface FormLabelProps extends React.ComponentProps<'label'> {
-  children?: React.ReactNode
+export interface FormLabelProps extends React.ComponentProps<'label'> {
   error?: object
-  className?: string
 }
 
 export function FormLabel({
@@ -34,10 +29,8 @@ export function FormLabel({
     </Label>
   )
 }
-interface FormMessageProps {
+export interface FormMessageProps extends React.ComponentProps<'p'> {
   message?: string[] | string
-  className?: string
-  props?: React.ComponentProps<'p'>
 }
 
 export function FormMessage({
@@ -59,11 +52,7 @@ export function FormMessage({
   )
 }
 
-interface FormDescriptionProps {
-  children?: React.ReactNode
-  className?: string
-  props?: React.ComponentProps<'p'>
-}
+export interface FormDescriptionProps extends React.ComponentProps<'p'> {}
 
 export function FormDescription({
   children,
@@ -78,4 +67,10 @@ export function FormDescription({
       {children}
     </p>
   )
+}
+
+export interface FormFooterProps extends React.ComponentProps<'div'> {}
+
+export function FormFooter({ children, ...props }: FormFooterProps) {
+  return <DialogFooter {...props}>{children}</DialogFooter>
 }
