@@ -23,16 +23,21 @@ export const action = withAuthentication(
     // submission が成功しなかった場合、クライアントに送信結果を報告します。
     if (submission.status !== 'success') {
       throw new Error('Invalid submission data.')
-      // return json({ result: submission.reply() }, { status: 422 })
     }
 
     const data = submission.value
+
+    const endDate = !data.endDate
+      ? null
+      : data.startDate.getTime() === data.endDate.getTime()
+        ? null
+        : data.endDate
 
     await updateEvent({
       id: event.id,
       title: data.title,
       start_datetime: data.startDate.toISOString(),
-      end_datetime: data.endDate?.toISOString() || null,
+      end_datetime: endDate?.toISOString() || null,
       all_day: !!data.allDay,
       memo: data.memo || '',
       location: data.location || '',

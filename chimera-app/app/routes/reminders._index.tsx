@@ -16,7 +16,7 @@ export default function Index() {
       <div className="text-l mb-8 font-bold">
         This feature is under development. Please check back later.
       </div>
-      Push通知を受け取るためだけのモバイルアプリを作ってみようかな
+      Push通知をモバイル端末で受診できるようにする予定です。
     </div>
   )
 }

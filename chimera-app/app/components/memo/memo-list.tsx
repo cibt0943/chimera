@@ -21,7 +21,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
-import { MEMO_URL } from '~/constants'
+import { API_URL, MEMO_URL } from '~/constants'
 import { useDebounce, useQueue } from '~/lib/utils'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
 import { ListItem } from './memo-list-item'
@@ -142,7 +142,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     fetcher.submit(
       { status: memo.status },
       {
-        action: `/memos/${memo.id}/status`,
+        action: [API_URL, MEMO_URL, '/' + memo.id].join(''),
         method: 'post',
       },
     )
@@ -188,7 +188,8 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   // メモの表示順変更API呼び出し
   async function moveMemoApi(fromMemo: Memo, toMemo: Memo) {
     // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
-    await fetch(`/memos/${fromMemo.id}/position`, {
+    const url = [MEMO_URL, fromMemo.id, 'position'].join('/')
+    await fetch(url, {
       method: 'POST',
       body: JSON.stringify({ toMemoId: toMemo.id }),
     }).then((response) => {

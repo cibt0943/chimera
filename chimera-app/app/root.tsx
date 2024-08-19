@@ -76,7 +76,7 @@ export default function App() {
 
   // トーストメッセージを表示
   React.useEffect(() => {
-    if (toast) {
+    if (toast && toast.message !== '') {
       if (toast.type === 'success') {
         notify.success(t(toast.message))
       } else {

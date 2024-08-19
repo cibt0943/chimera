@@ -48,7 +48,7 @@ import {
 import { Button } from '~/components/ui/button'
 import { ToastAction } from '~/components/ui/toast'
 import { useToast } from '~/components/ui/use-toast'
-import { TODO_URL } from '~/constants'
+import { API_URL, TODO_URL } from '~/constants'
 import { useDebounce, useQueue, useIsLoading } from '~/lib/utils'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
@@ -310,7 +310,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     fetcher.submit(
       { status: updateTask.status },
       {
-        action: [TODO_URL, updateTask.id, 'status'].join('/'),
+        action: [API_URL, TODO_URL, '/' + updateTask.id].join(''),
         method: 'post',
       },
     )

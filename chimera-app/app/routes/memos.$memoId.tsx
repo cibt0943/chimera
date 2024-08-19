@@ -23,7 +23,6 @@ export const action = withAuthentication(
     // submission が成功しなかった場合、クライアントに送信結果を報告します。
     if (submission.status !== 'success') {
       throw new Error('Invalid submission data.')
-      // return json({ result: submission.reply() }, { status: 422 })
     }
 
     const data = submission.value
@@ -37,7 +36,9 @@ export const action = withAuthentication(
       related_date_all_day: !!data.relatedDateAllDay,
     })
 
-    return redirect(data.returnUrl || [MEMO_URL, memo.id].join('/'))
+    const redirectUrl =
+      (formData.get('returnUrl') as string) || [MEMO_URL, memo.id].join('/')
+    return redirect(redirectUrl)
   },
 )
 

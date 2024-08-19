@@ -13,6 +13,7 @@ This product can be used on [Kobushi](https://kobushi.fly.dev).
 - [x] return キーで選択行を編集
 - [x] Option + return キーで選択行の状態を完了
 - [x] Option + delete キーで選択行を削除
+- [x] 期限日情報で、イベントカレンダーに表示
 
 ### Memo
 
@@ -27,8 +28,8 @@ This product can be used on [Kobushi](https://kobushi.fly.dev).
 - [x] Option + delete キーで選択行を削除
 - [x] Option + ← キーでメモ一覧へフォーカス移動
 - [x] Option + → キーでメモ詳細のテキストエリアへフォーカス移動
-- [ ] メモには日付情報を持つ。デフォルトは作成日で変更可能
-- [ ] 日付情報で、カレンダーに表示
+- [x] メモには日付情報を持つ。
+- [x] 日付情報で、イベントカレンダーに表示
 - [ ] パブリック URL を作成したメモはログインしないで共同編集可能（リアルタイム編集にしようかな）
 - [ ] Undo Redo
 

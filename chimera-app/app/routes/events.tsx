@@ -84,12 +84,9 @@ export const loader = withAuthentication(async ({ loginSession }) => {
 export default function Layout() {
   const { calendarEvents } = useTypedLoaderData<LoaderData>()
 
-  const params = useParams()
-  const { eventId } = params
-
   return (
     <div className="p-4">
-      <Calendar defaultEvents={calendarEvents} showId={eventId || ''} />
+      <Calendar defaultEvents={calendarEvents} />
       <Outlet />
     </div>
   )

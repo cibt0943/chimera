@@ -12,7 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip'
-import { MEMO_URL } from '~/constants'
+import { API_URL, MEMO_URL } from '~/constants'
 import { Memo, MemoStatus } from '~/types/memos'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 
@@ -47,7 +47,7 @@ export function MemoActionButton({
                 fetcher.submit(
                   { status: archiveMenu.toStatus },
                   {
-                    action: [MEMO_URL, memo.id, 'status'].join('/'),
+                    action: [API_URL, MEMO_URL, '/' + memo.id].join(''),
                     method: 'post',
                   },
                 )
