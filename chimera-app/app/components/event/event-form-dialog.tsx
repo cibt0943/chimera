@@ -18,12 +18,14 @@ export interface EventFormDialogProps {
   event: Event | undefined
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  returnUrl?: string
 }
 
 export function EventFormDialog({
   event,
   isOpen,
   setIsOpen,
+  returnUrl = EVENT_URL,
 }: EventFormDialogProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -41,7 +43,7 @@ export function EventFormDialog({
         setIsOpen(open)
         if (!open) {
           await sleep(200) // ダイアログが閉じるアニメーションが終わるまで待機
-          navigate(EVENT_URL)
+          navigate(returnUrl)
         }
       }}
     >
@@ -50,7 +52,11 @@ export function EventFormDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{desc}</DialogDescription>
         </DialogHeader>
-        <EventForm event={event} onSubmit={() => setIsOpen(false)}>
+        <EventForm
+          event={event}
+          onSubmit={() => setIsOpen(false)}
+          returnUrl={returnUrl}
+        >
           {event?.id && (
             <EventDeleteButton
               event={event}
@@ -58,6 +64,7 @@ export function EventFormDialog({
                 event.stopPropagation()
                 setIsOpen(false)
               }}
+              returnUrl={returnUrl}
             />
           )}
         </EventForm>

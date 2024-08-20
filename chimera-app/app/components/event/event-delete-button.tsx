@@ -1,21 +1,31 @@
 import { useTranslation } from 'react-i18next'
 import { RiDeleteBinLine } from 'react-icons/ri'
 import { Button } from '~/components/ui/button'
+import { EVENT_URL } from '~/constants'
 import { Event } from '~/types/events'
 import { EventDeleteConfirmDialog } from './event-delete-confirm-dialog'
 
 export interface EventDeleteButtonProps {
   event: Event | undefined
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
+  returnUrl?: string
 }
 
-export function EventDeleteButton({ event, onSubmit }: EventDeleteButtonProps) {
+export function EventDeleteButton({
+  event,
+  onSubmit,
+  returnUrl = EVENT_URL,
+}: EventDeleteButtonProps) {
   const { t } = useTranslation()
 
   if (!event) return null
 
   return (
-    <EventDeleteConfirmDialog event={event} onSubmit={onSubmit}>
+    <EventDeleteConfirmDialog
+      event={event}
+      onSubmit={onSubmit}
+      returnUrl={returnUrl}
+    >
       <Button
         type="button"
         variant="link"

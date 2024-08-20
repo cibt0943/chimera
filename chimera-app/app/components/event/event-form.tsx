@@ -29,10 +29,16 @@ type useInputControlType = ReturnType<typeof useInputControl<string>>
 export interface EventFormProps {
   event: Event | undefined
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  returnUrl?: string
   children?: React.ReactNode
 }
 
-export function EventForm({ event, onSubmit, children }: EventFormProps) {
+export function EventForm({
+  event,
+  onSubmit,
+  returnUrl = EVENT_URL,
+  children,
+}: EventFormProps) {
   const { t } = useTranslation()
 
   // 新規作成時であってもeventに初期値を埋めて送られてくるため、idがあるかどうかで判定
@@ -145,6 +151,7 @@ export function EventForm({ event, onSubmit, children }: EventFormProps) {
         <InputConform meta={fields.location} type="text" />
         <FormMessage message={fields.location.errors} />
       </FormItem>
+      <input type="hidden" name="returnUrl" value={returnUrl} />
       <FormFooter className="sm:justify-between">
         {children || <div>&nbsp;</div>}
         <Button type="submit">{t('common.message.save')}</Button>

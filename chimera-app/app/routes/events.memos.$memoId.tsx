@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MetaFunction } from '@remix-run/node'
+import { useLocation } from '@remix-run/react'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { EVENT_URL } from '~/constants'
 import { withAuthentication } from '~/lib/auth-middleware'
@@ -25,13 +26,14 @@ export const loader = withAuthentication(async ({ params, loginSession }) => {
 export default function Memo() {
   const { memo } = useTypedLoaderData<LoaderData>()
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
+  const location = useLocation()
 
   return (
     <MemoFormDialog
       memo={memo}
       isOpen={isOpenDialog}
       setIsOpen={setIsOpenDialog}
-      returnUrl={EVENT_URL}
+      returnUrl={EVENT_URL + location.search}
     />
   )
 }

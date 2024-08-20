@@ -1,9 +1,22 @@
 import * as React from 'react'
-import { useNavigate, useFetcher } from '@remix-run/react'
+import {
+  useNavigate,
+  useFetcher,
+  useSearchParams,
+  useLocation,
+} from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { RxCheckCircled, RxPencil2, RxCalendar } from 'react-icons/rx'
+import { format, startOfMonth } from 'date-fns'
+import {
+  RiCircleLine,
+  RiProgress4Line,
+  RiProgress8Line,
+  RiProhibited2Line,
+} from 'react-icons/ri'
+import { RxPencil2, RxCalendar } from 'react-icons/rx'
 import allLocales from '@fullcalendar/core/locales-all'
 import {
+  DatesSetArg,
   DateSelectArg,
   EventContentArg,
   EventClickArg,
@@ -18,7 +31,7 @@ import interactionPlugin, {
 import listPlugin from '@fullcalendar/list'
 import { API_URL, TODO_URL, MEMO_URL, EVENT_URL } from '~/constants'
 import { Event, CalendarEvents, CalendarEventType } from '~/types/events'
-import { Task } from '~/types/tasks'
+import { Task, TaskStatus } from '~/types/tasks'
 import { Memo } from '~/types/memos'
 import { EventFormDialog, EventFormDialogProps } from './event-form-dialog'
 
@@ -32,12 +45,32 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   const fetcher = useFetcher()
   const [actionEvent, setActionEvent] = React.useState<Event>() // イベント作成用
   const [isOpenEventDialog, setIsOpenEventDialog] = React.useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const location = useLocation()
+
+  // 日付セット時の処理
+  function handleDatesSet(arg: DatesSetArg) {
+    if (viewMode !== arg.view.type) {
+      setSearchParams((prev) => {
+        prev.set('view', arg.view.type)
+        return prev
+      })
+    }
+
+    const startStr = format(arg.view.currentStart, 'yyyy-MM-dd')
+    if (startDate !== startStr) {
+      setSearchParams((prev) => {
+        prev.set('start', startStr)
+        return prev
+      })
+    }
+  }
 
   // イベント編集
   function handleEventClick(arg: EventClickArg) {
     const { type, srcObj } = arg.event.extendedProps
     const url = getEditUrl(type, srcObj.id)
-    if (url) navigate(url)
+    if (url) navigate(url + location.search)
   }
 
   // 編集画面URLを取得
@@ -46,9 +79,9 @@ export function Calendar({ defaultEvents }: CalendarProps) {
       case CalendarEventType.EVENT:
         return [EVENT_URL, id].join('/')
       case CalendarEventType.TASK:
-        return [EVENT_URL, 'todos', id].join('/')
+        return [EVENT_URL, TODO_URL, '/' + id].join('')
       case CalendarEventType.MEMO:
-        return [EVENT_URL, 'memos', id].join('/')
+        return [EVENT_URL, MEMO_URL, '/' + id].join('')
       default:
         return null
     }
@@ -143,6 +176,10 @@ export function Calendar({ defaultEvents }: CalendarProps) {
     )
   }
 
+  const viewMode = searchParams.get('view') || 'dayGridMonth'
+  const startDate =
+    searchParams.get('start') || format(startOfMonth(new Date()), 'yyyy-MM-dd')
+
   return (
     <>
       <div className="h-[calc(100vh_-_50px)]">
@@ -156,6 +193,9 @@ export function Calendar({ defaultEvents }: CalendarProps) {
             center: 'title',
             right: 'dayGridMonth dayGridWeek listMonth',
           }}
+          datesSet={handleDatesSet}
+          initialView={viewMode}
+          initialDate={startDate}
           viewClassNames={['text-sm', 'text-muted-foreground']}
           editable={true}
           selectable={true}
@@ -179,6 +219,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
         event={actionEvent}
         isOpen={isOpenEventDialog}
         setIsOpen={setIsOpenEventDialog}
+        returnUrl={EVENT_URL + location.search}
       />
     </>
   )
@@ -255,13 +296,13 @@ function transformEventData(eventData: EventInput) {
   return eventData
 }
 
-// a custom render function
+// イベント表示用コンポーネント
 function renderEventContent(eventContent: EventContentArg) {
   const { timeText } = eventContent
   const { title } = eventContent.event
-  const { type } = eventContent.event.extendedProps
+  const { type, srcObj } = eventContent.event.extendedProps
 
-  const Icon = EventTypeIcon({ type })
+  const Icon = EventTypeIcon({ type, srcObj })
 
   return (
     <div className="flex items-center truncate" title={title}>
@@ -274,12 +315,29 @@ function renderEventContent(eventContent: EventContentArg) {
   )
 }
 
-function EventTypeIcon({ type }: { type: CalendarEventType }) {
+function EventTypeIcon({
+  type,
+  srcObj,
+}: {
+  type: CalendarEventType
+  srcObj: Event | Task | Memo
+}) {
   switch (type) {
     case CalendarEventType.EVENT:
       return RxCalendar
     case CalendarEventType.TASK:
-      return RxCheckCircled
+      switch ((srcObj as Task).status) {
+        case TaskStatus.NEW:
+          return RiCircleLine
+        case TaskStatus.DOING:
+          return RiProgress4Line
+        case TaskStatus.DONE:
+          return RiProgress8Line
+        case TaskStatus.PENDING:
+          return RiProhibited2Line
+        default:
+          return RiCircleLine
+      }
     case CalendarEventType.MEMO:
       return RxPencil2
     default:
