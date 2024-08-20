@@ -7,8 +7,16 @@ import {
   RxFile,
   RxPaperPlane,
 } from 'react-icons/rx'
+import { RiBook3Line } from 'react-icons/ri'
 import { buttonVariants } from '~/components/ui/button'
-import { TODO_URL, MEMO_URL, EVENT_URL } from '~/constants'
+import {
+  TODO_URL,
+  MEMO_URL,
+  EVENT_URL,
+  DAILY_NOTE_URL,
+  FILE_URL,
+  REMINDER_URL,
+} from '~/constants'
 import { cn } from '~/lib/utils'
 import { AccountMenu } from '~/components/account-menu'
 
@@ -73,11 +81,15 @@ export function Sidebar() {
             <RxCalendar className="mr-2 h-5 w-5" />
             Event
           </CustomNavLink>
-          <CustomNavLink to="/files">
+          <CustomNavLink to={DAILY_NOTE_URL}>
+            <RiBook3Line className="mr-2 h-5 w-5" />
+            Daily Note
+          </CustomNavLink>
+          <CustomNavLink to={FILE_URL}>
             <RxFile className="mr-2 h-5 w-5" />
             File
           </CustomNavLink>
-          <CustomNavLink to="/reminders">
+          <CustomNavLink to={REMINDER_URL}>
             <RxPaperPlane className="mr-2 h-5 w-5" />
             Reminder
           </CustomNavLink>

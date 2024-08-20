@@ -7,7 +7,7 @@ services:
       - ./chimera-app:/chimera-app
     ports:
       - 3000:3000
-      - 3001:3001
+      - 3001:3001 # for remix dev server websocket
     # env_file: ./chimera-app/.env
     tty: true
     stdin_open: true

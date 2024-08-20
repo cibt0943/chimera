@@ -1,12 +1,14 @@
-## Chimera is a service with five functions
+## Chimera: A Personal Web Service with Multiple Features
 
-Chimera is the development code and the service name is 「Kobushi」.
+Chimera is the development code name, and the service is officially named 「Kobushi」.
 
-### Link to product
+### Product Link
 
-This product can be used on [Kobushi](https://kobushi.fly.dev).
+You can access the service here: [Kobushi](https://kobushi.fly.dev)
 
-### Todo
+### Features
+
+#### Todo
 
 - [x] ↑↓ キーで選択行を移動
 - [x] Option + ↑↓ キーで選択行の表示順移動
@@ -15,7 +17,7 @@ This product can be used on [Kobushi](https://kobushi.fly.dev).
 - [x] Option + delete キーで選択行を削除
 - [x] 期限日情報で、イベントカレンダーに表示
 
-### Memo
+#### Memo
 
 使い方として終わったものはタグをつけてアーカイブしておく。<br>
 日々確認したり見たりしているファイルのも一覧い置いておく。<br>
@@ -33,21 +35,27 @@ This product can be used on [Kobushi](https://kobushi.fly.dev).
 - [ ] パブリック URL を作成したメモはログインしないで共同編集可能（リアルタイム編集にしようかな）
 - [ ] Undo Redo
 
-### Event
+#### Event
 
 - [x] カレンダーへ イベントの追加、編集、削除が行える
 - [x] カレンダーから Todo の参照、追加、編集、削除が行える
 - [x] カレンダーから Memo の参照、追加、編集、削除が行える
 
-### File
+#### Daily Note
 
-Linux コマンド操作を主としたファイラー機能にしようかと思っています
+普通の日記帳
+左にカレンダー右にメモ内容を配置して
+カレンダーには情報があるかどうかを表示
 
-### Reminder
+#### File
 
-Push 通知を受け取るためだけのモバイルアプリを作ってみようかな
+Linux コマンド操作を主としたファイラー機能の予定
 
-### Account
+#### Reminder
+
+モバイル端末で Todo や Event のリマインダ通知を受信できるようにする予定
+
+#### Account
 
 アカウント管理およびに認証、認可には Auth0 を利用しています。
 

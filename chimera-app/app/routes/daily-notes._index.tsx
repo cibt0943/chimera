@@ -2,7 +2,7 @@ import { MetaFunction, json } from '@remix-run/node'
 import { withAuthentication } from '~/lib/auth-middleware'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Files | Kobushi' }]
+  return [{ title: 'DailyNotes | Kobushi' }]
 }
 
 export const loader = withAuthentication(async ({ loginSession }) => {
@@ -12,11 +12,11 @@ export const loader = withAuthentication(async ({ loginSession }) => {
 export default function Index() {
   return (
     <div>
-      <h1 className="mb-4 text-xl font-bold">File</h1>
+      <h1 className="mb-4 text-xl font-bold">Daily Note</h1>
       <div className="text-l mb-8 font-bold">
         This feature is under development. Please check back later.
       </div>
-      Linuxコマンド操作を主としたファイラー機能の予定
+      普通の日記帳
     </div>
   )
 }
