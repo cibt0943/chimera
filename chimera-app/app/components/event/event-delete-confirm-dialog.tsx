@@ -14,16 +14,18 @@ export interface EventDeleteConfirmDialogProps {
   event: Event | undefined
   isOpen?: boolean
   setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
-  children?: React.ReactNode
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  returnUrl?: string
+  children?: React.ReactNode
 }
 
 export function EventDeleteConfirmDialog({
   event,
   isOpen,
   setIsOpen,
-  children,
   onSubmit,
+  returnUrl = EVENT_URL,
+  children,
 }: EventDeleteConfirmDialogProps) {
   const { t } = useTranslation()
 
@@ -54,7 +56,9 @@ export function EventDeleteConfirmDialog({
         action={action}
         method="delete"
         onSubmit={onSubmit}
-      />
+      >
+        <input type="hidden" name="returnUrl" value={returnUrl} />
+      </Form>
     </ConfirmDialog>
   )
 }

@@ -37,7 +37,7 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
 
   const data = submission.value
 
-  const newEvent = await insertEvent({
+  await insertEvent({
     account_id: loginSession.account.id,
     start_datetime: data.startDate.toISOString(),
     end_datetime: data.endDate?.toISOString() || null,
@@ -47,7 +47,8 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
     location: data.location || '',
   })
 
-  return redirect(EVENT_URL + '?day=' + newEvent.startDate.toISOString())
+  const redirectUrl = (formData.get('returnUrl') as string) || EVENT_URL
+  return redirect(redirectUrl)
 })
 
 type LoaderData = {

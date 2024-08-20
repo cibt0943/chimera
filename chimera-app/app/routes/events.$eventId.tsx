@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MetaFunction, redirect } from '@remix-run/node'
+import { useLocation } from '@remix-run/react'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
 import { EVENT_URL } from '~/constants'
@@ -43,7 +44,8 @@ export const action = withAuthentication(
       location: data.location || '',
     })
 
-    return redirect(EVENT_URL)
+    const redirectUrl = (formData.get('returnUrl') as string) || EVENT_URL
+    return redirect(redirectUrl)
   },
 )
 
@@ -61,12 +63,14 @@ export const loader = withAuthentication(async ({ params, loginSession }) => {
 export default function Event() {
   const { event } = useTypedLoaderData<LoaderData>()
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
+  const location = useLocation()
 
   return (
     <EventFormDialog
       event={event}
       isOpen={isOpenDialog}
       setIsOpen={setIsOpenDialog}
+      returnUrl={EVENT_URL + location.search}
     />
   )
 }
