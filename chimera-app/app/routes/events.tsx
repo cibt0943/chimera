@@ -1,5 +1,6 @@
 import { MetaFunction, LinksFunction, redirect } from '@remix-run/node'
-import { Outlet, useParams } from '@remix-run/react'
+import { Outlet } from '@remix-run/react'
+import { startOfMonth, addMonths, subMonths } from 'date-fns'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
 import { EVENT_URL } from '~/constants'
@@ -29,10 +30,9 @@ export const meta: MetaFunction = () => {
 export const action = withAuthentication(async ({ request, loginSession }) => {
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: EventSchema })
-  // submission が成功しなかった場合、クライアントに送信結果を報告します。
+  // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
   if (submission.status !== 'success') {
     throw new Error('Invalid submission data.')
-    // return json({ result: submission.reply() }, { status: 422 })
   }
 
   const data = submission.value
@@ -55,10 +55,34 @@ type LoaderData = {
   calendarEvents: CalendarEvents
 }
 
-export const loader = withAuthentication(async ({ loginSession }) => {
-  const events = await getEvents(loginSession.account.id)
-  const tasks = await getTasks(loginSession.account.id)
-  const memos = await getMemos(loginSession.account.id)
+export function getDispStartDayFromParams(request: Request): Date {
+  const url = new URL(request.url)
+  const searchParams = url.searchParams
+  const startStr = searchParams.get('start')
+  const startDate = startStr ? new Date(startStr) : new Date()
+  return startOfMonth(startDate)
+}
+
+export const loader = withAuthentication(async ({ request, loginSession }) => {
+  const startDay = getDispStartDayFromParams(request)
+  const getStart = subMonths(startDay, 1)
+  // 3ヶ月先の分まで取得
+  // 2ヶ月分だと1ヶ月先に移動した際にデータ取得の前に古いデータでレンダリングされる際に情報が抜けて、
+  // 最新のデータ取得後に表示されるので)
+  const getEnd = addMonths(startDay, 3)
+
+  const events = await getEvents(loginSession.account.id, {
+    startDateStart: getStart,
+    startDateEnd: getEnd,
+  })
+  const tasks = await getTasks(loginSession.account.id, {
+    dueDateStart: getStart,
+    dueDateEnd: getEnd,
+  })
+  const memos = await getMemos(loginSession.account.id, {
+    relatedDateStart: getStart,
+    relatedDateEnd: getEnd,
+  })
 
   const calendarEvents: CalendarEvents = []
 
@@ -69,13 +93,11 @@ export const loader = withAuthentication(async ({ loginSession }) => {
 
   // Tasks → CalendarEvents
   tasks.forEach((task) => {
-    if (!task.dueDate) return
     calendarEvents.push(Task2Calendar(task as TaskWithNonNullableDueDate))
   })
 
   // Memos → CalendarEvents
   memos.forEach((memo) => {
-    if (!memo.relatedDate) return
     calendarEvents.push(Memo2Calendar(memo as MemoWithNonNullableRelatedDate))
   })
 

@@ -20,7 +20,7 @@ export const action = withAuthentication(
 
     const formData = await request.formData()
     const submission = parseWithZod(formData, { schema: MemoSchema })
-    // submission が成功しなかった場合、クライアントに送信結果を報告します。
+    // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
     if (submission.status !== 'success') {
       throw new Error('Invalid submission data.')
     }
