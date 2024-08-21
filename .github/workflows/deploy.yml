@@ -1,4 +1,4 @@
-name: Deploy to Fly.io
+name: deploy
 
 # on:
 #   push:
@@ -27,16 +27,16 @@ jobs:
         run: yarn install
 
       - name: Set up Supabase CLI
-      - uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@v1
 
       - name: Supabase Link
-      - run: supabase link --project-ref $SUPABASE_PROJECT_ID
+        run: supabase link --project-ref $SUPABASE_PROJECT_ID
 
       - name: Migrate database
-      - run: supabase db push
+        run: supabase db push
 
       - name: Set up Fly.io CLI
-      - uses: superfly/flyctl-actions/setup-flyctl@master
+        uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly.io
-      - run: flyctl deploy --remote-only
+        run: flyctl deploy --remote-only
