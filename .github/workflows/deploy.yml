@@ -1,0 +1,41 @@
+name: Deploy to Fly.io
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18" # Remixに対応するNode.jsのバージョンを指定
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Remix app
+        run: npm run build
+
+      - name: Provision Supabase
+        run: |
+          # Supabase CLIのインストール
+          npm install -g supabase
+          # Supabaseプロジェクトの設定
+          supabase login --token ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          supabase db push  # データベーススキーマのマイグレーション
+
+      - name: Deploy to Fly.io
+        run: |
+          # Fly.io CLIのインストール
+          curl -L https://fly.io/install.sh | sh
+          # Fly.ioにログイン
+          fly auth login --access-token ${{ secrets.FLY_ACCESS_TOKEN }}
+          # Fly.ioアプリのデプロイ
+          fly deploy
