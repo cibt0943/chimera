@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 import {
   Tasks,
   Task,
@@ -9,13 +10,32 @@ import {
 import { supabase } from '~/lib/supabase-client.server'
 
 // タスク一覧を取得
-export async function getTasks(accountId: string): Promise<Tasks> {
-  const { data, error } = await supabase
+interface GetTasksOptionParams {
+  dueDateStart?: Date
+  dueDateEnd?: Date
+}
+export async function getTasks(
+  accountId: string,
+  options?: GetTasksOptionParams,
+): Promise<Tasks> {
+  const { dueDateStart, dueDateEnd } = options || {}
+
+  let query = supabase
     .from('tasks')
     .select()
     .eq('account_id', accountId)
     .order('position', { ascending: false })
     .order('id')
+
+  if (dueDateStart) {
+    query = query.gt('due_date', format(dueDateStart, 'yyyy-MM-dd'))
+  }
+
+  if (dueDateEnd) {
+    query = query.lt('due_date', format(dueDateEnd, 'yyyy-MM-dd'))
+  }
+
+  const { data, error } = await query
   if (error) throw error
 
   const tasks = data.map((task) => {

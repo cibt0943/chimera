@@ -29,7 +29,6 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
   if (submission.status !== 'success') {
     throw new Error('Invalid submission data.')
-    // return json({ result: submission.reply() }, { status: 422 })
   }
 
   const data = submission.value
@@ -55,10 +54,9 @@ type LoaderData = {
 
 export const loader = withAuthentication(async ({ loginSession }) => {
   const memoSettings = await getOrInsertMemoSettings(loginSession.account.id)
-  const memos = await getMemos(
-    loginSession.account.id,
-    memoSettings.listFilter.statuses,
-  )
+  const memos = await getMemos(loginSession.account.id, {
+    statuses: memoSettings.listFilter.statuses,
+  })
 
   return typedjson({
     memos,

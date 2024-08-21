@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 import {
   Events,
   Event,
@@ -8,12 +9,31 @@ import {
 import { supabase } from '~/lib/supabase-client.server'
 
 // イベント一覧を取得
-export async function getEvents(accountId: string): Promise<Events> {
-  const { data, error } = await supabase
+interface GetEventsOptionParams {
+  startDateStart?: Date
+  startDateEnd?: Date
+}
+export async function getEvents(
+  accountId: string,
+  options?: GetEventsOptionParams,
+): Promise<Events> {
+  const { startDateStart, startDateEnd } = options || {}
+
+  let query = supabase
     .from('events')
     .select()
     .eq('account_id', accountId)
     .order('id')
+
+  if (startDateStart) {
+    query = query.gt('start_datetime', format(startDateStart, 'yyyy-MM-dd'))
+  }
+
+  if (startDateEnd) {
+    query = query.lt('start_datetime', format(startDateEnd, 'yyyy-MM-dd'))
+  }
+
+  const { data, error } = await query
   if (error) throw error
 
   const events = data.map((event) => {

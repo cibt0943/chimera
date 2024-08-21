@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 import {
   Memos,
   Memo,
@@ -10,18 +11,37 @@ import {
 import { supabase } from '~/lib/supabase-client.server'
 
 // メモ一覧を取得
+interface GetMemosOptionParams {
+  statuses?: MemoStatus[]
+  relatedDateStart?: Date
+  relatedDateEnd?: Date
+}
 export async function getMemos(
   accountId: string,
-  statuses?: MemoStatus[],
+  options?: GetMemosOptionParams,
 ): Promise<Memos> {
-  if (!statuses) statuses = [MemoStatus.NOMAL, MemoStatus.ARCHIVED]
-  const { data, error } = await supabase
+  const { statuses, relatedDateStart, relatedDateEnd } = options || {}
+
+  let query = supabase
     .from('memos')
     .select()
     .eq('account_id', accountId)
-    .in('status', statuses)
     .order('position', { ascending: false })
     .order('id')
+
+  if (statuses) {
+    query = query.in('status', statuses)
+  }
+
+  if (relatedDateStart) {
+    query = query.gt('related_date', format(relatedDateStart, 'yyyy-MM-dd'))
+  }
+
+  if (relatedDateEnd) {
+    query = query.lt('related_date', format(relatedDateEnd, 'yyyy-MM-dd'))
+  }
+
+  const { data, error } = await query
   if (error) throw error
 
   const memos = data.map((memo) => {
