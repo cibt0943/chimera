@@ -39,4 +39,5 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly.io
+        working-directory: chimera-app
         run: flyctl deploy --remote-only
