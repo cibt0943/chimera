@@ -35,5 +35,7 @@ RUN yarn run build
 # Remove development dependencies
 RUN yarn install --production=true
 
+RUN  rm -rf /var/lib/apt/lists/*
+
 # Start the server by default, this can be overwritten at runtime
 CMD [ "yarn", "run", "start" ]
