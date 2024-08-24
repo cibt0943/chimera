@@ -1,4 +1,4 @@
-import { useIsomorphicLayoutEffect } from '~/lib/useIsomorphic-layout-effect'
+import { useIsomorphicLayoutEffect } from '~/lib/hooks'
 import { Theme } from '~/types/accounts'
 
 // テーマ設定

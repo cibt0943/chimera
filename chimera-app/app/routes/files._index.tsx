@@ -12,7 +12,6 @@ export const loader = withAuthentication(async ({ loginSession }) => {
 export default function Index() {
   return (
     <div>
-      <h1 className="mb-4 text-xl font-bold">File</h1>
       <div className="text-l mb-8 font-bold">
         This feature is under development. Please check back later.
       </div>

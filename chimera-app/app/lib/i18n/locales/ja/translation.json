@@ -65,8 +65,7 @@
     }
   },
   "account": {
-    "title-account": "アカウント",
-    "title-password": "パスワード",
+    "menu_label": "アカウント設定",
     "model": {
       "email": "メールアドレス",
       "name": "名前",
@@ -85,23 +84,25 @@
       }
     },
     "message": {
+      "general": "一般",
+      "password": "パスワード",
       "need_login": "この機能を利用するにはログインする必要があります",
       "login": "ログイン",
       "logout": "ログアウト",
       "account_deletion": "アカウントの削除",
-      "account_info": "アカウントの情報を設定してください",
-      "password_info": "パスワードを変更することができます",
       "do_delete": "アカウントを削除する",
       "change_password": "パスワードを変更する",
       "last_login": "最終ログイン日時",
       "last_password_change": "最終パスワード変更日時",
-      "changed_password_title": "パスワード変更メールを送信しました",
+      "changed_password_info": "パスワード変更メールを送信しました",
       "changed_password_description": "メールを確認してください。メールに記載されたURLよりパスワード変更を行うことができます。",
       "updated": "アカウントを更新しました"
     }
   },
+  "todo": {
+    "menu_label": "Todo"
+  },
   "task": {
-    "title": "タスク",
     "model": {
       "id": "ID",
       "title": "タイトル",
@@ -134,8 +135,7 @@
     }
   },
   "memo": {
-    "title": "メモ",
-    "un_titled": "無題",
+    "menu_label": "Memo",
     "model": {
       "id": "ID",
       "title": "タイトル",
@@ -149,6 +149,7 @@
       }
     },
     "message": {
+      "un_titled": "無題",
       "memo_creation": "メモの作成",
       "memo_editing": "メモの編集",
       "memo_deletion": "メモの削除",
@@ -162,7 +163,6 @@
     }
   },
   "memo_settings": {
-    "title": "環境設定",
     "message": {
       "list_show_archived": "リストにアーカイブ済みのメモを表示する",
       "list_show_content": "リストにメモ内容のプレビューを表示する",
@@ -170,7 +170,7 @@
     }
   },
   "event": {
-    "title": "イベント",
+    "menu_label": "Event",
     "model": {
       "id": "ID",
       "title": "タイトル",
@@ -181,10 +181,21 @@
       "location": "場所"
     },
     "message": {
+      "event": "イベント",
+      "event_en": "Event",
       "event_creation": "イベントの作成",
       "event_editing": "イベントの編集",
       "event_deletion": "イベントの削除",
       "set_event_info": "イベントの情報を設定してください"
     }
+  },
+  "daily_note": {
+    "menu_label": "Daily Note"
+  },
+  "file": {
+    "menu_label": "File"
+  },
+  "reminder": {
+    "menu_label": "Reminder"
   }
 }

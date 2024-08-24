@@ -18,10 +18,10 @@ export default function AccountSettings() {
   return (
     <div>
       <div className="space-y-6">
-        <h2 className="text-xl font-bold">{t('account.title-password')}</h2>
+        <h2 className="text-xl font-bold">{t('account.message.password')}</h2>
         <Alert>
           <RiMailSendLine className="h-4 w-4" />
-          <AlertTitle>{t('account.message.changed_password_title')}</AlertTitle>
+          <AlertTitle>{t('account.message.changed_password_info')}</AlertTitle>
           <AlertDescription>
             {t('account.message.changed_password_description')}
           </AlertDescription>

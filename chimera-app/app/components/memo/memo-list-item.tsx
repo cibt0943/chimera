@@ -5,8 +5,8 @@ import { format } from 'date-fns'
 import { RiArchiveLine } from 'react-icons/ri'
 import { CSS } from '@dnd-kit/utilities'
 import { useSortable } from '@dnd-kit/sortable'
-// import { cn, useDateDiffFormat } from '~/lib/utils'
-import { cn, useAgoFormat } from '~/lib/utils'
+import { cn } from '~/lib/utils'
+import { useAgoFormat } from '~/lib/hooks'
 import { Memo, MemoStatus } from '~/types/memos'
 
 function NavLinkClassName({
@@ -87,7 +87,9 @@ export function ListItem(props: ListItemProps) {
       role="listitem"
     >
       <div className="flex items-center">
-        <div className="line-clamp-1">{item.title || t('memo.un_titled')}</div>
+        <div className="line-clamp-1">
+          {item.title || t('memo.message.un_titled')}
+        </div>
         <div className="ml-auto">{children}</div>
       </div>
       {isPreview && (

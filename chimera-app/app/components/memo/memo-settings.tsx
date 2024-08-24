@@ -21,11 +21,11 @@ export function MemoSettings() {
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="hidden h-8 px-2 lg:flex">
           <RiListSettingsLine className="h-4 w-4 text-primary/80" />
-          <span className="sr-only">{t('memo_settings.title')}</span>
+          <span className="sr-only">{t('common.message.settings')}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] space-y-4">
-        <h4 className="font-medium">{t('memo_settings.title')}</h4>
+        <h4 className="font-medium">{t('common.message.settings')}</h4>
         <ShowArchivedSwith />
         <ShowContentSwith />
         <AutoSaveSwith />

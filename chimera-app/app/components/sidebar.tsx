@@ -1,26 +1,12 @@
 import { NavLink } from '@remix-run/react'
+import { useTranslation } from 'react-i18next'
 import { PiHandFistBold } from 'react-icons/pi'
-import {
-  RxCheckCircled,
-  RxPencil2,
-  RxCalendar,
-  RxFile,
-  RxPaperPlane,
-} from 'react-icons/rx'
-import { RiBook3Line } from 'react-icons/ri'
 import { buttonVariants } from '~/components/ui/button'
-import {
-  TODO_URL,
-  MEMO_URL,
-  EVENT_URL,
-  DAILY_NOTE_URL,
-  FILE_URL,
-  REMINDER_URL,
-} from '~/constants'
 import { cn } from '~/lib/utils'
+import { MenuList } from '~/lib/menu'
 import { AccountMenu } from '~/components/account-menu'
 
-type NavLinkClassNameProps = {
+interface NavLinkClassNameProps {
   isActive: boolean
   isPending: boolean
 }
@@ -35,7 +21,7 @@ function NavLinkClassName({ isActive, isPending }: NavLinkClassNameProps) {
   )
 }
 
-type CustomNavLinkProps = {
+interface CustomNavLinkProps {
   to: string
   children: React.ReactNode
 }
@@ -57,6 +43,8 @@ function CustomNavLink({ to, children }: CustomNavLinkProps) {
 }
 
 export function Sidebar() {
+  const { t } = useTranslation()
+
   return (
     <div className="flex h-screen w-44 flex-col justify-between px-2">
       <div className="overflow-auto">
@@ -69,30 +57,12 @@ export function Sidebar() {
           </h1>
         </div>
         <div className="grid gap-1 p-px">
-          <CustomNavLink to={TODO_URL}>
-            <RxCheckCircled className="mr-2 h-5 w-5" />
-            Todo
-          </CustomNavLink>
-          <CustomNavLink to={MEMO_URL}>
-            <RxPencil2 className="mr-2 h-5 w-5" />
-            Memo
-          </CustomNavLink>
-          <CustomNavLink to={EVENT_URL}>
-            <RxCalendar className="mr-2 h-5 w-5" />
-            Event
-          </CustomNavLink>
-          <CustomNavLink to={DAILY_NOTE_URL}>
-            <RiBook3Line className="mr-2 h-5 w-5" />
-            Daily Note
-          </CustomNavLink>
-          <CustomNavLink to={FILE_URL}>
-            <RxFile className="mr-2 h-5 w-5" />
-            File
-          </CustomNavLink>
-          <CustomNavLink to={REMINDER_URL}>
-            <RxPaperPlane className="mr-2 h-5 w-5" />
-            Reminder
-          </CustomNavLink>
+          {MenuList.map((menu, index) => (
+            <CustomNavLink to={menu.url} key={index}>
+              <menu.icon className="mr-2 h-5 w-5" />
+              {t(menu.title)}
+            </CustomNavLink>
+          ))}
         </div>
       </div>
       <div className="mx-2 mb-4">

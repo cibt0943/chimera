@@ -34,7 +34,7 @@ export function MemoDeleteConfirmDialog({
   const action = [MEMO_URL, memo.id, 'delete'].join('/')
   const desc =
     '「' +
-    (memo.title || t('memo.un_titled')) +
+    (memo.title || t('memo.message.un_titled')) +
     '」' +
     t('common.message.confirm_deletion')
 
