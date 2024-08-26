@@ -181,47 +181,45 @@ export function Calendar({ defaultEvents }: CalendarProps) {
     searchParams.get('start') || format(startOfMonth(new Date()), 'yyyy-MM-dd')
 
   return (
-    <>
-      <div className="h-[calc(100vh_-_50px)]">
-        <FullCalendar
-          plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
-          height={'100%'}
-          locales={allLocales}
-          locale={i18n.language}
-          headerToolbar={{
-            left: 'prev today next',
-            center: 'title',
-            right: 'dayGridMonth dayGridWeek listMonth',
-          }}
-          datesSet={handleDatesSet}
-          initialView={viewMode}
-          initialDate={startDate}
-          viewClassNames={['text-sm', 'text-muted-foreground']}
-          editable={true}
-          selectable={true}
-          select={handleSelect}
-          dayHeaderClassNames={() => ['font-normal']}
-          dayCellContent={(arg) => arg.dayNumberText.replace('日', '')}
-          events={defaultEvents}
-          eventContent={renderEventContent}
-          eventTimeFormat={{ hour: 'numeric', minute: '2-digit' }}
-          displayEventEnd={true}
-          eventInteractive={true}
-          eventClassNames={() => ['text-primary']}
-          eventTextColor="black"
-          eventClick={handleEventClick}
-          eventDataTransform={transformEventData}
-          eventDrop={handleEventDrop}
-          eventResize={handleEventResize}
-        />
-      </div>
+    <div className="h-[calc(100dvh_-_84px)] lg:h-[calc(100dvh_-_32px)]">
+      <FullCalendar
+        plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
+        height={'100%'}
+        locales={allLocales}
+        locale={i18n.language}
+        headerToolbar={{
+          left: 'prev today next',
+          center: 'title',
+          right: 'dayGridMonth dayGridWeek listMonth',
+        }}
+        datesSet={handleDatesSet}
+        initialView={viewMode}
+        initialDate={startDate}
+        viewClassNames={['text-sm', 'text-muted-foreground']}
+        editable={true}
+        selectable={true}
+        select={handleSelect}
+        dayHeaderClassNames={() => ['font-normal']}
+        dayCellContent={(arg) => arg.dayNumberText.replace('日', '')}
+        events={defaultEvents}
+        eventContent={renderEventContent}
+        eventTimeFormat={{ hour: 'numeric', minute: '2-digit' }}
+        displayEventEnd={true}
+        eventInteractive={true}
+        eventClassNames={() => ['text-primary']}
+        eventTextColor="black"
+        eventClick={handleEventClick}
+        eventDataTransform={transformEventData}
+        eventDrop={handleEventDrop}
+        eventResize={handleEventResize}
+      />
       <EventFormDialogMemo
         event={actionEvent}
         isOpen={isOpenEventDialog}
         setIsOpen={setIsOpenEventDialog}
         returnUrl={EVENT_URL + location.search}
       />
-    </>
+    </div>
   )
 }
 

@@ -17,9 +17,10 @@ import { Toaster } from '~/components/ui/toaster'
 import styles from '~/styles/tailwind.css'
 import i18n, { useChangeLanguage } from '~/lib/i18n/i18n'
 import { authenticator } from '~/lib/auth.server'
-import { useTheme } from './lib/useTheme'
+import { useTheme } from './lib/hooks'
 import { Theme, Language } from '~/types/accounts'
 import { LoadingEffect } from '~/components/loading-effect'
+import { Navbar } from '~/components/navbar'
 import { Sidebar } from '~/components/sidebar'
 import { useSetAtom } from 'jotai'
 import { loginSessionAtom } from '~/lib/state'
@@ -97,17 +98,20 @@ export default function App() {
         <style data-fullcalendar />
         <Links />
       </head>
-      <body>
+      <body className="overflow-y-hidden">
         <I18nextProvider i18n={i18n}>
           <div className="flex">
-            <aside className="">
+            <aside className="h-screen overflow-auto">
               <Sidebar />
             </aside>
-            <main className="h-screen grow overflow-auto">
-              <LoadingEffect>
-                <Outlet />
-              </LoadingEffect>
-            </main>
+            <div className="h-screen flex-1 overflow-auto">
+              <Navbar />
+              <main>
+                <LoadingEffect>
+                  <Outlet />
+                </LoadingEffect>
+              </main>
+            </div>
             <Toaster />
             <Sonner closeButton />
           </div>

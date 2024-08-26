@@ -1,4 +1,3 @@
-import { MetaFunction } from '@remix-run/node'
 import { redirectWithSuccess } from 'remix-toast'
 import { parseWithZod } from '@conform-to/zod'
 import { ACCOUNT_URL } from '~/constants'
@@ -8,10 +7,6 @@ import { authenticator } from '~/lib/auth.server'
 import { updateAuth0User } from '~/lib/auth0-api.server'
 import { getSession, commitSession } from '~/lib/session.server'
 import { AccountGeneralSchema } from '~/types/accounts'
-
-export const meta: MetaFunction = () => {
-  return [{ title: 'Account settings | Kobushi' }]
-}
 
 export const action = withAuthentication(async ({ request, loginSession }) => {
   const account = await getAccount(loginSession.account.id)

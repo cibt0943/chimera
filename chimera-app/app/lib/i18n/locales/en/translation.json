@@ -65,7 +65,7 @@
     }
   },
   "account": {
-    "menu_label": "Account Settings",
+    "page_title": "Account Settings",
     "model": {
       "email": "Email",
       "name": "Name",
@@ -100,7 +100,8 @@
     }
   },
   "todo": {
-    "menu_label": "Todo"
+    "menu_label": "Todo",
+    "page_title": "Todo"
   },
   "task": {
     "model": {
@@ -136,6 +137,7 @@
   },
   "memo": {
     "menu_label": "Memo",
+    "page_title": "Memo",
     "model": {
       "id": "ID",
       "title": "Title",
@@ -172,6 +174,7 @@
   },
   "event": {
     "menu_label": "Event",
+    "page_title": "Event",
     "model": {
       "id": "ID",
       "title": "Title",
@@ -189,21 +192,15 @@
     }
   },
   "daily_note": {
-    "message": {
-      "daily_note": "Daily Note",
-      "daily_note_en": "Daily Note"
-    }
+    "menu_label": "Daily Note",
+    "page_title": "Daily Note"
   },
   "file": {
-    "message": {
-      "file": "File",
-      "file_en": "File"
-    }
+    "menu_label": "File",
+    "page_title": "File"
   },
   "reminder": {
-    "message": {
-      "reminder": "Reminder",
-      "reminder_en": "Reminder"
-    }
+    "menu_label": "Reminder",
+    "page_title": "Reminder"
   }
 }

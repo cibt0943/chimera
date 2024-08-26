@@ -106,7 +106,7 @@ function MemoForm({
         <TextareaConform
           meta={fields.content}
           key={fields.content.key}
-          className="h-[calc(100vh_-_360px)] resize-none bg-[#303841] text-white focus-visible:ring-0"
+          className="h-[calc(100dvh_-_360px)] resize-none bg-[#303841] text-white focus-visible:ring-0"
         />
         <FormMessage message={fields.content.errors} />
       </FormItem>

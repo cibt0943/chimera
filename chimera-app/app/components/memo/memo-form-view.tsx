@@ -13,7 +13,7 @@ import {
 } from '~/components/lib/form'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
-import { useDebounce, useQueue } from '~/lib/hooks'
+import { useDebounce, useApiQueue } from '~/lib/hooks'
 import { Memo } from '~/types/memos'
 import { useMemoConform } from './memo-conform'
 import { MemoActionButton } from './memo-action-button'
@@ -27,7 +27,7 @@ interface MemoFormViewProps {
 export function MemoFormView({ memo }: MemoFormViewProps) {
   const { t } = useTranslation()
   const formRef = React.useRef<HTMLFormElement>(null)
-  const { enqueue } = useQueue()
+  const { enqueue } = useApiQueue()
   const memoFormFetcher = useFetcher({ key: 'memo-form' })
 
   const memoSettings = useAtomValue(memoSettingsAtom)
@@ -110,7 +110,7 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
           <TextareaConform
             meta={fields.content}
             key={fields.content.key}
-            className="h-[calc(100vh_-_216px)] resize-none bg-[#303841] text-white focus-visible:ring-0"
+            className="h-[calc(100dvh_-_268px)] resize-none bg-[#303841] text-white focus-visible:ring-0"
           />
           <FormMessage message={fields.content.errors} />
         </FormItem>

@@ -11,6 +11,8 @@ export function sleep(waitMsec: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, waitMsec))
 }
 
+export const isBrowser = typeof window !== 'undefined'
+
 // date-fnsのlocaleを取得
 export function getLocale(locale: string): Locale {
   locale = locale.replaceAll('-', '')

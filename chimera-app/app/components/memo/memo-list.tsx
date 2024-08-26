@@ -22,7 +22,7 @@ import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
 import { API_URL, MEMO_URL } from '~/constants'
-import { useDebounce, useQueue } from '~/lib/hooks'
+import { useDebounce, useApiQueue } from '~/lib/hooks'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
 import { ListItem } from './memo-list-item'
 import { MemoActionMenu } from './memo-action-menu'
@@ -38,8 +38,8 @@ interface MemoListProps {
 
 export function MemoList({ defaultMemos, showId }: MemoListProps) {
   const { t } = useTranslation()
-  const { enqueue: searchEnqueue } = useQueue()
-  const { enqueue: moveMemoEnqueue } = useQueue()
+  const { enqueue: searchEnqueue } = useApiQueue()
+  const { enqueue: moveMemoEnqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const sensors = useSensors(
@@ -308,7 +308,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
         />
         <MemoSettings />
       </div>
-      <ScrollArea className="h-[calc(100vh_-_115px)]">
+      <ScrollArea className="h-[calc(100dvh_-_167px)] lg:h-[calc(100dvh_-_115px)]">
         <DndContext
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}

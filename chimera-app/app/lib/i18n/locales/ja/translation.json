@@ -65,7 +65,7 @@
     }
   },
   "account": {
-    "menu_label": "アカウント設定",
+    "page_title": "アカウント設定",
     "model": {
       "email": "メールアドレス",
       "name": "名前",
@@ -100,7 +100,8 @@
     }
   },
   "todo": {
-    "menu_label": "Todo"
+    "menu_label": "Todo",
+    "page_title": "Todo"
   },
   "task": {
     "model": {
@@ -136,6 +137,7 @@
   },
   "memo": {
     "menu_label": "Memo",
+    "page_title": "Memo",
     "model": {
       "id": "ID",
       "title": "タイトル",
@@ -171,6 +173,7 @@
   },
   "event": {
     "menu_label": "Event",
+    "page_title": "Event",
     "model": {
       "id": "ID",
       "title": "タイトル",
@@ -190,12 +193,15 @@
     }
   },
   "daily_note": {
-    "menu_label": "Daily Note"
+    "menu_label": "Daily Note",
+    "page_title": "Daily Note"
   },
   "file": {
-    "menu_label": "File"
+    "menu_label": "File",
+    "page_title": "File"
   },
   "reminder": {
-    "menu_label": "Reminder"
+    "menu_label": "Reminder",
+    "page_title": "Reminder"
   }
 }

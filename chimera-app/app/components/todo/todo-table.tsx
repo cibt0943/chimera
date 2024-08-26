@@ -49,7 +49,7 @@ import { Button } from '~/components/ui/button'
 import { ToastAction } from '~/components/ui/toast'
 import { useToast } from '~/components/ui/use-toast'
 import { API_URL, TODO_URL } from '~/constants'
-import { useDebounce, useQueue, useIsLoading } from '~/lib/hooks'
+import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
 import { TodoTableColumns } from './todo-table-columns'
@@ -75,7 +75,7 @@ interface TodoTableProps<TData extends RowData> {
 
 export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const { t } = useTranslation()
-  const { enqueue } = useQueue()
+  const { enqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const { toast } = useToast()

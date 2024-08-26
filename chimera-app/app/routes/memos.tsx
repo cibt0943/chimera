@@ -77,7 +77,7 @@ export default function Layout() {
   const { memoId } = params
 
   return (
-    <div className="h-screen p-4">
+    <div className="p-4 pt-0 lg:pt-4">
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
         <ResizablePanel defaultSize={35}>
           <MemoList defaultMemos={memos} showId={memoId || ''} />
