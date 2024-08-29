@@ -24,19 +24,23 @@ import { Button } from '~/components/ui/button'
 import { API_URL, MEMO_URL } from '~/constants'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
+import { MemoSettings } from '~/types/memo-settings'
 import { ListItem } from './memo-list-item'
 import { MemoActionMenu } from './memo-action-menu'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
-import { MemoSettings } from './memo-settings'
-import { useAtomValue } from 'jotai'
-import { memoSettingsAtom } from '~/lib/state'
+import { MemoSettingsForm } from './memo-settings-form'
 
 interface MemoListProps {
   defaultMemos: Memos
   showId: string
+  memoSettings: MemoSettings
 }
 
-export function MemoList({ defaultMemos, showId }: MemoListProps) {
+export function MemoList({
+  defaultMemos,
+  showId,
+  memoSettings,
+}: MemoListProps) {
   const { t } = useTranslation()
   const { enqueue: searchEnqueue } = useApiQueue()
   const { enqueue: moveMemoEnqueue } = useApiQueue()
@@ -50,8 +54,6 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     }),
     useSensor(TouchSensor, {}),
   )
-
-  const memoSettings = useAtomValue(memoSettingsAtom)
 
   // メモ一覧データ
   const [memos, setMemos] = React.useState(defaultMemos)
@@ -278,6 +280,8 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     },
   )
 
+  const isPrevew = !!memoSettings.listDisplay.content
+
   return (
     <div className="space-y-4 px-1 py-4">
       <div className="flex items-center space-x-2 px-3">
@@ -306,7 +310,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
           className="h-8"
           id="memos-title-search"
         />
-        <MemoSettings />
+        <MemoSettingsForm />
       </div>
       <ScrollArea className="h-[calc(100dvh_-_167px)] lg:h-[calc(100dvh_-_115px)]">
         <DndContext
@@ -328,7 +332,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
                     item={item}
                     setFocusedMemo={setFocusedMemo}
                     isSelected={item.id === selectedMemo?.id}
-                    isPreview={!!memoSettings?.listDisplay.content}
+                    isPreview={isPrevew}
                   >
                     <MemoActionMenu
                       memo={item}

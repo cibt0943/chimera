@@ -8,6 +8,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { cn } from '~/lib/utils'
 import { useAgoFormat } from '~/lib/hooks'
 import { Memo, MemoStatus } from '~/types/memos'
+import { MEMO_URL } from '~/constants'
 
 function NavLinkClassName({
   item,
@@ -71,11 +72,14 @@ export function ListItem(props: ListItemProps) {
 
   // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
   const updatedAtDiff = useAgoFormat(item.updatedAt)
+  const updatedAt = format(item.updatedAt, t('common.format.date_time_format'))
+  const to = [MEMO_URL, item.id].join('/')
+  const title = item.title || t('memo.message.un_titled')
 
   return (
     <NavLink
       className={NavLinkClassName({ item, isSelected })}
-      to={`/memos/${item.id}`}
+      to={to}
       id={`memo-${item.id}`}
       onFocus={() => {
         setFocusedMemo(item)
@@ -87,40 +91,23 @@ export function ListItem(props: ListItemProps) {
       role="listitem"
     >
       <div className="flex items-center">
-        <div className="line-clamp-1">
-          {item.title || t('memo.message.un_titled')}
-        </div>
+        <div className="line-clamp-1">{title}</div>
         <div className="ml-auto">{children}</div>
       </div>
-      {isPreview && (
-        <div className="line-clamp-2 text-xs text-muted-foreground">
-          {item.content.substring(0, 300)}
-        </div>
-      )}
+      <div className="line-clamp-2 text-xs text-muted-foreground">
+        {isPreview && item.content.substring(0, 300)}
+      </div>
       <div className="flex items-center justify-between space-x-2">
         <div>
           {item.status === MemoStatus.ARCHIVED && (
             <RiArchiveLine className="mr-2 h-4 w-4" />
           )}
         </div>
-        <ClientOnly
-          fallback={
-            <div className="ml-auto text-xs text-muted-foreground">&nbsp;</div>
-          }
-        >
-          {() => (
-            <div
-              className="ml-auto text-xs text-muted-foreground"
-              // 下記を表示するとエラーが発生する。サーバーサイドとクライアントで時間側が異なるためと思われる。
-              title={format(
-                item.updatedAt,
-                t('common.format.date_time_format'),
-              )}
-            >
-              {updatedAtDiff}
-            </div>
-          )}
-        </ClientOnly>
+        <div className="ml-auto text-xs text-muted-foreground">
+          <ClientOnly fallback={<span>&nbsp;</span>}>
+            {() => <span title={updatedAt}>{updatedAtDiff}</span>}
+          </ClientOnly>
+        </div>
       </div>
     </NavLink>
   )

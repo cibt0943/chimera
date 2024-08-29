@@ -67,7 +67,7 @@ export const loader = withAuthentication(async ({ loginSession }) => {
 export default function Layout() {
   const { memos, memoSettings } = useTypedLoaderData<LoaderData>()
 
-  // ログインユーザーのアカウント情報をグローバルステートに保存
+  // ログインユーザーのメモ設定情報をグローバルステートに保存
   const setMemoSettings = useSetAtom(memoSettingsAtom)
   React.useEffect(() => {
     setMemoSettings(memoSettings)
@@ -80,7 +80,11 @@ export default function Layout() {
     <div className="p-4 pt-1 lg:pt-4">
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
         <ResizablePanel defaultSize={35}>
-          <MemoList defaultMemos={memos} showId={memoId || ''} />
+          <MemoList
+            defaultMemos={memos}
+            showId={memoId || ''}
+            memoSettings={memoSettings}
+          />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={65}>

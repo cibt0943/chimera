@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useFetcher } from '@remix-run/react'
+import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { getFormProps } from '@conform-to/react'
@@ -13,6 +14,7 @@ import {
 } from '~/components/lib/form'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
+import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
 import { Memo } from '~/types/memos'
 import { useMemoConform } from './memo-conform'
@@ -115,16 +117,27 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
           <FormMessage message={fields.content.errors} />
         </FormItem>
         <FormItem>
-          <DateTimePickerConform
-            dateMeta={fields.relatedDate}
-            allDayMeta={fields.relatedDateAllDay}
-            defaultAllDay={true}
-            includeAllDayComponent={true}
-            onChangeData={handleChangeMemo}
-            onChangeAllDay={handleChangeMemo}
-            placeholder={t('memo.model.related_date')}
-            className="w-52"
-          />
+          <ClientOnly
+            fallback={
+              <DummyDateTimePicker
+                placeholder={t('memo.model.related_date')}
+                className="w-52"
+              />
+            }
+          >
+            {() => (
+              <DateTimePickerConform
+                dateMeta={fields.relatedDate}
+                allDayMeta={fields.relatedDateAllDay}
+                defaultAllDay={true}
+                includeAllDayComponent={true}
+                onChangeData={handleChangeMemo}
+                onChangeAllDay={handleChangeMemo}
+                placeholder={t('memo.model.related_date')}
+                className="w-52"
+              />
+            )}
+          </ClientOnly>
           <FormMessage message={fields.relatedDate.errors} />
         </FormItem>
         <input type="hidden" name="returnUrl" value={action} />
@@ -150,45 +163,33 @@ function SaveButton({ isChangedMemo }: { isChangedMemo: boolean }) {
   const { t } = useTranslation()
   const memoFormFetcher = useFetcher({ key: 'memo-form' })
   const memoSettings = useAtomValue(memoSettingsAtom)
+  if (!memoSettings) return null
 
-  const isDisabled = memoSettings?.autoSave || !isChangedMemo
+  const caption =
+    memoFormFetcher.state === 'submitting'
+      ? t('common.message.state_saving')
+      : !isChangedMemo
+        ? t('common.message.state_saved')
+        : memoSettings.autoSave
+          ? t('common.message.state_save_wait')
+          : t('common.message.save')
 
-  let caption
-  switch (memoFormFetcher.state) {
-    case 'submitting':
-      caption = t('common.message.state_saving')
-      break
-    default:
-      caption = memoSettings?.autoSave ? (
-        isChangedMemo ? (
-          t('common.message.state_save_wait')
-        ) : (
-          t('common.message.state_saved')
-        )
-      ) : (
-        <SaveHotkeyIcon />
-      )
-      break
-  }
-
-  function SaveHotkeyIcon() {
-    if (memoSettings?.autoSave) return null
-
-    return (
-      <>
-        {t('common.message.save')}
-        <p className="ml-2 text-xs">
-          <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-            <span>⌥</span>s
-          </kbd>
-        </p>
-      </>
-    )
-  }
+  const isDisabled = memoSettings.autoSave || !isChangedMemo
 
   return (
     <Button type="submit" className="sm:w-32" disabled={isDisabled}>
       {caption}
+      {!memoSettings.autoSave && <SaveHotkeyIcon />}
     </Button>
+  )
+}
+
+function SaveHotkeyIcon() {
+  return (
+    <p className="ml-2 text-xs">
+      <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
+        <span>⌥</span>s
+      </kbd>
+    </p>
   )
 }

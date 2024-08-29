@@ -56,5 +56,5 @@ export const loader = withAuthentication(async ({ params, loginSession }) => {
 export default function Memo() {
   const { memo } = useTypedLoaderData<LoaderData>()
 
-  return <ClientOnly>{() => <MemoFormView memo={memo} />}</ClientOnly>
+  return <MemoFormView memo={memo} />
 }

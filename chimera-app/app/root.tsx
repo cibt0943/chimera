@@ -9,15 +9,14 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react'
-import { I18nextProvider, useTranslation } from 'react-i18next'
+import { I18nextProvider } from 'react-i18next'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { getToast } from 'remix-toast'
-import { Toaster as Sonner, toast as notify } from 'sonner'
 import { Toaster } from '~/components/ui/toaster'
 import styles from '~/styles/tailwind.css'
-import i18n, { useChangeLanguage } from '~/lib/i18n/i18n'
+import i18n, { useLanguage } from '~/lib/i18n/i18n'
 import { authenticator } from '~/lib/auth.server'
-import { useTheme } from './lib/hooks'
+import { useTheme, useSonner, Sonner } from './lib/hooks'
 import { Theme, Language } from '~/types/accounts'
 import { LoadingEffect } from '~/components/loading-effect'
 import { Navbar } from '~/components/navbar'
@@ -61,13 +60,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function App() {
   const { loginSession, language, toast } = useTypedLoaderData<typeof loader>()
   const theme = loginSession?.account.theme || Theme.SYSTEM
-  const { t } = useTranslation()
 
   // useEffectにてOSのテーマ設定に合わせてテーマを変更
   useTheme(theme)
 
   // クライアントサイドでの言語設定
-  useChangeLanguage(language)
+  useLanguage(language)
 
   // ログインユーザーのアカウント情報をグローバルステートに保存
   const setLoginAccount = useSetAtom(loginSessionAtom)
@@ -76,15 +74,7 @@ export default function App() {
   }, [setLoginAccount, loginSession])
 
   // トーストメッセージを表示
-  React.useEffect(() => {
-    if (toast && toast.message !== '') {
-      if (toast.type === 'success') {
-        notify.success(t(toast.message))
-      } else {
-        notify.info(t(toast.message))
-      }
-    }
-  }, [toast, t])
+  useSonner(toast)
 
   return (
     <html lang={language} className={theme}>

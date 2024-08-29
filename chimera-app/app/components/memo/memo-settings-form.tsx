@@ -14,7 +14,7 @@ import { MemoStatus } from '~/types/memos'
 import { useAtomValue } from 'jotai'
 import { memoSettingsAtom } from '~/lib/state'
 
-export function MemoSettings() {
+export function MemoSettingsForm() {
   const { t } = useTranslation()
 
   return (
