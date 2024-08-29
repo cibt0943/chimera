@@ -9,6 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover'
+import { ACCOUNT_URL } from '~/constants'
 import { MemoStatus } from '~/types/memos'
 import { useAtomValue } from 'jotai'
 import { memoSettingsAtom } from '~/lib/state'
@@ -42,6 +43,8 @@ function ShowArchivedSwith() {
 
   // 表示するメモのフィルタ
   function updateMemoSettingStatusFilter(statuses: MemoStatus[]) {
+    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+
     fetcher.submit(
       {
         listFilter: {
@@ -49,7 +52,7 @@ function ShowArchivedSwith() {
         },
       },
       {
-        action: `/account/memo/settings`,
+        action: url,
         method: 'post',
         encType: 'application/json',
       },
@@ -91,6 +94,8 @@ function ShowContentSwith() {
 
   // 表示するメモのフィルタ
   function updateMemoSettingDisplayContent(isShow: boolean) {
+    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+
     fetcher.submit(
       {
         listDisplay: {
@@ -98,7 +103,7 @@ function ShowContentSwith() {
         },
       },
       {
-        action: `/account/memo/settings`,
+        action: url,
         method: 'post',
         encType: 'application/json',
       },
@@ -134,12 +139,14 @@ function AutoSaveSwith() {
 
   // 表示するメモのフィルタ
   function updateMemoSettingAutoSave(isAutoSave: boolean) {
+    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+
     fetcher.submit(
       {
         autoSave: isAutoSave,
       },
       {
-        action: `/account/memo/settings`,
+        action: url,
         method: 'post',
         encType: 'application/json',
       },

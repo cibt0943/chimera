@@ -103,7 +103,11 @@ export function ListItem(props: ListItemProps) {
             <RiArchiveLine className="mr-2 h-4 w-4" />
           )}
         </div>
-        <ClientOnly fallback={<div>&nbsp;</div>}>
+        <ClientOnly
+          fallback={
+            <div className="ml-auto text-xs text-muted-foreground">&nbsp;</div>
+          }
+        >
           {() => (
             <div
               className="ml-auto text-xs text-muted-foreground"

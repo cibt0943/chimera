@@ -415,7 +415,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         >
           <RiAddLine className="mr-2" />
           {t('common.message.add')}
-          <p className="ml-2 text-xs text-muted-foreground">
+          <p className="ml-2 hidden text-xs text-muted-foreground sm:block">
             <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
               <span>⌥</span>n
             </kbd>

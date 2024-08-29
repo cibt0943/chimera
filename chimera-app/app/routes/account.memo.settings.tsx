@@ -36,7 +36,7 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
     ...updateData,
   })
 
-  return json({ success: true, updatedMemoSettings })
+  return json({ memoSettings: updatedMemoSettings })
 })
 
 export const loader = withAuthentication(async ({ loginSession }) => {

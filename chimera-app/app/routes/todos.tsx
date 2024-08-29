@@ -51,7 +51,7 @@ export default function Layout() {
   const { todoId } = params
 
   return (
-    <div className="p-4 pt-0 lg:pt-4">
+    <div className="p-4 pt-1 lg:pt-4">
       <TodoTable defaultTasks={tasks} showId={todoId || ''} />
       <Outlet />
     </div>
