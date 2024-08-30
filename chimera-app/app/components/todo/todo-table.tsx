@@ -410,7 +410,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
       <div className="flex items-center space-x-2">
         <Button
           variant="secondary"
-          className="h-8 px-2 lg:px-3"
+          className="h-8 px-2 md:px-3"
           onClick={() => openAddTaskDialog()}
         >
           <RiAddLine className="mr-2" />

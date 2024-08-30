@@ -112,7 +112,7 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
           <TextareaConform
             meta={fields.content}
             key={fields.content.key}
-            className="h-[calc(100dvh_-_268px)] resize-none bg-[#303841] text-white focus-visible:ring-0"
+            className="h-[calc(100dvh_-_256px)] resize-none bg-[#303841] text-white focus-visible:ring-0 xl:h-[calc(100dvh_-_216px)]"
           />
           <FormMessage message={fields.content.errors} />
         </FormItem>

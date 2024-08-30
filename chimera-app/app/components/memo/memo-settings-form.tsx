@@ -20,7 +20,7 @@ export function MemoSettingsForm() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="hidden h-8 px-2 lg:flex">
+        <Button variant="outline" size="sm" className="flex h-8 px-2">
           <RiListSettingsLine className="h-4 w-4 text-primary/80" />
           <span className="sr-only">{t('common.message.settings')}</span>
         </Button>

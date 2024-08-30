@@ -55,7 +55,7 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-10 bg-background lg:hidden">
+    <header className="sticky top-0 z-10 bg-background xl:hidden">
       <div className="flex items-center space-x-2 px-4 py-2">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
@@ -83,7 +83,7 @@ export function Navbar() {
                 </div>
               </div>
               <div className="sticky bottom-0 bg-background p-4">
-                <AccountMenu />
+                <AccountMenu onSelect={handleLinkClick} />
               </div>
             </div>
           </SheetContent>

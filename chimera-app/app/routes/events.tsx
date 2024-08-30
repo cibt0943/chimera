@@ -108,7 +108,7 @@ export default function Layout() {
   const { calendarEvents } = useTypedLoaderData<LoaderData>()
 
   return (
-    <div className="p-4 pt-1 lg:pt-4">
+    <div className="p-4 pt-1 xl:pt-4">
       <Calendar defaultEvents={calendarEvents} />
       <Outlet />
     </div>

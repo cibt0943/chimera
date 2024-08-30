@@ -312,7 +312,7 @@ export function MemoList({
         />
         <MemoSettingsForm />
       </div>
-      <ScrollArea className="h-[calc(100dvh_-_167px)] lg:h-[calc(100dvh_-_115px)]">
+      <ScrollArea className="h-[calc(100dvh_-_155px)] xl:h-[calc(100dvh_-_115px)]">
         <DndContext
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}

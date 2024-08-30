@@ -25,7 +25,7 @@ export function TodoTableViewOptions<TData>({
         <Button
           variant="outline"
           size="sm"
-          className="ml-auto hidden h-8 md:inline-flex"
+          className="ml-auto hidden h-8 sm:inline-flex"
         >
           <RiEqualizerLine className="mr-2 h-4 w-4" />
           {t('task.message.view_settings')}

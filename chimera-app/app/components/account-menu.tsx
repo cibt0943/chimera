@@ -14,7 +14,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { useAtomValue } from 'jotai'
 import { loginSessionAtom } from '~/lib/state'
 
-export function AccountMenu() {
+interface AccountMenuProps {
+  onSelect?: (event: Event) => void
+}
+
+export function AccountMenu({ onSelect }: AccountMenuProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const fetcher = useFetcher()
@@ -46,7 +50,8 @@ export function AccountMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem
-            onClick={() => {
+            onSelect={(event: Event) => {
+              onSelect && onSelect(event)
               navigate(`/account/settings`)
             }}
           >
@@ -55,7 +60,7 @@ export function AccountMenu() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogoutClick}>
+        <DropdownMenuItem onSelect={handleLogoutClick}>
           <RiLogoutBoxRLine className="mr-2 h-4 w-4" />
           {t('account.message.logout')}
         </DropdownMenuItem>

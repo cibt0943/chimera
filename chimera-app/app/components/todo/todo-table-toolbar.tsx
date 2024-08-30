@@ -27,7 +27,7 @@ export function TodoTableToolbar<TData>({
           onChange={(event) =>
             table.getColumn('title')?.setFilterValue(event.target.value)
           }
-          className="h-8 w-[150px] lg:w-[250px]"
+          className="h-8 w-[155px] min-[420px]:w-[180px] md:w-[220px] lg:w-[250px]"
           id="tasks-title-search"
         />
         {table.getColumn('status') && (
