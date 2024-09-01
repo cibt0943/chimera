@@ -4,6 +4,7 @@ import { Outlet, useParams } from '@remix-run/react'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { parseWithZod } from '@conform-to/zod'
 import { MEMO_URL } from '~/constants'
+import { useMedia } from '~/lib/hooks'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { Memos, MemoSchema, MemoStatus } from '~/types/memos'
 import { MemoSettings } from '~/types/memo-settings'
@@ -76,8 +77,25 @@ export default function Layout() {
   const params = useParams()
   const { memoId } = params
 
+  const isLaptop = useMedia('(min-width: 1024px)', true)
+
+  if (!isLaptop) {
+    return (
+      <div className="p-4 pt-1 xl:pt-4">
+        <div className="rounded-lg border">
+          <MemoList
+            defaultMemos={memos}
+            showId={memoId || ''}
+            memoSettings={memoSettings}
+          />
+          <Outlet />
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="p-4 pt-1 lg:pt-4">
+    <div className="p-4 pt-1 xl:pt-4">
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
         <ResizablePanel defaultSize={35}>
           <MemoList

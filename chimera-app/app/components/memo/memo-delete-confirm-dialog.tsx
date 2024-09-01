@@ -59,7 +59,10 @@ export function MemoDeleteConfirmDialog({
         id="delete-memo-form"
         action={action}
         method="delete"
-        onSubmit={onSubmit}
+        onSubmit={(event) => {
+          event.stopPropagation()
+          onSubmit && onSubmit(event)
+        }}
       >
         <input type="hidden" name="returnUrl" value={returnUrl} />
       </Form>

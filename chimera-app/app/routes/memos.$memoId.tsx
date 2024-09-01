@@ -1,13 +1,15 @@
+import * as React from 'react'
 import { MetaFunction, redirect } from '@remix-run/node'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
-import { ClientOnly } from 'remix-utils/client-only'
 import { parseWithZod } from '@conform-to/zod'
 import { MEMO_URL } from '~/constants'
+import { useMedia } from '~/lib/hooks'
 import { withAuthentication } from '~/lib/auth-middleware'
 import type { Memo } from '~/types/memos'
 import { MemoSchema } from '~/types/memos'
 import { getMemo, updateMemo } from '~/models/memo.server'
 import { MemoFormView } from '~/components/memo/memo-form-view'
+import { MemoFormDialog } from '~/components/memo/memo-form-dialog'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: 'Memo ' + data?.memo.id + ' | Kobushi' }]
@@ -28,7 +30,7 @@ export const action = withAuthentication(
     const data = submission.value
 
     const [title, ...content] = (data.content || '').split('\n')
-    await updateMemo({
+    const updatedMemo = await updateMemo({
       id: memo.id,
       title: title,
       content: content.join('\n'),
@@ -36,9 +38,12 @@ export const action = withAuthentication(
       related_date_all_day: !!data.relatedDateAllDay,
     })
 
-    const redirectUrl =
-      (formData.get('returnUrl') as string) || [MEMO_URL, memo.id].join('/')
-    return redirect(redirectUrl)
+    const redirectUrl = formData.get('returnUrl') as string
+    if (redirectUrl) {
+      return redirect(redirectUrl)
+    }
+
+    return typedjson({ updatedMemo })
   },
 )
 
@@ -55,6 +60,20 @@ export const loader = withAuthentication(async ({ params, loginSession }) => {
 
 export default function Memo() {
   const { memo } = useTypedLoaderData<LoaderData>()
+  const isLaptop = useMedia('(min-width: 1024px)', true)
+  const [isOpenDialog, setIsOpenDialog] = React.useState(true)
+  const returnUrl = MEMO_URL
 
-  return <MemoFormView memo={memo} />
+  if (isLaptop) {
+    return <MemoFormView memo={memo} />
+  }
+
+  return (
+    <MemoFormDialog
+      memo={memo}
+      isOpen={isOpenDialog}
+      setIsOpen={setIsOpenDialog}
+      returnUrl={returnUrl}
+    />
+  )
 }

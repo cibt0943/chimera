@@ -37,7 +37,7 @@ export function MemoSettingsForm() {
 
 function ShowArchivedSwith() {
   const { t } = useTranslation()
-  const fetcher = useFetcher({ key: 'memo-settings' })
+  const fetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
   if (!memoSettings) return null
 
@@ -88,7 +88,7 @@ function ShowArchivedSwith() {
 
 function ShowContentSwith() {
   const { t } = useTranslation()
-  const fetcher = useFetcher({ key: 'memo-settings' })
+  const fetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
   if (!memoSettings) return null
 
@@ -133,7 +133,7 @@ function ShowContentSwith() {
 
 function AutoSaveSwith() {
   const { t } = useTranslation()
-  const fetcher = useFetcher({ key: 'memo-settings' })
+  const fetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
   if (!memoSettings) return null
 
