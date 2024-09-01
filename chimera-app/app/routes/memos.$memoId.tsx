@@ -62,10 +62,10 @@ export default function Memo() {
   const { memo } = useTypedLoaderData<LoaderData>()
   const isLaptop = useMedia('(min-width: 1024px)', true)
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
-  const returnUrl = MEMO_URL
 
   if (isLaptop) {
-    return <MemoFormView memo={memo} />
+    const returnUrl = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
+    return <MemoFormView memo={memo} returnUrl={returnUrl} />
   }
 
   return (
@@ -73,7 +73,7 @@ export default function Memo() {
       memo={memo}
       isOpen={isOpenDialog}
       setIsOpen={setIsOpenDialog}
-      returnUrl={returnUrl}
+      returnUrl={MEMO_URL}
     />
   )
 }

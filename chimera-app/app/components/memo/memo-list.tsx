@@ -58,30 +58,32 @@ export function MemoList({
   // メモ一覧データ
   const [memos, setMemos] = React.useState(defaultMemos)
 
+  // 一覧で選択しているメモ
+  const [selectedMemo, setSelectedMemo] = React.useState<Memo>()
+
+  // 一覧でフォーカスしているメモ
+  const [focusedMemo, setFocusedMemo] = React.useState<Memo>()
+
   // 検索文字列
   const [searchTerm, setSearchTerm] = React.useState('')
 
   // 編集・削除するメモ
   const [actionMemo, setActionMemo] = React.useState<Memo>()
 
+  // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
+  // メモ一覧要素参照用
   const useMemosRef = React.useRef<HTMLDivElement>(null)
+
+  // メモ追加ボタン参照用
   const useAddButtonRef = React.useRef<HTMLButtonElement>(null)
 
-  // フィルタリング後のメモ一覧データ更新（memosに依存した値なのでstateで持つ必要はないと考えメモ化した変数で対応）
+  // フィルタリング後のメモ一覧データ
   const dispMemos = React.useMemo(() => {
     if (!searchTerm) return memos
     return memos.filter((memo) => memo.title.toLowerCase().includes(searchTerm))
   }, [memos, searchTerm])
-
-  // 一覧で選択しているメモ（選択行はpropsのshowIdで特定されるためstateで持つ必要はないと考えメモ化した変数で対応）
-  const selectedMemo = React.useMemo(() => {
-    return memos.find((memo) => memo.id === showId)
-  }, [memos, showId])
-
-  // 一覧でフォーカスしているメモ
-  const [focusedMemo, setFocusedMemo] = React.useState(selectedMemo)
 
   // フィルタリング前のメモ一覧データ更新
   React.useEffect(() => {
@@ -90,9 +92,15 @@ export function MemoList({
 
   // focusedMemoに合わせてフォーカスを設定
   React.useEffect(() => {
-    if (!focusedMemo) return
     setListFocus(focusedMemo)
   }, [focusedMemo])
+
+  const targetId = showId ? showId : selectedMemo?.id
+  React.useEffect(() => {
+    const selectMemo = memos.find((memo) => memo.id === targetId)
+    setSelectedMemo(selectMemo)
+    setFocusedMemo(selectMemo)
+  }, [memos, targetId])
 
   // メモ一覧の検索
   async function searchMemos(searchTerm: string) {
@@ -183,7 +191,7 @@ export function MemoList({
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error'
       alert(msg)
-      navigate('.?refresh=true', { replace: true })
+      navigate('.', { replace: true })
     }
   }
 
@@ -206,13 +214,18 @@ export function MemoList({
     moveMemoEnqueue(() =>
       moveMemoApi(fromMemo, toMemo).catch((error) => {
         alert(error.message)
-        navigate('.?refresh=true', { replace: true })
+        navigate('.', { replace: true })
       }),
     )
   }, 300)
 
-  function setListFocus(memo: Memo) {
-    useMemosRef.current?.querySelector<HTMLElement>(`#memo-${memo.id}`)?.focus()
+  // 指定メモへフォーカスを設定
+  function setListFocus(memo: Memo | undefined, force = false) {
+    const targetMemo = memo ? memo : force ? dispMemos[0] : undefined
+    targetMemo &&
+      useMemosRef.current
+        ?.querySelector<HTMLElement>(`#memo-${targetMemo.id}`)
+        ?.focus()
   }
 
   // キーボード操作(スコープあり)
@@ -271,7 +284,7 @@ export function MemoList({
           break
         // フォーカスを一覧へ移動
         case 'left':
-          focusedMemo && setListFocus(focusedMemo)
+          setListFocus(focusedMemo, true)
           break
       }
     },
@@ -304,9 +317,7 @@ export function MemoList({
         <Input
           type="search"
           placeholder={t('memo.message.title_search')}
-          onChange={(event) => {
-            searchMemosDebounce(event.target.value)
-          }}
+          onChange={(event) => searchMemosDebounce(event.target.value)}
           className="h-8"
           id="memos-title-search"
         />

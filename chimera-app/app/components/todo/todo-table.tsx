@@ -102,9 +102,16 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
 
-  const [actionTask, setActionTask] = React.useState<Task>() // 編集・削除するタスク
+  // 編集・削除するタスク
+  const [actionTask, setActionTask] = React.useState<Task>()
+
+  // 追加用ダイアログの表示・非表示
   const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
+
+  // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
+
+  // tbody要素参照用
   const useTBodyRef = React.useRef<HTMLTableSectionElement>(null)
 
   const table = useReactTable({
@@ -158,8 +165,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   // 選択行にフォーカスを設定
   React.useEffect(() => {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
-    if (!nowSelectedRow) return
-    setListFocus(nowSelectedRow.original)
+    nowSelectedRow && setListFocus(nowSelectedRow.original)
   }, [table, rowSelection])
 
   // タスク追加ダイアログを開く
@@ -232,7 +238,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error'
       alert(msg)
-      navigate('.?refresh=true', { replace: true })
+      navigate('.', { replace: true })
     }
   }
 
@@ -336,6 +342,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     nowSelectedRow && openDeleteTaskDialog(nowSelectedRow.original)
   }
 
+  // 指定タスクへフォーカスを設定
   function setListFocus(task: Task) {
     useTBodyRef.current?.querySelector<HTMLElement>(`#row-${task.id}`)?.focus()
     // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
@@ -508,6 +515,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         task={undefined}
         isOpen={isOpenAddDialog}
         setIsOpen={setIsOpenAddDialog}
+        returnUrl={TODO_URL}
       />
       <TaskDeleteConfirmDialogMemo
         task={actionTask}

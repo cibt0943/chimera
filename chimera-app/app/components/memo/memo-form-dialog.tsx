@@ -34,12 +34,6 @@ export function MemoFormDialog({
   const memoSettings = useAtomValue(memoSettingsAtom)
   const autoSave = memoSettings?.autoSave || false
 
-  function onSubmit() {
-    if (!autoSave) {
-      setIsOpen(false)
-    }
-  }
-
   const memoFormSubmitReturnUrl = autoSave ? '' : returnUrl
 
   const title = memo
@@ -65,15 +59,19 @@ export function MemoFormDialog({
         <MemoForm
           memo={memo}
           fetcher={memoFormFetcher}
-          autoSave={autoSave}
-          onSubmit={onSubmit}
+          isAutoSave={autoSave}
+          onSubmit={() => !autoSave && setIsOpen(false)}
           returnUrl={memoFormSubmitReturnUrl}
+          textareaProps={{ className: 'h-[calc(100dvh_-_360px)]' }}
         >
           {memo && (
             <MemoActionButton
               memo={memo}
-              onDeleteSubmit={onSubmit}
-              returnUrl={returnUrl}
+              onDeleteSubmit={(event) => {
+                event.stopPropagation()
+                setIsOpen(false)
+              }}
+              deleteReturnUrl={returnUrl}
             />
           )}
         </MemoForm>

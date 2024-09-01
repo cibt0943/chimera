@@ -6,6 +6,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { getFormProps } from '@conform-to/react'
 import { Button } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
+import { cn } from '~/lib/utils'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
 import {
   FormItem,
@@ -22,18 +23,20 @@ import { useMemoConform } from './memo-conform'
 export interface MemoFormProps {
   memo: Memo | undefined
   fetcher: ReturnType<typeof useFetcher>
-  autoSave: boolean
+  isAutoSave: boolean
   returnUrl: string
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>
   children?: React.ReactNode
 }
 
 export function MemoForm({
   memo,
   fetcher,
-  autoSave,
+  isAutoSave,
   returnUrl,
   onSubmit,
+  textareaProps = {},
   children,
 }: MemoFormProps) {
   const { t } = useTranslation()
@@ -48,12 +51,12 @@ export function MemoForm({
 
   React.useEffect(() => {
     // メモが存在し、メモが変更されている場合、自動保存がOFF→ONの切り替え時に自動保存を実行する
-    if (memo && isChangedMemo && autoSave) {
+    if (memo && isChangedMemo && isAutoSave) {
       saveMemoApi()
     }
     // 以下のdisableを止める方法を検討したい。
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoSave])
+  }, [isAutoSave])
 
   // メモの保存API呼び出し
   async function saveMemoApi() {
@@ -70,7 +73,7 @@ export function MemoForm({
   // メモ情報が更新されていた保存する
   function handleChangeMemo() {
     setIsChangedMemo(true)
-    autoSave && saveMemoDebounce()
+    isAutoSave && saveMemoDebounce()
   }
 
   // キーボード操作
@@ -99,6 +102,8 @@ export function MemoForm({
 
   const action = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
 
+  const { className, ...otherProps } = textareaProps
+
   return (
     <fetcher.Form
       method="post"
@@ -115,7 +120,11 @@ export function MemoForm({
         <TextareaConform
           meta={fields.content}
           key={fields.content.key}
-          className="h-[calc(100dvh_-_360px)] resize-none bg-[#303841] text-white focus-visible:ring-0"
+          className={cn(
+            'resize-none bg-[#303841] text-white focus-visible:ring-0',
+            className,
+          )}
+          {...otherProps}
         />
         <FormMessage message={fields.content.errors} />
       </FormItem>
@@ -149,38 +158,41 @@ export function MemoForm({
         {children || <div>&nbsp;</div>}
         <SaveButton
           isChangedMemo={isChangedMemo}
-          fetcher={fetcher}
-          autoSave={autoSave}
+          isSubmitting={fetcher.state === 'submitting'}
+          isAutoSave={isAutoSave}
         />
       </FormFooter>
     </fetcher.Form>
   )
 }
 
-interface SaveButtonProps {
+export interface SaveButtonProps {
   isChangedMemo: boolean
-  fetcher: ReturnType<typeof useFetcher>
-  autoSave: boolean
+  isSubmitting: boolean
+  isAutoSave: boolean
 }
 
-function SaveButton({ isChangedMemo, fetcher, autoSave }: SaveButtonProps) {
+export function SaveButton({
+  isChangedMemo,
+  isSubmitting,
+  isAutoSave,
+}: SaveButtonProps) {
   const { t } = useTranslation()
 
-  const caption =
-    fetcher.state === 'submitting'
-      ? t('common.message.state_saving')
-      : !isChangedMemo
-        ? t('common.message.state_saved')
-        : autoSave
-          ? t('common.message.state_save_wait')
-          : t('common.message.save')
+  const caption = isSubmitting
+    ? t('common.message.state_saving')
+    : !isChangedMemo
+      ? t('common.message.state_saved')
+      : isAutoSave
+        ? t('common.message.state_save_wait')
+        : t('common.message.save')
 
-  const isDisabled = autoSave || !isChangedMemo
+  const isDisabled = isAutoSave || !isChangedMemo
 
   return (
     <Button type="submit" className="sm:w-32" disabled={isDisabled}>
       {caption}
-      {!autoSave && <SaveHotkeyIcon />}
+      {!isAutoSave && <SaveHotkeyIcon />}
     </Button>
   )
 }

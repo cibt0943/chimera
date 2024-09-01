@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { MetaFunction, LinksFunction, redirect } from '@remix-run/node'
 import { Outlet } from '@remix-run/react'
 import { startOfMonth, addMonths, subMonths } from 'date-fns'
@@ -14,11 +15,15 @@ import {
   TaskWithNonNullableDueDate,
   MemoWithNonNullableRelatedDate,
 } from '~/types/events'
+import { MemoSettings } from '~/types/memo-settings'
 import { getEvents, insertEvent } from '~/models/event.server'
 import { getTasks } from '~/models/task.server'
 import { getMemos } from '~/models/memo.server'
+import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
 import { ErrorView } from '~/components/lib/error-view'
 import { Calendar } from '~/components/event/calendar'
+import { useSetAtom } from 'jotai'
+import { memoSettingsAtom } from '~/lib/state'
 import styles from '~/styles/events.css'
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
@@ -53,6 +58,7 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
 
 type LoaderData = {
   calendarEvents: CalendarEvents
+  memoSettings: MemoSettings
 }
 
 export function getDispStartDayFromParams(request: Request): Date {
@@ -84,6 +90,8 @@ export const loader = withAuthentication(async ({ request, loginSession }) => {
     relatedDateEnd: getEnd,
   })
 
+  const memoSettings = await getOrInsertMemoSettings(loginSession.account.id)
+
   const calendarEvents: CalendarEvents = []
 
   // Events → CalendarEvents
@@ -101,11 +109,17 @@ export const loader = withAuthentication(async ({ request, loginSession }) => {
     calendarEvents.push(Memo2Calendar(memo as MemoWithNonNullableRelatedDate))
   })
 
-  return typedjson({ calendarEvents })
+  return typedjson({ calendarEvents, memoSettings })
 })
 
 export default function Layout() {
-  const { calendarEvents } = useTypedLoaderData<LoaderData>()
+  const { calendarEvents, memoSettings } = useTypedLoaderData<LoaderData>()
+
+  // ログインユーザーのメモ設定情報をグローバルステートに保存
+  const setMemoSettings = useSetAtom(memoSettingsAtom)
+  React.useEffect(() => {
+    setMemoSettings(memoSettings)
+  }, [setMemoSettings, memoSettings])
 
   return (
     <div className="p-4 pt-1 xl:pt-4">

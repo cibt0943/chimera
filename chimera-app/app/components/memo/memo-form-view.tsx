@@ -10,9 +10,10 @@ import { memoSettingsAtom } from '~/lib/state'
 
 interface MemoFormViewProps {
   memo: Memo | undefined
+  returnUrl: string
 }
 
-export function MemoFormView({ memo }: MemoFormViewProps) {
+export function MemoFormView({ memo, returnUrl }: MemoFormViewProps) {
   const formRef = React.useRef<HTMLDivElement>(null)
   const memoFormFetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
@@ -38,17 +39,24 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
     },
   )
 
-  const returnUrl = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
-
   return (
-    <div className="m-4" ref={formRef}>
+    <div className="p-4" ref={formRef}>
       <MemoForm
         memo={memo}
         fetcher={memoFormFetcher}
-        autoSave={memoSettings?.autoSave || false}
+        isAutoSave={memoSettings?.autoSave || false}
         returnUrl={returnUrl}
+        textareaProps={{
+          className: 'h-[calc(100dvh_-_256px)] xl:h-[calc(100dvh_-_216px)]',
+        }}
       >
-        {memo && <MemoActionButton memo={memo} returnUrl={MEMO_URL} />}
+        {memo && (
+          <MemoActionButton
+            memo={memo}
+            deleteReturnUrl={MEMO_URL}
+            onDeleteSubmit={(event) => event.stopPropagation()}
+          />
+        )}
       </MemoForm>
     </div>
   )

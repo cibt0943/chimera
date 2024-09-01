@@ -27,13 +27,14 @@ export default function Todo() {
   const { task } = useTypedLoaderData<LoaderData>()
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
   const location = useLocation()
+  const returnUrl = EVENT_URL + location.search
 
   return (
     <TaskFormDialog
       task={task}
       isOpen={isOpenDialog}
       setIsOpen={setIsOpenDialog}
-      returnUrl={EVENT_URL + location.search}
+      returnUrl={returnUrl}
     />
   )
 }
