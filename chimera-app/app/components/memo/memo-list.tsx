@@ -97,6 +97,8 @@ export function MemoList({
     setSelectedMemo(selectMemo)
     setFocusedMemo(selectMemo)
     setListFocus(selectMemo)
+    // 以下のdisableを止める方法を検討したい。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetId])
 
   // メモ一覧の検索

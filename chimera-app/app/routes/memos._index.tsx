@@ -6,5 +6,5 @@ export default function Index() {
 
   if (!isLaptop) return null
 
-  return <MemoFormView memo={undefined} />
+  return <MemoFormView memo={undefined} returnUrl="" />
 }
