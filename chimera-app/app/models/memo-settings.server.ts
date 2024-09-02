@@ -27,7 +27,8 @@ export async function getOrInsertMemoSettings(
     const memoSettings = await getMemoSettings(accountId)
     if (memoSettings) return memoSettings
   } catch (error) {
-    //握りつぶす
+    //accountIdが空以外は握りつぶす
+    if (accountId === '') throw error
   }
 
   const { data, error } = await supabase

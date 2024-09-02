@@ -39,11 +39,7 @@ export const action = withAuthentication(
     })
 
     const redirectUrl = formData.get('returnUrl') as string
-    if (redirectUrl) {
-      return redirect(redirectUrl)
-    }
-
-    return typedjson({ updatedMemo })
+    return redirectUrl ? redirect(redirectUrl) : typedjson({ updatedMemo })
   },
 )
 
@@ -64,7 +60,8 @@ export default function Memo() {
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
 
   if (isLaptop) {
-    const returnUrl = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
+    // const returnUrl = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
+    const returnUrl = '' //画面遷移しないので、returnUrlは空文字
     return <MemoFormView memo={memo} returnUrl={returnUrl} />
   }
 

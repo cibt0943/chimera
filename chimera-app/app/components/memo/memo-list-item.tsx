@@ -35,14 +35,14 @@ function NavLinkClassName({
 // Item Component
 interface ListItemProps {
   item: Memo
-  setFocusedMemo: React.Dispatch<React.SetStateAction<Memo | undefined>>
+  onFocus: () => void
   isSelected: boolean
   isPreview: boolean
   children: React.ReactNode
 }
 
 export function ListItem(props: ListItemProps) {
-  const { item, setFocusedMemo, isSelected, isPreview, children } = props
+  const { item, onFocus, isSelected, isPreview, children } = props
 
   const { t } = useTranslation()
   const {
@@ -81,9 +81,7 @@ export function ListItem(props: ListItemProps) {
       className={NavLinkClassName({ item, isSelected })}
       to={to}
       id={`memo-${item.id}`}
-      onFocus={() => {
-        setFocusedMemo(item)
-      }}
+      onFocus={onFocus}
       ref={setNodeRef}
       style={style}
       {...attributes}

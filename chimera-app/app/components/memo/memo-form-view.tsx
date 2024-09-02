@@ -17,6 +17,7 @@ export function MemoFormView({ memo, returnUrl }: MemoFormViewProps) {
   const formRef = React.useRef<HTMLDivElement>(null)
   const memoFormFetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
+  const autoSave = memoSettings?.autoSave || false
 
   // テキストエリアにフォーカス
   function setTextAreaFocus() {
@@ -44,7 +45,7 @@ export function MemoFormView({ memo, returnUrl }: MemoFormViewProps) {
       <MemoForm
         memo={memo}
         fetcher={memoFormFetcher}
-        isAutoSave={memoSettings?.autoSave || false}
+        isAutoSave={autoSave}
         returnUrl={returnUrl}
         textareaProps={{
           className: 'h-[calc(100dvh_-_256px)] xl:h-[calc(100dvh_-_216px)]',

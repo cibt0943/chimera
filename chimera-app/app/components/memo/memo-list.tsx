@@ -90,17 +90,14 @@ export function MemoList({
     setMemos(defaultMemos)
   }, [defaultMemos])
 
-  // focusedMemoに合わせてフォーカスを設定
-  React.useEffect(() => {
-    setListFocus(focusedMemo)
-  }, [focusedMemo])
-
+  // F5でリロードされた場合に選択行のフォーカスを設定
   const targetId = showId ? showId : selectedMemo?.id
   React.useEffect(() => {
     const selectMemo = memos.find((memo) => memo.id === targetId)
     setSelectedMemo(selectMemo)
     setFocusedMemo(selectMemo)
-  }, [memos, targetId])
+    setListFocus(selectMemo)
+  }, [targetId])
 
   // メモ一覧の検索
   async function searchMemos(searchTerm: string) {
@@ -121,6 +118,7 @@ export function MemoList({
     }
     if (targetIndex < 0 || targetIndex >= dispMemos.length) return
     setFocusedMemo(dispMemos[targetIndex])
+    setListFocus(dispMemos[targetIndex])
   }
 
   // 選択行の表示順を1ステップ変更
@@ -341,7 +339,7 @@ export function MemoList({
                   <ListItem
                     key={item.id}
                     item={item}
-                    setFocusedMemo={setFocusedMemo}
+                    onFocus={() => setFocusedMemo(item)}
                     isSelected={item.id === selectedMemo?.id}
                     isPreview={isPrevew}
                   >

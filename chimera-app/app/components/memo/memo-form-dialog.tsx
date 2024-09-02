@@ -34,6 +34,7 @@ export function MemoFormDialog({
   const memoSettings = useAtomValue(memoSettingsAtom)
   const autoSave = memoSettings?.autoSave || false
 
+  //autosaveの場合はsubmitしても画面遷移しないので、returnUrlは空文字
   const memoFormSubmitReturnUrl = autoSave ? '' : returnUrl
 
   const title = memo

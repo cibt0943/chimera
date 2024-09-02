@@ -7,5 +7,6 @@ export function useIsLoading() {
 
 export function useIsLoadingEffect() {
   const navigation = useNavigation()
-  return useIsLoading() && navigation.location?.state?.isLoadEffect === true
+  const isLoading = useIsLoading()
+  return isLoading && navigation.location?.state?.isLoadEffect === true
 }

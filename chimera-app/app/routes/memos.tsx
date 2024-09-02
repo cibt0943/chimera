@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { MetaFunction, redirect } from '@remix-run/node'
 import { Outlet, useParams } from '@remix-run/react'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
@@ -17,8 +16,6 @@ import {
 } from '~/components/ui/resizable'
 import { ErrorView } from '~/components/lib/error-view'
 import { MemoList } from '~/components/memo/memo-list'
-import { useSetAtom } from 'jotai'
-import { memoSettingsAtom } from '~/lib/state'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Memos | Kobushi' }]
@@ -67,12 +64,6 @@ export const loader = withAuthentication(async ({ loginSession }) => {
 
 export default function Layout() {
   const { memos, memoSettings } = useTypedLoaderData<LoaderData>()
-
-  // ログインユーザーのメモ設定情報をグローバルステートに保存
-  const setMemoSettings = useSetAtom(memoSettingsAtom)
-  React.useEffect(() => {
-    setMemoSettings(memoSettings)
-  }, [setMemoSettings, memoSettings])
 
   const params = useParams()
   const { memoId } = params

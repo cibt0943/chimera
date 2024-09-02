@@ -18,11 +18,12 @@ import i18n, { useLanguage } from '~/lib/i18n/i18n'
 import { authenticator } from '~/lib/auth.server'
 import { useTheme, useSonner, Sonner } from './lib/hooks'
 import { Theme, Language } from '~/types/accounts'
+import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
 import { LoadingEffect } from '~/components/loading-effect'
 import { Navbar } from '~/components/navbar'
 import { Sidebar } from '~/components/sidebar'
 import { useSetAtom } from 'jotai'
-import { loginSessionAtom } from '~/lib/state'
+import { loginSessionAtom, memoSettingsAtom } from '~/lib/state'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -46,19 +47,24 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // セッションから認証情報を取得
   const loginSession = await authenticator.isAuthenticated(request)
 
-  // 言語を変更
+  // 言語を設定
   let language = loginSession?.account.language || 'auto'
   language = language === 'auto' ? getLanguageFromHeader(request) : language
   i18n.changeLanguage(language)
 
+  // メモ設定を取得
+  const memoSettings =
+    loginSession && (await getOrInsertMemoSettings(loginSession.account.id))
+
   // トーストメッセージを取得
   const { toast, headers } = await getToast(request)
 
-  return typedjson({ loginSession, language, toast }, { headers })
+  return typedjson({ loginSession, language, memoSettings, toast }, { headers })
 }
 
 export default function App() {
-  const { loginSession, language, toast } = useTypedLoaderData<typeof loader>()
+  const { loginSession, language, memoSettings, toast } =
+    useTypedLoaderData<typeof loader>()
   const theme = loginSession?.account.theme || Theme.SYSTEM
 
   // useEffectにてOSのテーマ設定に合わせてテーマを変更
@@ -72,6 +78,12 @@ export default function App() {
   React.useEffect(() => {
     setLoginAccount(loginSession)
   }, [setLoginAccount, loginSession])
+
+  // ログインユーザーのメモ設定情報をグローバルステートに保存
+  const setMemoSettings = useSetAtom(memoSettingsAtom)
+  React.useEffect(() => {
+    setMemoSettings(memoSettings)
+  }, [setMemoSettings, memoSettings])
 
   // トーストメッセージを表示
   useSonner(toast)
