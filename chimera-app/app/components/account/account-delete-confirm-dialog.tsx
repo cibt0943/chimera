@@ -8,18 +8,22 @@ import {
 import { buttonVariants } from '~/components/ui/button'
 import { ACCOUNT_URL } from '~/constants'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
+import type { AccountGeneral } from '~/types/accounts'
 
 interface DeleteAccountConfirmDialogProps {
+  accountGeneral: AccountGeneral
   children: React.ReactNode
 }
 
 export function AccountDeleteConfirmDialog({
+  accountGeneral,
   children,
 }: DeleteAccountConfirmDialogProps) {
   const { t } = useTranslation()
 
   const action = [ACCOUNT_URL, 'delete'].join('/')
-  const desc = t('account.title-account') + t('common.message.confirm_deletion')
+  const desc =
+    '「' + accountGeneral.name + '」' + t('common.message.confirm_deletion')
 
   return (
     <ConfirmDialog

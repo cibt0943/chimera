@@ -49,7 +49,7 @@ import { Button } from '~/components/ui/button'
 import { ToastAction } from '~/components/ui/toast'
 import { useToast } from '~/components/ui/use-toast'
 import { API_URL, TODO_URL } from '~/constants'
-import { useDebounce, useQueue, useIsLoading } from '~/lib/utils'
+import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
 import { TodoTableColumns } from './todo-table-columns'
@@ -75,7 +75,7 @@ interface TodoTableProps<TData extends RowData> {
 
 export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const { t } = useTranslation()
-  const { enqueue } = useQueue()
+  const { enqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const { toast } = useToast()
@@ -102,9 +102,16 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
 
-  const [actionTask, setActionTask] = React.useState<Task>() // 編集・削除するタスク
+  // 編集・削除するタスク
+  const [actionTask, setActionTask] = React.useState<Task>()
+
+  // 追加用ダイアログの表示・非表示
   const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
+
+  // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
+
+  // tbody要素参照用
   const useTBodyRef = React.useRef<HTMLTableSectionElement>(null)
 
   const table = useReactTable({
@@ -158,8 +165,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   // 選択行にフォーカスを設定
   React.useEffect(() => {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
-    if (!nowSelectedRow) return
-    setListFocus(nowSelectedRow.original)
+    nowSelectedRow && setListFocus(nowSelectedRow.original)
   }, [table, rowSelection])
 
   // タスク追加ダイアログを開く
@@ -232,7 +238,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error'
       alert(msg)
-      navigate('.?refresh=true', { replace: true })
+      navigate('.', { replace: true })
     }
   }
 
@@ -336,6 +342,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     nowSelectedRow && openDeleteTaskDialog(nowSelectedRow.original)
   }
 
+  // 指定タスクへフォーカスを設定
   function setListFocus(task: Task) {
     useTBodyRef.current?.querySelector<HTMLElement>(`#row-${task.id}`)?.focus()
     // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
@@ -410,12 +417,12 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
       <div className="flex items-center space-x-2">
         <Button
           variant="secondary"
-          className="h-8 px-2 lg:px-3"
+          className="h-8 px-2 md:px-3"
           onClick={() => openAddTaskDialog()}
         >
           <RiAddLine className="mr-2" />
           {t('common.message.add')}
-          <p className="ml-2 text-xs text-muted-foreground">
+          <p className="ml-2 hidden text-xs text-muted-foreground sm:block">
             <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
               <span>⌥</span>n
             </kbd>
@@ -508,6 +515,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         task={undefined}
         isOpen={isOpenAddDialog}
         setIsOpen={setIsOpenAddDialog}
+        returnUrl={TODO_URL}
       />
       <TaskDeleteConfirmDialogMemo
         task={actionTask}

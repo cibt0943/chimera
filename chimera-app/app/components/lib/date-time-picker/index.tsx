@@ -180,12 +180,12 @@ function TimeControl({
 }
 
 interface DispValueProps {
-  date: Date | undefined
-  allDay: boolean
-  placeholder: string
+  date?: Date
+  allDay?: boolean
+  placeholder?: string
 }
 
-function DispValue({ date, allDay, placeholder }: DispValueProps) {
+function DispValue({ date, allDay = false, placeholder = '' }: DispValueProps) {
   const { t } = useTranslation()
 
   const [formattedDate, className] = date
@@ -221,5 +221,24 @@ function ToggleAllDay({ allDay, onChangeAllDay }: ToggleAllDayProps) {
     >
       <span className="text-xs">{t('common.message.set_time')}</span>
     </Toggle>
+  )
+}
+
+export interface DummyDateTimePickerProps {
+  className?: string
+  placeholder?: string
+}
+
+export function DummyDateTimePicker({
+  className,
+  placeholder,
+}: DummyDateTimePickerProps) {
+  return (
+    <div className={cn('flex items-center rounded-md border', className)}>
+      <Button variant="ghost" className="grow justify-start px-2">
+        <RxCalendar className="mr-2 h-5 w-5 text-muted-foreground" />
+        <DispValue placeholder={placeholder} />
+      </Button>
+    </div>
   )
 }

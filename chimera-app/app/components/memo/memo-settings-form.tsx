@@ -9,23 +9,24 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover'
+import { ACCOUNT_URL } from '~/constants'
 import { MemoStatus } from '~/types/memos'
 import { useAtomValue } from 'jotai'
 import { memoSettingsAtom } from '~/lib/state'
 
-export function MemoSettings() {
+export function MemoSettingsForm() {
   const { t } = useTranslation()
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="hidden h-8 px-2 lg:flex">
+        <Button variant="outline" size="sm" className="flex h-8 px-2">
           <RiListSettingsLine className="h-4 w-4 text-primary/80" />
-          <span className="sr-only">{t('memo_settings.title')}</span>
+          <span className="sr-only">{t('common.message.settings')}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] space-y-4">
-        <h4 className="font-medium">{t('memo_settings.title')}</h4>
+        <h4 className="font-medium">{t('common.message.settings')}</h4>
         <ShowArchivedSwith />
         <ShowContentSwith />
         <AutoSaveSwith />
@@ -36,12 +37,14 @@ export function MemoSettings() {
 
 function ShowArchivedSwith() {
   const { t } = useTranslation()
-  const fetcher = useFetcher({ key: 'memo-settings' })
+  const fetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ
   function updateMemoSettingStatusFilter(statuses: MemoStatus[]) {
+    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+
     fetcher.submit(
       {
         listFilter: {
@@ -49,7 +52,7 @@ function ShowArchivedSwith() {
         },
       },
       {
-        action: `/account/memo/settings`,
+        action: url,
         method: 'post',
         encType: 'application/json',
       },
@@ -85,12 +88,14 @@ function ShowArchivedSwith() {
 
 function ShowContentSwith() {
   const { t } = useTranslation()
-  const fetcher = useFetcher({ key: 'memo-settings' })
+  const fetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ
   function updateMemoSettingDisplayContent(isShow: boolean) {
+    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+
     fetcher.submit(
       {
         listDisplay: {
@@ -98,7 +103,7 @@ function ShowContentSwith() {
         },
       },
       {
-        action: `/account/memo/settings`,
+        action: url,
         method: 'post',
         encType: 'application/json',
       },
@@ -128,18 +133,20 @@ function ShowContentSwith() {
 
 function AutoSaveSwith() {
   const { t } = useTranslation()
-  const fetcher = useFetcher({ key: 'memo-settings' })
+  const fetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ
   function updateMemoSettingAutoSave(isAutoSave: boolean) {
+    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+
     fetcher.submit(
       {
         autoSave: isAutoSave,
       },
       {
-        action: `/account/memo/settings`,
+        action: url,
         method: 'post',
         encType: 'application/json',
       },

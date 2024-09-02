@@ -22,24 +22,28 @@ import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
 import { API_URL, MEMO_URL } from '~/constants'
-import { useDebounce, useQueue } from '~/lib/utils'
+import { useDebounce, useApiQueue } from '~/lib/hooks'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
+import { MemoSettings } from '~/types/memo-settings'
 import { ListItem } from './memo-list-item'
 import { MemoActionMenu } from './memo-action-menu'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
-import { MemoSettings } from './memo-settings'
-import { useAtomValue } from 'jotai'
-import { memoSettingsAtom } from '~/lib/state'
+import { MemoSettingsForm } from './memo-settings-form'
 
 interface MemoListProps {
   defaultMemos: Memos
   showId: string
+  memoSettings: MemoSettings
 }
 
-export function MemoList({ defaultMemos, showId }: MemoListProps) {
+export function MemoList({
+  defaultMemos,
+  showId,
+  memoSettings,
+}: MemoListProps) {
   const { t } = useTranslation()
-  const { enqueue: searchEnqueue } = useQueue()
-  const { enqueue: moveMemoEnqueue } = useQueue()
+  const { enqueue: searchEnqueue } = useApiQueue()
+  const { enqueue: moveMemoEnqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const sensors = useSensors(
@@ -51,10 +55,14 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     useSensor(TouchSensor, {}),
   )
 
-  const memoSettings = useAtomValue(memoSettingsAtom)
-
   // メモ一覧データ
   const [memos, setMemos] = React.useState(defaultMemos)
+
+  // 一覧で選択しているメモ
+  const [selectedMemo, setSelectedMemo] = React.useState<Memo>()
+
+  // 一覧でフォーカスしているメモ
+  const [focusedMemo, setFocusedMemo] = React.useState<Memo>()
 
   // 検索文字列
   const [searchTerm, setSearchTerm] = React.useState('')
@@ -62,35 +70,36 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
   // 編集・削除するメモ
   const [actionMemo, setActionMemo] = React.useState<Memo>()
 
+  // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
+  // メモ一覧要素参照用
   const useMemosRef = React.useRef<HTMLDivElement>(null)
+
+  // メモ追加ボタン参照用
   const useAddButtonRef = React.useRef<HTMLButtonElement>(null)
 
-  // フィルタリング後のメモ一覧データ更新（memosに依存した値なのでstateで持つ必要はないと考えメモ化した変数で対応）
+  // フィルタリング後のメモ一覧データ
   const dispMemos = React.useMemo(() => {
     if (!searchTerm) return memos
     return memos.filter((memo) => memo.title.toLowerCase().includes(searchTerm))
   }, [memos, searchTerm])
-
-  // 一覧で選択しているメモ（選択行はpropsのshowIdで特定されるためstateで持つ必要はないと考えメモ化した変数で対応）
-  const selectedMemo = React.useMemo(() => {
-    return memos.find((memo) => memo.id === showId)
-  }, [memos, showId])
-
-  // 一覧でフォーカスしているメモ
-  const [focusedMemo, setFocusedMemo] = React.useState(selectedMemo)
 
   // フィルタリング前のメモ一覧データ更新
   React.useEffect(() => {
     setMemos(defaultMemos)
   }, [defaultMemos])
 
-  // focusedMemoに合わせてフォーカスを設定
+  // F5でリロードされた場合に選択行のフォーカスを設定
+  const targetId = showId ? showId : selectedMemo?.id
   React.useEffect(() => {
-    if (!focusedMemo) return
-    setListFocus(focusedMemo)
-  }, [focusedMemo])
+    const selectMemo = memos.find((memo) => memo.id === targetId)
+    setSelectedMemo(selectMemo)
+    setFocusedMemo(selectMemo)
+    setListFocus(selectMemo)
+    // 以下のdisableを止める方法を検討したい。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetId])
 
   // メモ一覧の検索
   async function searchMemos(searchTerm: string) {
@@ -111,6 +120,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     }
     if (targetIndex < 0 || targetIndex >= dispMemos.length) return
     setFocusedMemo(dispMemos[targetIndex])
+    setListFocus(dispMemos[targetIndex])
   }
 
   // 選択行の表示順を1ステップ変更
@@ -181,7 +191,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error'
       alert(msg)
-      navigate('.?refresh=true', { replace: true })
+      navigate('.', { replace: true })
     }
   }
 
@@ -204,13 +214,18 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
     moveMemoEnqueue(() =>
       moveMemoApi(fromMemo, toMemo).catch((error) => {
         alert(error.message)
-        navigate('.?refresh=true', { replace: true })
+        navigate('.', { replace: true })
       }),
     )
   }, 300)
 
-  function setListFocus(memo: Memo) {
-    useMemosRef.current?.querySelector<HTMLElement>(`#memo-${memo.id}`)?.focus()
+  // 指定メモへフォーカスを設定
+  function setListFocus(memo: Memo | undefined, force = false) {
+    const targetMemo = memo ? memo : force ? dispMemos[0] : undefined
+    targetMemo &&
+      useMemosRef.current
+        ?.querySelector<HTMLElement>(`#memo-${targetMemo.id}`)
+        ?.focus()
   }
 
   // キーボード操作(スコープあり)
@@ -269,7 +284,7 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
           break
         // フォーカスを一覧へ移動
         case 'left':
-          focusedMemo && setListFocus(focusedMemo)
+          setListFocus(focusedMemo, true)
           break
       }
     },
@@ -277,6 +292,8 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
       enableOnFormTags: true, // テキストエリアにフォーカスがあってもフォーカス移動できるようにする
     },
   )
+
+  const isPrevew = !!memoSettings.listDisplay.content
 
   return (
     <div className="space-y-4 px-1 py-4">
@@ -300,15 +317,13 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
         <Input
           type="search"
           placeholder={t('memo.message.title_search')}
-          onChange={(event) => {
-            searchMemosDebounce(event.target.value)
-          }}
+          onChange={(event) => searchMemosDebounce(event.target.value)}
           className="h-8"
           id="memos-title-search"
         />
-        <MemoSettings />
+        <MemoSettingsForm />
       </div>
-      <ScrollArea className="h-[calc(100vh_-_115px)]">
+      <ScrollArea className="h-[calc(100dvh_-_155px)] xl:h-[calc(100dvh_-_115px)]">
         <DndContext
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}
@@ -326,9 +341,9 @@ export function MemoList({ defaultMemos, showId }: MemoListProps) {
                   <ListItem
                     key={item.id}
                     item={item}
-                    setFocusedMemo={setFocusedMemo}
+                    onFocus={() => setFocusedMemo(item)}
                     isSelected={item.id === selectedMemo?.id}
-                    isPreview={!!memoSettings?.listDisplay.content}
+                    isPreview={isPrevew}
                   >
                     <MemoActionMenu
                       memo={item}

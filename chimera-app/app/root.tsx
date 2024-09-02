@@ -9,20 +9,21 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react'
-import { I18nextProvider, useTranslation } from 'react-i18next'
+import { I18nextProvider } from 'react-i18next'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { getToast } from 'remix-toast'
-import { Toaster as Sonner, toast as notify } from 'sonner'
 import { Toaster } from '~/components/ui/toaster'
 import styles from '~/styles/tailwind.css'
-import i18n, { useChangeLanguage } from '~/lib/i18n/i18n'
+import i18n, { useLanguage } from '~/lib/i18n/i18n'
 import { authenticator } from '~/lib/auth.server'
-import { useTheme } from './lib/useTheme'
+import { useTheme, useSonner, Sonner } from './lib/hooks'
 import { Theme, Language } from '~/types/accounts'
+import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
 import { LoadingEffect } from '~/components/loading-effect'
+import { Navbar } from '~/components/navbar'
 import { Sidebar } from '~/components/sidebar'
 import { useSetAtom } from 'jotai'
-import { loginSessionAtom } from '~/lib/state'
+import { loginSessionAtom, memoSettingsAtom } from '~/lib/state'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -46,27 +47,31 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // セッションから認証情報を取得
   const loginSession = await authenticator.isAuthenticated(request)
 
-  // 言語を変更
+  // 言語を設定
   let language = loginSession?.account.language || 'auto'
   language = language === 'auto' ? getLanguageFromHeader(request) : language
   i18n.changeLanguage(language)
 
+  // メモ設定を取得
+  const memoSettings =
+    loginSession && (await getOrInsertMemoSettings(loginSession.account.id))
+
   // トーストメッセージを取得
   const { toast, headers } = await getToast(request)
 
-  return typedjson({ loginSession, language, toast }, { headers })
+  return typedjson({ loginSession, language, memoSettings, toast }, { headers })
 }
 
 export default function App() {
-  const { loginSession, language, toast } = useTypedLoaderData<typeof loader>()
+  const { loginSession, language, memoSettings, toast } =
+    useTypedLoaderData<typeof loader>()
   const theme = loginSession?.account.theme || Theme.SYSTEM
-  const { t } = useTranslation()
 
   // useEffectにてOSのテーマ設定に合わせてテーマを変更
   useTheme(theme)
 
   // クライアントサイドでの言語設定
-  useChangeLanguage(language)
+  useLanguage(language)
 
   // ログインユーザーのアカウント情報をグローバルステートに保存
   const setLoginAccount = useSetAtom(loginSessionAtom)
@@ -74,16 +79,14 @@ export default function App() {
     setLoginAccount(loginSession)
   }, [setLoginAccount, loginSession])
 
-  // トーストメッセージを表示
+  // ログインユーザーのメモ設定情報をグローバルステートに保存
+  const setMemoSettings = useSetAtom(memoSettingsAtom)
   React.useEffect(() => {
-    if (toast && toast.message !== '') {
-      if (toast.type === 'success') {
-        notify.success(t(toast.message))
-      } else {
-        notify.info(t(toast.message))
-      }
-    }
-  }, [toast, t])
+    setMemoSettings(memoSettings)
+  }, [setMemoSettings, memoSettings])
+
+  // トーストメッセージを表示
+  useSonner(toast)
 
   return (
     <html lang={language} className={theme}>
@@ -97,17 +100,20 @@ export default function App() {
         <style data-fullcalendar />
         <Links />
       </head>
-      <body>
+      <body className="overflow-y-hidden">
         <I18nextProvider i18n={i18n}>
           <div className="flex">
-            <aside className="">
+            <aside className="h-screen overflow-auto">
               <Sidebar />
             </aside>
-            <main className="h-screen grow overflow-auto">
-              <LoadingEffect>
-                <Outlet />
-              </LoadingEffect>
-            </main>
+            <div className="h-screen flex-1 overflow-auto">
+              <Navbar />
+              <main>
+                <LoadingEffect>
+                  <Outlet />
+                </LoadingEffect>
+              </main>
+            </div>
             <Toaster />
             <Sonner closeButton />
           </div>

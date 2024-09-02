@@ -27,13 +27,14 @@ export default function Memo() {
   const { memo } = useTypedLoaderData<LoaderData>()
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
   const location = useLocation()
+  const returnUrl = EVENT_URL + location.search
 
   return (
     <MemoFormDialog
       memo={memo}
       isOpen={isOpenDialog}
       setIsOpen={setIsOpenDialog}
-      returnUrl={EVENT_URL + location.search}
+      returnUrl={returnUrl}
     />
   )
 }

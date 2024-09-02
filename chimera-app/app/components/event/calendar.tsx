@@ -30,6 +30,7 @@ import interactionPlugin, {
 } from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
 import { API_URL, TODO_URL, MEMO_URL, EVENT_URL } from '~/constants'
+import { useMedia } from '~/lib/hooks'
 import { Event, CalendarEvents, CalendarEventType } from '~/types/events'
 import { Task, TaskStatus } from '~/types/tasks'
 import { Memo } from '~/types/memos'
@@ -47,6 +48,8 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   const [isOpenEventDialog, setIsOpenEventDialog] = React.useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const location = useLocation()
+  const isLaptop = useMedia('(min-width: 1024px)')
+  const callenderRef = React.useRef<FullCalendar>(null)
 
   // 日付セット時の処理
   function handleDatesSet(arg: DatesSetArg) {
@@ -176,52 +179,67 @@ export function Calendar({ defaultEvents }: CalendarProps) {
     )
   }
 
-  const viewMode = searchParams.get('view') || 'dayGridMonth'
-  const startDate =
-    searchParams.get('start') || format(startOfMonth(new Date()), 'yyyy-MM-dd')
+  const viewMode = isLaptop
+    ? searchParams.get('view') || 'dayGridMonth'
+    : 'listMonth'
+  const defaultStartDate = format(startOfMonth(new Date()), 'yyyy-MM-dd')
+  const startDate = searchParams.get('start') || defaultStartDate
+  const headerToolbarRight = isLaptop
+    ? 'dayGridMonth dayGridWeek listMonth'
+    : ''
+
+  React.useEffect(() => {
+    // 以下のワーニングを回避するために非同期でviewModeを変更
+    // Warning: flushSync was called from inside a lifecycle method.
+    // React cannot flush when React is already rendering.
+    // Consider moving this call to a scheduler task or micro task.
+    Promise.resolve().then(() => {
+      if (!callenderRef.current) return
+      callenderRef.current.getApi().changeView(viewMode)
+    })
+  }, [viewMode])
 
   return (
-    <>
-      <div className="h-[calc(100vh_-_50px)]">
-        <FullCalendar
-          plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
-          height={'100%'}
-          locales={allLocales}
-          locale={i18n.language}
-          headerToolbar={{
-            left: 'prev today next',
-            center: 'title',
-            right: 'dayGridMonth dayGridWeek listMonth',
-          }}
-          datesSet={handleDatesSet}
-          initialView={viewMode}
-          initialDate={startDate}
-          viewClassNames={['text-sm', 'text-muted-foreground']}
-          editable={true}
-          selectable={true}
-          select={handleSelect}
-          dayHeaderClassNames={() => ['font-normal']}
-          dayCellContent={(arg) => arg.dayNumberText.replace('日', '')}
-          events={defaultEvents}
-          eventContent={renderEventContent}
-          eventTimeFormat={{ hour: 'numeric', minute: '2-digit' }}
-          displayEventEnd={true}
-          eventInteractive={true}
-          eventClassNames={() => ['text-primary']}
-          eventTextColor="black"
-          eventClick={handleEventClick}
-          eventDataTransform={transformEventData}
-          eventDrop={handleEventDrop}
-          eventResize={handleEventResize}
-        />
-      </div>
+    <div className="h-[calc(100dvh_-_72px)] xl:h-[calc(100dvh_-_32px)]">
+      <FullCalendar
+        plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
+        height={'100%'}
+        locales={allLocales}
+        locale={i18n.language}
+        headerToolbar={{
+          left: 'prev today next',
+          center: 'title',
+          right: headerToolbarRight,
+        }}
+        datesSet={handleDatesSet}
+        initialView={viewMode}
+        initialDate={startDate}
+        viewClassNames={['text-sm', 'text-muted-foreground']}
+        editable={true}
+        selectable={true}
+        select={handleSelect}
+        dayHeaderClassNames={() => ['font-normal']}
+        dayCellContent={(arg) => arg.dayNumberText.replace('日', '')}
+        events={defaultEvents}
+        eventContent={renderEventContent}
+        eventTimeFormat={{ hour: 'numeric', minute: '2-digit' }}
+        displayEventEnd={true}
+        eventInteractive={true}
+        eventClassNames={() => ['text-primary']}
+        eventTextColor="black"
+        eventClick={handleEventClick}
+        eventDataTransform={transformEventData}
+        eventDrop={handleEventDrop}
+        eventResize={handleEventResize}
+        ref={callenderRef}
+      />
       <EventFormDialogMemo
         event={actionEvent}
         isOpen={isOpenEventDialog}
         setIsOpen={setIsOpenEventDialog}
         returnUrl={EVENT_URL + location.search}
       />
-    </>
+    </div>
   )
 }
 

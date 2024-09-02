@@ -5,6 +5,7 @@ import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
 import { Button } from '~/components/ui/button'
 import { SelectItem } from '~/components/ui/select'
+import { ACCOUNT_URL } from '~/constants'
 import {
   FormItem,
   FormLabel,
@@ -15,28 +16,33 @@ import { Required } from '~/components/lib/required'
 import { InputConform } from '~/components/lib/conform/input'
 import { SelectConform } from '~/components/lib/conform/select'
 import {
-  AccountSettings,
-  AccountSettingsSchema,
-  AccountSettingsSchemaType,
+  AccountGeneral,
+  AccountGeneralSchema,
+  AccountGeneralSchemaType,
   LanguageList,
   ThemeList,
 } from '~/types/accounts'
 
 interface AccountFormProps {
-  accountSettings: AccountSettings
+  accountGeneral: AccountGeneral
   children?: React.ReactNode
 }
 
-export function AccountForm({ accountSettings, children }: AccountFormProps) {
+export function AccountGeneralForm({
+  accountGeneral,
+  children,
+}: AccountFormProps) {
   const { t } = useTranslation()
 
-  const defaultValue = accountSettings
-  const [form, fields] = useForm<AccountSettingsSchemaType>({
-    id: 'account-form',
+  const action = [ACCOUNT_URL, 'general'].join('/')
+  const defaultValue = accountGeneral
+
+  const [form, fields] = useForm<AccountGeneralSchemaType>({
+    id: 'account-general-form',
     defaultValue: defaultValue,
-    constraint: getZodConstraint(AccountSettingsSchema),
+    constraint: getZodConstraint(AccountGeneralSchema),
     onValidate: ({ formData }) => {
-      return parseWithZod(formData, { schema: AccountSettingsSchema })
+      return parseWithZod(formData, { schema: AccountGeneralSchema })
     },
     shouldRevalidate: 'onInput',
   })
@@ -46,7 +52,7 @@ export function AccountForm({ accountSettings, children }: AccountFormProps) {
       method="post"
       {...getFormProps(form)}
       className="space-y-6"
-      action=""
+      action={action}
       state={{ isLoadEffect: true }}
     >
       <FormItem>

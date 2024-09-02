@@ -59,7 +59,6 @@ export type Account = {
   theme: Theme
 }
 
-// 既存のAccountオブジェクトに対してDBのアカウント情報をマージ
 export function AccountModel2Account(accountModel: AccountModel): Account {
   return {
     id: accountModel.id,
@@ -90,14 +89,23 @@ export type LoginSession = {
 
 // アカウント設定の型
 export type AccountSettings = {
+  general: AccountGeneral
+  password: AccountPassword
+}
+
+// アカウント設定：一般の型
+export type AccountGeneral = {
   name: string
   language: Language
   theme: Theme
+}
+// アカウント設定：パスワードの型
+export type AccountPassword = {
   lastLogin: Date
   lastPasswordChange: Date
 }
 
-export const AccountSettingsSchema = zod.object({
+export const AccountGeneralSchema = zod.object({
   name: zod
     .string({ required_error: '必須項目です' })
     .max(255, { message: '255文字以内で入力してください' }),
@@ -109,4 +117,4 @@ export const AccountSettingsSchema = zod.object({
   }),
 })
 
-export type AccountSettingsSchemaType = zod.infer<typeof AccountSettingsSchema>
+export type AccountGeneralSchemaType = zod.infer<typeof AccountGeneralSchema>

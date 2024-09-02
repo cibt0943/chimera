@@ -14,6 +14,7 @@ import {
   TaskWithNonNullableDueDate,
   MemoWithNonNullableRelatedDate,
 } from '~/types/events'
+import { MemoSettings } from '~/types/memo-settings'
 import { getEvents, insertEvent } from '~/models/event.server'
 import { getTasks } from '~/models/task.server'
 import { getMemos } from '~/models/memo.server'
@@ -53,6 +54,7 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
 
 type LoaderData = {
   calendarEvents: CalendarEvents
+  memoSettings: MemoSettings
 }
 
 export function getDispStartDayFromParams(request: Request): Date {
@@ -108,7 +110,7 @@ export default function Layout() {
   const { calendarEvents } = useTypedLoaderData<LoaderData>()
 
   return (
-    <div className="p-4">
+    <div className="p-4 pt-1 xl:pt-4">
       <Calendar defaultEvents={calendarEvents} />
       <Outlet />
     </div>

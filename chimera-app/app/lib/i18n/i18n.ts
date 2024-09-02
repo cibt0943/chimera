@@ -47,7 +47,7 @@ i18n
 
 export default i18n
 
-export function useChangeLanguage(locale: string) {
+export function useLanguage(locale: string) {
   React.useEffect(() => {
     i18n.changeLanguage(locale)
   }, [locale])

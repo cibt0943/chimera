@@ -65,8 +65,7 @@
     }
   },
   "account": {
-    "title-account": "Account",
-    "title-password": "Password",
+    "page_title": "Account Settings",
     "model": {
       "email": "Email",
       "name": "Name",
@@ -85,12 +84,12 @@
       }
     },
     "message": {
+      "general": "General",
+      "password": "Password",
       "need_login": "You must be logged in to use this feature",
       "login": "Log in",
       "logout": "Log out",
       "account_deletion": "Account Deletion",
-      "account_info": "Update your account settings",
-      "password_info": "You can change your password",
       "do_delete": "Delete your account",
       "change_password": "Change Password",
       "last_login": "Last Login Date",
@@ -100,8 +99,11 @@
       "updated": "Your account has been updated"
     }
   },
+  "todo": {
+    "menu_label": "Todo",
+    "page_title": "Todo"
+  },
   "task": {
-    "title": "Task",
     "model": {
       "id": "ID",
       "title": "Title",
@@ -134,8 +136,8 @@
     }
   },
   "memo": {
-    "title": "Memo",
-    "un_titled": "Untitled",
+    "menu_label": "Memo",
+    "page_title": "Memo",
     "model": {
       "id": "ID",
       "title": "Title",
@@ -148,8 +150,8 @@
         "archive": "Archive"
       }
     },
-
     "message": {
+      "un_titled": "Untitled",
       "memo_creation": "Memo Creation",
       "memo_editing": "Memo Editing",
       "memo_deletion": "Memo Deletion",
@@ -164,7 +166,6 @@
     }
   },
   "memo_settings": {
-    "title": "Settings",
     "message": {
       "list_show_archived": "Show Archived Items in List",
       "list_show_content": "Show Content Preview in List",
@@ -172,7 +173,8 @@
     }
   },
   "event": {
-    "title": "Event",
+    "menu_label": "Event",
+    "page_title": "Event",
     "model": {
       "id": "ID",
       "title": "Title",
@@ -188,5 +190,17 @@
       "event_deletion": "Event Deletion",
       "set_event_info": "Set the event information"
     }
+  },
+  "daily_note": {
+    "menu_label": "Daily Note",
+    "page_title": "Daily Note"
+  },
+  "file": {
+    "menu_label": "File",
+    "page_title": "File"
+  },
+  "reminder": {
+    "menu_label": "Reminder",
+    "page_title": "Reminder"
   }
 }

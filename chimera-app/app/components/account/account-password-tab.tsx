@@ -4,24 +4,22 @@ import { format } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Separator } from '~/components/ui/separator'
 import { Button } from '~/components/ui/button'
+import { ACCOUNT_URL } from '~/constants'
 import { FormFooter } from '~/components/lib/form'
-import type { AccountSettings } from '~/types/accounts'
+import type { AccountPassword } from '~/types/accounts'
 
-interface PasswordTabProps {
-  accountSettings: AccountSettings
+interface AccountPasswordTabProps {
+  accountPassword: AccountPassword
 }
 
-export function PasswordTab({ accountSettings }: PasswordTabProps) {
+export function AccountPasswordTab({
+  accountPassword,
+}: AccountPasswordTabProps) {
   const { t } = useTranslation()
+  const action = [ACCOUNT_URL, 'password'].join('/')
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1.5">
-        <h2 className="text-xl font-bold">{t('account.title-password')}</h2>
-        <p className="text-sm text-muted-foreground">
-          {t('account.message.password_info')}
-        </p>
-      </div>
       <Separator />
       <Card>
         <CardHeader>
@@ -30,7 +28,7 @@ export function PasswordTab({ accountSettings }: PasswordTabProps) {
         <CardContent>
           <p>
             {format(
-              accountSettings.lastLogin,
+              accountPassword.lastLogin,
               t('common.format.date_time_format'),
             )}
           </p>
@@ -43,13 +41,13 @@ export function PasswordTab({ accountSettings }: PasswordTabProps) {
         <CardContent>
           <p>
             {format(
-              accountSettings.lastPasswordChange,
+              accountPassword.lastPasswordChange,
               t('common.format.date_time_format'),
             )}
           </p>
         </CardContent>
       </Card>
-      <Form action={`/account/password`} method="post">
+      <Form action={action} method="post">
         <FormFooter>
           <Button type="submit">{t('account.message.change_password')}</Button>
         </FormFooter>

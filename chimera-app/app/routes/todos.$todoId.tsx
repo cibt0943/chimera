@@ -60,6 +60,7 @@ export default function Todo() {
       task={task}
       isOpen={isOpenDialog}
       setIsOpen={setIsOpenDialog}
+      returnUrl={TODO_URL}
     />
   )
 }

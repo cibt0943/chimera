@@ -19,7 +19,7 @@ export function TodoTableToolbar<TData>({
 
   return (
     <div className="flex flex-1 items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
+      <div className="flex items-center space-x-2">
         <Input
           type="search"
           placeholder={t('task.message.title_search')}
@@ -27,7 +27,7 @@ export function TodoTableToolbar<TData>({
           onChange={(event) =>
             table.getColumn('title')?.setFilterValue(event.target.value)
           }
-          className="h-8 w-[150px] lg:w-[250px]"
+          className="h-8 w-[155px] min-[420px]:w-[180px] md:w-[220px] lg:w-[250px]"
           id="tasks-title-search"
         />
         {table.getColumn('status') && (
@@ -41,7 +41,7 @@ export function TodoTableToolbar<TData>({
           <Button
             variant="ghost"
             onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3"
+            className="hidden h-8 px-2 sm:inline-flex"
             size="sm"
           >
             {t('common.message.reset')}
