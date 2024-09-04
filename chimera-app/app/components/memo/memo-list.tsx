@@ -47,12 +47,8 @@ export function MemoList({
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 10,
-      },
-    }),
-    useSensor(TouchSensor, {}),
+    useSensor(MouseSensor, { activationConstraint: { distance: 10 } }),
+    useSensor(TouchSensor, { activationConstraint: { distance: 10 } }),
   )
 
   // メモ一覧データ
@@ -118,7 +114,7 @@ export function MemoList({
       const nowIndex = dispMemos.findIndex((memo) => memo.id === focusedMemo.id)
       targetIndex = isUp ? nowIndex - 1 : nowIndex + 1
     }
-    if (targetIndex < 0 || targetIndex >= dispMemos.length) return
+    if (!dispMemos[targetIndex]) return
     setFocusedMemo(dispMemos[targetIndex])
     setListFocus(dispMemos[targetIndex])
   }
@@ -133,7 +129,7 @@ export function MemoList({
     // フィルタリング後のメモデータ(dispMemos)を元に表示順更新対象のメモを取得
     const fromIndex = dispMemos.findIndex((memo) => targetMemo.id === memo.id)
     const toIndex = isUp ? fromIndex - 1 : fromIndex + 1
-    if (toIndex < 0 || toIndex >= dispMemos.length) return
+    if (!dispMemos[toIndex]) return
     moveMemo(targetMemo, dispMemos[toIndex])
   }
 
@@ -255,8 +251,7 @@ export function MemoList({
         // メモ削除
         case 'delete':
         case 'backspace':
-          if (!selectedMemo) return
-          openDeleteMemoDialog(selectedMemo)
+          selectedMemo && openDeleteMemoDialog(selectedMemo)
           break
       }
     },

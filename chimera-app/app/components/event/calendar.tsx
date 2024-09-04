@@ -73,7 +73,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   function handleEventClick(arg: EventClickArg) {
     const { type, srcObj } = arg.event.extendedProps
     const url = getEditUrl(type, srcObj.id)
-    if (url) navigate(url + location.search)
+    url && navigate(url + location.search)
   }
 
   // 編集画面URLを取得
@@ -161,7 +161,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
 
     // fullcalendarは終日の場合、終了日の値が1日後の日付になるので1日前に変更
     if (endDate) {
-      if (srcObj.allDay) endDate.setDate(endDate.getDate() - 1)
+      srcObj.allDay && endDate.setDate(endDate.getDate() - 1)
       copyTime(srcObj.endDate, endDate)
     }
 
@@ -218,14 +218,16 @@ export function Calendar({ defaultEvents }: CalendarProps) {
         editable={true}
         selectable={true}
         select={handleSelect}
-        dayHeaderClassNames={() => ['font-normal']}
+        dayHeaderClassNames={['font-normal']}
         dayCellContent={(arg) => arg.dayNumberText.replace('日', '')}
+        listDayFormat={{ day: 'numeric', weekday: 'short' }}
+        listDaySideFormat={() => ''}
         events={defaultEvents}
         eventContent={renderEventContent}
         eventTimeFormat={{ hour: 'numeric', minute: '2-digit' }}
         displayEventEnd={true}
         eventInteractive={true}
-        eventClassNames={() => ['text-primary']}
+        eventClassNames={['text-primary']}
         eventTextColor="black"
         eventClick={handleEventClick}
         eventDataTransform={transformEventData}
@@ -253,7 +255,7 @@ function createEventDropRequest(
 
   // fullcalendarは終日の場合、終了日の値が1日後の日付になるので1日前に変更
   if (endDate) {
-    if (srcObj.allDay) endDate.setDate(endDate.getDate() - 1)
+    srcObj.allDay && endDate.setDate(endDate.getDate() - 1)
     copyTime(srcObj.endDate, endDate)
   }
 

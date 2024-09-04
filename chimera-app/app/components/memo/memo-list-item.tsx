@@ -18,8 +18,8 @@ function NavLinkClassName({
   isSelected: boolean
 }) {
   const selectedClassName = isSelected
-    ? 'bg-blue-100 dark:bg-slate-700'
-    : 'hover:bg-accent'
+    ? 'bg-blue-100 dark:bg-muted'
+    : 'hover:bg-blue-100/50 dark:hover:bg-muted/50'
 
   const archiveClassName =
     item.status === MemoStatus.ARCHIVED ? 'text-muted-foreground' : ''
