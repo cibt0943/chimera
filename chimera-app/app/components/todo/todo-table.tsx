@@ -81,12 +81,8 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const { toast } = useToast()
   const isLoading = useIsLoading()
   const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 5,
-      },
-    }),
-    useSensor(TouchSensor, {}),
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, {}),
   )
 
@@ -210,6 +206,11 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     return sorting.length == 0
   }
 
+  // 並び順を変更できないか否か
+  function cannotMoveTask() {
+    return !canMoveTask()
+  }
+
   // ドラッグ&ドロップによるタスクの表示順変更
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -268,7 +269,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   // タスクの表示順を1ステップ変更
   function moveTaskOneStep(targetTask: Task, isUp: boolean) {
-    if (!canMoveTask()) {
+    if (cannotMoveTask()) {
       clearSortToast()
       return
     }
@@ -434,13 +435,9 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         <DndContext
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}
-          cancelDrop={() => {
-            return !canMoveTask()
-          }}
+          cancelDrop={cannotMoveTask}
           onDragEnd={handleDragEnd}
-          onDragCancel={() => {
-            clearSortToast()
-          }}
+          onDragCancel={clearSortToast}
           sensors={sensors}
           id="dnd-context-for-todo-table"
         >
@@ -546,12 +543,10 @@ function DraggableRow({ row }: { row: Row<Task> }) {
       data-state={row.getIsSelected() && 'selected'}
       ref={setNodeRef}
       style={style}
-      onFocus={() => {
-        row.toggleSelected(true)
-      }}
+      onFocus={() => row.toggleSelected(true)}
       tabIndex={0}
       id={`row-${row.id}`}
-      className="outline-none data-[state=selected]:bg-blue-100 dark:data-[state=selected]:bg-slate-700"
+      className="outline-none hover:bg-blue-100/50 data-[state=selected]:bg-blue-100 dark:hover:bg-muted/50 dark:data-[state=selected]:bg-muted"
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>
