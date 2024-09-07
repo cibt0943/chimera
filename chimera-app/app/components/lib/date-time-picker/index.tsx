@@ -141,7 +141,7 @@ export function DateTimePicker({
             handleChangeDate(undefined)
           }}
         >
-          <RiCloseLine className="h-4 w-4 text-primary/30" />
+          <RiCloseLine className="h-4 w-4 text-muted-foreground" />
         </Button>
       )}
     </div>

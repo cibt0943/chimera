@@ -1,6 +1,7 @@
 import { NavLink } from '@remix-run/react'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
+import { RiEqualFill } from 'react-icons/ri'
 import { format } from 'date-fns'
 import { ColumnDef, Column, Row } from '@tanstack/react-table'
 import { useSortable } from '@dnd-kit/sortable'
@@ -18,8 +19,8 @@ function RowDragHandleCell({ rowId }: { rowId: string }) {
   })
   return (
     // Alternatively, you could set these attributes on the rows themselves
-    <Button variant="ghost" {...attributes} {...listeners} className="h-8 w-8">
-      🟰
+    <Button variant="ghost" {...attributes} {...listeners} size="icon">
+      <RiEqualFill className="h-4 w-4 font-bold" />
     </Button>
   )
 }

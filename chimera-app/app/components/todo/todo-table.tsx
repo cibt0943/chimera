@@ -546,7 +546,8 @@ function DraggableRow({ row }: { row: Row<Task> }) {
       onFocus={() => row.toggleSelected(true)}
       tabIndex={0}
       id={`row-${row.id}`}
-      className="outline-none hover:bg-blue-100/50 data-[state=selected]:bg-blue-100 dark:hover:bg-muted/50 dark:data-[state=selected]:bg-muted"
+      className="outline-none hover:bg-muted/50 data-[state=selected]:bg-muted"
+      // className="outline-none hover:bg-blue-100/50 data-[state=selected]:bg-blue-100 dark:hover:bg-muted/50 dark:data-[state=selected]:bg-muted"
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>

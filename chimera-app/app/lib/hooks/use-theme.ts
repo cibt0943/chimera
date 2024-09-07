@@ -23,9 +23,7 @@ export function useTheme(theme: Theme) {
   isomorphicLayoutEffect(() => {
     updateClassName()
     const mediaQuery = window.matchMedia(prefersLightMQ)
-    const handleChange = () => {
-      updateClassName()
-    }
+    const handleChange = () => updateClassName()
     mediaQuery.addEventListener('change', handleChange)
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme])
