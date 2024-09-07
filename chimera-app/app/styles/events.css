@@ -10,6 +10,14 @@
   @apply inline-flex h-8 items-center justify-center whitespace-nowrap rounded-md border-none bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground shadow-sm transition-colors hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 !important;
 }
 
+.fc-daygrid-day-top {
+  @apply justify-center;
+}
+
+.fc-daygrid-day-number {
+  @apply text-muted-foreground;
+}
+
 /* リスト表示時の行に対するボーダー変更 */
 .fc-list {
   @apply border-border !important;
@@ -24,13 +32,17 @@
 
 /* リスト表示時の日付行に対するスタイル */
 .fc-list .fc-list-day-cushion {
-  @apply bg-secondary;
-  @apply font-normal;
+  @apply bg-muted/30 font-normal;
+}
+
+.dark .fc-list .fc-list-day-cushion {
+  @apply bg-background/95;
 }
 
 /* リスト表示時のイベント行に対するスタイル */
 .fc-list-event:hover td {
-  @apply bg-blue-100/50 !important;
+  /* @apply bg-blue-100/50 !important; */
+  @apply bg-muted/50 !important;
 }
 
 /* リスト表示時のイベント行に対するスタイル */

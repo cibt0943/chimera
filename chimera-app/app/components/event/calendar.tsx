@@ -214,7 +214,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
         datesSet={handleDatesSet}
         initialView={viewMode}
         initialDate={startDate}
-        viewClassNames={['text-sm', 'text-muted-foreground']}
+        viewClassNames={['text-sm']}
         editable={true}
         selectable={true}
         select={handleSelect}
@@ -227,7 +227,6 @@ export function Calendar({ defaultEvents }: CalendarProps) {
         eventTimeFormat={{ hour: 'numeric', minute: '2-digit' }}
         displayEventEnd={true}
         eventInteractive={true}
-        eventClassNames={['text-primary']}
         eventTextColor="black"
         eventClick={handleEventClick}
         eventDataTransform={transformEventData}

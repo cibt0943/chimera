@@ -89,7 +89,7 @@ export default function App() {
   useSonner(toast)
 
   return (
-    <html lang={language} className={theme}>
+    <html lang={language} className="" suppressHydrationWarning={true}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -99,14 +99,28 @@ export default function App() {
         {/* https://github.com/fullcalendar/fullcalendar-examples/tree/main/remix */}
         <style data-fullcalendar />
         <Links />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+            (function() {
+              var theme = "${theme}";
+              if (theme === "system") {
+                theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+              }
+              const root = document.documentElement
+              root.classList.add(theme);
+            })();
+          `,
+          }}
+        />
       </head>
       <body className="overflow-y-hidden">
         <I18nextProvider i18n={i18n}>
           <div className="flex">
-            <aside className="h-screen overflow-auto">
+            <aside className="h-dvh overflow-auto">
               <Sidebar />
             </aside>
-            <div className="h-screen flex-1 overflow-auto">
+            <div className="h-dvh flex-1 overflow-auto">
               <Navbar />
               <main>
                 <LoadingEffect>
