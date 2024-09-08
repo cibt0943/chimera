@@ -82,7 +82,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const isLoading = useIsLoading()
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { distance: 10 } }),
     useSensor(KeyboardSensor, {}),
   )
 

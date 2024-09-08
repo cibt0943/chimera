@@ -48,7 +48,7 @@ export function MemoList({
   const fetcher = useFetcher()
   const sensors = useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: { distance: 10 },
+      activationConstraint: { distance: 5 },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
