@@ -15,7 +15,7 @@ export function Sidebar() {
         </h1>
       </div>
       <div className="flex-1">
-        <div className="grid gap-1 p-px">
+        <div className="m-px grid gap-1">
           <Menus />
         </div>
       </div>

@@ -47,8 +47,15 @@ export function MemoList({
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 10 } }),
-    useSensor(TouchSensor, { activationConstraint: { distance: 10 } }),
+    useSensor(MouseSensor, {
+      activationConstraint: { distance: 10 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250, // 長押しして250ms経過後にドラッグを開始
+        distance: 10,
+      },
+    }),
   )
 
   // メモ一覧データ
