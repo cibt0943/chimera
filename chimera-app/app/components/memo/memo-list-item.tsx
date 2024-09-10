@@ -17,18 +17,17 @@ function NavLinkClassName({
   item: Memo
   isSelected: boolean
 }) {
-  const selectedClassName = isSelected ? 'bg-muted' : 'hover:bg-muted/50'
-  // const selectedClassName = isSelected
-  // ? 'bg-blue-100 dark:bg-muted'
-  // : 'hover:bg-blue-100/50 dark:hover:bg-muted/50'
+  const selectedClassName = isSelected
+    ? 'bg-muted'
+    : 'hover:bg-muted/50 bg-background'
 
   const archiveClassName =
     item.status === MemoStatus.ARCHIVED ? 'text-muted-foreground' : ''
 
   return cn(
-    'flex flex-col gap-2 rounded-lg border p-3 text-sm group',
-    // 'focus-visible:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400',
-    'focus-visible:outline-none focus:ring-2 focus:ring-inset focus:ring-ring',
+    'flex flex-col gap-2 rounded-md border p-3 text-sm group',
+    // 'outline-none focus:ring-2 focus:ring-inset focus:ring-ring',
+    'outline-none focus:ring-1 focus:ring-inset focus:ring-ring',
     selectedClassName,
     archiveClassName,
   )

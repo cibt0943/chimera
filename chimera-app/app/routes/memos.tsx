@@ -72,15 +72,13 @@ export default function Layout() {
 
   if (!isLaptop) {
     return (
-      <div className="p-4 pt-1 xl:pt-4">
-        <div className="rounded-lg border">
-          <MemoList
-            defaultMemos={memos}
-            showId={memoId || ''}
-            memoSettings={memoSettings}
-          />
-          <Outlet />
-        </div>
+      <div className="pt-1">
+        <MemoList
+          defaultMemos={memos}
+          showId={memoId || ''}
+          memoSettings={memoSettings}
+        />
+        <Outlet />
       </div>
     )
   }

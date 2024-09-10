@@ -51,10 +51,7 @@ export function MemoList({
       activationConstraint: { distance: 5 },
     }),
     useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250, // 長押しして250ms経過後にドラッグを開始
-        distance: 10,
-      },
+      activationConstraint: { distance: 10 },
     }),
   )
 
@@ -298,13 +295,13 @@ export function MemoList({
   const isPrevew = !!memoSettings.listDisplay.content
 
   return (
-    <div className="space-y-4 px-1 py-4">
+    <div className="space-y-4 px-1 lg:py-4">
       <div className="flex items-center space-x-2 px-3">
         <Form action={MEMO_URL} method="post">
           <Button
             type="submit"
             variant="secondary"
-            className="h-8 px-2"
+            className="h-8 px-3"
             ref={useAddButtonRef}
           >
             <RiAddLine className="mr-2" />
@@ -325,7 +322,7 @@ export function MemoList({
         />
         <MemoSettingsForm />
       </div>
-      <ScrollArea className="h-[calc(100dvh_-_155px)] xl:h-[calc(100dvh_-_115px)]">
+      <ScrollArea className="h-[calc(100dvh_-_121px)] lg:h-[calc(100dvh_-_155px)] xl:h-[calc(100dvh_-_115px)]">
         <DndContext
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}
