@@ -81,12 +81,12 @@ export function ListItem(props: ListItemProps) {
 
   return (
     <NavLink
-      className={NavLinkClassName({ item, isSelected })}
-      to={to}
       id={`memo-${item.id}`}
-      onFocus={onFocus}
       ref={setNodeRef}
+      to={to}
+      className={NavLinkClassName({ item, isSelected })}
       style={style}
+      onFocus={onFocus}
       {...attributes}
       {...listeners}
       role="listitem"

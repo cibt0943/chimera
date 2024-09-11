@@ -542,15 +542,14 @@ function DraggableRow({ row }: { row: Row<Task> }) {
 
   return (
     <TableRow
-      key={row.id}
-      data-state={row.getIsSelected() && 'selected'}
-      ref={setNodeRef}
-      style={style}
-      onFocus={() => row.toggleSelected(true)}
-      tabIndex={0}
       id={`row-${row.id}`}
+      ref={setNodeRef}
+      tabIndex={0}
       // className="outline-none"
       className="rounded outline-none focus:ring-1 focus:ring-inset focus:ring-ring"
+      style={style}
+      onFocus={() => row.toggleSelected(true)}
+      data-state={row.getIsSelected() && 'selected'}
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>
