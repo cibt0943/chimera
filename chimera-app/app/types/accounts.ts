@@ -102,7 +102,7 @@ export type AccountGeneral = {
 // アカウント設定：パスワードの型
 export type AccountPassword = {
   lastLogin: Date
-  lastPasswordChange: Date
+  lastPasswordChange: Date | undefined
 }
 
 export const AccountGeneralSchema = zod.object({

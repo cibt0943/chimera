@@ -97,61 +97,69 @@ export function EventForm({
       {...getFormProps(form)}
       action={action}
     >
-      <FormItem>
-        <FormLabel htmlFor={fields.title.id}>
-          {t('event.model.title')}
-          <Required />
-        </FormLabel>
-        <InputConform meta={fields.title} type="text" />
-        <FormMessage message={fields.title.errors} />
-      </FormItem>
-      <FormItem>
-        <div className="flex flex-row space-x-6">
-          <div className="basis-1/2">
-            <DateTimePickerField
-              label={t('event.model.start')}
-              qequired={true}
-              fieldMeta={fields.startDate}
-              control={startDateControl}
-              allDay={fields.allDay.value === 'on'}
-            />
-          </div>
-          <div className="basis-1/2">
-            <DateTimePickerField
-              label={t('event.model.end')}
-              qequired={false}
-              fieldMeta={fields.endDate}
-              control={endDateControl}
-              allDay={fields.allDay.value === 'on'}
-            />
-          </div>
-        </div>
-        <div className="flex items-center">
-          <Checkbox
-            id={fields.allDay.id}
-            checked={fields.allDay.value === 'on'}
-            onCheckedChange={handleCheckedChangeAllDay}
-            name={fields.allDay.id}
-          />
-          <FormLabel htmlFor={fields.allDay.id} className="ml-2">
-            {t('event.model.all_day')}
+      <div className="max-h-[calc(100dvh_-_240px)] space-y-8 overflow-y-auto px-0.5">
+        <FormItem>
+          <FormLabel htmlFor={fields.title.id}>
+            {t('event.model.title')}
+            <Required />
           </FormLabel>
-        </div>
-        <FormMessage message={fields.allDay.errors} />
-      </FormItem>
-      <FormItem>
-        <FormLabel htmlFor={fields.memo.id}>{t('event.model.memo')}</FormLabel>
-        <TextareaConform meta={fields.memo} className="resize-none" rows={4} />
-        <FormMessage message={fields.memo.errors} />
-      </FormItem>
-      <FormItem>
-        <FormLabel htmlFor={fields.location.id}>
-          {t('event.model.location')}
-        </FormLabel>
-        <InputConform meta={fields.location} type="text" />
-        <FormMessage message={fields.location.errors} />
-      </FormItem>
-      <input type="hidden" name="returnUrl" value={returnUrl} />
+          <InputConform meta={fields.title} type="text" />
+          <FormMessage message={fields.title.errors} />
+        </FormItem>
+        <FormItem>
+          <div className="flex flex-row space-x-6">
+            <div className="basis-1/2">
+              <DateTimePickerField
+                label={t('event.model.start')}
+                qequired={true}
+                fieldMeta={fields.startDate}
+                control={startDateControl}
+                allDay={fields.allDay.value === 'on'}
+              />
+            </div>
+            <div className="basis-1/2">
+              <DateTimePickerField
+                label={t('event.model.end')}
+                qequired={false}
+                fieldMeta={fields.endDate}
+                control={endDateControl}
+                allDay={fields.allDay.value === 'on'}
+              />
+            </div>
+          </div>
+          <div className="flex items-center">
+            <Checkbox
+              id={fields.allDay.id}
+              checked={fields.allDay.value === 'on'}
+              onCheckedChange={handleCheckedChangeAllDay}
+              name={fields.allDay.id}
+            />
+            <FormLabel htmlFor={fields.allDay.id} className="ml-2">
+              {t('event.model.all_day')}
+            </FormLabel>
+          </div>
+          <FormMessage message={fields.allDay.errors} />
+        </FormItem>
+        <FormItem>
+          <FormLabel htmlFor={fields.memo.id}>
+            {t('event.model.memo')}
+          </FormLabel>
+          <TextareaConform
+            meta={fields.memo}
+            className="resize-none"
+            rows={4}
+          />
+          <FormMessage message={fields.memo.errors} />
+        </FormItem>
+        <FormItem>
+          <FormLabel htmlFor={fields.location.id}>
+            {t('event.model.location')}
+          </FormLabel>
+          <InputConform meta={fields.location} type="text" />
+          <FormMessage message={fields.location.errors} />
+        </FormItem>
+        <input type="hidden" name="returnUrl" value={returnUrl} />
+      </div>
       <FormFooter className="sm:justify-between">
         {children || <div>&nbsp;</div>}
         <Button type="submit">{t('common.message.save')}</Button>

@@ -96,7 +96,8 @@
       "last_password_change": "Last Password Change Date",
       "changed_password_info": "A password change email has been sent",
       "changed_password_description": "Please check your email. You can change your password using the URL provided in the email.",
-      "updated": "Your account has been updated"
+      "updated": "Your account has been updated",
+      "no_password_change_history": "No password change history"
     }
   },
   "todo": {

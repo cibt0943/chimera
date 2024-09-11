@@ -47,8 +47,15 @@ export function MemoList({
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 10 } }),
-    useSensor(TouchSensor, { activationConstraint: { distance: 10 } }),
+    useSensor(MouseSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 1000,
+        tolerance: 10,
+      },
+    }),
   )
 
   // メモ一覧データ
@@ -291,13 +298,13 @@ export function MemoList({
   const isPrevew = !!memoSettings.listDisplay.content
 
   return (
-    <div className="space-y-4 px-1 py-4">
+    <div className="space-y-4 px-1 lg:py-4">
       <div className="flex items-center space-x-2 px-3">
         <Form action={MEMO_URL} method="post">
           <Button
             type="submit"
             variant="secondary"
-            className="h-8 px-2"
+            className="h-8 px-3"
             ref={useAddButtonRef}
           >
             <RiAddLine className="mr-2" />
@@ -318,7 +325,7 @@ export function MemoList({
         />
         <MemoSettingsForm />
       </div>
-      <ScrollArea className="h-[calc(100dvh_-_155px)] xl:h-[calc(100dvh_-_115px)]">
+      <ScrollArea className="h-[calc(100dvh_-_121px)] lg:h-[calc(100dvh_-_155px)] xl:h-[calc(100dvh_-_115px)]">
         <DndContext
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}

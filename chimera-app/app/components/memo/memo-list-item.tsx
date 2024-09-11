@@ -17,18 +17,18 @@ function NavLinkClassName({
   item: Memo
   isSelected: boolean
 }) {
-  const selectedClassName = isSelected ? 'bg-muted' : 'hover:bg-muted/50'
-  // const selectedClassName = isSelected
-  // ? 'bg-blue-100 dark:bg-muted'
-  // : 'hover:bg-blue-100/50 dark:hover:bg-muted/50'
+  const selectedClassName = isSelected
+    ? 'bg-muted'
+    : 'hover:bg-muted/50 bg-background'
 
   const archiveClassName =
     item.status === MemoStatus.ARCHIVED ? 'text-muted-foreground' : ''
 
   return cn(
-    'flex flex-col gap-2 rounded-lg border p-3 text-sm group',
-    // 'focus-visible:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400',
-    'focus-visible:outline-none focus:ring-2 focus:ring-inset focus:ring-ring',
+    'flex flex-col gap-2 rounded-md border p-3 text-sm group',
+    // 'outline-none focus:ring-2 focus:ring-inset focus:ring-ring',
+    'outline-none focus:ring-1 focus:ring-inset focus:ring-ring',
+    'select-none',
     selectedClassName,
     archiveClassName,
   )
@@ -70,6 +70,7 @@ export function ListItem(props: ListItemProps) {
     ...(isDragging && {
       pointerEvents: 'none',
     }),
+    WebkitTouchCallout: 'none', // iOSの長押し時のコンテキストメニューの表示を防ぐ
   }
 
   // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
@@ -80,12 +81,12 @@ export function ListItem(props: ListItemProps) {
 
   return (
     <NavLink
-      className={NavLinkClassName({ item, isSelected })}
-      to={to}
       id={`memo-${item.id}`}
-      onFocus={onFocus}
       ref={setNodeRef}
+      to={to}
+      className={NavLinkClassName({ item, isSelected })}
       style={style}
+      onFocus={onFocus}
       {...attributes}
       {...listeners}
       role="listitem"

@@ -8,6 +8,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { TODO_URL } from '~/constants'
+import { cn } from '~/lib/utils'
 import { Task, TaskStatusList } from '~/types/tasks'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
@@ -19,7 +20,13 @@ function RowDragHandleCell({ rowId }: { rowId: string }) {
   })
   return (
     // Alternatively, you could set these attributes on the rows themselves
-    <Button variant="ghost" {...attributes} {...listeners} size="icon">
+    <Button
+      variant="ghost"
+      {...attributes}
+      {...listeners}
+      size="icon"
+      className="touch-none select-none"
+    >
       <RiEqualFill className="h-4 w-4 font-bold" />
     </Button>
   )
@@ -57,7 +64,11 @@ function DueDateCell({ row }: { row: Row<Task> }) {
 function StatusCell({ row }: { row: Row<Task> }) {
   const { t } = useTranslation()
   const status = TaskStatusList[row.original.status]
-  return status ? <Badge className={status.color}>{t(status.label)}</Badge> : ''
+  return status ? (
+    <Badge className={cn(status.color, 'break-keep')}>{t(status.label)}</Badge>
+  ) : (
+    ''
+  )
 }
 
 export const TodoTableColumns: ColumnDef<Task>[] = [

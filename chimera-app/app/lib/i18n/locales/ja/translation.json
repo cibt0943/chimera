@@ -96,7 +96,8 @@
       "last_password_change": "最終パスワード変更日時",
       "changed_password_info": "パスワード変更メールを送信しました",
       "changed_password_description": "メールを確認してください。メールに記載されたURLよりパスワード変更を行うことができます。",
-      "updated": "アカウントを更新しました"
+      "updated": "アカウントを更新しました",
+      "no_password_change_history": "パスワードの変更履歴はありません"
     }
   },
   "todo": {
