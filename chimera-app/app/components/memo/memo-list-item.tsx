@@ -28,6 +28,7 @@ function NavLinkClassName({
     'flex flex-col gap-2 rounded-md border p-3 text-sm group',
     // 'outline-none focus:ring-2 focus:ring-inset focus:ring-ring',
     'outline-none focus:ring-1 focus:ring-inset focus:ring-ring',
+    'select-none',
     selectedClassName,
     archiveClassName,
   )
@@ -69,6 +70,7 @@ export function ListItem(props: ListItemProps) {
     ...(isDragging && {
       pointerEvents: 'none',
     }),
+    WebkitTouchCallout: 'none', // iOSの長押し時のコンテキストメニューの表示を防ぐ
   }
 
   // const updatedAtDiff = useDateDiffFormat(item.updatedAt)

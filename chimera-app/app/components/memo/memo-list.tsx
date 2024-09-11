@@ -51,7 +51,10 @@ export function MemoList({
       activationConstraint: { distance: 5 },
     }),
     useSensor(TouchSensor, {
-      activationConstraint: { distance: 10 },
+      activationConstraint: {
+        delay: 1000,
+        tolerance: 10,
+      },
     }),
   )
 
