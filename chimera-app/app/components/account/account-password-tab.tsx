@@ -40,10 +40,12 @@ export function AccountPasswordTab({
         </CardHeader>
         <CardContent>
           <p>
-            {format(
-              accountPassword.lastPasswordChange,
-              t('common.format.date_time_format'),
-            )}
+            {accountPassword.lastPasswordChange
+              ? format(
+                  accountPassword.lastPasswordChange,
+                  t('common.format.date_time_format'),
+                )
+              : t('account.message.no_password_change_history')}
           </p>
         </CardContent>
       </Card>

@@ -6,11 +6,7 @@ function getInitialState(query: string, defaultState?: boolean) {
     return defaultState
   }
 
-  if (isBrowser) {
-    return window.matchMedia(query).matches
-  }
-
-  return false
+  return isBrowser ? window.matchMedia(query).matches : false
 }
 
 export function useMedia(query: string, defaultState?: boolean) {

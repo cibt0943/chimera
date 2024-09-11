@@ -35,6 +35,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
   useSortable,
+  sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import {
@@ -82,8 +83,10 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const isLoading = useIsLoading()
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, {}),
+    useSensor(TouchSensor, { activationConstraint: { distance: 10 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   )
 
   // tanstack/react-table
@@ -418,7 +421,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
       <div className="flex items-center space-x-2">
         <Button
           variant="secondary"
-          className="h-8 px-2 md:px-3"
+          className="h-8 px-3"
           onClick={() => openAddTaskDialog()}
         >
           <RiAddLine className="mr-2" />
@@ -539,15 +542,14 @@ function DraggableRow({ row }: { row: Row<Task> }) {
 
   return (
     <TableRow
-      key={row.id}
-      data-state={row.getIsSelected() && 'selected'}
+      id={`row-${row.id}`}
       ref={setNodeRef}
+      tabIndex={0}
+      // className="outline-none"
+      className="rounded outline-none focus:ring-1 focus:ring-inset focus:ring-ring"
       style={style}
       onFocus={() => row.toggleSelected(true)}
-      tabIndex={0}
-      id={`row-${row.id}`}
-      className="outline-none hover:bg-muted/50 data-[state=selected]:bg-muted"
-      // className="outline-none hover:bg-blue-100/50 data-[state=selected]:bg-blue-100 dark:hover:bg-muted/50 dark:data-[state=selected]:bg-muted"
+      data-state={row.getIsSelected() && 'selected'}
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>
