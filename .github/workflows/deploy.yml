@@ -2,8 +2,6 @@ name: deploy
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
   deploy:
@@ -16,14 +14,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "chimera-app/package.json"
-
-      - name: Install dependencies
-        run: yarn install
 
       - name: Set up Supabase CLI
         uses: supabase/setup-cli@v1
