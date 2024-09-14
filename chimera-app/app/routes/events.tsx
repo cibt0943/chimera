@@ -20,7 +20,7 @@ import { getTasks } from '~/models/task.server'
 import { getMemos } from '~/models/memo.server'
 import { ErrorView } from '~/components/lib/error-view'
 import { Calendar } from '~/components/event/calendar'
-import styles from '~/styles/events.css'
+import styles from '~/styles/events.css?url'
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 
