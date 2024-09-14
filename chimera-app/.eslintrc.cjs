@@ -19,6 +19,7 @@ module.exports = {
     commonjs: true,
     es6: true,
   },
+  ignorePatterns: ['!**/.server', '!**/.client'],
 
   // Base config
   extends: ['eslint:recommended'],
@@ -43,6 +44,9 @@ module.exports = {
           { name: 'Link', linkAttribute: 'to' },
           { name: 'NavLink', linkAttribute: 'to' },
         ],
+        'import/resolver': {
+          typescript: {},
+        },
       },
     },
 
@@ -69,18 +73,9 @@ module.exports = {
       ],
     },
 
-    // shadcn-uiでeslintのワーニング('className' is missing in props validation)が出る問題を無視する
-    // https://github.com/shadcn-ui/ui/issues/120
-    {
-      files: ['**/components/ui/*.tsx'],
-      rules: {
-        'react/prop-types': 'off',
-      },
-    },
-
     // Node
     {
-      files: ['.eslintrc.js'],
+      files: ['.eslintrc.cjs', 'server.js'],
       env: {
         node: true,
       },

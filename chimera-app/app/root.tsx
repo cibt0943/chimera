@@ -1,9 +1,7 @@
 import * as React from 'react'
-import { cssBundleHref } from '@remix-run/css-bundle'
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
 import {
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -13,7 +11,7 @@ import { I18nextProvider } from 'react-i18next'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { getToast } from 'remix-toast'
 import { Toaster } from '~/components/ui/toaster'
-import styles from '~/styles/tailwind.css'
+import styles from '~/styles/tailwind.css?url'
 import i18n, { useLanguage } from '~/lib/i18n/i18n'
 import { authenticator } from '~/lib/auth.server'
 import { useTheme, useSonner, Sonner } from './lib/hooks'
@@ -25,10 +23,7 @@ import { Sidebar } from '~/components/sidebar'
 import { useSetAtom } from 'jotai'
 import { loginSessionAtom, memoSettingsAtom } from '~/lib/state'
 
-export const links: LinksFunction = () => [
-  { rel: 'stylesheet', href: styles },
-  ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
-]
+export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 
 function getLanguageFromHeader(request: Request) {
   // リクエストヘッダから言語を取得
@@ -134,7 +129,6 @@ export default function App() {
         </I18nextProvider>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   )
