@@ -3,9 +3,11 @@ import { cn } from '~/lib/utils'
 import { Label } from '~/components/ui/label'
 import { DialogFooter } from '~/components/ui/dialog'
 
-export interface FormItemProps extends React.ComponentProps<'div'> {}
-
-export function FormItem({ children, className, ...props }: FormItemProps) {
+export function FormItem({
+  children,
+  className,
+  ...props
+}: React.ComponentProps<'div'>) {
   return (
     <div className={cn('space-y-2', className)} {...props}>
       {children}
@@ -52,13 +54,11 @@ export function FormMessage({
   )
 }
 
-export interface FormDescriptionProps extends React.ComponentProps<'p'> {}
-
 export function FormDescription({
   children,
   className,
   ...props
-}: FormDescriptionProps) {
+}: React.ComponentProps<'p'>) {
   return (
     <p
       className={cn('text-[0.8rem] text-muted-foreground', className)}
@@ -69,8 +69,9 @@ export function FormDescription({
   )
 }
 
-export interface FormFooterProps extends React.ComponentProps<'div'> {}
-
-export function FormFooter({ children, ...props }: FormFooterProps) {
+export function FormFooter({
+  children,
+  ...props
+}: React.ComponentProps<'div'>) {
   return <DialogFooter {...props}>{children}</DialogFooter>
 }
