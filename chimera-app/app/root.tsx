@@ -14,6 +14,7 @@ import { Toaster } from '~/components/ui/toaster'
 import styles from '~/styles/tailwind.css?url'
 import i18n, { useLanguage } from '~/lib/i18n/i18n'
 import { authenticator } from '~/lib/auth.server'
+import { getUserAgent } from '~/lib/utils'
 import { useTheme, useSonner, Sonner } from './lib/hooks'
 import { Theme, Language } from '~/types/accounts'
 import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
@@ -21,7 +22,11 @@ import { LoadingEffect } from '~/components/loading-effect'
 import { Navbar } from '~/components/navbar'
 import { Sidebar } from '~/components/sidebar'
 import { useSetAtom } from 'jotai'
-import { loginSessionAtom, memoSettingsAtom } from '~/lib/state'
+import {
+  useUserAgentAtom,
+  loginSessionAtom,
+  memoSettingsAtom,
+} from '~/lib/state'
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 
@@ -67,6 +72,12 @@ export default function App() {
 
   // クライアントサイドでの言語設定
   useLanguage(language)
+
+  // ユーザーエージェント情報をグローバルステートに保存
+  const { setUserAgent } = useUserAgentAtom()
+  React.useEffect(() => {
+    setUserAgent(getUserAgent())
+  }, [setUserAgent])
 
   // ログインユーザーのアカウント情報をグローバルステートに保存
   const setLoginAccount = useSetAtom(loginSessionAtom)

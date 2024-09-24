@@ -6,7 +6,7 @@ import { Memo } from '~/types/memos'
 import { MemoForm } from './memo-form'
 import { MemoActionButton } from './memo-action-button'
 import { useAtomValue } from 'jotai'
-import { memoSettingsAtom } from '~/lib/state'
+import { useUserAgentAtom, memoSettingsAtom } from '~/lib/state'
 
 interface MemoFormViewProps {
   memo: Memo | undefined
@@ -14,6 +14,7 @@ interface MemoFormViewProps {
 }
 
 export function MemoFormView({ memo, returnUrl }: MemoFormViewProps) {
+  const { userAgent } = useUserAgentAtom()
   const formRef = React.useRef<HTMLDivElement>(null)
   const memoFormFetcher = useFetcher()
   const memoSettings = useAtomValue(memoSettingsAtom)
@@ -26,7 +27,7 @@ export function MemoFormView({ memo, returnUrl }: MemoFormViewProps) {
 
   // キーボード操作
   useHotkeys(
-    ['alt+right'],
+    [`${userAgent.modifierKey}+right`],
     (event, handler) => {
       switch (handler.keys?.join('')) {
         case 'right':

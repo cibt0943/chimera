@@ -1,16 +1,20 @@
 import * as React from 'react'
-import { isBrowser } from '~/lib/utils'
+import { useIsServer } from '~/lib/hooks'
 
-function getInitialState(query: string, defaultState?: boolean) {
+function useGetInitialState(query: string, defaultState?: boolean) {
+  const isServer = useIsServer()
+
   if (defaultState !== undefined) {
     return defaultState
   }
 
-  return isBrowser ? window.matchMedia(query).matches : false
+  return isServer ? false : window.matchMedia(query).matches
 }
 
 export function useMedia(query: string, defaultState?: boolean) {
-  const [state, setState] = React.useState(getInitialState(query, defaultState))
+  const [state, setState] = React.useState(
+    useGetInitialState(query, defaultState),
+  )
 
   React.useEffect(() => {
     let mounted = true

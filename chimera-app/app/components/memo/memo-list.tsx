@@ -29,6 +29,7 @@ import { ListItem } from './memo-list-item'
 import { MemoActionMenu } from './memo-action-menu'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 import { MemoSettingsForm } from './memo-settings-form'
+import { useUserAgentAtom } from '~/lib/state'
 
 interface MemoListProps {
   defaultMemos: Memos
@@ -42,6 +43,7 @@ export function MemoList({
   memoSettings,
 }: MemoListProps) {
   const { t } = useTranslation()
+  const { userAgent } = useUserAgentAtom()
   const { enqueue: searchEnqueue } = useApiQueue()
   const { enqueue: moveMemoEnqueue } = useApiQueue()
   const navigate = useNavigate()
@@ -277,7 +279,7 @@ export function MemoList({
 
   // キーボード操作(スコープなし)
   useHotkeys(
-    ['alt+n', 'alt+left'],
+    ['alt+n', `${userAgent.modifierKey}+left`],
     (_, handler) => {
       switch (handler.keys?.join('')) {
         // メモ追加
@@ -311,7 +313,7 @@ export function MemoList({
             {t('common.message.add')}
             <p className="ml-2 text-xs text-muted-foreground">
               <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-                <span>⌥</span>n
+                <span>{userAgent.modifierKeyIcon}</span>n
               </kbd>
             </p>
           </Button>
