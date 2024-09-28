@@ -11,8 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import { useAtomValue } from 'jotai'
-import { loginSessionAtom } from '~/lib/state'
+import { useLoginSessionAtom } from '~/lib/state'
 
 interface AccountMenuProps {
   onSelect?: (event: Event) => void
@@ -24,7 +23,7 @@ export function AccountMenu({ onSelect }: AccountMenuProps) {
   const fetcher = useFetcher()
 
   // ログインユーザーのアカウント情報をグローバルステートから取得
-  const loginSession = useAtomValue(loginSessionAtom)
+  const { loginSession } = useLoginSessionAtom()
   if (!loginSession) return null
 
   const handleLogoutClick = () => {

@@ -12,8 +12,7 @@ import { sleep } from '~/lib/utils'
 import { Memo } from '~/types/memos'
 import { MemoForm } from './memo-form'
 import { MemoActionButton } from './memo-action-button'
-import { useAtomValue } from 'jotai'
-import { memoSettingsAtom } from '~/lib/state'
+import { useMemoSettingsAtom } from '~/lib/state'
 
 export interface MemoFormDialogProps {
   memo: Memo | undefined
@@ -31,7 +30,7 @@ export function MemoFormDialog({
   const { t } = useTranslation()
   const navigate = useNavigate()
   const memoFormFetcher = useFetcher()
-  const memoSettings = useAtomValue(memoSettingsAtom)
+  const { memoSettings } = useMemoSettingsAtom()
   const autoSave = memoSettings?.autoSave || false
 
   //autosaveの場合はsubmitしても画面遷移しないので、returnUrlは空文字

@@ -5,8 +5,7 @@ import { MEMO_URL } from '~/constants'
 import { Memo } from '~/types/memos'
 import { MemoForm } from './memo-form'
 import { MemoActionButton } from './memo-action-button'
-import { useAtomValue } from 'jotai'
-import { useUserAgentAtom, memoSettingsAtom } from '~/lib/state'
+import { useUserAgentAtom, useMemoSettingsAtom } from '~/lib/state'
 
 interface MemoFormViewProps {
   memo: Memo | undefined
@@ -17,7 +16,7 @@ export function MemoFormView({ memo, returnUrl }: MemoFormViewProps) {
   const { userAgent } = useUserAgentAtom()
   const formRef = React.useRef<HTMLDivElement>(null)
   const memoFormFetcher = useFetcher()
-  const memoSettings = useAtomValue(memoSettingsAtom)
+  const { memoSettings } = useMemoSettingsAtom()
   const autoSave = memoSettings?.autoSave || false
 
   // テキストエリアにフォーカス

@@ -26,7 +26,8 @@ export function isServerSide() {
 // ユーザーのOSを判定する関数
 export function getOS(): OS {
   if (isServerSide()) {
-    return OS.UNKNOWN // サーバーサイドではOSが判定できないため
+    // サーバーサイドではOSが判定できないためUNKNOWNを返す
+    return OS.UNKNOWN
   }
 
   const userAgent = window.navigator.userAgent

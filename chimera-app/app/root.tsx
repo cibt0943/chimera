@@ -21,11 +21,10 @@ import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
 import { LoadingEffect } from '~/components/loading-effect'
 import { Navbar } from '~/components/navbar'
 import { Sidebar } from '~/components/sidebar'
-import { useSetAtom } from 'jotai'
 import {
   useUserAgentAtom,
-  loginSessionAtom,
-  memoSettingsAtom,
+  useLoginSessionAtom,
+  useMemoSettingsAtom,
 } from '~/lib/state'
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
@@ -73,6 +72,9 @@ export default function App() {
   // クライアントサイドでの言語設定
   useLanguage(language)
 
+  // トーストメッセージを表示
+  useSonner(toast)
+
   // ユーザーエージェント情報をグローバルステートに保存
   const { setUserAgent } = useUserAgentAtom()
   React.useEffect(() => {
@@ -80,19 +82,16 @@ export default function App() {
   }, [setUserAgent])
 
   // ログインユーザーのアカウント情報をグローバルステートに保存
-  const setLoginAccount = useSetAtom(loginSessionAtom)
+  const { setLoginSession } = useLoginSessionAtom()
   React.useEffect(() => {
-    setLoginAccount(loginSession)
-  }, [setLoginAccount, loginSession])
+    setLoginSession(loginSession)
+  }, [setLoginSession, loginSession])
 
   // ログインユーザーのメモ設定情報をグローバルステートに保存
-  const setMemoSettings = useSetAtom(memoSettingsAtom)
+  const { setMemoSettings } = useMemoSettingsAtom()
   React.useEffect(() => {
     setMemoSettings(memoSettings)
   }, [setMemoSettings, memoSettings])
-
-  // トーストメッセージを表示
-  useSonner(toast)
 
   return (
     <html lang={language} className="" suppressHydrationWarning={true}>

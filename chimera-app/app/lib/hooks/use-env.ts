@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { isServerSide, UserAgent, getUserAgent } from '~/lib/utils'
+import { isServerSide, getUserAgent, UserAgent } from '~/lib/utils'
 
 // サーバーサイドかどうかを判定するカスタムフック
 export function useIsServer() {
@@ -13,11 +13,12 @@ export function useIsServer() {
   return isServer
 }
 
+// ユーザーエージェント情報を取得するカスタムフック
 export function useUserAgent() {
   const [userAgent, setUserAgent] = React.useState<UserAgent>(getUserAgent())
 
   React.useEffect(() => {
-    // クライアントサイドでOSを設定
+    // クライアントサイドでユーザーエージェント情報を設定
     setUserAgent(getUserAgent())
   }, [])
 
