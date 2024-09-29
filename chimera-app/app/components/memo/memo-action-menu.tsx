@@ -24,7 +24,7 @@ import {
 import { MEMO_URL } from '~/constants'
 import { cn } from '~/lib/utils'
 import { Memo, MemoStatus } from '~/types/memos'
-import { useUserAgentAtom } from '~/lib/state'
+import { useUserAgentAtom } from '~/lib/global-state'
 
 interface MemoActionMenuProps {
   memo: Memo

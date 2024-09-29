@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import { useLoginSessionAtom } from '~/lib/state'
+import { useLoginSessionAtom } from '~/lib/global-state'
 
 interface AccountMenuProps {
   onSelect?: (event: Event) => void

@@ -29,7 +29,7 @@ import { ListItem } from './memo-list-item'
 import { MemoActionMenu } from './memo-action-menu'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 import { MemoSettingsForm } from './memo-settings-form'
-import { useUserAgentAtom } from '~/lib/state'
+import { useUserAgentAtom } from '~/lib/global-state'
 
 interface MemoListProps {
   defaultMemos: Memos

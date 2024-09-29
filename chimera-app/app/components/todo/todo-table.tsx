@@ -59,7 +59,7 @@ import {
   TaskDeleteConfirmDialog,
   TaskDeleteConfirmDialogProps,
 } from './task-delete-confirm-dialog'
-import { useUserAgentAtom } from '~/lib/state'
+import { useUserAgentAtom } from '~/lib/global-state'
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
     moveTask: (task: TData, isUp: boolean) => void

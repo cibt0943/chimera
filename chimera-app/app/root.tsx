@@ -25,7 +25,7 @@ import {
   useUserAgentAtom,
   useLoginSessionAtom,
   useMemoSettingsAtom,
-} from '~/lib/state'
+} from '~/lib/global-state'
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 

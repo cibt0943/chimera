@@ -5,7 +5,7 @@ import { MEMO_URL } from '~/constants'
 import { Memo } from '~/types/memos'
 import { MemoForm } from './memo-form'
 import { MemoActionButton } from './memo-action-button'
-import { useUserAgentAtom, useMemoSettingsAtom } from '~/lib/state'
+import { useUserAgentAtom, useMemoSettingsAtom } from '~/lib/global-state'
 
 interface MemoFormViewProps {
   memo: Memo | undefined

@@ -11,7 +11,7 @@ import {
 } from '~/components/ui/popover'
 import { ACCOUNT_URL } from '~/constants'
 import { MemoStatus } from '~/types/memos'
-import { useMemoSettingsAtom } from '~/lib/state'
+import { useMemoSettingsAtom } from '~/lib/global-state'
 
 export function MemoSettingsForm() {
   const { t } = useTranslation()

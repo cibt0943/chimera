@@ -12,7 +12,7 @@ import { sleep } from '~/lib/utils'
 import { Memo } from '~/types/memos'
 import { MemoForm } from './memo-form'
 import { MemoActionButton } from './memo-action-button'
-import { useMemoSettingsAtom } from '~/lib/state'
+import { useMemoSettingsAtom } from '~/lib/global-state'
 
 export interface MemoFormDialogProps {
   memo: Memo | undefined

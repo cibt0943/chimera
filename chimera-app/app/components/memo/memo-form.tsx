@@ -19,7 +19,7 @@ import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker
 import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
 import { Memo } from '~/types/memos'
 import { useMemoConform } from './memo-conform'
-import { useUserAgentAtom } from '~/lib/state'
+import { useUserAgentAtom } from '~/lib/global-state'
 
 export interface MemoFormProps {
   memo: Memo | undefined

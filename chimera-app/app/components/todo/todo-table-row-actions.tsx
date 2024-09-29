@@ -23,7 +23,7 @@ import {
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
 import { Task, TaskStatus } from '~/types/tasks'
-import { useUserAgentAtom } from '~/lib/state'
+import { useUserAgentAtom } from '~/lib/global-state'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
