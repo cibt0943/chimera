@@ -19,6 +19,7 @@ import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker
 import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
 import { Memo } from '~/types/memos'
 import { useMemoConform } from './memo-conform'
+import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom } from '~/lib/global-state'
 
 export interface MemoFormProps {
@@ -199,12 +200,13 @@ export function SaveButton({
 }
 
 function SaveHotkeyIcon() {
-  const { userAgent } = useUserAgentAtom()
+  const userAgent = useUserAgentAtom()
+  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
 
   return (
     <p className="ml-2 text-xs">
       <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-        <span>{userAgent.modifierKeyIcon}</span>s
+        <span>{modifierKeyIcon}</span>s
       </kbd>
     </p>
   )

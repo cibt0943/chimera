@@ -24,6 +24,7 @@ import {
 import { MEMO_URL } from '~/constants'
 import { cn } from '~/lib/utils'
 import { Memo, MemoStatus } from '~/types/memos'
+import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom } from '~/lib/global-state'
 
 interface MemoActionMenuProps {
@@ -37,7 +38,8 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
   const { memo, handleMoveMemo, handleUpdateMemoStatus, handleDeleteMemo } =
     props
 
-  const { userAgent } = useUserAgentAtom()
+  const userAgent = useUserAgentAtom()
+  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
   const { t } = useTranslation()
   const navigate = useNavigate()
 
@@ -79,7 +81,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             <RiArrowUpLine className="mr-2 h-4 w-4" />
             {t('common.message.position_up')}
             <DropdownMenuShortcut>
-              {userAgent.modifierKeyIcon + ' ↑'}
+              {modifierKeyIcon + ' ↑'}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -91,7 +93,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             <RiArrowDownLine className="mr-2 h-4 w-4" />
             {t('common.message.position_down')}
             <DropdownMenuShortcut>
-              {userAgent.modifierKeyIcon + ' ↓'}
+              {modifierKeyIcon + ' ↓'}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -104,7 +106,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             {archiveMenu.icon}
             {archiveMenu.caption}
             <DropdownMenuShortcut>
-              {userAgent.modifierKeyIcon + ' '}
+              {modifierKeyIcon + ' '}
               <RiCornerDownLeftLine className="inline h-3 w-3" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
@@ -131,7 +133,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             <RiDeleteBinLine className="mr-2 h-4 w-4" />
             {t('common.message.delete')}
             <DropdownMenuShortcut>
-              {userAgent.modifierKeyIcon + ' '}
+              {modifierKeyIcon + ' '}
               <RiDeleteBack2Line className="inline h-3 w-3" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>

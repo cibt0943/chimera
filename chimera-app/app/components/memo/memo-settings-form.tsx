@@ -37,7 +37,7 @@ export function MemoSettingsForm() {
 function ShowArchivedSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
-  const { memoSettings } = useMemoSettingsAtom()
+  const memoSettings = useMemoSettingsAtom()
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ
@@ -88,7 +88,7 @@ function ShowArchivedSwith() {
 function ShowContentSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
-  const { memoSettings } = useMemoSettingsAtom()
+  const memoSettings = useMemoSettingsAtom()
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ
@@ -133,7 +133,7 @@ function ShowContentSwith() {
 function AutoSaveSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
-  const { memoSettings } = useMemoSettingsAtom()
+  const memoSettings = useMemoSettingsAtom()
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ

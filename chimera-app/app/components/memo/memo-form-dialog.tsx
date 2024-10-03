@@ -30,7 +30,7 @@ export function MemoFormDialog({
   const { t } = useTranslation()
   const navigate = useNavigate()
   const memoFormFetcher = useFetcher()
-  const { memoSettings } = useMemoSettingsAtom()
+  const memoSettings = useMemoSettingsAtom()
   const autoSave = memoSettings?.autoSave || false
 
   //autosaveの場合はsubmitしても画面遷移しないので、returnUrlは空文字

@@ -23,7 +23,7 @@ export function AccountMenu({ onSelect }: AccountMenuProps) {
   const fetcher = useFetcher()
 
   // ログインユーザーのアカウント情報をグローバルステートから取得
-  const { loginSession } = useLoginSessionAtom()
+  const loginSession = useLoginSessionAtom()
   if (!loginSession) return null
 
   const handleLogoutClick = () => {

@@ -30,39 +30,41 @@ export function getOS(): OS {
     return OS.UNKNOWN
   }
 
-  const userAgent = window.navigator.userAgent
-  const platform = window.navigator.platform
+  const userAgent = window.navigator.userAgent.toLowerCase()
 
-  if (platform.startsWith('Win')) {
+  if (userAgent.indexOf('windows') !== -1) {
     return OS.WIN
-  } else if (platform.startsWith('Mac')) {
+  } else if (userAgent.indexOf('mac') !== -1) {
     return OS.MAC
-  } else if (/Android/.test(userAgent)) {
-    return OS.ANDROID
-  } else if (/iPhone|iPad|iPod/.test(userAgent)) {
-    return OS.IOS
-  } else if (/Linux/.test(platform)) {
+  } else if (userAgent.indexOf('linux') !== -1) {
     return OS.LINUX
+  } else if (/iphone|ipad|ipod/.test(userAgent)) {
+    return OS.IOS
+  } else if (userAgent.indexOf('android') !== -1) {
+    return OS.ANDROID
   }
   return OS.UNKNOWN
 }
 
 // ユーザーのOSを判定するカスタムフック
 export interface UserAgent {
-  userOS: OS
+  OS: OS
   isWindows: boolean
   isMac: boolean
-  modifierKey: string
-  modifierKeyIcon: string
 }
 
 // ユーザーエージェント情報を取得する関数
 export function getUserAgent(): UserAgent {
   const userOS = getOS()
   return {
-    userOS,
+    OS: userOS,
     isWindows: userOS === OS.WIN,
     isMac: userOS === OS.MAC,
+  }
+}
+
+export function getModifierKeyInfo(userOS: OS) {
+  return {
     modifierKey: userOS === OS.WIN ? 'mod' : 'alt',
     modifierKeyIcon: userOS === OS.WIN ? 'alt' : '⌥',
   }

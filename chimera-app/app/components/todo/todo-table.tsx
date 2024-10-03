@@ -59,6 +59,7 @@ import {
   TaskDeleteConfirmDialog,
   TaskDeleteConfirmDialogProps,
 } from './task-delete-confirm-dialog'
+import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom } from '~/lib/global-state'
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
@@ -76,7 +77,8 @@ interface TodoTableProps<TData extends RowData> {
 
 export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const { t } = useTranslation()
-  const { userAgent } = useUserAgentAtom()
+  const userAgent = useUserAgentAtom()
+  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
   const { enqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
@@ -432,7 +434,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.add')}
           <p className="ml-2 hidden text-xs text-muted-foreground sm:block">
             <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-              <span>{userAgent.modifierKeyIcon}</span>n
+              <span>{modifierKeyIcon}</span>n
             </kbd>
           </p>
         </Button>

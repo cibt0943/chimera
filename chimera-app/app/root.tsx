@@ -1,4 +1,3 @@
-import * as React from 'react'
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
 import {
   Links,
@@ -14,7 +13,6 @@ import { Toaster } from '~/components/ui/toaster'
 import styles from '~/styles/tailwind.css?url'
 import i18n, { useLanguage } from '~/lib/i18n/i18n'
 import { authenticator } from '~/lib/auth.server'
-import { getUserAgent } from '~/lib/utils'
 import { useTheme, useSonner, Sonner } from './lib/hooks'
 import { Theme, Language } from '~/types/accounts'
 import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
@@ -22,12 +20,18 @@ import { LoadingEffect } from '~/components/loading-effect'
 import { Navbar } from '~/components/navbar'
 import { Sidebar } from '~/components/sidebar'
 import {
-  useUserAgentAtom,
-  useLoginSessionAtom,
-  useMemoSettingsAtom,
+  useSetUserAgentAtom,
+  useSetLoginSessionAtom,
+  useSetMemoSettingsAtom,
 } from '~/lib/global-state'
 
-export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
+export const links: LinksFunction = () => [
+  {
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap',
+  },
+  { rel: 'stylesheet', href: styles },
+]
 
 function getLanguageFromHeader(request: Request) {
   // リクエストヘッダから言語を取得
@@ -76,22 +80,13 @@ export default function App() {
   useSonner(toast)
 
   // ユーザーエージェント情報をグローバルステートに保存
-  const { setUserAgent } = useUserAgentAtom()
-  React.useEffect(() => {
-    setUserAgent(getUserAgent())
-  }, [setUserAgent])
+  useSetUserAgentAtom()
 
   // ログインユーザーのアカウント情報をグローバルステートに保存
-  const { setLoginSession } = useLoginSessionAtom()
-  React.useEffect(() => {
-    setLoginSession(loginSession)
-  }, [setLoginSession, loginSession])
+  useSetLoginSessionAtom(loginSession)
 
   // ログインユーザーのメモ設定情報をグローバルステートに保存
-  const { setMemoSettings } = useMemoSettingsAtom()
-  React.useEffect(() => {
-    setMemoSettings(memoSettings)
-  }, [setMemoSettings, memoSettings])
+  useSetMemoSettingsAtom(memoSettings)
 
   return (
     <html lang={language} className="" suppressHydrationWarning={true}>

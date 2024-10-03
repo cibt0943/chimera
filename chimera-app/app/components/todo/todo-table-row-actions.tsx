@@ -23,6 +23,7 @@ import {
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
 import { Task, TaskStatus } from '~/types/tasks'
+import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom } from '~/lib/global-state'
 
 interface DataTableRowActionsProps<TData> {
@@ -35,7 +36,8 @@ export function TodoTableRowActions({
   table,
 }: DataTableRowActionsProps<Task>) {
   const { t } = useTranslation()
-  const { userAgent } = useUserAgentAtom()
+  const userAgent = useUserAgentAtom()
+  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
 
   const task = row.original
 
@@ -58,9 +60,7 @@ export function TodoTableRowActions({
         >
           <RiArrowUpLine className="mr-2 h-4 w-4" />
           {t('common.message.position_up')}
-          <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' ↑'}
-          </DropdownMenuShortcut>
+          <DropdownMenuShortcut>{modifierKeyIcon + ' ↑'}</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
@@ -69,9 +69,7 @@ export function TodoTableRowActions({
         >
           <RiArrowDownLine className="mr-2 h-4 w-4" />
           {t('common.message.position_down')}
-          <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' ↓'}
-          </DropdownMenuShortcut>
+          <DropdownMenuShortcut>{modifierKeyIcon + ' ↓'}</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -83,9 +81,7 @@ export function TodoTableRowActions({
         >
           <RiCircleLine className="mr-2 h-4 w-4" />
           {t('task.message.to_new')}
-          <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' 1'}
-          </DropdownMenuShortcut>
+          <DropdownMenuShortcut>{modifierKeyIcon + ' 1'}</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={task.status === TaskStatus.DOING}
@@ -96,9 +92,7 @@ export function TodoTableRowActions({
         >
           <RiProgress4Line className="mr-2 h-4 w-4" />
           {t('task.message.to_doing')}
-          <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' 2'}
-          </DropdownMenuShortcut>
+          <DropdownMenuShortcut>{modifierKeyIcon + ' 2'}</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={task.status === TaskStatus.DONE}
@@ -109,9 +103,7 @@ export function TodoTableRowActions({
         >
           <RiProgress8Line className="mr-2 h-4 w-4" />
           {t('task.message.to_done')}
-          <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' 3'}
-          </DropdownMenuShortcut>
+          <DropdownMenuShortcut>{modifierKeyIcon + ' 3'}</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={task.status === TaskStatus.PENDING}
@@ -122,9 +114,7 @@ export function TodoTableRowActions({
         >
           <RiProhibited2Line className="mr-2 h-4 w-4" />
           {t('task.message.to_pending')}
-          <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' 4'}
-          </DropdownMenuShortcut>
+          <DropdownMenuShortcut>{modifierKeyIcon + ' 4'}</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
@@ -147,7 +137,7 @@ export function TodoTableRowActions({
           <RiDeleteBinLine className="mr-2 h-4 w-4" />
           {t('common.message.delete')}
           <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' '}
+            {modifierKeyIcon + ' '}
             <RiDeleteBack2Line className="inline h-3 w-3" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
