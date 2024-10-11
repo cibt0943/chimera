@@ -5,8 +5,8 @@ import { MEMO_URL } from '~/constants'
 import { Memo } from '~/types/memos'
 import { MemoForm } from './memo-form'
 import { MemoActionButton } from './memo-action-button'
-import { useAtomValue } from 'jotai'
-import { memoSettingsAtom } from '~/lib/state'
+import { getModifierKeyInfo } from '~/lib/utils'
+import { useUserAgentAtom, useMemoSettingsAtom } from '~/lib/global-state'
 
 interface MemoFormViewProps {
   memo: Memo | undefined
@@ -14,9 +14,11 @@ interface MemoFormViewProps {
 }
 
 export function MemoFormView({ memo, returnUrl }: MemoFormViewProps) {
+  const userAgent = useUserAgentAtom()
+  const { modifierKey } = getModifierKeyInfo(userAgent.OS)
   const formRef = React.useRef<HTMLDivElement>(null)
   const memoFormFetcher = useFetcher()
-  const memoSettings = useAtomValue(memoSettingsAtom)
+  const memoSettings = useMemoSettingsAtom()
   const autoSave = memoSettings?.autoSave || false
 
   // テキストエリアにフォーカス
@@ -26,7 +28,7 @@ export function MemoFormView({ memo, returnUrl }: MemoFormViewProps) {
 
   // キーボード操作
   useHotkeys(
-    ['alt+right'],
+    [`${modifierKey}+right`],
     (event, handler) => {
       switch (handler.keys?.join('')) {
         case 'right':

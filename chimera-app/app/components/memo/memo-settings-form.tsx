@@ -11,8 +11,7 @@ import {
 } from '~/components/ui/popover'
 import { ACCOUNT_URL } from '~/constants'
 import { MemoStatus } from '~/types/memos'
-import { useAtomValue } from 'jotai'
-import { memoSettingsAtom } from '~/lib/state'
+import { useMemoSettingsAtom } from '~/lib/global-state'
 
 export function MemoSettingsForm() {
   const { t } = useTranslation()
@@ -38,7 +37,7 @@ export function MemoSettingsForm() {
 function ShowArchivedSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
-  const memoSettings = useAtomValue(memoSettingsAtom)
+  const memoSettings = useMemoSettingsAtom()
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ
@@ -89,7 +88,7 @@ function ShowArchivedSwith() {
 function ShowContentSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
-  const memoSettings = useAtomValue(memoSettingsAtom)
+  const memoSettings = useMemoSettingsAtom()
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ
@@ -134,7 +133,7 @@ function ShowContentSwith() {
 function AutoSaveSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
-  const memoSettings = useAtomValue(memoSettingsAtom)
+  const memoSettings = useMemoSettingsAtom()
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ

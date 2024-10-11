@@ -1,4 +1,3 @@
-import * as React from 'react'
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
 import {
   Links,
@@ -20,10 +19,20 @@ import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
 import { LoadingEffect } from '~/components/loading-effect'
 import { Navbar } from '~/components/navbar'
 import { Sidebar } from '~/components/sidebar'
-import { useSetAtom } from 'jotai'
-import { loginSessionAtom, memoSettingsAtom } from '~/lib/state'
+import {
+  useSetUserAgentAtom,
+  useSetLoginSessionAtom,
+  useSetMemoSettingsAtom,
+} from '~/lib/global-state'
 
-export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
+export const links: LinksFunction = () => [
+  // {
+  //   rel: 'stylesheet',
+  //   // href: 'https://fonts.googleapis.com/css2?family=BIZ+UDMincho:wght@400;700&display=swap',
+  //   href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap',
+  // },
+  { rel: 'stylesheet', href: styles },
+]
 
 function getLanguageFromHeader(request: Request) {
   // リクエストヘッダから言語を取得
@@ -68,20 +77,17 @@ export default function App() {
   // クライアントサイドでの言語設定
   useLanguage(language)
 
-  // ログインユーザーのアカウント情報をグローバルステートに保存
-  const setLoginAccount = useSetAtom(loginSessionAtom)
-  React.useEffect(() => {
-    setLoginAccount(loginSession)
-  }, [setLoginAccount, loginSession])
-
-  // ログインユーザーのメモ設定情報をグローバルステートに保存
-  const setMemoSettings = useSetAtom(memoSettingsAtom)
-  React.useEffect(() => {
-    setMemoSettings(memoSettings)
-  }, [setMemoSettings, memoSettings])
-
   // トーストメッセージを表示
   useSonner(toast)
+
+  // ユーザーエージェント情報をグローバルステートに保存
+  useSetUserAgentAtom()
+
+  // ログインユーザーのアカウント情報をグローバルステートに保存
+  useSetLoginSessionAtom(loginSession)
+
+  // ログインユーザーのメモ設定情報をグローバルステートに保存
+  useSetMemoSettingsAtom(memoSettings)
 
   return (
     <html lang={language} className="" suppressHydrationWarning={true}>
@@ -109,7 +115,7 @@ export default function App() {
           }}
         />
       </head>
-      <body className="overflow-y-hidden">
+      <body className="overflow-y-hidden font-sans">
         <I18nextProvider i18n={i18n}>
           <div className="flex">
             <aside className="h-dvh overflow-auto">

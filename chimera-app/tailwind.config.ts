@@ -15,6 +15,19 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        // sans: ['Noto Sans JP', 'sans-serif'],
+        // sans: ['BIZ UDMincho', 'sans-serif'],
+        // sans: [
+        //   'Helvetica Neue',
+        //   'Arial',
+        //   'Hiragino Kaku Gothic ProN',
+        //   'Hiragino Sans',
+        //   'Meiryo',
+        //   'sans-serif',
+        // ],
+        sans: ['Meiryo', 'system-ui'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

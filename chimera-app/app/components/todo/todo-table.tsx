@@ -59,7 +59,8 @@ import {
   TaskDeleteConfirmDialog,
   TaskDeleteConfirmDialogProps,
 } from './task-delete-confirm-dialog'
-
+import { getModifierKeyInfo } from '~/lib/utils'
+import { useUserAgentAtom } from '~/lib/global-state'
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
     moveTask: (task: TData, isUp: boolean) => void
@@ -76,6 +77,8 @@ interface TodoTableProps<TData extends RowData> {
 
 export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const { t } = useTranslation()
+  const userAgent = useUserAgentAtom()
+  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
   const { enqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
@@ -368,9 +371,6 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
       'alt+backspace',
     ],
     (_, handler) => {
-      // ローディング中、ダイアログが開いている場合は何もしない
-      if (isLoading || isOpenAddDialog || isOpenDeleteDialog || showId) return
-
       switch (handler.keys?.join('')) {
         case 'enter':
           showSelectedTaskEdit()
@@ -405,16 +405,22 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         const target = e.target as HTMLElement
         return !['tr', 'body'].includes(target.tagName.toLowerCase())
       },
+      // ローディング中、ダイアログが開いている場合は何もしない
+      enabled: !(isLoading || isOpenAddDialog || isOpenDeleteDialog || showId),
     },
   )
 
   // タスク追加ダイアログを開く
-  useHotkeys(['alt+n'], () => {
-    // ローディング中、ダイアログが開いている場合は何もしない
-    if (isLoading || isOpenAddDialog || isOpenDeleteDialog || showId) return
-
-    openAddTaskDialog()
-  })
+  useHotkeys(
+    ['alt+n'],
+    () => {
+      openAddTaskDialog()
+    },
+    {
+      // ローディング中、ダイアログが開いている場合は何もしない
+      enabled: !(isLoading || isOpenAddDialog || isOpenDeleteDialog || showId),
+    },
+  )
 
   return (
     <div className="space-y-4">
@@ -428,7 +434,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.add')}
           <p className="ml-2 hidden text-xs text-muted-foreground sm:block">
             <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-              <span>⌥</span>n
+              <span>{modifierKeyIcon}</span>n
             </kbd>
           </p>
         </Button>

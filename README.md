@@ -11,11 +11,12 @@ You can access the service here: [Kobushi](https://kobushi.fly.dev)
 #### Todo
 
 - [x] ↑↓ キーで選択行を移動
-- [x] Option + ↑↓ キーで選択行の表示順移動
+- [x] (Mac: Option, Win: Alt) + ↑↓ キーで選択行の表示順移動
 - [x] return キーで選択行を編集
-- [x] Option + return キーで選択行の状態を完了
-- [x] Option + delete キーで選択行を削除
-- [x] 期限日情報で、イベントカレンダーに表示
+- [x] (Mac: Option, Win: Alt) + 1〜4 キーで選択行の状態を変更
+- [x] (Mac: Option, Win: Alt) + delete キーで選択行を削除
+- [x] 期限日情報を持つ。
+- [x] 期限日でイベントカレンダーにタスク情報を表示
 
 #### Memo
 
@@ -24,14 +25,14 @@ You can access the service here: [Kobushi](https://kobushi.fly.dev)
 必要になった時にアーカイブ済みのファイルからタグを元に検索して取り出す。
 
 - [x] ↑↓ キーでフォーカス行を移動
-- [x] Option + ↑↓ キーで選択行の表示順移動
+- [x] (Mac: Option, Win: Alt) + ↑↓ キーで選択行の表示順移動
 - [x] return キーで選択行を編集
-- [x] Option + return キーで選択行をアーカイブ
-- [x] Option + delete キーで選択行を削除
-- [x] Option + ← キーでメモ一覧へフォーカス移動
-- [x] Option + → キーでメモ詳細のテキストエリアへフォーカス移動
-- [x] メモには日付情報を持つ。
-- [x] 日付情報で、イベントカレンダーに表示
+- [x] (Mac: Option, Win: Alt) + return キーで選択行をアーカイブする(アーカイブから戻す)
+- [x] (Mac: Option, Win: Alt) + delete キーで選択行を削除
+- [x] (Mac: Option, Win: Ctrl) + ← キーでメモ一覧へフォーカス移動
+- [x] (Mac: Option, Win: Ctrl) + → キーでメモ詳細のテキストエリアへフォーカス移動
+- [x] メモは関連日付情報を持つ。
+- [x] 関連日付でイベントカレンダーにメモ情報を表示
 - [ ] パブリック URL を作成したメモはログインしないで共同編集可能（リアルタイム編集にしようかな）
 - [ ] Undo Redo
 

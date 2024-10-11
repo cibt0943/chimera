@@ -24,6 +24,8 @@ import {
 import { MEMO_URL } from '~/constants'
 import { cn } from '~/lib/utils'
 import { Memo, MemoStatus } from '~/types/memos'
+import { getModifierKeyInfo } from '~/lib/utils'
+import { useUserAgentAtom } from '~/lib/global-state'
 
 interface MemoActionMenuProps {
   memo: Memo
@@ -36,6 +38,8 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
   const { memo, handleMoveMemo, handleUpdateMemoStatus, handleDeleteMemo } =
     props
 
+  const userAgent = useUserAgentAtom()
+  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
   const { t } = useTranslation()
   const navigate = useNavigate()
 
@@ -67,7 +71,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuPortal>
-        <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuContent align="end" className="w-60">
           <DropdownMenuItem
             onClick={(event) => {
               event.stopPropagation() // アンカータグのクリックイベントをキャンセル
@@ -76,7 +80,9 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
           >
             <RiArrowUpLine className="mr-2 h-4 w-4" />
             {t('common.message.position_up')}
-            <DropdownMenuShortcut>⌥ ↑</DropdownMenuShortcut>
+            <DropdownMenuShortcut>
+              {modifierKeyIcon + ' ↑'}
+            </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={(event) => {
@@ -86,7 +92,9 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
           >
             <RiArrowDownLine className="mr-2 h-4 w-4" />
             {t('common.message.position_down')}
-            <DropdownMenuShortcut>⌥ ↓</DropdownMenuShortcut>
+            <DropdownMenuShortcut>
+              {modifierKeyIcon + ' ↓'}
+            </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -98,7 +106,8 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             {archiveMenu.icon}
             {archiveMenu.caption}
             <DropdownMenuShortcut>
-              ⌥ <RiCornerDownLeftLine className="inline h-3 w-3" />
+              {modifierKeyIcon + ' '}
+              <RiCornerDownLeftLine className="inline h-3 w-3" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -124,7 +133,8 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             <RiDeleteBinLine className="mr-2 h-4 w-4" />
             {t('common.message.delete')}
             <DropdownMenuShortcut>
-              ⌥ <RiDeleteBack2Line className="inline h-3 w-3" />
+              {modifierKeyIcon + ' '}
+              <RiDeleteBack2Line className="inline h-3 w-3" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>
