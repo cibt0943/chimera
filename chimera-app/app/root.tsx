@@ -26,10 +26,11 @@ import {
 } from '~/lib/global-state'
 
 export const links: LinksFunction = () => [
-  {
-    rel: 'stylesheet',
-    href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap',
-  },
+  // {
+  //   rel: 'stylesheet',
+  //   // href: 'https://fonts.googleapis.com/css2?family=BIZ+UDMincho:wght@400;700&display=swap',
+  //   href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap',
+  // },
   { rel: 'stylesheet', href: styles },
 ]
 
@@ -114,7 +115,7 @@ export default function App() {
           }}
         />
       </head>
-      <body className="overflow-y-hidden">
+      <body className="overflow-y-hidden font-sans">
         <I18nextProvider i18n={i18n}>
           <div className="flex">
             <aside className="h-dvh overflow-auto">
