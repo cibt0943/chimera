@@ -5,9 +5,8 @@ import configPrettier from 'eslint-config-prettier'
 import pluginReact from 'eslint-plugin-react'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
 import pluginJsxA11y from 'eslint-plugin-jsx-a11y'
-// eslint-plugin-importはES9へ対応してから使う
-// import pluginImport from 'eslint-plugin-import'
-
+// ES9に対応したらしいので有効にしたけどちゃんと動いてるか後で確認する
+import pluginImport from 'eslint-plugin-import'
 // eslint-plugin-react-hooks がES9に対応していないので一時的にES8の設定をES9で使えるようにする
 import { fixupPluginRules } from '@eslint/compat'
 
@@ -20,6 +19,7 @@ export default tseslint.config(
     ignores: ['build/', 'app/components/ui/'],
   },
   eslint.configs.recommended, // eslint:recommended を適用する
+  pluginImport.flatConfigs.recommended,
   ...tseslint.configs.recommended, // @typescript-eslint/eslint-plugin を適用する
   configPrettier, // eslint-config-prettier を適用する
   {

@@ -6,7 +6,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { getFormProps } from '@conform-to/react'
 import { Button } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
-import { cn } from '~/lib/utils'
+import { cn, getModifierKeyInfo } from '~/lib/utils'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
 import {
   FormItem,
@@ -19,7 +19,6 @@ import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker
 import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
 import { Memo } from '~/types/memos'
 import { useMemoConform } from './memo-conform'
-import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom } from '~/lib/global-state'
 
 export interface MemoFormProps {

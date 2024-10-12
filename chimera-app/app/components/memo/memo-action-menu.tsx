@@ -22,9 +22,8 @@ import {
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
 import { MEMO_URL } from '~/constants'
-import { cn } from '~/lib/utils'
+import { cn, getModifierKeyInfo } from '~/lib/utils'
 import { Memo, MemoStatus } from '~/types/memos'
-import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom } from '~/lib/global-state'
 
 interface MemoActionMenuProps {
