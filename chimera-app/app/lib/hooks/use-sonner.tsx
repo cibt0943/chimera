@@ -1,21 +1,36 @@
 import * as React from 'react'
 import { ToastMessage } from 'remix-toast'
-import { Toaster as Sonner, toast as notify } from 'sonner'
+import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 
-export function useSonner(toast: ToastMessage | undefined) {
+export function useSonner(toastMsg: ToastMessage | undefined) {
   const { t } = useTranslation()
 
   // トーストメッセージを表示
   React.useEffect(() => {
-    if (toast && toast.message !== '') {
-      if (toast.type === 'success') {
-        notify.success(t(toast.message))
-      } else {
-        notify.info(t(toast.message))
+    if (toastMsg && toastMsg.message !== '') {
+      const options = {
+        description: toastMsg.description,
+        duration: toastMsg.duration,
+      }
+
+      switch (toastMsg.type) {
+        case 'success':
+          toast.success(t(toastMsg.message), options)
+          break
+        case 'error':
+          toast.error(t(toastMsg.message, options))
+          break
+        case 'info':
+          toast.info(t(toastMsg.message), options)
+          break
+        case 'warning':
+          toast.warning(t(toastMsg.message), options)
+          break
+        default:
+          toast(t(toastMsg.message), options)
+          break
       }
     }
-  }, [toast, t])
+  }, [toastMsg, t])
 }
-
-export { Sonner }

@@ -9,11 +9,11 @@ import {
 import { I18nextProvider } from 'react-i18next'
 import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { getToast } from 'remix-toast'
-import { Toaster } from '~/components/ui/toaster'
+import { Toaster } from '~/components/ui/sonner'
 import styles from '~/styles/tailwind.css?url'
 import i18n, { useLanguage } from '~/lib/i18n/i18n'
 import { authenticator } from '~/lib/auth.server'
-import { useTheme, useSonner, Sonner } from './lib/hooks'
+import { useTheme, useSonner } from './lib/hooks'
 import { Theme, Language } from '~/types/accounts'
 import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
 import { LoadingEffect } from '~/components/loading-effect'
@@ -129,8 +129,7 @@ export default function App() {
                 </LoadingEffect>
               </main>
             </div>
-            <Toaster />
-            <Sonner closeButton />
+            <Toaster closeButton richColors />
           </div>
         </I18nextProvider>
         <ScrollRestoration />
