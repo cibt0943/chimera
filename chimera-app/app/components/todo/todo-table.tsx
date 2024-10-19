@@ -47,8 +47,7 @@ import {
   TableRow,
 } from '~/components/ui/table'
 import { Button } from '~/components/ui/button'
-import { ToastAction } from '~/components/ui/toast'
-import { useToast } from '~/components/ui/use-toast'
+import { toast } from 'sonner'
 import { API_URL, TODO_URL } from '~/constants'
 import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
@@ -82,7 +81,6 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const { enqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
-  const { toast } = useToast()
   const isLoading = useIsLoading()
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
@@ -183,26 +181,15 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   // 並び順を変更できない場合のトースト表示
   function clearSortToast() {
-    toast({
+    toast.warning(t('common.message.order_cannot_changed_sorting'), {
       duration: 8000,
-      variant: 'destructive',
-      description: (
-        <div className="">
-          {t('common.message.order_cannot_changed_sorting')}
-          <br />
-          {t('common.message.clear_sort?')}
-        </div>
-      ),
-      action: (
-        <ToastAction
-          altText={t('common.message.clear_sorting')}
-          onClick={() => {
-            table.resetSorting()
-          }}
-        >
-          {t('common.message.clear')}
-        </ToastAction>
-      ),
+      description: t('common.message.clear_sort?'),
+      action: {
+        label: t('common.message.clear'),
+        onClick: () => {
+          table.resetSorting()
+        },
+      },
     })
   }
 
