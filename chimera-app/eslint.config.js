@@ -59,8 +59,8 @@ export default tseslint.config(
     rules: {
       ...pluginReact.configs.recommended.rules,
       ...pluginReact.configs['jsx-runtime'].rules,
-      ...pluginJsxA11y.configs.recommended.rules,
       ...pluginReactHooks.configs.recommended.rules,
+      ...pluginJsxA11y.configs.recommended.rules,
       'react/prop-types': 'off', // Props の型チェックは TS で行う & 誤検知があるため無効化
     },
     settings: {
