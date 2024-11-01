@@ -9,6 +9,7 @@ import {
   useInputControl,
 } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
+import { Matcher } from 'react-day-picker'
 import { Button } from '~/components/ui/button'
 import { Checkbox } from '~/components/ui/checkbox'
 import { EVENT_URL } from '~/constants'
@@ -23,8 +24,6 @@ import { InputConform } from '~/components/lib/conform/input'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePicker } from '~/components/lib/date-time-picker'
 import { Event, EventSchema, EventSchemaType } from '~/types/events'
-
-type useInputControlType = ReturnType<typeof useInputControl<string>>
 
 export interface EventFormProps {
   event: Event | undefined
@@ -90,6 +89,14 @@ export function EventForm({
     ],
   )
 
+  const startDate = startDateControl.value
+    ? new Date(startDateControl.value)
+    : undefined
+  const endDate = endDateControl.value
+    ? new Date(endDateControl.value)
+    : undefined
+  const endDateDisabled = startDate ? { before: startDate } : undefined
+
   return (
     <Form
       method="post"
@@ -113,8 +120,12 @@ export function EventForm({
                 label={t('event.model.start')}
                 qequired={true}
                 fieldMeta={fields.startDate}
-                control={startDateControl}
+                selectedDate={startDate}
+                defaultMonth={startDate}
                 allDay={fields.allDay.value === 'on'}
+                handleChangeDate={(date) => {
+                  startDateControl.change(date?.toISOString() || '')
+                }}
               />
             </div>
             <div className="basis-1/2">
@@ -122,8 +133,13 @@ export function EventForm({
                 label={t('event.model.end')}
                 qequired={false}
                 fieldMeta={fields.endDate}
-                control={endDateControl}
+                selectedDate={endDate}
+                defaultMonth={endDate || startDate || new Date()}
                 allDay={fields.allDay.value === 'on'}
+                handleChangeDate={(date) => {
+                  endDateControl.change(date?.toISOString() || '')
+                }}
+                disabled={endDateDisabled}
               />
             </div>
           </div>
@@ -172,23 +188,23 @@ interface DateTimePickerFieldProps {
   label: string
   qequired: boolean
   fieldMeta: FieldMetadata<Date | undefined>
-  control: useInputControlType
+  selectedDate: Date | undefined
+  defaultMonth: Date | undefined
   allDay: boolean
+  handleChangeDate: (date: Date | undefined) => void
+  disabled?: Matcher
 }
 
 function DateTimePickerField({
   label,
   qequired,
   fieldMeta,
-  control,
+  selectedDate,
+  defaultMonth,
   allDay,
+  handleChangeDate,
+  disabled,
 }: DateTimePickerFieldProps) {
-  const date = fieldMeta.value ? toDate(fieldMeta.value) : undefined
-
-  function handleChangeDate(date: Date | undefined) {
-    control.change(date?.toISOString() || '')
-  }
-
   return (
     <FormItem>
       <FormLabel htmlFor={fieldMeta.id}>
@@ -196,12 +212,14 @@ function DateTimePickerField({
         {qequired && <Required />}
       </FormLabel>
       <DateTimePicker
-        date={date}
+        triggerId={fieldMeta.id}
+        selectedDate={selectedDate}
+        defaultMonth={defaultMonth}
         allDay={allDay}
         defaultAllDay={true}
         includeAllDayComponent={false}
         onChangeDate={handleChangeDate}
-        triggerId={fieldMeta.id}
+        disabled={disabled}
       />
       <FormMessage message={fieldMeta.errors} />
     </FormItem>

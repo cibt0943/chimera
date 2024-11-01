@@ -8,6 +8,7 @@ services:
     ports:
       - 3000:3000
       - 24678:24678 # HMR用のポートを追加
+      - 7777:7777 # eslint config-inspector用のポートを追加
     # env_file: ./chimera-app/.env
     tty: true
     stdin_open: true

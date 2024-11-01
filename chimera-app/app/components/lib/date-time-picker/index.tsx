@@ -3,6 +3,7 @@ import { RiCloseLine } from 'react-icons/ri'
 import { RxCalendar } from 'react-icons/rx'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
+import { Matcher } from 'react-day-picker'
 import { Button } from '~/components/ui/button'
 import { Calendar } from '~/components/ui/calendar'
 import {
@@ -15,28 +16,34 @@ import { cn, getLocale } from '~/lib/utils'
 import { TimePicker } from './time-picker'
 
 export interface DatePickerProps extends React.ComponentProps<'div'> {
-  date: Date | undefined
-  onChangeDate: (date: Date | undefined) => void
   triggerId?: string
+  selectedDate: Date | undefined
+  defaultMonth: Date | undefined
+  onChangeDate: (date: Date | undefined) => void
   placeholder?: string
+  disabled?: Matcher
 }
 
 export function DatePicker({
-  date,
-  onChangeDate,
   triggerId,
+  selectedDate,
+  defaultMonth,
+  onChangeDate,
   placeholder = '',
+  disabled,
   ...divProps
 }: DatePickerProps) {
   return (
     <DateTimePicker
-      date={date}
+      selectedDate={selectedDate}
+      defaultMonth={defaultMonth}
       allDay={true}
       defaultAllDay={true}
       includeAllDayComponent={false}
       onChangeDate={onChangeDate}
       triggerId={triggerId}
       placeholder={placeholder}
+      disabled={disabled}
       {...divProps}
     />
   )
@@ -50,14 +57,16 @@ export interface DateTimePickerProps extends DatePickerProps {
 }
 
 export function DateTimePicker({
-  date,
+  triggerId,
+  selectedDate,
+  defaultMonth,
   allDay,
   defaultAllDay,
   includeAllDayComponent,
   onChangeDate,
   onChangeAllDay = () => {},
-  triggerId,
   placeholder = '',
+  disabled,
   ...divProps
 }: DateTimePickerProps) {
   const { i18n } = useTranslation()
@@ -68,22 +77,22 @@ export function DateTimePicker({
 
   const handleChangeDate = React.useCallback(
     (newDate: Date | undefined) => {
-      if (date !== newDate) onChangeDate(newDate)
+      if (selectedDate !== newDate) onChangeDate(newDate)
     },
-    [date, onChangeDate],
+    [selectedDate, onChangeDate],
   )
 
   const handleChangeAllDay = React.useCallback(
     (newAllDay: boolean) => {
       if (allDay !== newAllDay) onChangeAllDay(newAllDay)
 
-      if (newAllDay && date) {
-        const updatedDate = new Date(date)
+      if (newAllDay && selectedDate) {
+        const updatedDate = new Date(selectedDate)
         updatedDate.setHours(9, 0)
         onChangeDate(updatedDate)
       }
     },
-    [allDay, date, onChangeAllDay, onChangeDate],
+    [allDay, selectedDate, onChangeAllDay, onChangeDate],
   )
 
   return (
@@ -99,29 +108,34 @@ export function DateTimePicker({
             className="grow justify-start px-2"
           >
             <RxCalendar className="mr-2 h-5 w-5 text-muted-foreground" />
-            <DispValue date={date} allDay={allDay} placeholder={placeholder} />
+            <DispValue
+              date={selectedDate}
+              allDay={allDay}
+              placeholder={placeholder}
+            />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
-            defaultMonth={date}
+            defaultMonth={defaultMonth}
             initialFocus={true}
             locale={locale}
-            selected={date}
+            selected={selectedDate}
             onSelect={(selectedDay: Date | undefined) => {
               if (selectedDay) {
                 // 日付が変更されても時分は維持（デフォルトは9:00）
                 selectedDay.setHours(
-                  date?.getHours() || 9,
-                  date?.getMinutes() || 0,
+                  selectedDate?.getHours() || 9,
+                  selectedDate?.getMinutes() || 0,
                 )
               }
               handleChangeDate(selectedDay)
             }}
+            disabled={disabled}
           />
           <TimeControl
-            date={date}
+            date={selectedDate}
             allDay={allDay}
             includeAllDayComponent={includeAllDayComponent}
             onChangeDate={handleChangeDate}
@@ -129,7 +143,7 @@ export function DateTimePicker({
           />
         </PopoverContent>
       </Popover>
-      {date && (
+      {selectedDate && (
         <Button
           type="button"
           variant="ghost"

@@ -53,7 +53,7 @@ export function TaskFormDialog({
         </DialogHeader>
         <TaskForm
           task={task}
-          onSubmit={() => setIsOpen(false)}
+          // onSubmit={() => setIsOpen(false)}
           returnUrl={returnUrl}
         >
           {task && (
