@@ -52,7 +52,8 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
 
   return (
     <DateTimePicker
-      date={dateValue}
+      selectedDate={dateValue}
+      defaultMonth={dateValue}
       allDay={allDayValue}
       defaultAllDay={defaultAllDay}
       includeAllDayComponent={includeAllDayComponent}
