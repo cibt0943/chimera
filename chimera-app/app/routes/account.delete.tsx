@@ -1,4 +1,5 @@
 import { redirect } from '@remix-run/node'
+import { AUTH_URL } from '~/constants'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { deleteAccount } from '~/models/account.server'
 import { deleteAuth0User } from '~/lib/auth0-api.server'
@@ -9,5 +10,6 @@ export const action = withAuthentication(async ({ loginSession }) => {
   // DBからアカウントを削除
   await deleteAccount(loginSession.account.id)
 
-  return redirect('/auth/logout')
+  const url = [AUTH_URL, 'logout'].join('/')
+  return redirect(url)
 })

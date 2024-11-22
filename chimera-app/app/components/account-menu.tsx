@@ -1,6 +1,11 @@
 import { useNavigate, useFetcher } from '@remix-run/react'
-import { RiUserSettingsLine, RiLogoutBoxRLine } from 'react-icons/ri'
 import { useTranslation } from 'react-i18next'
+import { LuUserCog2, LuLogOut } from 'react-icons/lu'
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '~/components/ui/sidebar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,13 +16,10 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
+import { AUTH_URL, ACCOUNT_URL } from '~/constants'
 import { useLoginSessionAtom } from '~/lib/global-state'
 
-interface AccountMenuProps {
-  onSelect?: (event: Event) => void
-}
-
-export function AccountMenu({ onSelect }: AccountMenuProps) {
+export function AccountMenu() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const fetcher = useFetcher()
@@ -26,44 +28,49 @@ export function AccountMenu({ onSelect }: AccountMenuProps) {
   const loginSession = useLoginSessionAtom()
   if (!loginSession) return null
 
-  const handleLogoutClick = () => {
-    fetcher.submit(
-      {},
-      {
-        action: '/auth/logout',
-        method: 'post',
-      },
-    )
+  function handleUerSettingsClick() {
+    const url = [ACCOUNT_URL, 'settings'].join('/')
+    navigate(url)
+  }
+
+  function handleLogoutClick() {
+    const url = [AUTH_URL, 'logout'].join('/')
+    fetcher.submit(null, { method: 'post', action: url })
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Avatar className="h-8 w-8 cursor-pointer">
-          <AvatarImage src={loginSession.auth0User.picture} />
-          <AvatarFallback>{loginSession.auth0User.name}</AvatarFallback>
-        </Avatar>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel>{loginSession.auth0User.name}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem
-            onSelect={(event: Event) => {
-              onSelect && onSelect(event)
-              navigate(`/account/settings`)
-            }}
-          >
-            <RiUserSettingsLine className="mr-2 h-4 w-4" />
-            {t('common.message.settings')}
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={handleLogoutClick}>
-          <RiLogoutBoxRLine className="mr-2 h-4 w-4" />
-          {t('account.message.logout')}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton>
+              <Avatar className="h-6 w-6">
+                <AvatarImage
+                  src={loginSession.auth0User.picture}
+                  alt={loginSession.auth0User.name}
+                />
+                <AvatarFallback>{loginSession.auth0User.name}</AvatarFallback>
+              </Avatar>
+              <span>{loginSession.auth0User.name}</span>
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>{loginSession.auth0User.name}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem onSelect={handleUerSettingsClick}>
+                <LuUserCog2 />
+                {t('common.message.settings')}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={handleLogoutClick}>
+              <LuLogOut />
+              {t('account.message.logout')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   )
 }

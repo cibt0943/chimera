@@ -1,4 +1,5 @@
 export const API_URL = '/api'
+export const AUTH_URL = '/auth'
 export const ACCOUNT_URL = '/account'
 export const TODO_URL = '/todos'
 export const MEMO_URL = '/memos'
