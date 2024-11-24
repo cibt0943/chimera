@@ -9,7 +9,7 @@ import { getMemo } from '~/models/memo.server'
 import { MemoFormDialog } from '~/components/memo/memo-form-dialog'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: 'Memo ' + data?.memo.id + ' Edit | Kobushi' }]
+  return [{ title: 'Memo ' + data?.memo.id + ' Edit | I forgot' }]
 }
 
 type LoaderData = {

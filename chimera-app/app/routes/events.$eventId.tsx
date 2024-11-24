@@ -11,7 +11,7 @@ import { getEvent, updateEvent } from '~/models/event.server'
 import { EventFormDialog } from '~/components/event/event-form-dialog'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: 'Event ' + data?.event.id + ' Edit | Kobushi' }]
+  return [{ title: 'Event ' + data?.event.id + ' Edit | I forgot' }]
 }
 
 export const action = withAuthentication(

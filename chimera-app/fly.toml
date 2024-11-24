@@ -1,18 +1,13 @@
-# fly.toml app configuration file generated for kobushi on 2024-06-30T11:23:23+09:00
+# fly.toml app configuration file generated for iforgot on 2024-11-24T17:30:13+09:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'kobushi'
+app = 'iforgot'
 primary_region = 'nrt'
 
 [build]
   dockerfile = 'Dockerfile.fly'
-
-[env]
-  DOMAIN = 'kobushi.fly.dev'
-  # 文字列じゃないとNGらしい
-  PORT = '8080'
 
 [http_service]
   internal_port = 8080

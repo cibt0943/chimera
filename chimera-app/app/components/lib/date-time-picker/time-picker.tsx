@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { RiTimeLine } from 'react-icons/ri'
+import { LuClock9 } from 'react-icons/lu'
 import { cn } from '~/lib/utils'
 import { TimePickerInput } from './time-picker-input'
 
@@ -25,7 +25,7 @@ export function TimePicker({
       )}
     >
       <div className="px-1">
-        <RiTimeLine className="h-4 w-4 text-muted-foreground" />
+        <LuClock9 className="text-muted-foreground" />
       </div>
       <div className="text-center">
         <TimePickerInput

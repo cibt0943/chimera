@@ -104,7 +104,7 @@ export function EventForm({
       {...getFormProps(form)}
       action={action}
     >
-      <div className="max-h-[calc(100dvh_-_240px)] space-y-8 overflow-y-auto px-0.5">
+      <div className="max-h-[calc(100svh_-_240px)] space-y-8 overflow-y-auto px-0.5">
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
             {t('event.model.title')}

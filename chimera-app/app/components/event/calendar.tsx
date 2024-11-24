@@ -200,7 +200,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   }, [viewMode])
 
   return (
-    <div className="h-[calc(100dvh_-_72px)] xl:h-[calc(100dvh_-_32px)]">
+    <div className="h-[calc(100svh_-_68px)] lg:h-[calc(100svh_-_32px)]">
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
         height={'100%'}

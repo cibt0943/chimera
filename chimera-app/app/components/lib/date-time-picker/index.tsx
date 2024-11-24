@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { RiCloseLine } from 'react-icons/ri'
-import { RxCalendar } from 'react-icons/rx'
+import { LuCalendar, LuX } from 'react-icons/lu'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { Matcher } from 'react-day-picker'
@@ -107,7 +106,7 @@ export function DateTimePicker({
             id={triggerId}
             className="grow justify-start px-2"
           >
-            <RxCalendar className="mr-2 h-5 w-5 text-muted-foreground" />
+            <LuCalendar className="text-muted-foreground" />
             <DispValue
               date={selectedDate}
               allDay={allDay}
@@ -155,7 +154,7 @@ export function DateTimePicker({
             handleChangeDate(undefined)
           }}
         >
-          <RiCloseLine className="h-4 w-4 text-muted-foreground" />
+          <LuX className="text-muted-foreground" />
         </Button>
       )}
     </div>
@@ -250,7 +249,7 @@ export function DummyDateTimePicker({
   return (
     <div className={cn('flex items-center rounded-md border', className)}>
       <Button variant="ghost" className="grow justify-start px-2">
-        <RxCalendar className="mr-2 h-5 w-5 text-muted-foreground" />
+        <LuCalendar className="text-muted-foreground" />
         <DispValue placeholder={placeholder} />
       </Button>
     </div>

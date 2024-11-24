@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { RiCheckLine, RiAddCircleLine } from 'react-icons/ri'
+import { LuCheck, LuPlusCircle } from 'react-icons/lu'
 import { Column } from '@tanstack/react-table'
 import { cn } from '~/lib/utils'
 import { Badge } from '~/components/ui/badge'
@@ -44,11 +44,11 @@ export function TodoTableFacetedFilter<TData, TValue>({
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 border-dashed">
-          <RiAddCircleLine className="mr-2 h-4 w-4" />
+          <LuPlusCircle />
           {title}
           {selectedValues?.size > 0 && (
             <>
-              <Separator orientation="vertical" className="mx-2 h-4" />
+              <Separator orientation="vertical" className="h-4" />
               <Badge
                 variant="secondary"
                 className="rounded-sm px-1 font-normal md:hidden"
@@ -81,7 +81,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0" align="start">
+      <PopoverContent className="w-[180px] p-0" align="start">
         <Command>
           <CommandInput placeholder={title} />
           <CommandList>
@@ -107,20 +107,17 @@ export function TodoTableFacetedFilter<TData, TValue>({
                   >
                     <div
                       className={cn(
-                        'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                        'flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
                         isSelected
                           ? 'bg-primary text-primary-foreground'
                           : 'opacity-50 [&_svg]:invisible',
                       )}
                     >
-                      <RiCheckLine className={cn('h-4 w-4')} />
+                      <LuCheck className="!h-3 !w-3" />
                     </div>
-                    {/* {option.icon && (
-                      <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-                    )} */}
                     <span>{t(option.label)}</span>
                     {facets?.get(option.value) && (
-                      <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
+                      <span className="ml-auto flex h-4 w-4 items-center justify-end font-mono text-xs">
                         {facets.get(option.value)}
                       </span>
                     )}

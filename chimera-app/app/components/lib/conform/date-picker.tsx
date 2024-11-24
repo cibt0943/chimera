@@ -26,7 +26,8 @@ export function DateTimePickerConform(props: DatePickerConformProps) {
 
   return (
     <DatePicker
-      date={dateValue}
+      selectedDate={dateValue}
+      defaultMonth={dateValue}
       onChangeDate={handleChangeDate}
       triggerId={dateMeta.id}
       placeholder={placeholder}

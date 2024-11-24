@@ -6,7 +6,7 @@ import { AccountTabs } from '~/components/account/account-tabs'
 import type { AccountSettings } from '~/types/accounts'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Account settings | Kobushi' }]
+  return [{ title: 'Account settings | I forgot' }]
 }
 
 type LoaderData = {

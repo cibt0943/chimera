@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { RiCloseLine } from 'react-icons/ri'
+import { LuXCircle } from 'react-icons/lu'
 import { Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -45,7 +45,7 @@ export function TodoTableToolbar<TData>({
             size="sm"
           >
             {t('common.message.reset')}
-            <RiCloseLine className="ml-2 h-3 w-3" />
+            <LuXCircle />
           </Button>
         )}
       </div>

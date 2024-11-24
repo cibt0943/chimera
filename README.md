@@ -1,10 +1,10 @@
 ## Chimera: A Personal Web Service with Multiple Features
 
-Chimera is the development code name, and the service is officially named 「Kobushi」.
+Chimera is the development code name, and the service is officially named 「iforgot」.
 
 ### Product Link
 
-You can access the service here: [Kobushi](https://kobushi.fly.dev)
+You can access the service here: [iforgot](https://iforgot.fly.dev)
 
 ### Features
 
