@@ -2,7 +2,7 @@ import { MetaFunction, json } from '@remix-run/node'
 import { withAuthentication } from '~/lib/auth-middleware'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Reminders | Kobushi' }]
+  return [{ title: 'Reminders | I forgot' }]
 }
 
 export const loader = withAuthentication(async ({ loginSession }) => {

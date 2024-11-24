@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useNavigate, useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { RiAddLine } from 'react-icons/ri'
+import { LuPlus } from 'react-icons/lu'
 import {
   ColumnFiltersState,
   VisibilityState,
@@ -417,9 +417,9 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
           className="h-8 px-3"
           onClick={() => openAddTaskDialog()}
         >
-          <RiAddLine className="mr-2" />
+          <LuPlus />
           {t('common.message.add')}
-          <p className="ml-2 hidden text-xs text-muted-foreground sm:block">
+          <p className="hidden text-xs text-muted-foreground sm:block">
             <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
               <span>{modifierKeyIcon}</span>n
             </kbd>

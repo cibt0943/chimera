@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { RiEqualizerLine } from 'react-icons/ri'
+import { LuSettings2 } from 'react-icons/lu'
 import { Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import {
@@ -27,7 +27,7 @@ export function TodoTableViewOptions<TData>({
           size="sm"
           className="ml-auto hidden h-8 sm:inline-flex"
         >
-          <RiEqualizerLine className="mr-2 h-4 w-4" />
+          <LuSettings2 />
           {t('task.message.view_settings')}
         </Button>
       </DropdownMenuTrigger>

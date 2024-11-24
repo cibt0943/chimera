@@ -13,7 +13,7 @@ import {
   REMINDER_URL,
 } from '~/constants'
 
-export const MenuList = [
+export const FuncMenuList = [
   { title: 'todo.menu_label', url: TODO_URL, icon: LuListTodo },
   { title: 'memo.menu_label', url: MEMO_URL, icon: LuFileEdit },
   { title: 'event.menu_label', url: EVENT_URL, icon: LuCalendarDays },

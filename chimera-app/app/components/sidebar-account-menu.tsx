@@ -19,7 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { AUTH_URL, ACCOUNT_URL } from '~/constants'
 import { useLoginSessionAtom } from '~/lib/global-state'
 
-export function AccountMenu() {
+export function SidebarAccountMenu() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const fetcher = useFetcher()
@@ -43,8 +43,8 @@ export function AccountMenu() {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton>
-              <Avatar className="h-6 w-6">
+            <SidebarMenuButton size="lg">
+              <Avatar className="h-8 w-8">
                 <AvatarImage
                   src={loginSession.auth0User.picture}
                   alt={loginSession.auth0User.name}

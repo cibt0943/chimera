@@ -7,9 +7,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '~/components/ui/sidebar'
-import { MenuList } from '~/lib/menu'
+import { FuncMenuList } from '~/lib/func-menu'
 
-export function Menus() {
+export function SidebarFuncMenu() {
   const { t } = useTranslation()
   const location = useLocation()
 
@@ -22,14 +22,14 @@ export function Menus() {
     <SidebarGroup>
       <SidebarGroupContent>
         <SidebarMenu>
-          {MenuList.map((item) => (
+          {FuncMenuList.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 asChild
                 isActive={isActive(item.url)}
                 tooltip={t(item.title)}
               >
-                <NavLink to={item.url}>
+                <NavLink to={item.url} state={{ isLoadEffect: true }}>
                   <item.icon />
                   <span>{t(item.title)}</span>
                 </NavLink>

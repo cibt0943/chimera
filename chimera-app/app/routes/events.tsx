@@ -25,7 +25,7 @@ import styles from '~/styles/events.css?url'
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Events | Kobushi' }]
+  return [{ title: 'Events | I forgot' }]
 }
 
 export const action = withAuthentication(async ({ request, loginSession }) => {
@@ -110,7 +110,7 @@ export default function Layout() {
   const { calendarEvents } = useTypedLoaderData<LoaderData>()
 
   return (
-    <div className="p-4 pt-1 xl:pt-4">
+    <div className="p-4 pt-1 lg:pt-4">
       <Calendar defaultEvents={calendarEvents} />
       <Outlet />
     </div>

@@ -11,8 +11,8 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '~/components/ui/sidebar'
-import { Menus } from '~/components/menus'
-import { AccountMenu } from '~/components/account-menu'
+import { SidebarFuncMenu } from '~/components/sidebar-func-menu'
+import { SidebarAccountMenu } from '~/components/sidebar-account-menu'
 
 export function AppSidebar() {
   return (
@@ -35,10 +35,10 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <Menus />
+        <SidebarFuncMenu />
       </SidebarContent>
       <SidebarFooter>
-        <AccountMenu />
+        <SidebarAccountMenu />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

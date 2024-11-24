@@ -5,20 +5,6 @@ import { AppNavbar } from '~/components/app-navbar'
 import { LoadingEffect } from '~/components/loading-effect'
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  // return (
-  //   <div className="flex">
-  //     <aside className="h-dvh overflow-auto">
-  //       <Sidebar />
-  //     </aside>
-  //     <div className="h-dvh flex-1 overflow-auto">
-  //       <main>
-  //         <LoadingEffect>{children}</LoadingEffect>
-  //       </main>
-  //     </div>
-  //     <Toaster closeButton richColors />
-  //   </div>
-  // )
-
   return (
     <SidebarProvider
       style={

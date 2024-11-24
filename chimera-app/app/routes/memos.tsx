@@ -18,7 +18,7 @@ import { ErrorView } from '~/components/lib/error-view'
 import { MemoList } from '~/components/memo/memo-list'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Memos | Kobushi' }]
+  return [{ title: 'Memos | I forgot' }]
 }
 
 export const action = withAuthentication(async ({ request, loginSession }) => {
@@ -84,7 +84,7 @@ export default function Layout() {
   }
 
   return (
-    <div className="p-4 pt-1 xl:pt-4">
+    <div className="p-4 pt-1 lg:pt-4">
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
         <ResizablePanel defaultSize={35}>
           <MemoList

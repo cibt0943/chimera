@@ -203,7 +203,7 @@ function SaveHotkeyIcon() {
   const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
 
   return (
-    <p className="ml-2 text-xs">
+    <p className="text-xs">
       <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
         <span>{modifierKeyIcon}</span>s
       </kbd>
