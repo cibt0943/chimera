@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { RiDeleteBinLine } from 'react-icons/ri'
+import { LuTrash2 } from 'react-icons/lu'
 import { Button } from '~/components/ui/button'
 import { TODO_URL } from '~/constants'
 import { Task } from '~/types/tasks'
@@ -31,7 +31,7 @@ export function TaskDeleteButton({
         variant="link"
         className="mt-2 border-destructive/50 px-0 text-destructive sm:mt-0"
       >
-        <RiDeleteBinLine className="mr-1 h-4 w-4" />
+        <LuTrash2 />
         {t('common.message.delete')}
       </Button>
     </TaskDeleteConfirmDialog>

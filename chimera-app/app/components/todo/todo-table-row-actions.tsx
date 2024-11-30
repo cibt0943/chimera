@@ -1,17 +1,17 @@
 import { useTranslation } from 'react-i18next'
 import {
-  RiMoreLine,
-  RiArrowUpLine,
-  RiArrowDownLine,
-  RiCircleLine,
-  RiProgress4Line,
-  RiProgress8Line,
-  RiProhibited2Line,
-  RiEdit2Line,
-  RiDeleteBinLine,
-  RiDeleteBack2Line,
-  RiCornerDownLeftLine,
-} from 'react-icons/ri'
+  LuMoreHorizontal,
+  LuArrowUpFromLine,
+  LuArrowDownFromLine,
+  LuCircleDot,
+  LuPlayCircle,
+  LuCheckCircle2,
+  LuPauseCircle,
+  LuPencilLine,
+  LuTrash2,
+  LuDelete,
+  LuCornerDownLeft,
+} from 'react-icons/lu'
 import { Row, Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import {
@@ -44,21 +44,18 @@ export function TodoTableRowActions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-        >
-          <RiMoreLine className="h-4 w-4" />
+        <Button variant="ghost" size="icon">
+          <LuMoreHorizontal />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
+      <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem
           onClick={() => {
             table.options.meta?.moveTask(task, true)
           }}
         >
-          <RiArrowUpLine className="mr-2 h-4 w-4" />
+          <LuArrowUpFromLine />
           {t('common.message.position_up')}
           <DropdownMenuShortcut>{modifierKeyIcon + ' ↑'}</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -67,7 +64,7 @@ export function TodoTableRowActions({
             table.options.meta?.moveTask(task, false)
           }}
         >
-          <RiArrowDownLine className="mr-2 h-4 w-4" />
+          <LuArrowDownFromLine />
           {t('common.message.position_down')}
           <DropdownMenuShortcut>{modifierKeyIcon + ' ↓'}</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -79,7 +76,7 @@ export function TodoTableRowActions({
             table.options.meta?.updateTaskStatus(upateTask)
           }}
         >
-          <RiCircleLine className="mr-2 h-4 w-4" />
+          <LuCircleDot />
           {t('task.message.to_new')}
           <DropdownMenuShortcut>{modifierKeyIcon + ' 1'}</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -90,7 +87,7 @@ export function TodoTableRowActions({
             table.options.meta?.updateTaskStatus(upateTask)
           }}
         >
-          <RiProgress4Line className="mr-2 h-4 w-4" />
+          <LuPlayCircle />
           {t('task.message.to_doing')}
           <DropdownMenuShortcut>{modifierKeyIcon + ' 2'}</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -101,7 +98,7 @@ export function TodoTableRowActions({
             table.options.meta?.updateTaskStatus(upateTask)
           }}
         >
-          <RiProgress8Line className="mr-2 h-4 w-4" />
+          <LuCheckCircle2 />
           {t('task.message.to_done')}
           <DropdownMenuShortcut>{modifierKeyIcon + ' 3'}</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -112,7 +109,7 @@ export function TodoTableRowActions({
             table.options.meta?.updateTaskStatus(upateTask)
           }}
         >
-          <RiProhibited2Line className="mr-2 h-4 w-4" />
+          <LuPauseCircle />
           {t('task.message.to_pending')}
           <DropdownMenuShortcut>{modifierKeyIcon + ' 4'}</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -121,10 +118,10 @@ export function TodoTableRowActions({
             table.options.meta?.editTask(task)
           }}
         >
-          <RiEdit2Line className="mr-2 h-4 w-4" />
+          <LuPencilLine />
           {t('common.message.edit')}
           <DropdownMenuShortcut>
-            <RiCornerDownLeftLine className="inline h-3 w-3" />
+            <LuCornerDownLeft className="inline" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -134,11 +131,11 @@ export function TodoTableRowActions({
           }}
           className="text-red-600 focus:text-red-600"
         >
-          <RiDeleteBinLine className="mr-2 h-4 w-4" />
+          <LuTrash2 />
           {t('common.message.delete')}
           <DropdownMenuShortcut>
             {modifierKeyIcon + ' '}
-            <RiDeleteBack2Line className="inline h-3 w-3" />
+            <LuDelete className="inline" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>

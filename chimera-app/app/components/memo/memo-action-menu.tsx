@@ -1,16 +1,16 @@
 import { useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import {
-  RiMoreLine,
-  RiArrowUpLine,
-  RiArrowDownLine,
-  RiEdit2Line,
-  RiDeleteBinLine,
-  RiDeleteBack2Line,
-  RiCornerDownLeftLine,
-  RiInboxArchiveLine,
-  RiInboxUnarchiveLine,
-} from 'react-icons/ri'
+  LuMoreHorizontal,
+  LuArrowUpFromLine,
+  LuArrowDownFromLine,
+  LuArchive,
+  LuArchiveRestore,
+  LuPencilLine,
+  LuTrash2,
+  LuDelete,
+  LuCornerDownLeft,
+} from 'react-icons/lu'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
@@ -52,12 +52,12 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
     memo.status === MemoStatus.NOMAL
       ? {
           toStatus: MemoStatus.ARCHIVED,
-          icon: <RiInboxArchiveLine className="mr-2 h-4 w-4" />,
+          icon: <LuArchive />,
           caption: t('memo.message.to_archive'),
         }
       : {
           toStatus: MemoStatus.NOMAL,
-          icon: <RiInboxUnarchiveLine className="mr-2 h-4 w-4" />,
+          icon: <LuArchiveRestore />,
           caption: t('memo.message.un_archive'),
         }
 
@@ -65,7 +65,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className={buttonClassName}>
-          <RiMoreLine className="h-4 w-4" />
+          <LuMoreHorizontal />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
@@ -77,7 +77,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
               handleMoveMemo(memo, true)
             }}
           >
-            <RiArrowUpLine className="mr-2 h-4 w-4" />
+            <LuArrowUpFromLine />
             {t('common.message.position_up')}
             <DropdownMenuShortcut>
               {modifierKeyIcon + ' ↑'}
@@ -89,7 +89,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
               handleMoveMemo(memo, false)
             }}
           >
-            <RiArrowDownLine className="mr-2 h-4 w-4" />
+            <LuArrowDownFromLine />
             {t('common.message.position_down')}
             <DropdownMenuShortcut>
               {modifierKeyIcon + ' ↓'}
@@ -106,7 +106,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             {archiveMenu.caption}
             <DropdownMenuShortcut>
               {modifierKeyIcon + ' '}
-              <RiCornerDownLeftLine className="inline h-3 w-3" />
+              <LuCornerDownLeft className="inline" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -115,10 +115,10 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
               navigate([MEMO_URL, memo.id].join('/'))
             }}
           >
-            <RiEdit2Line className="mr-2 h-4 w-4" />
+            <LuPencilLine />
             {t('common.message.edit')}
             <DropdownMenuShortcut>
-              <RiCornerDownLeftLine className="inline h-3 w-3" />
+              <LuCornerDownLeft className="inline" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -129,11 +129,11 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             }}
             className="text-red-600 focus:text-red-600"
           >
-            <RiDeleteBinLine className="mr-2 h-4 w-4" />
+            <LuTrash2 />
             {t('common.message.delete')}
             <DropdownMenuShortcut>
               {modifierKeyIcon + ' '}
-              <RiDeleteBack2Line className="inline h-3 w-3" />
+              <LuDelete className="inline" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>

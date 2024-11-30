@@ -1,4 +1,4 @@
-import { RiSunLine, RiMoonClearFill, RiMacLine } from 'react-icons/ri'
+import { LuSun, LuMoonStar, LuMonitor } from 'react-icons/lu'
 import { toDate } from 'date-fns'
 import * as zod from 'zod'
 import type { Database } from '~/types/schema'
@@ -29,17 +29,17 @@ export const ThemeList = [
   {
     value: Theme.SYSTEM,
     label: 'account.model.theme_list.system',
-    icon: RiMacLine,
+    icon: LuMonitor,
   },
   {
     value: Theme.LIGHT,
     label: 'account.model.theme_list.light',
-    icon: RiSunLine,
+    icon: LuSun,
   },
   {
     value: Theme.DARK,
     label: 'account.model.theme_list.dark',
-    icon: RiMoonClearFill,
+    icon: LuMoonStar,
   },
 ]
 

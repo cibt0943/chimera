@@ -33,7 +33,7 @@
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-popover": "^1.1.2",
-    "@radix-ui/react-scroll-area": "^1.2.0",
+    "@radix-ui/react-scroll-area": "^1.2.1",
     "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
@@ -59,20 +59,20 @@
     "jotai": "^2.10.1",
     "lucide-react": "^0.460.0",
     "morgan": "^1.10.0",
-    "next-themes": "^0.3.0",
+    "next-themes": "^0.4.3",
     "react": "^18.2.0",
     "react-day-picker": "8.10.1",
     "react-dom": "^18.2.0",
     "react-hotkeys-hook": "^4.4.4",
     "react-i18next": "^15.1.0",
     "react-icons": "^5.0.1",
-    "react-resizable-panels": "^2.1.6",
+    "react-resizable-panels": "^2.1.7",
     "remix-auth": "^3.6.0",
     "remix-auth-auth0": "^1.9.0",
     "remix-toast": "^1.2.1",
     "remix-typedjson": "^0.4.1",
     "remix-utils": "^7.5.0",
-    "sonner": "^1.5.0",
+    "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4"
@@ -109,6 +109,6 @@
     "vite-tsconfig-paths": "^5.0.1"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   }
 }

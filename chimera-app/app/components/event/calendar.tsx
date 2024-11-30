@@ -8,12 +8,13 @@ import {
 import { useTranslation } from 'react-i18next'
 import { format, startOfMonth } from 'date-fns'
 import {
-  RiCircleLine,
-  RiProgress4Line,
-  RiProgress8Line,
-  RiProhibited2Line,
-} from 'react-icons/ri'
-import { RxPencil2, RxCalendar } from 'react-icons/rx'
+  LuCircleDot,
+  LuPlayCircle,
+  LuCheckCircle2,
+  LuPauseCircle,
+  LuFileEdit,
+  LuCalendarDays,
+} from 'react-icons/lu'
 import allLocales from '@fullcalendar/core/locales-all'
 import {
   DatesSetArg,
@@ -343,24 +344,24 @@ function EventTypeIcon({
 }) {
   switch (type) {
     case CalendarEventType.EVENT:
-      return RxCalendar
+      return LuCalendarDays
     case CalendarEventType.TASK:
       switch ((srcObj as Task).status) {
         case TaskStatus.NEW:
-          return RiCircleLine
+          return LuCircleDot
         case TaskStatus.DOING:
-          return RiProgress4Line
+          return LuPlayCircle
         case TaskStatus.DONE:
-          return RiProgress8Line
+          return LuCheckCircle2
         case TaskStatus.PENDING:
-          return RiProhibited2Line
+          return LuPauseCircle
         default:
-          return RiCircleLine
+          return LuCircleDot
       }
     case CalendarEventType.MEMO:
-      return RxPencil2
+      return LuFileEdit
     default:
-      return RxCalendar
+      return LuCalendarDays
   }
 }
 

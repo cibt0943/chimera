@@ -181,9 +181,7 @@ function TimeControl({
   const className = includeAllDayComponent ? 'justify-between' : 'justify-end'
 
   return (
-    <div
-      className={cn('flex items-center justify-between p-3 pt-0', className)}
-    >
+    <div className={cn('flex items-center justify-between p-3', className)}>
       {includeAllDayComponent && (
         <ToggleAllDay allDay={allDay} onChangeAllDay={onChangeAllDay} />
       )}

@@ -1,5 +1,9 @@
 import { useTranslation } from 'react-i18next'
-import { RiExpandUpDownLine, RiSortAsc, RiSortDesc } from 'react-icons/ri'
+import {
+  LuChevronsUpDown,
+  LuArrowUpNarrowWide,
+  LuArrowDownWideNarrow,
+} from 'react-icons/lu'
 import { Column } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import {
@@ -34,28 +38,28 @@ export function TodoTableColumnHeader<TData, TValue>({
           <Button
             variant="ghost"
             size="sm"
-            className="-ml-3 h-8 data-[state=open]:bg-accent"
+            className="-ml-3 data-[state=open]:bg-accent"
           >
             <span>{title}</span>
             {column.getIsSorted() === 'desc' ? (
-              <RiSortDesc className="ml-2 h-4 w-4" />
+              <LuArrowDownWideNarrow />
             ) : column.getIsSorted() === 'asc' ? (
-              <RiSortAsc className="ml-2 h-4 w-4" />
+              <LuArrowUpNarrowWide />
             ) : (
-              <RiExpandUpDownLine className="ml-2 h-3 w-3" />
+              <LuChevronsUpDown className="!h-3.5 !w-3.5" />
             )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
           {(column.getIsSorted() === 'desc' || !column.getIsSorted()) && (
             <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-              <RiSortAsc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+              <LuArrowUpNarrowWide className="text-muted-foreground/70" />
               {t('common.message.sort_asc')}
             </DropdownMenuItem>
           )}
           {(column.getIsSorted() === 'asc' || !column.getIsSorted()) && (
             <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-              <RiSortDesc className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+              <LuArrowDownWideNarrow className="text-muted-foreground/70" />
               {t('common.message.sort_desc')}
             </DropdownMenuItem>
           )}
@@ -63,7 +67,7 @@ export function TodoTableColumnHeader<TData, TValue>({
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => column.clearSorting()}>
-                <RiExpandUpDownLine className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                <LuChevronsUpDown className="text-muted-foreground/70" />
                 {t('common.message.clear')}
               </DropdownMenuItem>
             </>
