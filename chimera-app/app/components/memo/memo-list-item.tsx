@@ -2,7 +2,7 @@ import { NavLink } from '@remix-run/react'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import { RiArchiveLine } from 'react-icons/ri'
+import { LuArchive } from 'react-icons/lu'
 import { CSS } from '@dnd-kit/utilities'
 import { useSortable } from '@dnd-kit/sortable'
 import { cn } from '~/lib/utils'
@@ -99,11 +99,7 @@ export function ListItem(props: ListItemProps) {
         {isPreview && item.content.substring(0, 300)}
       </div>
       <div className="flex items-center justify-between space-x-2">
-        <div>
-          {item.status === MemoStatus.ARCHIVED && (
-            <RiArchiveLine className="mr-2 h-4 w-4" />
-          )}
-        </div>
+        <div>{item.status === MemoStatus.ARCHIVED && <LuArchive />}</div>
         <div className="ml-auto text-xs text-muted-foreground">
           <ClientOnly fallback={<span>&nbsp;</span>}>
             {() => <span title={updatedAt}>{updatedAtDiff}</span>}

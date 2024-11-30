@@ -1,6 +1,6 @@
 import { useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { RiListSettingsLine } from 'react-icons/ri'
+import { LuSettings } from 'react-icons/lu'
 import { Button } from '~/components/ui/button'
 import { Label } from '~/components/ui/label'
 import { Switch } from '~/components/ui/switch'
@@ -20,7 +20,7 @@ export function MemoSettingsForm() {
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="flex h-8 px-2">
-          <RiListSettingsLine className="h-4 w-4 text-primary/80" />
+          <LuSettings className="text-primary/80" />
           <span className="sr-only">{t('common.message.settings')}</span>
         </Button>
       </PopoverTrigger>

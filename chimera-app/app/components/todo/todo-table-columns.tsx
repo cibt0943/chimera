@@ -1,7 +1,7 @@
 import { NavLink } from '@remix-run/react'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
-import { RiEqualFill } from 'react-icons/ri'
+import { LuEqual } from 'react-icons/lu'
 import { format } from 'date-fns'
 import { ColumnDef, Column, Row } from '@tanstack/react-table'
 import { useSortable } from '@dnd-kit/sortable'
@@ -27,7 +27,7 @@ function RowDragHandleCell({ rowId }: { rowId: string }) {
       size="icon"
       className="touch-none select-none"
     >
-      <RiEqualFill className="h-4 w-4 font-bold" />
+      <LuEqual />
     </Button>
   )
 }
@@ -103,6 +103,7 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
         </NavLink>
       )
     },
+    sortingFn: 'alphanumeric',
   },
   {
     accessorKey: 'status',

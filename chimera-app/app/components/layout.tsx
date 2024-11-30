@@ -9,8 +9,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <SidebarProvider
       style={
         {
-          '--sidebar-width': '11rem',
-          '--sidebar-width-mobile': '11rem',
+          '--sidebar-width': '12rem',
+          '--sidebar-width-mobile': '12rem',
         } as React.CSSProperties
       }
     >
