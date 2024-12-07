@@ -2,10 +2,10 @@ import { NavLink, useLocation } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import {
   LuListTodo,
-  LuFileEdit,
+  LuFilePen,
   LuCalendarDays,
   LuBook,
-  LuAlarmCheck,
+  LuAlarmClockCheck,
 } from 'react-icons/lu'
 import {
   SidebarGroup,
@@ -24,7 +24,7 @@ import {
 
 export const FuncMenuList = [
   { title: 'todo.menu_label', url: TODO_URL, icon: LuListTodo },
-  { title: 'memo.menu_label', url: MEMO_URL, icon: LuFileEdit },
+  { title: 'memo.menu_label', url: MEMO_URL, icon: LuFilePen },
   { title: 'event.menu_label', url: EVENT_URL, icon: LuCalendarDays },
   {
     title: 'daily_note.menu_label',
@@ -34,7 +34,7 @@ export const FuncMenuList = [
   {
     title: 'reminder.menu_label',
     url: REMINDER_URL,
-    icon: LuAlarmCheck,
+    icon: LuAlarmClockCheck,
   },
 ]
 

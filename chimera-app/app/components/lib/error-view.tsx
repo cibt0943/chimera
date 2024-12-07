@@ -1,5 +1,5 @@
 import { useRouteError } from '@remix-run/react'
-import { LuAlertTriangle } from 'react-icons/lu'
+import { LuTriangleAlert } from 'react-icons/lu'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 
 export function ErrorView() {
@@ -9,7 +9,7 @@ export function ErrorView() {
 
   return (
     <Alert variant="destructive">
-      <LuAlertTriangle />
+      <LuTriangleAlert />
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>{errMessage}</AlertDescription>
     </Alert>

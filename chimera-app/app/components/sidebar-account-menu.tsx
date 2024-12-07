@@ -1,6 +1,6 @@
 import { useNavigate, useFetcher } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
-import { LuUserCog2, LuLogOut } from 'react-icons/lu'
+import { LuUserRoundCog, LuLogOut } from 'react-icons/lu'
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -59,7 +59,7 @@ export function SidebarAccountMenu() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem onSelect={handleUerSettingsClick}>
-                <LuUserCog2 />
+                <LuUserRoundCog />
                 {t('common.message.settings')}
               </DropdownMenuItem>
             </DropdownMenuGroup>
