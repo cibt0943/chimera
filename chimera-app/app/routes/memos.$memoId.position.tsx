@@ -1,5 +1,5 @@
+import { typedjson } from 'remix-typedjson'
 import { withAuthentication } from '~/lib/auth-middleware'
-import { json } from '@remix-run/node'
 import { getMemo, updateMemoPosition } from '~/models/memo.server'
 
 export const action = withAuthentication(
@@ -13,6 +13,6 @@ export const action = withAuthentication(
 
     const updatedMemo = await updateMemoPosition(fromMemo.id, toMemo.position)
 
-    return json({ memo: updatedMemo })
+    return typedjson({ memo: updatedMemo })
   },
 )

@@ -1,4 +1,4 @@
-import { json } from '@remix-run/node'
+import { typedjson } from 'remix-typedjson'
 import { withAuthentication } from '~/lib/auth-middleware'
 import {
   getMemoSettings,
@@ -36,10 +36,10 @@ export const action = withAuthentication(async ({ request, loginSession }) => {
     ...updateData,
   })
 
-  return json({ memoSettings: updatedMemoSettings })
+  return typedjson({ memoSettings: updatedMemoSettings })
 })
 
 export const loader = withAuthentication(async ({ loginSession }) => {
   const memoSettings = await getMemoSettings(loginSession.account.id)
-  return json({ memoSettings })
+  return typedjson({ memoSettings })
 })

@@ -105,7 +105,7 @@ export default function App() {
           }}
         />
       </head>
-      <body className="overflow-y-hidden">
+      <body>
         <I18nextProvider i18n={i18n}>
           <Layout>
             <Outlet />

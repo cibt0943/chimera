@@ -1,4 +1,4 @@
-import { json } from '@remix-run/node'
+import { typedjson } from 'remix-typedjson'
 import { withAuthentication } from '~/lib/auth-middleware'
 import { getTask, updateTaskPosition } from '~/models/task.server'
 
@@ -13,6 +13,6 @@ export const action = withAuthentication(
 
     const updatedTask = await updateTaskPosition(fromTask.id, toTask.position)
 
-    return json({ task: updatedTask })
+    return typedjson({ task: updatedTask })
   },
 )

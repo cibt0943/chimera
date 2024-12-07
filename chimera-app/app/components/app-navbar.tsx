@@ -8,8 +8,7 @@ import {
 } from '~/components/ui/breadcrumb'
 import { Separator } from '~/components/ui/separator'
 import { SidebarTrigger } from '~/components/ui/sidebar'
-
-import { FuncMenuList } from '~/lib/func-menu'
+import { FuncMenuList } from '~/components/sidebar-func-menu'
 
 function Title() {
   const { t } = useTranslation()

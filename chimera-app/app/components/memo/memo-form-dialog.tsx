@@ -46,9 +46,10 @@ export function MemoFormDialog({
       open={isOpen}
       onOpenChange={async (open) => {
         setIsOpen(open)
-        if (open) return
-        await sleep(200) // ダイアログが閉じるアニメーションが終わるまで待機
-        navigate(returnUrl)
+        if (!open) {
+          await sleep(200) // ダイアログが閉じるアニメーションが終わるまで待機
+          navigate(returnUrl)
+        }
       }}
     >
       <DialogContent className="sm:max-w-[620px]">

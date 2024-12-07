@@ -53,14 +53,14 @@ export function TaskFormDialog({
         </DialogHeader>
         <TaskForm
           task={task}
-          // onSubmit={() => setIsOpen(false)}
+          onSubmit={() => setIsOpen(false)}
           returnUrl={returnUrl}
         >
           {task && (
             <TaskDeleteButton
               task={task}
               onSubmit={(event) => {
-                event.stopPropagation()
+                event.stopPropagation() // これがないと「The submit event is dispatched by form#delete-task-form instead of 〜」というエラーが出る
                 setIsOpen(false)
               }}
               returnUrl={returnUrl}

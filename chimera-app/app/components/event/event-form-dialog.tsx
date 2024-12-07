@@ -10,9 +10,9 @@ import {
 } from '~/components/ui/dialog'
 import { EVENT_URL } from '~/constants'
 import { sleep } from '~/lib/utils'
+import { Event } from '~/types/events'
 import { EventForm } from './event-form'
 import { EventDeleteButton } from './event-delete-button'
-import { Event } from '~/types/events'
 
 export interface EventFormDialogProps {
   event: Event | undefined
@@ -61,7 +61,7 @@ export function EventFormDialog({
             <EventDeleteButton
               event={event}
               onSubmit={(event) => {
-                event.stopPropagation()
+                event.stopPropagation() // これがないと「The submit event is dispatched by form#delete-event-form instead of 〜」というエラーが出る
                 setIsOpen(false)
               }}
               returnUrl={returnUrl}
