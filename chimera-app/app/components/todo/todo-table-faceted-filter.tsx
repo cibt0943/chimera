@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { LuCheck, LuPlusCircle } from 'react-icons/lu'
+import { LuCheck, LuCirclePlus } from 'react-icons/lu'
 import { Column } from '@tanstack/react-table'
 import { cn } from '~/lib/utils'
 import { Badge } from '~/components/ui/badge'
@@ -44,7 +44,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 border-dashed">
-          <LuPlusCircle />
+          <LuCirclePlus />
           {title}
           {selectedValues?.size > 0 && (
             <>

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { LuXCircle } from 'react-icons/lu'
+import { LuCircleX } from 'react-icons/lu'
 import { Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -45,7 +45,7 @@ export function TodoTableToolbar<TData>({
             size="sm"
           >
             {t('common.message.reset')}
-            <LuXCircle />
+            <LuCircleX />
           </Button>
         )}
       </div>

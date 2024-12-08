@@ -1,10 +1,10 @@
 ## Chimera: A Personal Web Service with Multiple Features
 
-Chimera is the development code name, and the service is officially named 「iforgot」.
+Chimera is the development code name, and the service is officially named 「IMA」.
 
 ### Product Link
 
-You can access the service here: [iforgot](https://iforgot.fly.dev)
+You can access the service here: [IMA](https://ima.fly.dev)
 
 ### Features
 

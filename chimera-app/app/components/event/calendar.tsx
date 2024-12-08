@@ -9,10 +9,10 @@ import { useTranslation } from 'react-i18next'
 import { format, startOfMonth } from 'date-fns'
 import {
   LuCircleDot,
-  LuPlayCircle,
-  LuCheckCircle2,
-  LuPauseCircle,
-  LuFileEdit,
+  LuCirclePlay,
+  LuCircleCheck,
+  LuCirclePause,
+  LuFilePen,
   LuCalendarDays,
 } from 'react-icons/lu'
 import allLocales from '@fullcalendar/core/locales-all'
@@ -352,14 +352,14 @@ function EventTypeIcon({
         case TaskStatus.DOING:
           return LuPlayCircle
         case TaskStatus.DONE:
-          return LuCheckCircle2
+          return LuCircleCheck
         case TaskStatus.PENDING:
-          return LuPauseCircle
+          return LuCirclePause
         default:
-          return LuCircleDot
+          return LuCirclePlay
       }
     case CalendarEventType.MEMO:
-      return LuFileEdit
+      return LuFilePen
     default:
       return LuCalendarDays
   }

@@ -12,7 +12,7 @@ import { MemoFormView } from '~/components/memo/memo-form-view'
 import { MemoFormDialog } from '~/components/memo/memo-form-dialog'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: 'Memo ' + data?.memo.id + ' | I forgot' }]
+  return [{ title: 'Memo ' + data?.memo.id + ' | IMA' }]
 }
 
 export const action = withAuthentication(

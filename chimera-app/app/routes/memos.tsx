@@ -18,7 +18,7 @@ import { ErrorView } from '~/components/lib/error-view'
 import { MemoList } from '~/components/memo/memo-list'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Memos | I forgot' }]
+  return [{ title: 'Memos | IMA' }]
 }
 
 export const action = withAuthentication(async ({ request, loginSession }) => {

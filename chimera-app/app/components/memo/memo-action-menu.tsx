@@ -1,7 +1,7 @@
 import { useNavigate } from '@remix-run/react'
 import { useTranslation } from 'react-i18next'
 import {
-  LuMoreHorizontal,
+  LuEllipsis,
   LuArrowUpFromLine,
   LuArrowDownFromLine,
   LuArchive,
@@ -65,7 +65,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className={buttonClassName}>
-          <LuMoreHorizontal />
+          <LuEllipsis />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>

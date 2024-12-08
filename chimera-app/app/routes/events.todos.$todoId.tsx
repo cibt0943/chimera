@@ -9,7 +9,7 @@ import { getTask } from '~/models/task.server'
 import { TaskFormDialog } from '~/components/todo/task-form-dialog'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: 'Todo ' + data?.task.id + ' Edit | I forgot' }]
+  return [{ title: 'Todo ' + data?.task.id + ' Edit | IMA' }]
 }
 
 type LoaderData = {

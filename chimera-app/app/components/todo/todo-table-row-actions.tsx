@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import {
-  LuMoreHorizontal,
+  LuEllipsis,
   LuArrowUpFromLine,
   LuArrowDownFromLine,
   LuCircleDot,
-  LuPlayCircle,
-  LuCheckCircle2,
-  LuPauseCircle,
+  LuCirclePlay,
+  LuCircleCheck,
+  LuCirclePause,
   LuPencilLine,
   LuTrash2,
   LuDelete,
@@ -45,7 +45,7 @@ export function TodoTableRowActions({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
-          <LuMoreHorizontal />
+          <LuEllipsis />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
@@ -87,7 +87,7 @@ export function TodoTableRowActions({
             table.options.meta?.updateTaskStatus(upateTask)
           }}
         >
-          <LuPlayCircle />
+          <LuCirclePlay />
           {t('task.message.to_doing')}
           <DropdownMenuShortcut>{modifierKeyIcon + ' 2'}</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -98,7 +98,7 @@ export function TodoTableRowActions({
             table.options.meta?.updateTaskStatus(upateTask)
           }}
         >
-          <LuCheckCircle2 />
+          <LuCircleCheck />
           {t('task.message.to_done')}
           <DropdownMenuShortcut>{modifierKeyIcon + ' 3'}</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -109,7 +109,7 @@ export function TodoTableRowActions({
             table.options.meta?.updateTaskStatus(upateTask)
           }}
         >
-          <LuPauseCircle />
+          <LuCirclePause />
           {t('task.message.to_pending')}
           <DropdownMenuShortcut>{modifierKeyIcon + ' 4'}</DropdownMenuShortcut>
         </DropdownMenuItem>
