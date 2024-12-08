@@ -1,5 +1,5 @@
 import { NavLink } from '@remix-run/react'
-import { LuBird } from 'react-icons/lu'
+import { LuTrees } from 'react-icons/lu'
 import {
   Sidebar,
   SidebarHeader,
@@ -25,9 +25,8 @@ export function AppSidebar() {
               className={'group-data-[collapsible=icon]:!p-0'}
             >
               <NavLink to="/" className="font-bold">
-                <LuBird className="!h-5 !w-4 text-yellow-500" />
-                <LuBird className="!h-5 !w-5 text-yellow-500" />
-                <span className="text-yellow-500">I forgot.</span>
+                <LuTrees className="!h-5 !w-5 text-yellow-500" />
+                <span className="text-yellow-500">IMA</span>
               </NavLink>
             </SidebarMenuButton>
             <SidebarTrigger className="p-4" />

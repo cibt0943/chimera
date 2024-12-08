@@ -25,7 +25,7 @@ import styles from '~/styles/events.css?url'
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Events | I forgot' }]
+  return [{ title: 'Events | IMA' }]
 }
 
 export const action = withAuthentication(async ({ request, loginSession }) => {

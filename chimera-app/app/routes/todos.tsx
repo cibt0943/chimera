@@ -10,7 +10,7 @@ import { ErrorView } from '~/components/lib/error-view'
 import { TodoTable } from '~/components/todo/todo-table'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Todos | I forgot' }]
+  return [{ title: 'Todos | IMA' }]
 }
 
 export const action = withAuthentication(async ({ request, loginSession }) => {

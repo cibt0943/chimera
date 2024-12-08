@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for iforgot on 2024-11-24T17:30:13+09:00
+# fly.toml app configuration file generated for ima on 2024-12-08T17:58:48+09:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'iforgot'
+app = 'ima'
 primary_region = 'nrt'
 
 [build]

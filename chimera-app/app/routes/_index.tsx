@@ -4,7 +4,7 @@ import { TODO_URL } from '~/constants'
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'iforgot' },
+    { title: 'ima' },
     { name: 'description', content: 'Service with 5 functions' },
   ]
 }
