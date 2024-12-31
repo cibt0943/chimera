@@ -1,4 +1,4 @@
-import { useRouteError } from '@remix-run/react'
+import { useRouteError } from 'react-router'
 import { LuTriangleAlert } from 'react-icons/lu'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 

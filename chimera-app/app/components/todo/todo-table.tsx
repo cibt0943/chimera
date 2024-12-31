@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useNavigate, useFetcher } from '@remix-run/react'
+import { useNavigate, useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { LuPlus } from 'react-icons/lu'
 import {

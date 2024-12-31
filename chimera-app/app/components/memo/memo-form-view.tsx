@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useFetcher } from '@remix-run/react'
+import { useFetcher } from 'react-router'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { MEMO_URL } from '~/constants'
 import { Memo } from '~/types/memos'

@@ -1,4 +1,4 @@
-import { Form } from '@remix-run/react'
+import { Form } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'

@@ -1,4 +1,4 @@
-import { NavLink } from '@remix-run/react'
+import { NavLink } from 'react-router'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
