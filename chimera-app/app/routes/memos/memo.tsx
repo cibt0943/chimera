@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { redirect } from 'react-router'
+import { redirectWithSuccess } from 'remix-toast'
 import { parseWithZod } from '@conform-to/zod'
 import { MEMO_URL } from '~/constants'
 import { useMedia } from '~/lib/hooks'
@@ -18,13 +18,15 @@ export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const memo = await getMemo(params.memoId || '')
-  if (memo.accountId !== loginInfo.account.id) throw new Error('erorr')
+  if (memo.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: MemoSchema })
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
   if (submission.status !== 'success') {
-    throw new Error('Invalid submission data.')
+    throw new Response('Invalid submission data.', { status: 400 })
   }
 
   const data = submission.value
@@ -39,14 +41,18 @@ export async function action({ params, request }: Route.ActionArgs) {
   })
 
   const redirectUrl = formData.get('returnUrl') as string
-  return redirectUrl ? redirect(redirectUrl) : { updatedMemo }
+  return redirectUrl
+    ? redirectWithSuccess(redirectUrl, 'memo.message.updated')
+    : { updatedMemo }
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const memo = await getMemo(params.memoId || '')
-  if (memo.accountId !== loginInfo.account.id) throw new Error('erorr')
+  if (memo.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   return { memo }
 }

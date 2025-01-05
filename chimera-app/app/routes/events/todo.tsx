@@ -14,7 +14,9 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const task = await getTask(params.todoId || '')
-  if (task.accountId !== loginInfo.account.id) throw new Error('erorr')
+  if (task.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   return { task }
 }

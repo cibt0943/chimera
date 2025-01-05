@@ -17,8 +17,9 @@ export async function action({ request }: Route.ActionArgs) {
     schema: AccountGeneralSchema,
   })
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
-  if (submission.status !== 'success')
-    throw new Error('Invalid submission data.')
+  if (submission.status !== 'success') {
+    throw new Response('Invalid submission data.', { status: 400 })
+  }
 
   const data = submission.value
 

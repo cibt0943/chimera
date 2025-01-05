@@ -38,6 +38,7 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { toast } from 'sonner'
 import {
   Table,
   TableBody,
@@ -47,7 +48,6 @@ import {
   TableRow,
 } from '~/components/ui/table'
 import { Button } from '~/components/ui/button'
-import { toast } from 'sonner'
 import { API_URL, TODO_URL } from '~/constants'
 import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
@@ -216,48 +216,43 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   // タスクの表示順を変更
   function moveTask(fromTask: Task, toTask: Task) {
-    try {
-      setTableData((prev) => {
-        // フィルタリング前のタスクデータ(tableData)からfromとtoのindexを取得し順番を入れ替える
-        const fromIndex = prev.findIndex((data) => data.id === fromTask.id)
-        const toIndex = prev.findIndex((data) => data.id === toTask.id)
-        return arrayMove(prev, fromIndex, toIndex) //this is just a splice util
-      })
+    setTableData((prev) => {
+      // フィルタリング前のタスクデータ(tableData)からfromとtoのindexを取得し順番を入れ替える
+      const fromIndex = prev.findIndex((data) => data.id === fromTask.id)
+      const toIndex = prev.findIndex((data) => data.id === toTask.id)
+      return arrayMove(prev, fromIndex, toIndex) //this is just a splice util
+    })
 
-      // これによりフォーカスがD&D用のつまみから行全体に移動する
-      setRowSelection({ [fromTask.id]: true })
+    // これによりフォーカスがD&D用のつまみから行全体に移動する
+    setRowSelection({ [fromTask.id]: true })
 
-      // タスクの表示順変更API
-      moveTaskApiDebounce(fromTask, toTask)
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Error'
-      alert(msg)
-      navigate('.', { replace: true })
-    }
+    // タスクの表示順変更API
+    moveTaskApiDebounce(fromTask, toTask)
   }
 
   // タスクの表示順変更API呼び出し
   async function moveTaskApi(fromTask: Task, toTask: Task) {
-    // useFetcherのsubmitを利用すると自動でタスクデータを再取得してしまうのであえてfetchを利用
-    const url = [TODO_URL, fromTask.id, 'position'].join('/')
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({ toTaskId: toTask.id }),
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to update position api')
+    try {
+      // useFetcherのsubmitを利用すると自動でタスクデータを再取得してしまうのであえてfetchを利用
+      const url = [TODO_URL, fromTask.id, 'position'].join('/')
+      const response = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({ toTaskId: toTask.id }),
+      })
+
+      if (!response.ok) throw new Error('Failed to update position api')
+      toast.success(t('task.message.changed_position'))
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message)
+        navigate('.', { replace: true })
       }
-    })
+    }
   }
 
   // タスクの表示順変更APIをdebounce
   const moveTaskApiDebounce = useDebounce((fromTask, toTask) => {
-    enqueue(() =>
-      moveTaskApi(fromTask, toTask).catch((error) => {
-        alert(error.message)
-        navigate('.?refresh=true', { replace: true })
-      }),
-    )
+    enqueue(() => moveTaskApi(fromTask, toTask))
   }, 300)
 
   // タスクの表示順を1ステップ変更

@@ -122,7 +122,7 @@ export class Auth0Strategy<U> extends Strategy<U, Auth0StrategyVerifyOptions> {
    */
   protected authorizationParams(
     params: URLSearchParams,
-    request: Request,
+    _request: Request,
   ): URLSearchParams {
     return new URLSearchParams(params)
   }

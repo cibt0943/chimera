@@ -14,7 +14,7 @@ import pluginImport from 'eslint-plugin-import'
 export default tseslint.config(
   // base
   {
-    ignores: ['build/', 'app/components/ui/'],
+    ignores: ['build/', '.react-router', 'app/components/ui/'],
   },
   eslint.configs.recommended, // eslint:recommended を適用する
   ...tseslint.configs.recommended, // @typescript-eslint/eslint-plugin を適用する
@@ -43,6 +43,15 @@ export default tseslint.config(
           allowShortCircuit: true,
           // 三項演算子を許可
           allowTernary: true,
+        },
+      ],
+
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
         },
       ],
     },

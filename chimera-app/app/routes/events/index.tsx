@@ -1,4 +1,5 @@
-import { redirect, Outlet } from 'react-router'
+import { Outlet } from 'react-router'
+import { redirectWithSuccess } from 'remix-toast'
 import { startOfMonth, addMonths, subMonths } from 'date-fns'
 import { parseWithZod } from '@conform-to/zod'
 import { EVENT_URL } from '~/constants'
@@ -34,7 +35,7 @@ export async function action({ request }: Route.ActionArgs) {
   const submission = parseWithZod(formData, { schema: EventSchema })
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
   if (submission.status !== 'success') {
-    throw new Error('Invalid submission data.')
+    throw new Response('Invalid submission data.', { status: 400 })
   }
 
   const data = submission.value
@@ -50,7 +51,7 @@ export async function action({ request }: Route.ActionArgs) {
   })
 
   const redirectUrl = (formData.get('returnUrl') as string) || EVENT_URL
-  return redirect(redirectUrl)
+  return redirectWithSuccess(redirectUrl, 'event.message.created')
 }
 
 function getDispStartDayFromParams(request: Request): Date {

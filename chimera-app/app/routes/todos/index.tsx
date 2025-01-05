@@ -1,4 +1,5 @@
-import { redirect, useParams, Outlet } from 'react-router'
+import { redirectWithSuccess } from 'remix-toast'
+import { useParams, Outlet } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { TODO_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
@@ -18,7 +19,7 @@ export async function action({ request }: Route.ActionArgs) {
   const submission = parseWithZod(formData, { schema: TaskSchema })
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
   if (submission.status !== 'success') {
-    throw new Error('Invalid submission data.')
+    throw new Response('Invalid submission data.', { status: 400 })
   }
 
   const data = submission.value
@@ -32,7 +33,7 @@ export async function action({ request }: Route.ActionArgs) {
     due_date_all_day: !!data.dueDateAllDay,
   })
 
-  return redirect(TODO_URL)
+  return redirectWithSuccess(TODO_URL, 'task.message.created')
 }
 
 export async function loader({ request }: Route.LoaderArgs) {

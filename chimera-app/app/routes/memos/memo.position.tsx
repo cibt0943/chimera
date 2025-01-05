@@ -6,13 +6,17 @@ export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const fromMemo = await getMemo(params.memoId || '')
-  if (fromMemo.accountId !== loginInfo.account.id) throw new Error('erorr')
+  if (fromMemo.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   const data = await request.json()
   const toMemo = await getMemo(data.toMemoId)
-  if (toMemo.accountId !== loginInfo.account.id) throw new Error('erorr')
+  if (toMemo.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   const updatedMemo = await updateMemoPosition(fromMemo.id, toMemo.position)
 
-  return { memo: updatedMemo }
+  return Response.json({ memo: updatedMemo })
 }

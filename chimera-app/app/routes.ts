@@ -33,7 +33,7 @@ export default [
       layout('routes/memos/layout.tsx', [
         index('./routes/memos/index.tsx'),
         route(':memoId', './routes/memos/memo.tsx'),
-        route(':memoId/posiion', './routes/memos/memo.position.tsx'),
+        route(':memoId/position', './routes/memos/memo.position.tsx'),
         route(':memoId/delete', './routes/memos/memo.delete.tsx'),
       ]),
     ]),

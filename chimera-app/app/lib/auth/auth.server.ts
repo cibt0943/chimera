@@ -11,7 +11,7 @@ const Auth0StrategyOptions = {
   redirectURI: process.env.AUTH0_CALLBACK_URL!,
 }
 
-async function getUser(tokens: OAuth2Tokens, request: Request) {
+async function getUser(tokens: OAuth2Tokens, _request: Request) {
   const userInfoURL = `https://${Auth0StrategyOptions.domain}/userinfo`
   const accessToken = tokens.accessToken()
 
@@ -30,13 +30,13 @@ async function getUser(tokens: OAuth2Tokens, request: Request) {
   return { auth0User, account }
 }
 
-export const authenticator = new Authenticator<LoginInfo>()
-
 const auth0Strategy = new Auth0Strategy<LoginInfo>(
   Auth0StrategyOptions,
   async ({ tokens, request }) => {
     return await getUser(tokens, request)
   },
 )
+
+export const authenticator = new Authenticator<LoginInfo>()
 
 authenticator.use(auth0Strategy, 'auth0')

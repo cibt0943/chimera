@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { redirect, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
+import { redirectWithSuccess } from 'remix-toast'
 import { parseWithZod } from '@conform-to/zod'
 import { EVENT_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
@@ -16,13 +17,15 @@ export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const event = await getEvent(params.eventId || '')
-  if (event.accountId !== loginInfo.account.id) throw new Error('erorr')
+  if (event.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: EventSchema })
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
   if (submission.status !== 'success') {
-    throw new Error('Invalid submission data.')
+    throw new Response('Invalid submission data.', { status: 400 })
   }
 
   const data = submission.value
@@ -44,14 +47,16 @@ export async function action({ params, request }: Route.ActionArgs) {
   })
 
   const redirectUrl = (formData.get('returnUrl') as string) || EVENT_URL
-  return redirect(redirectUrl)
+  return redirectWithSuccess(redirectUrl, 'event.message.updated')
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const event = await getEvent(params.eventId || '')
-  if (event.accountId !== loginInfo.account.id) throw new Error('erorr')
+  if (event.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   return { event }
 }

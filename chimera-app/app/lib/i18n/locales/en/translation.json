@@ -133,7 +133,12 @@
       "to_pending": "Set to Pending",
       "view_settings": "View",
       "select_columns": "Select Columns",
-      "changed_status": "Status changed"
+      "changed_status": "Status changed",
+      "changed_due_date": "Due date changed",
+      "changed_position": "Position changed",
+      "created": "Task has been created",
+      "updated": "Task has been updated",
+      "deleted": "Task has been deleted"
     }
   },
   "memo": {
@@ -163,7 +168,12 @@
       "to_archive": "Archive",
       "un_archive": "Unarchive",
       "archived": "Archived",
-      "un_archived": "Unarchived"
+      "un_archived": "Unarchived",
+      "changed_related_date": "Related date changed",
+      "changed_position": "Position changed",
+      "created": "Memo has been created",
+      "updated": "Memo has been updated",
+      "deleted": "Memo has been deleted"
     }
   },
   "memo_settings": {
@@ -189,7 +199,11 @@
       "event_creation": "Event Creation",
       "event_editing": "Event Editing",
       "event_deletion": "Event Deletion",
-      "set_event_info": "Set the event information"
+      "set_event_info": "Set the event information",
+      "changed_date": "Date changed",
+      "created": "Event has been created",
+      "updated": "Event has been updated",
+      "deleted": "Event has been deleted"
     }
   },
   "daily_note": {

@@ -1,4 +1,4 @@
-import { redirect } from 'react-router'
+import { redirectWithSuccess } from 'remix-toast'
 import { parseWithZod } from '@conform-to/zod'
 import { MEMO_URL } from '~/constants'
 import { useMedia } from '~/lib/hooks'
@@ -15,7 +15,7 @@ export async function action({ request }: Route.ActionArgs) {
   const submission = parseWithZod(formData, { schema: MemoSchema })
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
   if (submission.status !== 'success') {
-    throw new Error('Invalid submission data.')
+    throw new Response('Invalid submission data.', { status: 400 })
   }
 
   const data = submission.value
@@ -31,7 +31,10 @@ export async function action({ request }: Route.ActionArgs) {
       data.relatedDateAllDay === undefined ? true : data.relatedDateAllDay,
   })
 
-  return redirect([MEMO_URL, newMemo.id].join('/'))
+  return redirectWithSuccess(
+    [MEMO_URL, newMemo.id].join('/'),
+    'memo.message.created',
+  )
 }
 
 export default function Index() {

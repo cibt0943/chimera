@@ -6,11 +6,14 @@ import { MemoStatus, UpdateMemoModel } from '~/types/memos'
 import { getMemo, updateMemo } from '~/models/memo.server'
 import type { Route } from './+types/api.memo'
 
+// メモの更新API（送られてきた値のみを更新）
 export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const memo = await getMemo(params.memoId || '')
-  if (memo.accountId !== loginInfo.account.id) throw new Error('erorr')
+  if (memo.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   const formData = await request.formData()
   const submission = parseWithZod(formData, {
@@ -24,7 +27,7 @@ export async function action({ params, request }: Route.ActionArgs) {
   })
   // submission が成功しなかった場合、クライアントに送信結果を報告します。
   if (submission.status !== 'success') {
-    throw new Error('Invalid submission data.')
+    throw new Response('Invalid submission data.', { status: 400 })
   }
 
   const data = submission.value
@@ -38,9 +41,11 @@ export async function action({ params, request }: Route.ActionArgs) {
         ? 'memo.message.archived'
         : 'memo.message.un_archived'
   }
+
   if (data.relatedDate !== undefined) {
     values.related_date = data.relatedDate?.toISOString() || null
     values.related_date_all_day = !!data.relatedDateAllDay
+    toastMsg = 'memo.message.changed_related_date'
   }
 
   const updatedMemo = await updateMemo(values)

@@ -133,7 +133,12 @@
       "to_pending": "保留に変更",
       "view_settings": "表示設定",
       "select_columns": "表示項目",
-      "changed_status": "状態を変更しました"
+      "changed_status": "状態を変更しました",
+      "changed_due_date": "期限を変更しました",
+      "changed_position": "表示位置を変更しました",
+      "created": "タスクを作成しました",
+      "updated": "タスクを更新しました",
+      "deleted": "タスクを削除しました"
     }
   },
   "memo": {
@@ -162,7 +167,12 @@
       "to_archive": "アーカイブする",
       "un_archive": "アーカイブから戻す",
       "archived": "アーカイブしました",
-      "un_archived": "アーカイブから戻しました"
+      "un_archived": "アーカイブから戻しました",
+      "changed_related_date": "関連日時を変更しました",
+      "changed_position": "表示位置を変更しました",
+      "created": "メモを作成しました",
+      "updated": "メモを更新しました",
+      "deleted": "メモを削除しました"
     }
   },
   "memo_settings": {
@@ -190,7 +200,11 @@
       "event_creation": "イベントの作成",
       "event_editing": "イベントの編集",
       "event_deletion": "イベントの削除",
-      "set_event_info": "イベントの情報を設定してください"
+      "set_event_info": "イベントの情報を設定してください",
+      "changed_date": "日付を変更しました",
+      "created": "イベントを作成しました",
+      "updated": "イベントを更新しました",
+      "deleted": "イベントを削除しました"
     }
   },
   "daily_note": {

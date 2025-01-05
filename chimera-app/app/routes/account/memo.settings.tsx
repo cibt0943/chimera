@@ -12,7 +12,10 @@ export async function action({ request }: Route.ActionArgs) {
   const memoSettings = await getMemoSettings(loginInfo.account.id)
 
   const submission = MemoSettingsSchema.safeParse(await request.json())
-  if (!submission.success) throw new Error('Invalid submission data.')
+  if (!submission.success) {
+    throw new Response('Invalid submission data.', { status: 400 })
+  }
+
   const data = submission.data
 
   // アカウントのメモ設定情報を更新

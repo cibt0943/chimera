@@ -14,7 +14,9 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const memo = await getMemo(params.memoId || '')
-  if (memo.accountId !== loginInfo.account.id) throw new Error('erorr')
+  if (memo.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   return { memo }
 }

@@ -1,4 +1,4 @@
-import { redirect } from 'react-router'
+import { redirectWithSuccess } from 'remix-toast'
 import { MEMO_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getMemo, deleteMemo } from '~/models/memo.server'
@@ -8,11 +8,13 @@ export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const memo = await getMemo(params.memoId || '')
-  if (memo.accountId !== loginInfo.account.id) throw new Error('erorr')
+  if (memo.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   await deleteMemo(memo.id)
 
   const formData = await request.formData()
   const returnUrl = formData.get('returnUrl') as string | null
-  return redirect(returnUrl || MEMO_URL)
+  return redirectWithSuccess(returnUrl || MEMO_URL, 'memo.message.deleted')
 }

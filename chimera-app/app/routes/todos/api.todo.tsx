@@ -6,11 +6,14 @@ import { TaskStatus, UpdateTaskModel } from '~/types/tasks'
 import { getTask, updateTask } from '~/models/task.server'
 import type { Route } from './+types/api.todo'
 
+// タスクの更新API（送られてきた値のみを更新）
 export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const task = await getTask(params.todoId || '')
-  if (task.accountId !== loginInfo.account.id) throw new Error('erorr')
+  if (task.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   const formData = await request.formData()
   const submission = parseWithZod(formData, {
@@ -24,20 +27,23 @@ export async function action({ params, request }: Route.ActionArgs) {
   })
   // submission が成功しなかった場合、クライアントに送信結果を報告します。
   if (submission.status !== 'success') {
-    throw new Error('Invalid submission data.')
+    throw new Response('Invalid submission data.', { status: 400 })
   }
 
   const data = submission.value
 
   let toastMsg = ''
   const values: UpdateTaskModel = { id: task.id }
+
   if (data.status !== undefined) {
     values.status = data.status
     toastMsg = 'task.message.changed_status'
   }
+
   if (data.dueDate !== undefined) {
     values.due_date = data.dueDate?.toISOString() || null
     values.due_date_all_day = !!data.dueDateAllDay
+    toastMsg = 'task.message.changed_due_date'
   }
 
   const updatedTask = await updateTask(values)
