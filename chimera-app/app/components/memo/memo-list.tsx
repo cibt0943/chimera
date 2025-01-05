@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form, useNavigate, useFetcher } from '@remix-run/react'
+import { Form, useNavigate, useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { LuPlus } from 'react-icons/lu'
 import { useHotkeys } from 'react-hotkeys-hook'
@@ -18,6 +18,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+import { toast } from 'sonner'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
@@ -204,16 +205,22 @@ export function MemoList({
 
   // メモの表示順変更API呼び出し
   async function moveMemoApi(fromMemo: Memo, toMemo: Memo) {
-    // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
-    const url = [MEMO_URL, fromMemo.id, 'position'].join('/')
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({ toMemoId: toMemo.id }),
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to update position api')
+    try {
+      // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
+      const url = [MEMO_URL, fromMemo.id, 'position'].join('/')
+      const response = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({ toMemoId: toMemo.id }),
+      })
+
+      if (!response.ok) throw new Error('Failed to update position api')
+      toast.success(t('memo.message.changed_position'))
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message)
+        navigate('.', { replace: true })
       }
-    })
+    }
   }
 
   // メモの表示順変更APIをdebounce

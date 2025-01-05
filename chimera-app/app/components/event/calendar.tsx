@@ -4,7 +4,7 @@ import {
   useFetcher,
   useSearchParams,
   useLocation,
-} from '@remix-run/react'
+} from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { format, startOfMonth } from 'date-fns'
 import {
@@ -350,7 +350,7 @@ function EventTypeIcon({
         case TaskStatus.NEW:
           return LuCircleDot
         case TaskStatus.DOING:
-          return LuPlayCircle
+          return LuCirclePlay
         case TaskStatus.DONE:
           return LuCircleCheck
         case TaskStatus.PENDING:

@@ -1,28 +1,29 @@
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
 import {
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-} from '@remix-run/react'
+  data,
+} from 'react-router'
 import { I18nextProvider } from 'react-i18next'
-import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { getToast } from 'remix-toast'
 import styles from '~/styles/tailwind.css?url'
 import i18n, { useLanguage } from '~/lib/i18n/i18n'
-import { authenticator } from '~/lib/auth.server'
 import { useTheme, useSonner } from '~/lib/hooks'
-import { Theme, Language } from '~/types/accounts'
+import { getSession } from '~/lib/session.server'
 import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
-import { Layout } from '~/components/layout'
 import {
   useSetUserAgentAtom,
-  useSetLoginSessionAtom,
+  useSetLoginInfoAtom,
   useSetMemoSettingsAtom,
 } from '~/lib/global-state'
+import type { Route } from './+types/root'
+import { Theme, Language } from '~/types/accounts'
 
-export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
+export function links() {
+  return [{ rel: 'stylesheet', href: styles }]
+}
 
 function getLanguageFromHeader(request: Request) {
   // リクエストヘッダから言語を取得
@@ -37,29 +38,29 @@ function getLanguageFromHeader(request: Request) {
   }
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   // セッションから認証情報を取得
-  const loginSession = await authenticator.isAuthenticated(request)
+  const session = await getSession(request.headers.get('cookie'))
+  const loginInfo = session.get('loginInfo')
 
   // 言語を設定
-  let language = loginSession?.account.language || 'auto'
+  let language = loginInfo?.account.language || 'auto'
   language = language === 'auto' ? getLanguageFromHeader(request) : language
   i18n.changeLanguage(language)
 
   // メモ設定を取得
   const memoSettings =
-    loginSession && (await getOrInsertMemoSettings(loginSession.account.id))
+    loginInfo && (await getOrInsertMemoSettings(loginInfo.account.id))
 
   // トーストメッセージを取得
   const { toast, headers } = await getToast(request)
 
-  return typedjson({ loginSession, language, memoSettings, toast }, { headers })
+  return data({ loginInfo, language, memoSettings, toast }, { headers })
 }
 
-export default function App() {
-  const { loginSession, language, memoSettings, toast } =
-    useTypedLoaderData<typeof loader>()
-  const theme = loginSession?.account.theme || Theme.SYSTEM
+export default function App({ loaderData }: Route.ComponentProps) {
+  const { loginInfo, language, memoSettings, toast } = loaderData
+  const theme = loginInfo?.account.theme || Theme.SYSTEM
 
   // useEffectにてOSのテーマ設定に合わせてテーマを変更
   useTheme(theme)
@@ -74,13 +75,13 @@ export default function App() {
   useSetUserAgentAtom()
 
   // ログインユーザーのアカウント情報をグローバルステートに保存
-  useSetLoginSessionAtom(loginSession)
+  useSetLoginInfoAtom(loginInfo)
 
   // ログインユーザーのメモ設定情報をグローバルステートに保存
   useSetMemoSettingsAtom(memoSettings)
 
   return (
-    <html lang={language} className="" suppressHydrationWarning={true}>
+    <html lang={language} suppressHydrationWarning={true}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -107,9 +108,7 @@ export default function App() {
       </head>
       <body>
         <I18nextProvider i18n={i18n}>
-          <Layout>
-            <Outlet />
-          </Layout>
+          <Outlet />
         </I18nextProvider>
         <ScrollRestoration />
         <Scripts />

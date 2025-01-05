@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useFetcher } from '@remix-run/react'
+import { useFetcher } from 'react-router'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from 'react-hotkeys-hook'

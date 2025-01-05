@@ -82,7 +82,7 @@ export type Auth0User = {
 }
 
 // ログインセッションの型
-export type LoginSession = {
+export type LoginInfo = {
   auth0User: Auth0User
   account: Account
 }

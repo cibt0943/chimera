@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form } from '@remix-run/react'
+import { Form } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod'
