@@ -1,5 +1,4 @@
-import { Outlet } from 'react-router'
-import { redirectWithSuccess } from 'remix-toast'
+import { Outlet, redirect } from 'react-router'
 import { startOfMonth, addMonths, subMonths } from 'date-fns'
 import { parseWithZod } from '@conform-to/zod'
 import { EVENT_URL } from '~/constants'
@@ -51,7 +50,7 @@ export async function action({ request }: Route.ActionArgs) {
   })
 
   const redirectUrl = (formData.get('returnUrl') as string) || EVENT_URL
-  return redirectWithSuccess(redirectUrl, 'event.message.created')
+  return redirect(redirectUrl)
 }
 
 function getDispStartDayFromParams(request: Request): Date {

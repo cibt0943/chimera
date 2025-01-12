@@ -17,8 +17,7 @@ export default function Layout() {
       }
     >
       <AppSidebar />
-      {/* <div className="h-dvh flex-1 overflow-auto"> */}
-      <div className="h-svh flex-1 overflow-auto">
+      <div className="h-dvh flex-1 overflow-auto">
         <AppNavbar />
         <main>
           <LoadingEffect>

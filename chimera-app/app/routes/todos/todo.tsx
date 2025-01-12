@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { redirectWithSuccess } from 'remix-toast'
+import { redirect } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { TODO_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
@@ -39,7 +39,7 @@ export async function action({ params, request }: Route.ActionArgs) {
   })
 
   const redirectUrl = (formData.get('returnUrl') as string) || TODO_URL
-  return redirectWithSuccess(redirectUrl, 'task.message.updated')
+  return redirect(redirectUrl)
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {

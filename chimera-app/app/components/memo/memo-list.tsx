@@ -157,13 +157,22 @@ export function MemoList({
 
   // メモのステータスを変更
   function updateMemoStatusApi(memo: Memo) {
-    fetcher.submit(
-      { status: memo.status },
-      {
-        action: [API_URL, MEMO_URL, '/' + memo.id].join(''),
-        method: 'post',
-      },
-    )
+    fetcher
+      .submit(
+        { status: memo.status },
+        {
+          action: [API_URL, MEMO_URL, `/${memo.id}`].join(''),
+          method: 'post',
+          encType: 'application/json',
+        },
+      )
+      .then(() => {
+        const msg =
+          memo.status === MemoStatus.NOMAL
+            ? 'memo.message.un_archived'
+            : 'memo.message.archived'
+        toast.success(t(msg))
+      })
   }
 
   // メモ削除ダイアログを開く
@@ -207,14 +216,13 @@ export function MemoList({
   async function moveMemoApi(fromMemo: Memo, toMemo: Memo) {
     try {
       // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
-      const url = [MEMO_URL, fromMemo.id, 'position'].join('/')
+      const url = [API_URL, MEMO_URL, `/${fromMemo.id}`, '/position'].join('')
       const response = await fetch(url, {
         method: 'POST',
         body: JSON.stringify({ toMemoId: toMemo.id }),
       })
 
       if (!response.ok) throw new Error('Failed to update position api')
-      toast.success(t('memo.message.changed_position'))
     } catch (error) {
       if (error instanceof Error) {
         alert(error.message)

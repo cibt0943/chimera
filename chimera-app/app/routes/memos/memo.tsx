@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { redirectWithSuccess } from 'remix-toast'
+import { redirect } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { MEMO_URL } from '~/constants'
 import { useMedia } from '~/lib/hooks'
@@ -41,9 +41,7 @@ export async function action({ params, request }: Route.ActionArgs) {
   })
 
   const redirectUrl = formData.get('returnUrl') as string
-  return redirectUrl
-    ? redirectWithSuccess(redirectUrl, 'memo.message.updated')
-    : { updatedMemo }
+  return redirectUrl ? redirect(redirectUrl) : { updatedMemo }
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {

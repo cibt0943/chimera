@@ -25,7 +25,6 @@ export default [
 
     route('todos', './routes/todos/index.tsx', [
       route(':todoId', './routes/todos/todo.tsx'),
-      route(':todoId/position', './routes/todos/todo.position.tsx'),
       route(':todoId/delete', './routes/todos/todo.delete.tsx'),
     ]),
 
@@ -33,7 +32,6 @@ export default [
       layout('routes/memos/layout.tsx', [
         index('./routes/memos/index.tsx'),
         route(':memoId', './routes/memos/memo.tsx'),
-        route(':memoId/position', './routes/memos/memo.position.tsx'),
         route(':memoId/delete', './routes/memos/memo.delete.tsx'),
       ]),
     ]),
@@ -58,8 +56,14 @@ export default [
     ]),
 
     ...prefix('api', [
-      ...prefix('todos', [route(':todoId', './routes/todos/api.todo.tsx')]),
-      ...prefix('memos', [route(':memoId', './routes/memos/api.memo.tsx')]),
+      ...prefix('todos', [
+        route(':todoId', './routes/todos/api.todo.tsx'),
+        route(':todoId/position', './routes/todos/api.todo.position.tsx'),
+      ]),
+      ...prefix('memos', [
+        route(':memoId', './routes/memos/api.memo.tsx'),
+        route(':memoId/position', './routes/memos/api.memo.position.tsx'),
+      ]),
       ...prefix('events', [route(':eventId', './routes/events/api.event.tsx')]),
     ]),
   ]),

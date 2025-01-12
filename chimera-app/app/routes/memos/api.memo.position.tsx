@@ -1,6 +1,6 @@
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getMemo, updateMemoPosition } from '~/models/memo.server'
-import type { Route } from './+types/memo.position'
+import type { Route } from './+types/api.memo.position'
 
 export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)

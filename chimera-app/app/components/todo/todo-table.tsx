@@ -234,14 +234,13 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   async function moveTaskApi(fromTask: Task, toTask: Task) {
     try {
       // useFetcherのsubmitを利用すると自動でタスクデータを再取得してしまうのであえてfetchを利用
-      const url = [TODO_URL, fromTask.id, 'position'].join('/')
+      const url = [API_URL, TODO_URL, `/${fromTask.id}`, '/position'].join('')
       const response = await fetch(url, {
         method: 'POST',
         body: JSON.stringify({ toTaskId: toTask.id }),
       })
 
       if (!response.ok) throw new Error('Failed to update position api')
-      toast.success(t('task.message.changed_position'))
     } catch (error) {
       if (error instanceof Error) {
         alert(error.message)
@@ -300,15 +299,20 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   }
 
   // タスクのステータス変更APIの呼び出し
-  function updateTaskStatusApi(updateTask: Task) {
+  function updateTaskStatusApi(task: Task) {
     // タスクのステータス変更API
-    fetcher.submit(
-      { status: updateTask.status },
-      {
-        action: [API_URL, TODO_URL, '/' + updateTask.id].join(''),
-        method: 'post',
-      },
-    )
+    fetcher
+      .submit(
+        { status: task.status },
+        {
+          action: [API_URL, TODO_URL, `/${task.id}`].join(''),
+          method: 'post',
+          encType: 'application/json',
+        },
+      )
+      .then(() => {
+        toast.success(t('task.message.changed_status'))
+      })
   }
 
   // 選択行のステータスを変更

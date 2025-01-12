@@ -1,6 +1,7 @@
 import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { LuTrash2, LuArchive, LuArchiveRestore } from 'react-icons/lu'
+import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import {
   Tooltip,
@@ -40,13 +41,22 @@ export function MemoActionButton({
               size="icon"
               onClick={(event) => {
                 event.preventDefault()
-                fetcher.submit(
-                  { status: archiveMenu.toStatus },
-                  {
-                    action: [API_URL, MEMO_URL, '/' + memo.id].join(''),
-                    method: 'post',
-                  },
-                )
+                fetcher
+                  .submit(
+                    { status: archiveMenu.toStatus },
+                    {
+                      action: [API_URL, MEMO_URL, `/${memo.id}`].join(''),
+                      method: 'post',
+                      encType: 'application/json',
+                    },
+                  )
+                  .then(() => {
+                    const msg =
+                      archiveMenu.toStatus === MemoStatus.NOMAL
+                        ? 'memo.message.un_archived'
+                        : 'memo.message.archived'
+                    toast.success(t(msg))
+                  })
               }}
             >
               {archiveMenu.icon}

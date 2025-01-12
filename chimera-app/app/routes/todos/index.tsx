@@ -1,5 +1,4 @@
-import { redirectWithSuccess } from 'remix-toast'
-import { useParams, Outlet } from 'react-router'
+import { useParams, Outlet, redirect } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { TODO_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
@@ -33,7 +32,7 @@ export async function action({ request }: Route.ActionArgs) {
     due_date_all_day: !!data.dueDateAllDay,
   })
 
-  return redirectWithSuccess(TODO_URL, 'task.message.created')
+  return redirect(TODO_URL)
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
