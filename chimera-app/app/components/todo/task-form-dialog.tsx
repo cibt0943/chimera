@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useLocation } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import {
   Dialog,
@@ -29,6 +29,7 @@ export function TaskFormDialog({
 }: TaskFormDialogProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const title = task
     ? t('task.message.task_editing')
@@ -42,7 +43,7 @@ export function TaskFormDialog({
         setIsOpen(open)
         if (!open) {
           await sleep(200) // ダイアログが閉じるアニメーションが終わるまで待機
-          navigate(returnUrl)
+          if (location.pathname !== returnUrl) navigate(returnUrl)
         }
       }}
     >

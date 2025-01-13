@@ -55,7 +55,7 @@ export function MemoActionButton({
                       archiveMenu.toStatus === MemoStatus.NOMAL
                         ? 'memo.message.un_archived'
                         : 'memo.message.archived'
-                    toast.success(t(msg))
+                    toast.info(t(msg))
                   })
               }}
             >

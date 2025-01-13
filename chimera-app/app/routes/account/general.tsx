@@ -1,4 +1,4 @@
-import { redirectWithSuccess } from 'remix-toast'
+import { redirectWithInfo } from 'remix-toast'
 import { parseWithZod } from '@conform-to/zod'
 import { ACCOUNT_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
@@ -42,7 +42,7 @@ export async function action({ request }: Route.ActionArgs) {
   session.set('loginInfo', loginInfo)
 
   const toastMsg = 'account.message.updated'
-  return redirectWithSuccess([ACCOUNT_URL, 'settings'].join('/'), toastMsg, {
+  return redirectWithInfo([ACCOUNT_URL, 'settings'].join('/'), toastMsg, {
     headers: {
       // 新しいセッション情報をクッキーとして設定するように指示
       'Set-Cookie': await commitSession(session),

@@ -171,7 +171,7 @@ export function MemoList({
           memo.status === MemoStatus.NOMAL
             ? 'memo.message.un_archived'
             : 'memo.message.archived'
-        toast.success(t(msg))
+        toast.info(t(msg))
       })
   }
 

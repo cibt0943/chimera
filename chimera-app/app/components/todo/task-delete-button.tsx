@@ -7,7 +7,7 @@ import { TaskDeleteConfirmDialog } from './task-delete-confirm-dialog'
 
 export interface TaskDeleteButtonProps {
   task: Task | undefined
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
   returnUrl?: string
 }
 

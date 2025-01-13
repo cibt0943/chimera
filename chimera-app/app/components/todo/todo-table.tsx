@@ -311,7 +311,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         },
       )
       .then(() => {
-        toast.success(t('task.message.changed_status'))
+        toast.info(t('task.message.changed_status'))
       })
   }
 
@@ -537,7 +537,6 @@ function DraggableRow({ row }: { row: Row<Task> }) {
       id={`row-${row.id}`}
       ref={setNodeRef}
       tabIndex={0}
-      // className="outline-none"
       className="rounded outline-none focus:ring-1 focus:ring-inset focus:ring-ring"
       style={style}
       onFocus={() => row.toggleSelected(true)}
