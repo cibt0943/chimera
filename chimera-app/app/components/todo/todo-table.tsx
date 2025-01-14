@@ -105,9 +105,6 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   // 編集・削除するタスク
   const [actionTask, setActionTask] = React.useState<Task>()
 
-  // 追加用ダイアログの表示・非表示
-  const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
-
   // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
@@ -170,7 +167,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   // タスク追加ダイアログを開く
   function openAddTaskDialog() {
-    setIsOpenAddDialog(true)
+    navigate('new')
   }
 
   // タスク削除ダイアログを開く
@@ -392,7 +389,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         return !['tr', 'body'].includes(target.tagName.toLowerCase())
       },
       // ローディング中、ダイアログが開いている場合は何もしない
-      enabled: !(isLoading || isOpenAddDialog || isOpenDeleteDialog || showId),
+      enabled: !(isLoading || isOpenDeleteDialog || showId),
     },
   )
 
@@ -404,7 +401,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     },
     {
       // ローディング中、ダイアログが開いている場合は何もしない
-      enabled: !(isLoading || isOpenAddDialog || isOpenDeleteDialog || showId),
+      enabled: !(isLoading || isOpenDeleteDialog || showId),
     },
   )
 
@@ -503,12 +500,6 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.next')}
         </Button>
       </div>
-      <TaskFormDialogMemo
-        task={undefined}
-        isOpen={isOpenAddDialog}
-        setIsOpen={setIsOpenAddDialog}
-        returnUrl={TODO_URL}
-      />
       <TaskDeleteConfirmDialogMemo
         task={actionTask}
         isOpen={isOpenDeleteDialog}
@@ -550,12 +541,6 @@ function DraggableRow({ row }: { row: Row<Task> }) {
     </TableRow>
   )
 }
-
-// タスク追加ダイアログのメモ化
-const TaskFormDialogMemo = React.memo((props: TaskFormDialogProps) => {
-  return <TaskFormDialog {...props} />
-})
-TaskFormDialogMemo.displayName = 'TaskFormDialogMemo'
 
 // タスク削除ダイアログのメモ化
 const TaskDeleteConfirmDialogMemo = React.memo(
