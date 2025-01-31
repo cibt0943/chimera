@@ -53,7 +53,6 @@ import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
 import { TodoTableColumns } from './todo-table-columns'
-import { TaskFormDialog, TaskFormDialogProps } from './task-form-dialog'
 import {
   TaskDeleteConfirmDialog,
   TaskDeleteConfirmDialogProps,
@@ -503,7 +502,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
       <TaskDeleteConfirmDialogMemo
         task={actionTask}
         isOpen={isOpenDeleteDialog}
-        setIsOpen={setIsOpenDeleteDialog}
+        onOpenChange={setIsOpenDeleteDialog}
       />
     </div>
   )

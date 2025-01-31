@@ -12,7 +12,7 @@ interface ConfirmDialogProps {
   title: string
   description: string
   isOpen?: boolean
-  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  onOpenChange?: (open: boolean) => void
   torigger?: React.ReactNode
   children?: React.ReactNode
 }
@@ -22,11 +22,11 @@ export function ConfirmDialog({
   torigger,
   description,
   isOpen,
-  setIsOpen,
+  onOpenChange,
   children,
 }: ConfirmDialogProps) {
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>{torigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
