@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router'
-import { SidebarProvider } from '~/components/ui/sidebar'
+import { SidebarProvider, SidebarInset } from '~/components/ui/sidebar'
 import { Toaster } from '~/components/ui/sonner'
 import { AppSidebar } from '~/components/layouts/app-sidebar'
 import { AppNavbar } from '~/components/layouts/app-navbar'
@@ -17,14 +17,12 @@ export default function Layout() {
       }
     >
       <AppSidebar />
-      <div className="h-dvh flex-1 overflow-auto">
+      <SidebarInset>
         <AppNavbar />
-        <main>
-          <LoadingEffect>
-            <Outlet />
-          </LoadingEffect>
-        </main>
-      </div>
+        <LoadingEffect>
+          <Outlet />
+        </LoadingEffect>
+      </SidebarInset>
       <Toaster closeButton richColors />
     </SidebarProvider>
   )

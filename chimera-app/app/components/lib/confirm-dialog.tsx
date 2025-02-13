@@ -10,7 +10,7 @@ import {
 
 interface ConfirmDialogProps {
   title: string
-  description: string
+  description: React.ReactNode | string
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void
   torigger?: React.ReactNode
