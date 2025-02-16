@@ -1,5 +1,3 @@
-import * as React from 'react'
-import { useNavigate, useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import {
   Dialog,
@@ -8,28 +6,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog'
-import { sleep } from '~/lib/utils'
 import { Memo } from '~/types/memos'
 import { MemoForm } from './memo-form'
-import { MemoActionButton } from './memo-action-button'
 import { useMemoSettingsAtom } from '~/lib/global-state'
 
 export interface MemoFormDialogProps {
   memo: Memo | undefined
   isOpen: boolean
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  returnUrl: string
+  onOpenChange: (open: boolean) => void
+  returnUrl?: string
 }
 
 export function MemoFormDialog({
   memo,
   isOpen,
-  setIsOpen,
+  onOpenChange,
   returnUrl,
 }: MemoFormDialogProps) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
-  const memoFormFetcher = useFetcher()
   const memoSettings = useMemoSettingsAtom()
   const autoSave = memoSettings?.autoSave || false
 
@@ -42,16 +36,7 @@ export function MemoFormDialog({
   const desc = t('memo.message.set_memo_info')
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={async (open) => {
-        setIsOpen(open)
-        if (!open) {
-          await sleep(200) // ダイアログが閉じるアニメーションが終わるまで待機
-          navigate(returnUrl)
-        }
-      }}
-    >
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[620px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -59,23 +44,10 @@ export function MemoFormDialog({
         </DialogHeader>
         <MemoForm
           memo={memo}
-          fetcher={memoFormFetcher}
           isAutoSave={autoSave}
-          onSubmit={() => !autoSave && setIsOpen(false)}
           returnUrl={memoFormSubmitReturnUrl}
           textareaProps={{ className: 'h-[calc(100svh_-_360px)]' }}
-        >
-          {memo && (
-            <MemoActionButton
-              memo={memo}
-              onDeleteSubmit={(event) => {
-                event.stopPropagation()
-                setIsOpen(false)
-              }}
-              deleteReturnUrl={returnUrl}
-            />
-          )}
-        </MemoForm>
+        />
       </DialogContent>
     </Dialog>
   )

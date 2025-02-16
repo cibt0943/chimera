@@ -1,6 +1,6 @@
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getTask, updateTaskPosition } from '~/models/task.server'
-import type { Route } from './+types/todo.position'
+import type { Route } from './+types/api.todo.position'
 
 export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)

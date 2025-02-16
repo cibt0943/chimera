@@ -1,6 +1,7 @@
 import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { LuTrash2, LuArchive, LuArchiveRestore } from 'react-icons/lu'
+import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import {
   Tooltip,
@@ -14,13 +15,11 @@ import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 
 interface MemoActionButtonProps {
   memo: Memo | undefined
-  onDeleteSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
   deleteReturnUrl?: string
 }
 
 export function MemoActionButton({
   memo,
-  onDeleteSubmit,
   deleteReturnUrl = MEMO_URL,
 }: MemoActionButtonProps) {
   const { t } = useTranslation()
@@ -40,13 +39,22 @@ export function MemoActionButton({
               size="icon"
               onClick={(event) => {
                 event.preventDefault()
-                fetcher.submit(
-                  { status: archiveMenu.toStatus },
-                  {
-                    action: [API_URL, MEMO_URL, '/' + memo.id].join(''),
-                    method: 'post',
-                  },
-                )
+                fetcher
+                  .submit(
+                    { status: archiveMenu.toStatus },
+                    {
+                      action: [API_URL, MEMO_URL, `/${memo.id}`].join(''),
+                      method: 'post',
+                      encType: 'application/json',
+                    },
+                  )
+                  .then(() => {
+                    const msg =
+                      archiveMenu.toStatus === MemoStatus.NOMAL
+                        ? 'memo.message.un_archived'
+                        : 'memo.message.archived'
+                    toast.info(t(msg))
+                  })
               }}
             >
               {archiveMenu.icon}
@@ -55,11 +63,7 @@ export function MemoActionButton({
           <TooltipContent>{archiveMenu.caption}</TooltipContent>
         </Tooltip>
         <Tooltip>
-          <MemoDeleteConfirmDialog
-            memo={memo}
-            onSubmit={onDeleteSubmit}
-            returnUrl={deleteReturnUrl}
-          >
+          <MemoDeleteConfirmDialog memo={memo} returnUrl={deleteReturnUrl}>
             <TooltipTrigger asChild>
               <Button variant="outline" size="icon">
                 <LuTrash2 />

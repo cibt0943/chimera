@@ -126,10 +126,10 @@ export function TodoTableRowActions({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
+          className="text-red-600 focus:text-red-600"
           onClick={() => {
             table.options.meta?.deleteTask(task)
           }}
-          className="text-red-600 focus:text-red-600"
         >
           <LuTrash2 />
           {t('common.message.delete')}

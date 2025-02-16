@@ -1,4 +1,4 @@
-import { redirectWithSuccess } from 'remix-toast'
+import { redirectWithInfo } from 'remix-toast'
 import { MEMO_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getMemo, deleteMemo } from '~/models/memo.server'
@@ -16,5 +16,5 @@ export async function action({ params, request }: Route.ActionArgs) {
 
   const formData = await request.formData()
   const returnUrl = formData.get('returnUrl') as string | null
-  return redirectWithSuccess(returnUrl || MEMO_URL, 'memo.message.deleted')
+  return redirectWithInfo(returnUrl || MEMO_URL, 'memo.message.deleted')
 }

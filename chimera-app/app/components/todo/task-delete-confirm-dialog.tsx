@@ -13,8 +13,7 @@ import { Task } from '~/types/tasks'
 export interface TaskDeleteConfirmDialogProps {
   task: Task | undefined
   isOpen?: boolean
-  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  onOpenChange?: (open: boolean) => void
   returnUrl?: string
   children?: React.ReactNode
 }
@@ -22,8 +21,7 @@ export interface TaskDeleteConfirmDialogProps {
 export function TaskDeleteConfirmDialog({
   task,
   isOpen,
-  setIsOpen,
-  onSubmit,
+  onOpenChange,
   returnUrl = TODO_URL,
   children,
 }: TaskDeleteConfirmDialogProps) {
@@ -39,7 +37,7 @@ export function TaskDeleteConfirmDialog({
       title={t('task.message.task_deletion')}
       description={desc}
       isOpen={isOpen}
-      setIsOpen={setIsOpen}
+      onOpenChange={onOpenChange}
       torigger={children}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
@@ -51,12 +49,7 @@ export function TaskDeleteConfirmDialog({
       >
         {t('common.message.delete')}
       </AlertDialogAction>
-      <Form
-        id="delete-task-form"
-        action={action}
-        method="delete"
-        onSubmit={onSubmit}
-      >
+      <Form id="delete-task-form" action={action} method="delete">
         <input type="hidden" name="returnUrl" value={returnUrl} />
       </Form>
     </ConfirmDialog>

@@ -1,4 +1,4 @@
-import { redirectWithSuccess } from 'remix-toast'
+import { redirect } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { MEMO_URL } from '~/constants'
 import { useMedia } from '~/lib/hooks'
@@ -31,10 +31,7 @@ export async function action({ request }: Route.ActionArgs) {
       data.relatedDateAllDay === undefined ? true : data.relatedDateAllDay,
   })
 
-  return redirectWithSuccess(
-    [MEMO_URL, newMemo.id].join('/'),
-    'memo.message.created',
-  )
+  return redirect([MEMO_URL, newMemo.id].join('/'))
 }
 
 export default function Index() {
@@ -42,5 +39,5 @@ export default function Index() {
 
   if (!isLaptop) return null
 
-  return <MemoFormView memo={undefined} returnUrl="" />
+  return <MemoFormView memo={undefined} />
 }

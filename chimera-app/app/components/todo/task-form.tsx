@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Form } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useForm, getFormProps } from '@conform-to/react'
@@ -18,6 +17,7 @@ import { InputConform } from '~/components/lib/conform/input'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { SelectConform } from '~/components/lib/conform/select'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
+import { TaskDeleteButton } from './task-delete-button'
 import {
   Task,
   TaskStatus,
@@ -28,17 +28,10 @@ import {
 
 export interface TaskFormProps {
   task: Task | undefined
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
   returnUrl?: string
-  children?: React.ReactNode
 }
 
-export function TaskForm({
-  task,
-  onSubmit,
-  returnUrl = TODO_URL,
-  children,
-}: TaskFormProps) {
+export function TaskForm({ task, returnUrl }: TaskFormProps) {
   const { t } = useTranslation()
 
   const action = task ? [TODO_URL, task.id].join('/') : TODO_URL
@@ -59,7 +52,6 @@ export function TaskForm({
       return parseWithZod(formData, { schema: TaskSchema })
     },
     shouldRevalidate: 'onInput',
-    onSubmit: onSubmit,
   })
 
   return (
@@ -118,7 +110,11 @@ export function TaskForm({
         <input type="hidden" name="returnUrl" value={returnUrl} />
       </div>
       <FormFooter className="sm:justify-between">
-        {children || <div>&nbsp;</div>}
+        {task ? (
+          <TaskDeleteButton task={task} returnUrl={returnUrl} />
+        ) : (
+          <div>&nbsp;</div>
+        )}
         <Button type="submit">{t('common.message.save')}</Button>
       </FormFooter>
     </Form>

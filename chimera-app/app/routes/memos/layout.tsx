@@ -39,24 +39,24 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 
   if (!isLaptop) {
     return (
-      <div className="pt-0">
+      <>
         <MemoList
           defaultMemos={memos}
-          showId={memoId || ''}
+          showId={memoId}
           memoSettings={memoSettings}
         />
         <Outlet />
-      </div>
+      </>
     )
   }
 
   return (
-    <div className="p-4 pt-0 lg:pt-4">
+    <div className="p-4">
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
         <ResizablePanel defaultSize={35}>
           <MemoList
             defaultMemos={memos}
-            showId={memoId || ''}
+            showId={memoId}
             memoSettings={memoSettings}
           />
         </ResizablePanel>

@@ -1,4 +1,4 @@
-import { redirectWithSuccess } from 'remix-toast'
+import { redirectWithInfo } from 'remix-toast'
 import { TODO_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getTask, deleteTask } from '~/models/task.server'
@@ -16,5 +16,5 @@ export async function action({ params, request }: Route.ActionArgs) {
 
   const formData = await request.formData()
   const returnUrl = formData.get('returnUrl') as string | undefined
-  return redirectWithSuccess(returnUrl || TODO_URL, 'task.message.deleted')
+  return redirectWithInfo(returnUrl || TODO_URL, 'task.message.deleted')
 }

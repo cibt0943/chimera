@@ -53,7 +53,6 @@ import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
 import { TodoTableColumns } from './todo-table-columns'
-import { TaskFormDialog, TaskFormDialogProps } from './task-form-dialog'
 import {
   TaskDeleteConfirmDialog,
   TaskDeleteConfirmDialogProps,
@@ -104,9 +103,6 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   // 編集・削除するタスク
   const [actionTask, setActionTask] = React.useState<Task>()
-
-  // 追加用ダイアログの表示・非表示
-  const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
 
   // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
@@ -170,7 +166,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   // タスク追加ダイアログを開く
   function openAddTaskDialog() {
-    setIsOpenAddDialog(true)
+    navigate('new')
   }
 
   // タスク削除ダイアログを開く
@@ -234,14 +230,13 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   async function moveTaskApi(fromTask: Task, toTask: Task) {
     try {
       // useFetcherのsubmitを利用すると自動でタスクデータを再取得してしまうのであえてfetchを利用
-      const url = [TODO_URL, fromTask.id, 'position'].join('/')
+      const url = [API_URL, TODO_URL, `/${fromTask.id}`, '/position'].join('')
       const response = await fetch(url, {
         method: 'POST',
         body: JSON.stringify({ toTaskId: toTask.id }),
       })
 
       if (!response.ok) throw new Error('Failed to update position api')
-      toast.success(t('task.message.changed_position'))
     } catch (error) {
       if (error instanceof Error) {
         alert(error.message)
@@ -300,15 +295,20 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   }
 
   // タスクのステータス変更APIの呼び出し
-  function updateTaskStatusApi(updateTask: Task) {
+  function updateTaskStatusApi(task: Task) {
     // タスクのステータス変更API
-    fetcher.submit(
-      { status: updateTask.status },
-      {
-        action: [API_URL, TODO_URL, '/' + updateTask.id].join(''),
-        method: 'post',
-      },
-    )
+    fetcher
+      .submit(
+        { status: task.status },
+        {
+          action: [API_URL, TODO_URL, `/${task.id}`].join(''),
+          method: 'post',
+          encType: 'application/json',
+        },
+      )
+      .then(() => {
+        toast.info(t('task.message.changed_status'))
+      })
   }
 
   // 選択行のステータスを変更
@@ -388,7 +388,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
         return !['tr', 'body'].includes(target.tagName.toLowerCase())
       },
       // ローディング中、ダイアログが開いている場合は何もしない
-      enabled: !(isLoading || isOpenAddDialog || isOpenDeleteDialog || showId),
+      enabled: !(isLoading || isOpenDeleteDialog || showId),
     },
   )
 
@@ -400,7 +400,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
     },
     {
       // ローディング中、ダイアログが開いている場合は何もしない
-      enabled: !(isLoading || isOpenAddDialog || isOpenDeleteDialog || showId),
+      enabled: !(isLoading || isOpenDeleteDialog || showId),
     },
   )
 
@@ -499,16 +499,10 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.next')}
         </Button>
       </div>
-      <TaskFormDialogMemo
-        task={undefined}
-        isOpen={isOpenAddDialog}
-        setIsOpen={setIsOpenAddDialog}
-        returnUrl={TODO_URL}
-      />
       <TaskDeleteConfirmDialogMemo
         task={actionTask}
         isOpen={isOpenDeleteDialog}
-        setIsOpen={setIsOpenDeleteDialog}
+        onOpenChange={setIsOpenDeleteDialog}
       />
     </div>
   )
@@ -533,7 +527,6 @@ function DraggableRow({ row }: { row: Row<Task> }) {
       id={`row-${row.id}`}
       ref={setNodeRef}
       tabIndex={0}
-      // className="outline-none"
       className="rounded outline-none focus:ring-1 focus:ring-inset focus:ring-ring"
       style={style}
       onFocus={() => row.toggleSelected(true)}
@@ -547,12 +540,6 @@ function DraggableRow({ row }: { row: Row<Task> }) {
     </TableRow>
   )
 }
-
-// タスク追加ダイアログのメモ化
-const TaskFormDialogMemo = React.memo((props: TaskFormDialogProps) => {
-  return <TaskFormDialog {...props} />
-})
-TaskFormDialogMemo.displayName = 'TaskFormDialogMemo'
 
 // タスク削除ダイアログのメモ化
 const TaskDeleteConfirmDialogMemo = React.memo(

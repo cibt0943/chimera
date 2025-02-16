@@ -81,11 +81,11 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   function getEditUrl(type: CalendarEventType, id: string) {
     switch (type) {
       case CalendarEventType.EVENT:
-        return [EVENT_URL, id].join('/')
+        return [EVENT_URL, `/${id}`].join('')
       case CalendarEventType.TASK:
-        return [EVENT_URL, TODO_URL, '/' + id].join('')
+        return [EVENT_URL, TODO_URL, `/${id}`].join('')
       case CalendarEventType.MEMO:
-        return [EVENT_URL, MEMO_URL, '/' + id].join('')
+        return [EVENT_URL, MEMO_URL, `/${id}`].join('')
       default:
         return null
     }
@@ -145,6 +145,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
     fetcher.submit(request.data, {
       action: request.action,
       method: 'post',
+      encType: 'application/json',
     })
   }
 
@@ -174,8 +175,9 @@ export function Calendar({ defaultEvents }: CalendarProps) {
         ...(endDate && { endDate: endDate.toISOString() }),
       },
       {
-        action: [API_URL, EVENT_URL, '/' + srcObj.id].join(''),
+        action: [API_URL, EVENT_URL, `/${srcObj.id}`].join(''),
         method: 'post',
+        encType: 'application/json',
       },
     )
   }
@@ -265,7 +267,7 @@ function createEventDropRequest(
     allDay: srcObj.allDay ? 'on' : '',
     ...(endDate && { endDate }),
   }
-  request.action = [API_URL, EVENT_URL, '/' + srcObj.id].join('')
+  request.action = [API_URL, EVENT_URL, `/${srcObj.id}`].join('')
   return request
 }
 
@@ -278,7 +280,7 @@ function createTaskDropRequest(startDate: Date, srcObj: Task) {
     dueDate: startDate,
     dueDateAllDay: srcObj.dueDateAllDay ? 'on' : '',
   }
-  request.action = [API_URL, TODO_URL, '/' + srcObj.id].join('')
+  request.action = [API_URL, TODO_URL, `/${srcObj.id}`].join('')
   return request
 }
 
@@ -291,7 +293,7 @@ function createMemoDropRequest(startDate: Date, srcObj: Memo) {
     relatedDate: startDate,
     relatedDateAllDay: srcObj.relatedDateAllDay ? 'on' : '',
   }
-  request.action = [API_URL, MEMO_URL, '/' + srcObj.id].join('')
+  request.action = [API_URL, MEMO_URL, `/${srcObj.id}`].join('')
   return request
 }
 

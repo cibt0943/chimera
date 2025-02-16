@@ -1,6 +1,4 @@
-import { dataWithSuccess } from 'remix-toast'
 import * as zod from 'zod'
-import { parseWithZod } from '@conform-to/zod'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getEvent, updateEvent } from '~/models/event.server'
 import type { Route } from './+types/api.event'
@@ -15,22 +13,23 @@ export async function action({ params, request }: Route.ActionArgs) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  const formData = await request.formData()
-  const submission = parseWithZod(formData, {
-    schema: zod.object({
-      startDate: zod.date().optional(),
-      endDate: zod.date().optional(),
-      allDay: zod.boolean().optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
-    }),
+  const jsonData = await request.json()
+
+  const scheme = zod.object({
+    startDate: zod.preprocess((v) => new Date(v), zod.date()).optional(),
+    endDate: zod.preprocess((v) => new Date(v), zod.date()).optional(),
+    allDay: zod.preprocess((v) => v === 'on', zod.boolean()).optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
   })
+
+  const submission = scheme.safeParse(jsonData)
+
   // submission が成功しなかった場合、クライアントに送信結果を報告します。
-  if (submission.status !== 'success') {
+  if (!submission.success) {
     throw new Response('Invalid submission data.', { status: 400 })
   }
 
-  const data = submission.value
+  const data = submission.data
 
-  let toastMsg = ''
   const values: UpdateEventModel = { id: event.id }
   if (data.startDate !== undefined) {
     const endDate = !data.endDate
@@ -42,10 +41,9 @@ export async function action({ params, request }: Route.ActionArgs) {
     values.start_datetime = data.startDate.toISOString()
     values.end_datetime = endDate?.toISOString() || null
     values.all_day = !!data.allDay
-    toastMsg = 'event.message.changed_date'
   }
 
   const updatedEvent = await updateEvent(values)
 
-  return dataWithSuccess({ event: updatedEvent }, toastMsg)
+  return Response.json({ event: updatedEvent })
 }

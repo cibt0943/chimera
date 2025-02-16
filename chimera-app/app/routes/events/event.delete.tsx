@@ -1,4 +1,4 @@
-import { redirectWithSuccess } from 'remix-toast'
+import { redirectWithInfo } from 'remix-toast'
 import { EVENT_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getEvent, deleteEvent } from '~/models/event.server'
@@ -16,5 +16,5 @@ export async function action({ params, request }: Route.ActionArgs) {
 
   const formData = await request.formData()
   const returnUrl = formData.get('returnUrl') as string | null
-  return redirectWithSuccess(returnUrl || EVENT_URL, 'event.message.deleted')
+  return redirectWithInfo(returnUrl || EVENT_URL, 'event.message.deleted')
 }
