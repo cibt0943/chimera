@@ -10,11 +10,10 @@ import { MEMO_URL } from '~/constants'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
 import { Memo } from '~/types/memos'
 
-export interface DeleteMemoConfirmDialogProps {
+export interface MemoDeleteConfirmDialogProps {
   memo: Memo | undefined
   isOpen?: boolean
-  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  onOpenChange?: (open: boolean) => void
   returnUrl?: string
   children?: React.ReactNode
 }
@@ -22,11 +21,10 @@ export interface DeleteMemoConfirmDialogProps {
 export function MemoDeleteConfirmDialog({
   memo,
   isOpen,
-  setIsOpen,
-  onSubmit,
+  onOpenChange,
   returnUrl = MEMO_URL,
   children,
-}: DeleteMemoConfirmDialogProps) {
+}: MemoDeleteConfirmDialogProps) {
   const { t } = useTranslation()
 
   if (!memo) return null
@@ -43,7 +41,7 @@ export function MemoDeleteConfirmDialog({
       title={t('memo.message.memo_deletion')}
       description={desc}
       isOpen={isOpen}
-      setIsOpen={setIsOpen}
+      onOpenChange={onOpenChange}
       torigger={children}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
@@ -55,12 +53,7 @@ export function MemoDeleteConfirmDialog({
       >
         {t('common.message.delete')}
       </AlertDialogAction>
-      <Form
-        id="delete-memo-form"
-        action={action}
-        method="delete"
-        onSubmit={onSubmit}
-      >
+      <Form id="delete-memo-form" action={action} method="delete">
         <input type="hidden" name="returnUrl" value={returnUrl} />
       </Form>
     </ConfirmDialog>

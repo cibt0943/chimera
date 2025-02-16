@@ -73,7 +73,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
         <DropdownMenuContent align="end" className="w-60">
           <DropdownMenuItem
             onClick={(event) => {
-              event.stopPropagation() // アンカータグのクリックイベントをキャンセル
+              event.stopPropagation() // 親エレメントのアンカータグのクリックイベントをキャンセル
               handleMoveMemo(memo, true)
             }}
           >
@@ -85,7 +85,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={(event) => {
-              event.stopPropagation() // アンカータグのクリックイベントをキャンセル
+              event.stopPropagation() // 親エレメントのアンカータグのクリックイベントをキャンセル
               handleMoveMemo(memo, false)
             }}
           >
@@ -98,7 +98,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={(event) => {
-              event.stopPropagation() // アンカータグのクリックイベントをキャンセル
+              event.stopPropagation() // 親エレメントのアンカータグのクリックイベントをキャンセル
               handleUpdateMemoStatus({ ...memo, status: archiveMenu.toStatus })
             }}
           >
@@ -111,7 +111,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={(event) => {
-              event.stopPropagation() // アンカータグのクリックイベントをキャンセル
+              event.stopPropagation() // 親エレメントのアンカータグのクリックイベントをキャンセル
               navigate([MEMO_URL, memo.id].join('/'))
             }}
           >
@@ -123,11 +123,11 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
+            className="text-red-600 focus:text-red-600"
             onClick={(event) => {
-              event.stopPropagation() // アンカータグのクリックイベントをキャンセル
+              event.stopPropagation() // 親エレメントのアンカータグのクリックイベントをキャンセル
               handleDeleteMemo(memo)
             }}
-            className="text-red-600 focus:text-red-600"
           >
             <LuTrash2 />
             {t('common.message.delete')}

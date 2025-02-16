@@ -62,7 +62,6 @@ export default function Todo({ loaderData }: Route.ComponentProps) {
   const { task } = loaderData
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
   const navigate = useNavigate()
-  const returnUrl = TODO_URL
 
   return (
     <TaskFormDialog
@@ -72,10 +71,10 @@ export default function Todo({ loaderData }: Route.ComponentProps) {
         if (!open) {
           setIsOpenDialog(false)
           await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
-          navigate(returnUrl)
+          navigate(TODO_URL)
         }
       }}
-      returnUrl={returnUrl}
+      returnUrl={TODO_URL}
     />
   )
 }

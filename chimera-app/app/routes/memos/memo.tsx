@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { redirect } from 'react-router'
+import { redirect, useNavigate } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { MEMO_URL } from '~/constants'
+import { sleep } from '~/lib/utils'
 import { useMedia } from '~/lib/hooks'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getMemo, updateMemo } from '~/models/memo.server'
@@ -59,18 +60,23 @@ export default function Memo({ loaderData }: Route.ComponentProps) {
   const { memo } = loaderData
   const isLaptop = useMedia('(min-width: 1024px)', true)
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
+  const navigate = useNavigate()
 
   if (isLaptop) {
-    // const returnUrl = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
-    const returnUrl = '' //画面遷移しないので、returnUrlは空文字
-    return <MemoFormView memo={memo} returnUrl={returnUrl} />
+    return <MemoFormView memo={memo} />
   }
 
   return (
     <MemoFormDialog
       memo={memo}
       isOpen={isOpenDialog}
-      setIsOpen={setIsOpenDialog}
+      onOpenChange={async (open) => {
+        if (!open) {
+          setIsOpenDialog(false)
+          await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
+          navigate(MEMO_URL)
+        }
+      }}
       returnUrl={MEMO_URL}
     />
   )

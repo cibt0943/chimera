@@ -39,5 +39,5 @@ export default function Index() {
 
   if (!isLaptop) return null
 
-  return <MemoFormView memo={undefined} returnUrl="" />
+  return <MemoFormView memo={undefined} />
 }

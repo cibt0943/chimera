@@ -35,7 +35,7 @@ import { useUserAgentAtom } from '~/lib/global-state'
 
 interface MemoListProps {
   defaultMemos: Memos
-  showId: string
+  showId: string | undefined
   memoSettings: MemoSettings
 }
 
@@ -352,7 +352,7 @@ export function MemoList({
           sensors={sensors}
           id="dnd-context-for-memos"
         >
-          <div className="space-y-3 px-3" id="memos" ref={useMemosRef}>
+          <div className="space-y-2 px-3" id="memos" ref={useMemosRef}>
             <SortableContext
               items={dispMemos}
               strategy={verticalListSortingStrategy}
@@ -384,7 +384,7 @@ export function MemoList({
       <MemoDeleteConfirmDialog
         memo={actionMemo}
         isOpen={isOpenDeleteDialog}
-        setIsOpen={setIsOpenDeleteDialog}
+        onOpenChange={setIsOpenDeleteDialog}
       />
     </div>
   )

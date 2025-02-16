@@ -18,33 +18,29 @@ import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
 import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
 import { Memo } from '~/types/memos'
+import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
 import { useUserAgentAtom } from '~/lib/global-state'
 
 export interface MemoFormProps {
   memo: Memo | undefined
-  fetcher: ReturnType<typeof useFetcher>
   isAutoSave: boolean
-  returnUrl: string
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  returnUrl?: string
   textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>
-  children?: React.ReactNode
 }
 
 export function MemoForm({
   memo,
-  fetcher,
   isAutoSave,
   returnUrl,
-  onSubmit,
   textareaProps = {},
-  children,
 }: MemoFormProps) {
   const { t } = useTranslation()
   const formRef = React.useRef<HTMLFormElement>(null)
   const { enqueue } = useApiQueue()
   // memoの状態を変更して保存したかどうか
   const [isChangedMemo, setIsChangedMemo] = React.useState(false)
+  const fetcher = useFetcher()
 
   React.useEffect(() => {
     setIsChangedMemo(false)
@@ -95,10 +91,6 @@ export function MemoForm({
 
   const { form, fields } = useMemoConform({
     memo,
-    onSubmit: (event) => {
-      setIsChangedMemo(false)
-      onSubmit && onSubmit(event)
-    },
   })
 
   const action = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
@@ -156,7 +148,11 @@ export function MemoForm({
       {/* 戻り先を切り替えるための値 */}
       <input type="hidden" name="returnUrl" value={returnUrl} />
       <FormFooter className="sm:justify-between">
-        {children || <div>&nbsp;</div>}
+        {memo ? (
+          <MemoActionButton memo={memo} deleteReturnUrl={MEMO_URL} />
+        ) : (
+          <div>&nbsp;</div>
+        )}
         <SaveButton
           isChangedMemo={isChangedMemo}
           isSubmitting={fetcher.state === 'submitting'}
