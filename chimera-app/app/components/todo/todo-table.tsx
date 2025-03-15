@@ -69,11 +69,11 @@ declare module '@tanstack/table-core' {
 }
 
 interface TodoTableProps<TData extends RowData> {
-  defaultTasks: TData[]
+  originalTasks: TData[]
   showId: string
 }
 
-export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
+export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
   const { t } = useTranslation()
   const userAgent = useUserAgentAtom()
   const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
@@ -90,7 +90,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   )
 
   // tanstack/react-table
-  const [tableData, setTableData] = React.useState<Tasks>(defaultTasks)
+  const [tableData, setTableData] = React.useState<Tasks>(originalTasks)
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
     { id: 'status', value: [0, 2] },
@@ -108,7 +108,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   // tbody要素参照用
-  const useTBodyRef = React.useRef<HTMLTableSectionElement>(null)
+  const tBodyRef = React.useRef<HTMLTableSectionElement>(null)
 
   const table = useReactTable({
     data: tableData,
@@ -155,8 +155,8 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   // タスクデータが変更されたらテーブルデータを更新
   React.useEffect(() => {
-    setTableData(defaultTasks)
-  }, [defaultTasks])
+    setTableData(originalTasks)
+  }, [originalTasks])
 
   // 選択行にフォーカスを設定
   React.useEffect(() => {
@@ -230,7 +230,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
   async function moveTaskApi(fromTask: Task, toTask: Task) {
     try {
       // useFetcherのsubmitを利用すると自動でタスクデータを再取得してしまうのであえてfetchを利用
-      const url = [API_URL, TODO_URL, `/${fromTask.id}`, '/position'].join('')
+      const url = `${API_URL}${TODO_URL}/${fromTask.id}/position`
       const response = await fetch(url, {
         method: 'POST',
         body: JSON.stringify({ toTaskId: toTask.id }),
@@ -333,8 +333,8 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   // 指定タスクへフォーカスを設定
   function setListFocus(task: Task) {
-    useTBodyRef.current?.querySelector<HTMLElement>(`#row-${task.id}`)?.focus()
-    // useTBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
+    tBodyRef.current?.querySelector<HTMLElement>(`#row-${task.id}`)?.focus()
+    // tBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
   }
 
   // キーボードショートカット
@@ -406,7 +406,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-2">
         <Button
           variant="secondary"
           className="h-8 px-3"
@@ -415,7 +415,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
           <LuPlus />
           {t('common.message.add')}
           <p className="hidden text-xs text-muted-foreground sm:block">
-            <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
+            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
               <span>{modifierKeyIcon}</span>n
             </kbd>
           </p>
@@ -457,7 +457,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody ref={useTBodyRef}>
+            <TableBody ref={tBodyRef}>
               <SortableContext
                 items={tableData}
                 strategy={verticalListSortingStrategy}
@@ -481,7 +481,7 @@ export function TodoTable({ defaultTasks, showId }: TodoTableProps<Task>) {
           </Table>
         </DndContext>
       </div>
-      <div className="flex items-center justify-end space-x-2">
+      <div className="flex items-center justify-end gap-2">
         <Button
           variant="outline"
           size="sm"

@@ -22,7 +22,7 @@ function Title() {
 
 export function AppNavbar() {
   return (
-    <header className="sticky top-0 z-10 flex h-12 items-center gap-2 bg-background px-4 lg:hidden">
+    <header className="sticky top-0 z-10 mb-0.5 flex h-12 items-center gap-2 bg-background px-4 lg:hidden">
       <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="mr-2 h-4" />
       <Breadcrumb>

@@ -37,12 +37,14 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 
   const isLaptop = useMedia('(min-width: 1024px)', true)
 
+  const memo = memos.find((m) => m.id === memoId)
+
   if (!isLaptop) {
     return (
       <>
         <MemoList
-          defaultMemos={memos}
-          showId={memoId}
+          originalMemos={memos}
+          selectedMemo={memo}
           memoSettings={memoSettings}
         />
         <Outlet />
@@ -55,8 +57,8 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
         <ResizablePanel defaultSize={35}>
           <MemoList
-            defaultMemos={memos}
-            showId={memoId}
+            originalMemos={memos}
+            selectedMemo={memo}
             memoSettings={memoSettings}
           />
         </ResizablePanel>

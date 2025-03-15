@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router'
+import { useNavigate } from 'react-router'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
@@ -13,23 +13,27 @@ import { MEMO_URL } from '~/constants'
 function NavLinkClassName({
   item,
   isSelected,
+  isFocused,
 }: {
   item: Memo
   isSelected: boolean
+  isFocused: boolean
 }) {
   const selectedClassName = isSelected
     ? 'bg-muted'
-    : 'hover:bg-muted/50 bg-background'
+    : 'bg-background hover:bg-muted'
+  const focusedClassName = isFocused ? 'ring-1 ring-inset ring-ring' : ''
 
   const archiveClassName =
     item.status === MemoStatus.ARCHIVED ? 'text-muted-foreground' : ''
 
   return cn(
     'flex flex-col gap-2 rounded-md border p-3 text-sm group',
-    // 'outline-none focus:ring-2 focus:ring-inset focus:ring-ring',
-    'outline-none focus:ring-1 focus:ring-inset focus:ring-ring',
-    'select-none',
+    'select-none outline-none',
+    // 'outline-none focus:ring-1 focus:ring-inset focus:ring-ring',
+    // 'select-none',
     selectedClassName,
+    focusedClassName,
     archiveClassName,
   )
 }
@@ -39,12 +43,13 @@ interface ListItemProps {
   item: Memo
   onFocus: () => void
   isSelected: boolean
+  isFocused: boolean
   isPreview: boolean
   children: React.ReactNode
 }
 
 export function ListItem(props: ListItemProps) {
-  const { item, onFocus, isSelected, isPreview, children } = props
+  const { item, onFocus, isSelected, isFocused, isPreview, children } = props
 
   const { t } = useTranslation()
   const {
@@ -57,20 +62,15 @@ export function ListItem(props: ListItemProps) {
   } = useSortable({
     id: item.id,
   })
+  const navigate = useNavigate()
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition: transition,
-    opacity: isDragging ? 0.8 : 1,
     zIndex: isDragging ? 1 : 0,
     position: 'relative',
-    // isDraggingの場合はpointerEventsをnoneにする(アンカーに対してドラッグ時のクリックを無効にする)
-    // この処理をしないと、ドラッグ中にアンカーをクリックしてしまうため、リンク先に遷移してしまう
-    // この方法のデメリットはドラッグ中のマウスポインターが標準のカーソルになること
-    ...(isDragging && {
-      pointerEvents: 'none',
-    }),
     WebkitTouchCallout: 'none', // iOSの長押し時のコンテキストメニューの表示を防ぐ
+    cursor: isDragging ? 'grabbing' : 'pointer',
   }
 
   // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
@@ -78,25 +78,35 @@ export function ListItem(props: ListItemProps) {
   const updatedAt = format(item.updatedAt, t('common.format.date_time_format'))
   const to = [MEMO_URL, item.id].join('/')
   const title = item.title || t('memo.message.un_titled')
+  const content = isPreview ? item.content.substring(0, 300) || '　' : ''
 
   return (
-    <NavLink
-      id={`memo-${item.id}`}
-      ref={setNodeRef}
-      to={to}
-      className={NavLinkClassName({ item, isSelected })}
-      style={style}
-      onFocus={onFocus}
+    <div
       {...attributes}
       {...listeners}
-      role="listitem"
+      id={`memo-${item.id}`}
+      ref={setNodeRef}
+      className={NavLinkClassName({ item, isSelected, isFocused })}
+      style={style}
+      onFocus={onFocus}
+      role="button"
+      data-role="listitem"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.altKey) {
+          navigate(to, { replace: true })
+        }
+      }}
+      onClick={(e) => {
+        navigate(to, { replace: true })
+      }}
     >
       <div className="flex items-center">
         <div className="line-clamp-1">{title}</div>
         <div className="ml-auto">{children}</div>
       </div>
-      <div className="line-clamp-2 text-xs text-muted-foreground">
-        {isPreview && item.content.substring(0, 300)}
+      <div className="line-clamp-1 text-xs text-muted-foreground">
+        {content}
       </div>
       <div className="flex items-center justify-between space-x-2">
         <div>{item.status === MemoStatus.ARCHIVED && <LuArchive />}</div>
@@ -106,6 +116,6 @@ export function ListItem(props: ListItemProps) {
           </ClientOnly>
         </div>
       </div>
-    </NavLink>
+    </div>
   )
 }
