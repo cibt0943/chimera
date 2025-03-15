@@ -34,14 +34,14 @@ import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom } from '~/lib/global-state'
 
 interface MemoListProps {
-  defaultMemos: Memos
-  showId: string | undefined
+  originalMemos: Memos
+  selectedMemo: Memo | undefined
   memoSettings: MemoSettings
 }
 
 export function MemoList({
-  defaultMemos,
-  showId,
+  originalMemos,
+  selectedMemo,
   memoSettings,
 }: MemoListProps) {
   const { t } = useTranslation()
@@ -64,19 +64,19 @@ export function MemoList({
   )
 
   // メモ一覧データ
-  const [memos, setMemos] = React.useState(defaultMemos)
-
-  // 一覧で選択しているメモ
-  const [selectedMemo, setSelectedMemo] = React.useState<Memo>()
+  const [memos, setMemos] = React.useState(originalMemos)
 
   // 一覧でフォーカスしているメモ
   const [focusedMemo, setFocusedMemo] = React.useState<Memo>()
+  //  const focusedMemoRef = React.useRef<Memo | undefined>(selectedMemo)
 
   // 検索文字列
   const [searchTerm, setSearchTerm] = React.useState('')
 
   // 編集・削除するメモ
-  const [actionMemo, setActionMemo] = React.useState<Memo>()
+  const [actionMemo, setActionMemo] = React.useState<Memo | undefined>(
+    selectedMemo,
+  )
 
   // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
@@ -95,19 +95,8 @@ export function MemoList({
 
   // フィルタリング前のメモ一覧データ更新
   React.useEffect(() => {
-    setMemos(defaultMemos)
-  }, [defaultMemos])
-
-  // F5でリロードされた場合に選択行のフォーカスを設定
-  const targetId = showId ? showId : selectedMemo?.id
-  React.useEffect(() => {
-    const selectMemo = memos.find((memo) => memo.id === targetId)
-    setSelectedMemo(selectMemo)
-    setFocusedMemo(selectMemo)
-    setListFocus(selectMemo)
-    // 以下のdisableを止める方法を検討したい。
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetId])
+    setMemos(originalMemos)
+  }, [originalMemos])
 
   // メモ一覧の検索
   async function searchMemos(searchTerm: string) {
@@ -124,10 +113,14 @@ export function MemoList({
     let targetIndex = 0
     if (focusedMemo) {
       const nowIndex = dispMemos.findIndex((memo) => memo.id === focusedMemo.id)
+      // if (focusedMemoRef.current) {
+      //   const nowIndex = dispMemos.findIndex(
+      //     (memo) => memo.id === focusedMemoRef.current?.id,
+      //   )
       targetIndex = isUp ? nowIndex - 1 : nowIndex + 1
     }
+
     if (!dispMemos[targetIndex]) return
-    setFocusedMemo(dispMemos[targetIndex])
     setListFocus(dispMemos[targetIndex])
   }
 
@@ -146,7 +139,7 @@ export function MemoList({
   }
 
   // 選択行のステータスを変更
-  function updateSeletedMemoStatus() {
+  function updateSelectedMemoStatus() {
     if (!selectedMemo) return
     const status =
       selectedMemo.status === MemoStatus.NOMAL
@@ -244,6 +237,10 @@ export function MemoList({
   // 指定メモへフォーカスを設定
   function setListFocus(memo: Memo | undefined, force = false) {
     const targetMemo = memo ? memo : force ? dispMemos[0] : undefined
+    // if (!targetMemo) return
+    // useMemosRef.current
+    //   ?.querySelector<HTMLElement>(`#memo-${targetMemo.id}`)
+    //   ?.focus()
     targetMemo &&
       useMemosRef.current
         ?.querySelector<HTMLElement>(`#memo-${targetMemo.id}`)
@@ -272,7 +269,7 @@ export function MemoList({
           break
         // メモのアーカイブ
         case 'enter':
-          updateSeletedMemoStatus()
+          updateSelectedMemoStatus()
           break
         // メモ削除
         case 'delete':
@@ -289,7 +286,7 @@ export function MemoList({
         const target = event.target as HTMLElement
         const tagName = target.tagName.toLowerCase()
         if (tagName === 'body') return false
-        return tagName !== 'a' || target.getAttribute('role') !== 'listitem'
+        return target.getAttribute('data-role') !== 'listitem'
       },
     },
   )
@@ -305,7 +302,7 @@ export function MemoList({
           break
         // フォーカスを一覧へ移動
         case 'left':
-          setListFocus(focusedMemo, true)
+          setListFocus(focusedMemoRef.current, true)
           break
       }
     },
@@ -318,7 +315,7 @@ export function MemoList({
 
   return (
     <div className="space-y-4 px-1 lg:py-4">
-      <div className="flex items-center space-x-2 px-3">
+      <div className="flex items-center gap-2 px-3">
         <Form action={MEMO_URL} method="post">
           <Button
             type="submit"
@@ -329,7 +326,7 @@ export function MemoList({
             <LuPlus />
             {t('common.message.add')}
             <p className="text-xs text-muted-foreground">
-              <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
+              <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
                 <span>{modifierKeyIcon}</span>n
               </kbd>
             </p>
@@ -352,7 +349,11 @@ export function MemoList({
           sensors={sensors}
           id="dnd-context-for-memos"
         >
-          <div className="space-y-2 px-3" id="memos" ref={useMemosRef}>
+          <div
+            className="flex flex-col gap-2 px-3"
+            id="memos"
+            ref={useMemosRef}
+          >
             <SortableContext
               items={dispMemos}
               strategy={verticalListSortingStrategy}
@@ -363,7 +364,10 @@ export function MemoList({
                     key={item.id}
                     item={item}
                     onFocus={() => setFocusedMemo(item)}
+                    // onFocus={() => (focusedMemoRef.current = item)}
                     isSelected={item.id === selectedMemo?.id}
+                    // isFocused={item.id === focusedMemoRef.current?.id}
+                    isFocused={item.id === focusedMemo?.id}
                     isPreview={isPrevew}
                   >
                     <MemoActionMenu

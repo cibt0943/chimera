@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router'
-import { LuTrees } from 'react-icons/lu'
+import { LuBird, LuFlower2, LuFlameKindling } from 'react-icons/lu'
 import {
   Sidebar,
   SidebarHeader,
@@ -24,9 +24,11 @@ export function AppSidebar() {
               asChild
               className={'group-data-[collapsible=icon]:!p-0'}
             >
-              <NavLink to="/" className="font-bold">
-                <LuTrees className="!h-5 !w-5 text-yellow-500" />
-                <span className="text-yellow-500">IMA</span>
+              <NavLink to="/" className="font-bold !text-yellow-500">
+                <LuBird />
+                <LuFlower2 />
+                <LuFlameKindling />
+                <span>IMA</span>
               </NavLink>
             </SidebarMenuButton>
             <SidebarTrigger className="p-4" />

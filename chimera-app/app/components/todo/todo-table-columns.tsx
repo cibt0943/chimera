@@ -15,7 +15,7 @@ import { TodoTableRowActions } from './todo-table-row-actions'
 
 // Cell Component
 function RowDragHandleCell({ rowId }: { rowId: string }) {
-  const { attributes, listeners } = useSortable({
+  const { attributes, listeners, isDragging } = useSortable({
     id: rowId,
   })
   return (
@@ -25,7 +25,7 @@ function RowDragHandleCell({ rowId }: { rowId: string }) {
       {...attributes}
       {...listeners}
       size="icon"
-      className="touch-none select-none"
+      className={`touch-none select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
     >
       <LuEqual />
     </Button>
