@@ -22,7 +22,7 @@ import {
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
 import { MEMO_URL } from '~/constants'
-import { cn, getModifierKeyInfo } from '~/lib/utils'
+import { cn } from '~/lib/utils'
 import { Memo, MemoStatus } from '~/types/memos'
 import { useUserAgentAtom } from '~/lib/global-state'
 
@@ -38,7 +38,6 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
     props
 
   const userAgent = useUserAgentAtom()
-  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
   const { t } = useTranslation()
   const navigate = useNavigate()
 
@@ -80,7 +79,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             <LuArrowUpFromLine />
             {t('common.message.position_up')}
             <DropdownMenuShortcut>
-              {modifierKeyIcon + ' ↑'}
+              {userAgent.modifierKeyIcon + ' ↑'}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -92,7 +91,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             <LuArrowDownFromLine />
             {t('common.message.position_down')}
             <DropdownMenuShortcut>
-              {modifierKeyIcon + ' ↓'}
+              {userAgent.modifierKeyIcon + ' ↓'}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -105,7 +104,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             {archiveMenu.icon}
             {archiveMenu.caption}
             <DropdownMenuShortcut>
-              {modifierKeyIcon + ' '}
+              {userAgent.modifierKeyIcon + ' '}
               <LuCornerDownLeft className="inline" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
@@ -132,7 +131,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
             <LuTrash2 />
             {t('common.message.delete')}
             <DropdownMenuShortcut>
-              {modifierKeyIcon + ' '}
+              {userAgent.modifierKeyIcon + ' '}
               <LuDelete className="inline" />
             </DropdownMenuShortcut>
           </DropdownMenuItem>

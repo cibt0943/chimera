@@ -18,6 +18,7 @@ import {
   useSetLoginInfoAtom,
   useSetMemoSettingsAtom,
 } from '~/lib/global-state'
+import { getUserAgent } from '~/lib/utils'
 import type { Route } from './+types/root'
 import { Theme, Language } from '~/types/accounts'
 
@@ -72,7 +73,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
   useSonner(toast)
 
   // ユーザーエージェント情報をグローバルステートに保存
-  useSetUserAgentAtom()
+  useSetUserAgentAtom(getUserAgent())
 
   // ログインユーザーのアカウント情報をグローバルステートに保存
   useSetLoginInfoAtom(loginInfo)

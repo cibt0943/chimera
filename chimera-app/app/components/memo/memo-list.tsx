@@ -30,7 +30,6 @@ import { ListItem } from './memo-list-item'
 import { MemoActionMenu } from './memo-action-menu'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 import { MemoSettingsForm } from './memo-settings-form'
-import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom } from '~/lib/global-state'
 
 interface MemoListProps {
@@ -46,7 +45,6 @@ export function MemoList({
 }: MemoListProps) {
   const { t } = useTranslation()
   const userAgent = useUserAgentAtom()
-  const { modifierKey, modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
   const { enqueue: searchEnqueue } = useApiQueue()
   const { enqueue: moveMemoEnqueue } = useApiQueue()
   const navigate = useNavigate()
@@ -293,7 +291,7 @@ export function MemoList({
 
   // キーボード操作(スコープなし)
   useHotkeys(
-    ['alt+n', `${modifierKey}+left`],
+    ['alt+n', `${userAgent.modifierKey}+left`],
     (_, handler) => {
       switch (handler.keys?.join('')) {
         // メモ追加
@@ -302,7 +300,8 @@ export function MemoList({
           break
         // フォーカスを一覧へ移動
         case 'left':
-          setListFocus(focusedMemoRef.current, true)
+          // setListFocus(focusedMemoRef.current, true)
+          setListFocus(focusedMemo, true)
           break
       }
     },
@@ -327,7 +326,7 @@ export function MemoList({
             {t('common.message.add')}
             <p className="text-xs text-muted-foreground">
               <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-                <span>{modifierKeyIcon}</span>n
+                <span>{userAgent.modifierKeyIcon}</span>n
               </kbd>
             </p>
           </Button>

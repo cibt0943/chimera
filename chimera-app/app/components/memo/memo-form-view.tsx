@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { Memo } from '~/types/memos'
 import { MemoForm } from './memo-form'
-import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom, useMemoSettingsAtom } from '~/lib/global-state'
 
 interface MemoFormViewProps {
@@ -11,7 +10,6 @@ interface MemoFormViewProps {
 
 export function MemoFormView({ memo }: MemoFormViewProps) {
   const userAgent = useUserAgentAtom()
-  const { modifierKey } = getModifierKeyInfo(userAgent.OS)
   const formRef = React.useRef<HTMLDivElement>(null)
   const memoSettings = useMemoSettingsAtom()
   const autoSave = memoSettings?.autoSave || false
@@ -23,7 +21,7 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
 
   // キーボード操作
   useHotkeys(
-    [`${modifierKey}+right`],
+    [`${userAgent.modifierKey}+right`],
     (event, handler) => {
       switch (handler.keys?.join('')) {
         case 'right':

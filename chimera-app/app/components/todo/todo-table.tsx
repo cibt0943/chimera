@@ -57,7 +57,6 @@ import {
   TaskDeleteConfirmDialog,
   TaskDeleteConfirmDialogProps,
 } from './task-delete-confirm-dialog'
-import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom } from '~/lib/global-state'
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
@@ -69,14 +68,13 @@ declare module '@tanstack/table-core' {
 }
 
 interface TodoTableProps<TData extends RowData> {
-  originalTasks: TData[]
+  tasks: TData[]
   showId: string
 }
 
-export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
+export function TodoTable({ tasks, showId }: TodoTableProps<Task>) {
   const { t } = useTranslation()
   const userAgent = useUserAgentAtom()
-  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
   const { enqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
@@ -90,7 +88,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
   )
 
   // tanstack/react-table
-  const [tableData, setTableData] = React.useState<Tasks>(originalTasks)
+  const [tableData, setTableData] = React.useState<Tasks>(tasks)
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
     { id: 'status', value: [0, 2] },
@@ -155,8 +153,8 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
 
   // タスクデータが変更されたらテーブルデータを更新
   React.useEffect(() => {
-    setTableData(originalTasks)
-  }, [originalTasks])
+    setTableData(tasks)
+  }, [tasks])
 
   // 選択行にフォーカスを設定
   React.useEffect(() => {
@@ -416,7 +414,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.add')}
           <p className="hidden text-xs text-muted-foreground sm:block">
             <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-              <span>{modifierKeyIcon}</span>n
+              <span>{userAgent.modifierKeyIcon}</span>n
             </kbd>
           </p>
         </Button>

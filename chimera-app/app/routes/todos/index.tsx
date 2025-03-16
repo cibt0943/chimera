@@ -50,7 +50,7 @@ export default function Index({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="p-4 pt-0 lg:pt-4">
-      <TodoTable originalTasks={tasks} showId={todoId || ''} />
+      <TodoTable tasks={tasks} showId={todoId || ''} />
       <Outlet />
     </div>
   )

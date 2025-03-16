@@ -6,7 +6,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { getFormProps } from '@conform-to/react'
 import { Button } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
-import { cn, getModifierKeyInfo } from '~/lib/utils'
+import { cn } from '~/lib/utils'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
 import {
   FormItem,
@@ -196,12 +196,11 @@ export function SaveButton({
 
 function SaveHotkeyIcon() {
   const userAgent = useUserAgentAtom()
-  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
 
   return (
     <p className="text-xs">
       <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-        <span>{modifierKeyIcon}</span>s
+        <span>{userAgent.modifierKeyIcon}</span>s
       </kbd>
     </p>
   )
