@@ -94,7 +94,7 @@ export function MemoForm({
     memo,
   })
 
-  const action = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
+  const action = memo ? `${MEMO_URL}/${memo.id}` : MEMO_URL
 
   const { className, ...otherProps } = textareaProps
 

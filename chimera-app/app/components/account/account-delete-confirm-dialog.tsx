@@ -21,7 +21,7 @@ export function AccountDeleteConfirmDialog({
 }: DeleteAccountConfirmDialogProps) {
   const { t } = useTranslation()
 
-  const action = [ACCOUNT_URL, 'delete'].join('/')
+  const action = `${ACCOUNT_URL}/delete`
   const desc =
     '「' + accountGeneral.name + '」' + t('common.message.confirm_deletion')
 

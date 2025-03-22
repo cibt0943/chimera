@@ -34,7 +34,7 @@ export interface TaskFormProps {
 export function TaskForm({ task, returnUrl }: TaskFormProps) {
   const { t } = useTranslation()
 
-  const action = task ? [TODO_URL, task.id].join('/') : TODO_URL
+  const action = task ? `${TODO_URL}/${task.id}` : TODO_URL
   const formId = task ? `task-form-${task.id}` : 'task-form-new'
   const defaultValue = task || {
     title: '',

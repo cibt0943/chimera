@@ -111,7 +111,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
           <DropdownMenuItem
             onClick={(event) => {
               event.stopPropagation() // 親エレメントのアンカータグのクリックイベントをキャンセル
-              navigate([MEMO_URL, memo.id].join('/'))
+              navigate(`${MEMO_URL}/${memo.id}`)
             }}
           >
             <LuPencilLine />

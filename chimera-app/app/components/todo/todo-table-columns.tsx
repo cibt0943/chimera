@@ -95,10 +95,7 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
     },
     cell: ({ row }) => {
       return (
-        <NavLink
-          to={[TODO_URL, row.id].join('/')}
-          className="truncate font-medium"
-        >
+        <NavLink to={`${TODO_URL}/${row.id}`} className="truncate font-medium">
           {row.original.title}
         </NavLink>
       )

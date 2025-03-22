@@ -31,7 +31,7 @@ export async function action({ request }: Route.ActionArgs) {
       data.relatedDateAllDay === undefined ? true : data.relatedDateAllDay,
   })
 
-  return redirect([MEMO_URL, newMemo.id].join('/'))
+  return redirect(`${MEMO_URL}/${newMemo.id}`)
 }
 
 export default function Index() {

@@ -147,7 +147,7 @@ export function MemoList({
       .submit(
         { status: memo.status },
         {
-          action: [API_URL, MEMO_URL, `/${memo.id}`].join(''),
+          action: `${API_URL}${MEMO_URL}/${memo.id}`,
           method: 'post',
           encType: 'application/json',
         },
@@ -207,7 +207,7 @@ export function MemoList({
   async function moveMemoApi(fromMemo: Memo, toMemo: Memo) {
     try {
       // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
-      const url = [API_URL, MEMO_URL, `/${fromMemo.id}`, '/position'].join('')
+      const url = `${API_URL}${MEMO_URL}/${fromMemo.id}/position`
       const response = await fetch(url, {
         method: 'POST',
         body: JSON.stringify({ toMemoId: toMemo.id }),

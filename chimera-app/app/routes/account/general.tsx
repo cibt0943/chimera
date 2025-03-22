@@ -42,7 +42,7 @@ export async function action({ request }: Route.ActionArgs) {
   session.set('loginInfo', loginInfo)
 
   const toastMsg = 'account.message.updated'
-  return redirectWithInfo([ACCOUNT_URL, 'settings'].join('/'), toastMsg, {
+  return redirectWithInfo(`${ACCOUNT_URL}/settings`, toastMsg, {
     headers: {
       // 新しいセッション情報をクッキーとして設定するように指示
       'Set-Cookie': await commitSession(session),

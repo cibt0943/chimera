@@ -29,12 +29,12 @@ export function SidebarAccountMenu() {
   if (!loginInfo) return null
 
   function handleUerSettingsClick() {
-    const url = [ACCOUNT_URL, 'settings'].join('/')
+    const url = `${ACCOUNT_URL}/settings`
     navigate(url)
   }
 
   function handleLogoutClick() {
-    const url = [AUTH_URL, 'logout'].join('/')
+    const url = `${AUTH_URL}/logout`
     fetcher.submit(null, { method: 'post', action: url })
   }
 

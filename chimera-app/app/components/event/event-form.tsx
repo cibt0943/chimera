@@ -45,7 +45,7 @@ export function EventForm({
     return !event?.id
   }
 
-  const action = isNew(event) ? EVENT_URL : [EVENT_URL, event.id].join('/')
+  const action = isNew(event) ? EVENT_URL : `${EVENT_URL}/${event.id}`
   const formId = isNew(event) ? 'event-form-new' : `event-form-${event.id}`
   const defaultValue = event
 

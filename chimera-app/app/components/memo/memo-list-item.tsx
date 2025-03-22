@@ -70,7 +70,7 @@ export function ListItem(props: ListItemProps) {
   // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
   const updatedAtDiff = useAgoFormat(item.updatedAt)
   const updatedAt = format(item.updatedAt, t('common.format.date_time_format'))
-  const to = [MEMO_URL, item.id].join('/')
+  const to = `${MEMO_URL}/${item.id}`
   const title = item.title || t('memo.message.un_titled')
   const content = isPreview ? item.content.substring(0, 300) || '　' : ''
 

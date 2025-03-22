@@ -29,7 +29,7 @@ export function TaskDeleteConfirmDialog({
 
   if (!task) return null
 
-  const action = [TODO_URL, task.id, 'delete'].join('/')
+  const action = `${TODO_URL}/${task.id}/delete`
   const desc = '「' + task.title + '」' + t('common.message.confirm_deletion')
 
   return (

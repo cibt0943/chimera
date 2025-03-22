@@ -280,7 +280,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
       .submit(
         { status: task.status },
         {
-          action: [API_URL, TODO_URL, `/${task.id}`].join(''),
+          action: `${API_URL}${TODO_URL}/${task.id}`,
           method: 'post',
           encType: 'application/json',
         },

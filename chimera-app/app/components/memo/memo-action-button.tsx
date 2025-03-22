@@ -43,7 +43,7 @@ export function MemoActionButton({
                   .submit(
                     { status: archiveMenu.toStatus },
                     {
-                      action: [API_URL, MEMO_URL, `/${memo.id}`].join(''),
+                      action: `${API_URL}${MEMO_URL}/${memo.id}`,
                       method: 'post',
                       encType: 'application/json',
                     },
