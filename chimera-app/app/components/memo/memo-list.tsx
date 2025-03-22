@@ -65,16 +65,13 @@ export function MemoList({
   const [memos, setMemos] = React.useState(originalMemos)
 
   // 一覧でフォーカスしているメモ
-  const [focusedMemo, setFocusedMemo] = React.useState<Memo>()
-  //  const focusedMemoRef = React.useRef<Memo | undefined>(selectedMemo)
+  const focusedMemoRef = React.useRef<Memo | undefined>(selectedMemo)
 
   // 検索文字列
   const [searchTerm, setSearchTerm] = React.useState('')
 
   // 編集・削除するメモ
-  const [actionMemo, setActionMemo] = React.useState<Memo | undefined>(
-    selectedMemo,
-  )
+  const [actionMemo, setActionMemo] = React.useState<Memo | undefined>()
 
   // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
@@ -109,12 +106,10 @@ export function MemoList({
   // フォーカスを1ステップ変更
   function changeFocusedMemoOneStep(isUp: boolean) {
     let targetIndex = 0
-    if (focusedMemo) {
-      const nowIndex = dispMemos.findIndex((memo) => memo.id === focusedMemo.id)
-      // if (focusedMemoRef.current) {
-      //   const nowIndex = dispMemos.findIndex(
-      //     (memo) => memo.id === focusedMemoRef.current?.id,
-      //   )
+    if (focusedMemoRef.current) {
+      const nowIndex = dispMemos.findIndex(
+        (memo) => memo.id === focusedMemoRef.current?.id,
+      )
       targetIndex = isUp ? nowIndex - 1 : nowIndex + 1
     }
 
@@ -164,6 +159,11 @@ export function MemoList({
             : 'memo.message.archived'
         toast.info(t(msg))
       })
+  }
+
+  // 選択行のメモ削除ダイアログを開く
+  function openSelectedMemoDeleteDialog() {
+    selectedMemo && openDeleteMemoDialog(selectedMemo)
   }
 
   // メモ削除ダイアログを開く
@@ -233,46 +233,53 @@ export function MemoList({
   }, 300)
 
   // 指定メモへフォーカスを設定
-  function setListFocus(memo: Memo | undefined, force = false) {
-    const targetMemo = memo ? memo : force ? dispMemos[0] : undefined
-    // if (!targetMemo) return
-    // useMemosRef.current
-    //   ?.querySelector<HTMLElement>(`#memo-${targetMemo.id}`)
-    //   ?.focus()
-    targetMemo &&
-      useMemosRef.current
-        ?.querySelector<HTMLElement>(`#memo-${targetMemo.id}`)
-        ?.focus()
+  function setListFocus(memo: Memo | undefined) {
+    const targetMemo = memo ? memo : dispMemos[0]
+    if (!targetMemo) return
+    useMemosRef.current
+      ?.querySelector<HTMLElement>(`#memo-${targetMemo.id}`)
+      ?.focus()
   }
 
-  // キーボード操作(スコープあり)
+  // キーボードショートカット(スコープあり)
+  const HOTKEYS = {
+    UP: 'up',
+    DOWN: 'down',
+    MODIFIER_UP: `${userAgent.modifierKey}+up`,
+    MODIFIER_DOWN: `${userAgent.modifierKey}+down`,
+    MODIFIER_ENTER: `${userAgent.modifierKey}+enter`,
+    MODIFIER_DELETE: `${userAgent.modifierKey}+delete`,
+    MODIFIER_BACKSPACE: `${userAgent.modifierKey}+backspace`,
+  }
+
   useHotkeys(
-    [
-      'up',
-      'down',
-      'alt+up',
-      'alt+down',
-      'alt+enter',
-      'alt+delete',
-      'alt+backspace',
-    ],
-    (_, handler) => {
-      switch (handler.keys?.join('')) {
-        // フォーカス上下or表示順上下の1ステップ移動
-        case 'up':
-        case 'down':
-          handler.alt
-            ? moveSelectedMemoOneStep(handler.keys.includes('up'))
-            : changeFocusedMemoOneStep(handler.keys.includes('up'))
+    Object.values(HOTKEYS),
+    (_, { hotkey }) => {
+      switch (hotkey) {
+        // フォーカス上移動
+        case HOTKEYS.UP:
+          changeFocusedMemoOneStep(true)
+          break
+        // フォーカス下移動
+        case HOTKEYS.DOWN:
+          changeFocusedMemoOneStep(false)
+          break
+        // メモの表示順を上へ移動
+        case HOTKEYS.MODIFIER_UP:
+          moveSelectedMemoOneStep(true)
+          break
+        // メモの表示順を下へ移動
+        case HOTKEYS.MODIFIER_DOWN:
+          moveSelectedMemoOneStep(false)
           break
         // メモのアーカイブ
-        case 'enter':
+        case HOTKEYS.MODIFIER_ENTER:
           updateSelectedMemoStatus()
           break
         // メモ削除
-        case 'delete':
-        case 'backspace':
-          selectedMemo && openDeleteMemoDialog(selectedMemo)
+        case HOTKEYS.MODIFIER_DELETE:
+        case HOTKEYS.MODIFIER_BACKSPACE:
+          openSelectedMemoDeleteDialog()
           break
       }
     },
@@ -289,9 +296,9 @@ export function MemoList({
     },
   )
 
-  // キーボード操作(スコープなし)
+  // キーボードショートカット(スコープなし)
   useHotkeys(
-    ['alt+n', `${userAgent.modifierKey}+left`],
+    [`${userAgent.modifierKey}+n`, `${userAgent.modifierKey}+left`],
     (_, handler) => {
       switch (handler.keys?.join('')) {
         // メモ追加
@@ -300,8 +307,7 @@ export function MemoList({
           break
         // フォーカスを一覧へ移動
         case 'left':
-          // setListFocus(focusedMemoRef.current, true)
-          setListFocus(focusedMemo, true)
+          setListFocus(focusedMemoRef.current)
           break
       }
     },
@@ -362,11 +368,8 @@ export function MemoList({
                   <ListItem
                     key={item.id}
                     item={item}
-                    onFocus={() => setFocusedMemo(item)}
-                    // onFocus={() => (focusedMemoRef.current = item)}
+                    onFocus={() => (focusedMemoRef.current = item)}
                     isSelected={item.id === selectedMemo?.id}
-                    // isFocused={item.id === focusedMemoRef.current?.id}
-                    isFocused={item.id === focusedMemo?.id}
                     isPreview={isPrevew}
                   >
                     <MemoActionMenu

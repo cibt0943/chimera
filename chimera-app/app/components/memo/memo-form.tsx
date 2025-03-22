@@ -36,6 +36,7 @@ export function MemoForm({
   textareaProps = {},
 }: MemoFormProps) {
   const { t } = useTranslation()
+  const userAgent = useUserAgentAtom()
   const formRef = React.useRef<HTMLFormElement>(null)
   const { enqueue } = useApiQueue()
   // memoの状態を変更して保存したかどうか
@@ -75,7 +76,7 @@ export function MemoForm({
 
   // キーボード操作
   useHotkeys(
-    ['alt+s'],
+    [`${userAgent.modifierKey}+s`],
     (event, handler) => {
       switch (handler.keys?.join('')) {
         case 's':
