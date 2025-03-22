@@ -71,11 +71,10 @@ export default function Memo({ loaderData }: Route.ComponentProps) {
       memo={memo}
       isOpen={isOpenDialog}
       onOpenChange={async (open) => {
-        if (!open) {
-          setIsOpenDialog(false)
-          await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
-          navigate(MEMO_URL)
-        }
+        if (open) return
+        setIsOpenDialog(false)
+        await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
+        navigate(MEMO_URL)
       }}
       returnUrl={MEMO_URL}
     />

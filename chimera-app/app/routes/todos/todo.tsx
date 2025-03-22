@@ -68,11 +68,10 @@ export default function Todo({ loaderData }: Route.ComponentProps) {
       task={task}
       isOpen={isOpenDialog}
       onOpenChange={async (open) => {
-        if (!open) {
-          setIsOpenDialog(false)
-          await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
-          navigate(TODO_URL)
-        }
+        if (open) return
+        setIsOpenDialog(false)
+        await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
+        navigate(TODO_URL)
       }}
       returnUrl={TODO_URL}
     />

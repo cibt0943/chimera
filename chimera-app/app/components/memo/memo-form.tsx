@@ -150,7 +150,7 @@ export function MemoForm({
       <input type="hidden" name="returnUrl" value={returnUrl} />
       <FormFooter className="sm:justify-between">
         {memo ? (
-          <MemoActionButton memo={memo} deleteReturnUrl={MEMO_URL} />
+          <MemoActionButton memo={memo} deleteReturnUrl={returnUrl} />
         ) : (
           <div>&nbsp;</div>
         )}
