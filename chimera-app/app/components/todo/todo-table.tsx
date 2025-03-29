@@ -53,11 +53,11 @@ import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
 import { TodoTableColumns } from './todo-table-columns'
+import { TaskFormDialog, TaskFormDialogProps } from './task-form-dialog'
 import {
   TaskDeleteConfirmDialog,
   TaskDeleteConfirmDialogProps,
 } from './task-delete-confirm-dialog'
-import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom } from '~/lib/global-state'
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
@@ -76,7 +76,6 @@ interface TodoTableProps<TData extends RowData> {
 export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
   const { t } = useTranslation()
   const userAgent = useUserAgentAtom()
-  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
   const { enqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
@@ -90,7 +89,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
   )
 
   // tanstack/react-table
-  const [tableData, setTableData] = React.useState<Tasks>(originalTasks)
+  const [tasks, setTasks] = React.useState<Tasks>(originalTasks)
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
     { id: 'status', value: [0, 2] },
@@ -104,6 +103,9 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
   // 編集・削除するタスク
   const [actionTask, setActionTask] = React.useState<Task>()
 
+  // 追加用ダイアログの表示・非表示
+  const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
+
   // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
@@ -111,7 +113,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
   const tBodyRef = React.useRef<HTMLTableSectionElement>(null)
 
   const table = useReactTable({
-    data: tableData,
+    data: tasks,
     columns: TodoTableColumns,
     state: {
       rowSelection,
@@ -155,7 +157,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
 
   // タスクデータが変更されたらテーブルデータを更新
   React.useEffect(() => {
-    setTableData(originalTasks)
+    setTasks(originalTasks)
   }, [originalTasks])
 
   // 選択行にフォーカスを設定
@@ -166,7 +168,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
 
   // タスク追加ダイアログを開く
   function openAddTaskDialog() {
-    navigate('new')
+    setIsOpenAddDialog(true)
   }
 
   // タスク削除ダイアログを開く
@@ -204,22 +206,22 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     // ソートやフィルタが実施されていないリストからインデックス情報を取得
-    const fromTask = tableData.find((data) => data.id === active.id)
-    const toTask = tableData.find((data) => data.id === over?.id)
+    const fromTask = tasks.find((data) => data.id === active.id)
+    const toTask = tasks.find((data) => data.id === over?.id)
     if (!fromTask || !toTask) return
     moveTask(fromTask, toTask)
   }
 
   // タスクの表示順を変更
   function moveTask(fromTask: Task, toTask: Task) {
-    setTableData((prev) => {
+    setTasks((prev) => {
       // フィルタリング前のタスクデータ(tableData)からfromとtoのindexを取得し順番を入れ替える
       const fromIndex = prev.findIndex((data) => data.id === fromTask.id)
       const toIndex = prev.findIndex((data) => data.id === toTask.id)
       return arrayMove(prev, fromIndex, toIndex) //this is just a splice util
     })
 
-    // これによりフォーカスがD&D用のつまみから行全体に移動する
+    // 選択行を変更
     setRowSelection({ [fromTask.id]: true })
 
     // タスクの表示順変更API
@@ -275,25 +277,6 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
     nowSelectedRow && moveTaskOneStep(nowSelectedRow.original, isUp)
   }
 
-  // 選択行を1ステップ変更
-  function changeSelectedRowOneStep(isUp: boolean) {
-    const nowSelectedRow = table.getSelectedRowModel().rows[0]
-    const viewRows = table.getRowModel().rows // ソートやフィルタが実施された後の現在表示されている行情報を取得
-
-    let nextSelectIndex = 0
-    if (nowSelectedRow) {
-      // 表示順に並んでいるviewRowsの中から選択行のindexを取得
-      // nowSelectedRow.indexの値は、ソート前のデータのindex
-      const viewIndex = viewRows.findIndex(
-        (data) => data.id === nowSelectedRow.id,
-      )
-      nextSelectIndex = isUp ? viewIndex - 1 : viewIndex + 1
-    }
-
-    const nextSelectedRow = viewRows[nextSelectIndex]
-    nextSelectedRow?.toggleSelected(true)
-  }
-
   // タスクのステータス変更APIの呼び出し
   function updateTaskStatusApi(task: Task) {
     // タスクのステータス変更API
@@ -301,7 +284,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
       .submit(
         { status: task.status },
         {
-          action: [API_URL, TODO_URL, `/${task.id}`].join(''),
+          action: `${API_URL}${TODO_URL}/${task.id}`,
           method: 'post',
           encType: 'application/json',
         },
@@ -337,46 +320,74 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
     // tBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
   }
 
-  // キーボードショートカット
+  // テーブルにフォーカスを設定
+  function changeSelectedTaskOneStep(isUp: boolean) {
+    const nowSelectedRow = table.getSelectedRowModel().rows[0]
+    const viewRows = table.getRowModel().rows // ソートやフィルタが実施された後の現在表示されている行情報を取得
+
+    let nextSelectIndex = 0
+    if (nowSelectedRow) {
+      // 表示順に並んでいるviewRowsの中から選択行のindexを取得
+      // nowSelectedRow.indexの値は、ソート前のデータのindex
+      const viewIndex = viewRows.findIndex(
+        (data) => data.id === nowSelectedRow.id,
+      )
+
+      nextSelectIndex = isUp ? viewIndex - 1 : viewIndex + 1
+    }
+
+    const nextSelectedRow = viewRows[nextSelectIndex]
+    nextSelectedRow?.toggleSelected(true)
+  }
+
+  // キーボードショートカット(スコープあり)
+  const HOTKEYS = {
+    ENTER: 'enter',
+    UP: 'up',
+    DOWN: 'down',
+    MODIFIER_UP: `${userAgent.modifierKey}+up`,
+    MODIFIER_DOWN: `${userAgent.modifierKey}+down`,
+    MODIFIER_1: `${userAgent.modifierKey}+1`,
+    MODIFIER_2: `${userAgent.modifierKey}+2`,
+    MODIFIER_3: `${userAgent.modifierKey}+3`,
+    MODIFIER_4: `${userAgent.modifierKey}+4`,
+    MODIFIER_DELETE: `${userAgent.modifierKey}+delete`,
+    MODIFIER_BACKSPACE: `${userAgent.modifierKey}+backspace`,
+  }
+
   useHotkeys(
-    [
-      'enter',
-      'up',
-      'down',
-      'alt+up',
-      'alt+down',
-      'alt+1',
-      'alt+2',
-      'alt+3',
-      'alt+4',
-      'alt+delete',
-      'alt+backspace',
-    ],
-    (_, handler) => {
-      switch (handler.keys?.join('')) {
-        case 'enter':
+    Object.values(HOTKEYS),
+    (_, { hotkey }) => {
+      switch (hotkey) {
+        case HOTKEYS.ENTER:
           showSelectedTaskEdit()
           break
-        case 'up':
-        case 'down':
-          handler.alt
-            ? moveSelectedTaskOneStep(handler.keys.includes('up'))
-            : changeSelectedRowOneStep(handler.keys.includes('up'))
+        case HOTKEYS.UP:
+          changeSelectedTaskOneStep(true)
           break
-        case '1':
+        case HOTKEYS.MODIFIER_UP:
+          moveSelectedTaskOneStep(true)
+          break
+        case HOTKEYS.DOWN:
+          changeSelectedTaskOneStep(false)
+          break
+        case HOTKEYS.MODIFIER_DOWN:
+          moveSelectedTaskOneStep(false)
+          break
+        case HOTKEYS.MODIFIER_1:
           updateSelectedTaskStatus(TaskStatus.NEW)
           break
-        case '2':
+        case HOTKEYS.MODIFIER_2:
           updateSelectedTaskStatus(TaskStatus.DOING)
           break
-        case '3':
+        case HOTKEYS.MODIFIER_3:
           updateSelectedTaskStatus(TaskStatus.DONE)
           break
-        case '4':
+        case HOTKEYS.MODIFIER_4:
           updateSelectedTaskStatus(TaskStatus.PENDING)
           break
-        case 'delete':
-        case 'backspace':
+        case HOTKEYS.MODIFIER_DELETE:
+        case HOTKEYS.MODIFIER_BACKSPACE:
           deleteSelectedTask()
           break
       }
@@ -392,11 +403,29 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
     },
   )
 
-  // タスク追加ダイアログを開く
+  // キーボードショートカット(スコープなし)
   useHotkeys(
-    ['alt+n'],
-    () => {
-      openAddTaskDialog()
+    [
+      `${userAgent.modifierKey}+n`,
+      `${userAgent.modifierKey}+left`,
+      `${userAgent.modifierKey}+right`,
+    ],
+    (_, handler) => {
+      switch (handler.keys?.join('')) {
+        // タスク追加ダイアログを開く
+        case 'n':
+          openAddTaskDialog()
+          break
+        // フォーカスを一覧へ移動
+        case 'left': {
+          changeSelectedTaskOneStep(true)
+          break
+        }
+        case 'right': {
+          changeSelectedTaskOneStep(false)
+          break
+        }
+      }
     },
     {
       // ローディング中、ダイアログが開いている場合は何もしない
@@ -416,7 +445,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.add')}
           <p className="hidden text-xs text-muted-foreground sm:block">
             <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-              <span>{modifierKeyIcon}</span>n
+              <span>{userAgent.modifierKeyIcon}</span>n
             </kbd>
           </p>
         </Button>
@@ -459,7 +488,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
             </TableHeader>
             <TableBody ref={tBodyRef}>
               <SortableContext
-                items={tableData}
+                items={tasks}
                 strategy={verticalListSortingStrategy}
               >
                 {table.getRowModel().rows?.length ? (
@@ -499,6 +528,11 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.next')}
         </Button>
       </div>
+      <TaskFormDialogMemo
+        task={undefined}
+        isOpen={isOpenAddDialog}
+        onOpenChange={setIsOpenAddDialog}
+      />
       <TaskDeleteConfirmDialogMemo
         task={actionTask}
         isOpen={isOpenDeleteDialog}
@@ -540,6 +574,12 @@ function DraggableRow({ row }: { row: Row<Task> }) {
     </TableRow>
   )
 }
+
+// タスク追加ダイアログのメモ化
+const TaskFormDialogMemo = React.memo((props: TaskFormDialogProps) => {
+  return <TaskFormDialog {...props} />
+})
+TaskFormDialogMemo.displayName = 'TaskFormDialogMemo'
 
 // タスク削除ダイアログのメモ化
 const TaskDeleteConfirmDialogMemo = React.memo(

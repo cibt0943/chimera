@@ -14,6 +14,7 @@ export interface TaskDeleteConfirmDialogProps {
   task: Task | undefined
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
   returnUrl?: string
   children?: React.ReactNode
 }
@@ -22,6 +23,7 @@ export function TaskDeleteConfirmDialog({
   task,
   isOpen,
   onOpenChange,
+  onSubmit,
   returnUrl = TODO_URL,
   children,
 }: TaskDeleteConfirmDialogProps) {
@@ -29,7 +31,7 @@ export function TaskDeleteConfirmDialog({
 
   if (!task) return null
 
-  const action = [TODO_URL, task.id, 'delete'].join('/')
+  const action = `${TODO_URL}/${task.id}/delete`
   const desc = '「' + task.title + '」' + t('common.message.confirm_deletion')
 
   return (
@@ -41,7 +43,6 @@ export function TaskDeleteConfirmDialog({
       torigger={children}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
-      {/* レスポンシブ対応のためにFormでButtonを囲まない */}
       <AlertDialogAction
         type="submit"
         className={buttonVariants({ variant: 'destructive' })}
@@ -49,7 +50,16 @@ export function TaskDeleteConfirmDialog({
       >
         {t('common.message.delete')}
       </AlertDialogAction>
-      <Form id="delete-task-form" action={action} method="delete">
+      {/* レスポンシブ対応のためにFormでButtonを囲まない */}
+      <Form
+        id="delete-task-form"
+        action={action}
+        method="delete"
+        onSubmit={(event) => {
+          event.stopPropagation() // これがないと「The submit event is dispatched by form#delete-event-form instead of 〜」というエラーが出る
+          onSubmit && onSubmit(event)
+        }}
+      >
         <input type="hidden" name="returnUrl" value={returnUrl} />
       </Form>
     </ConfirmDialog>

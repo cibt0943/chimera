@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog'
+import { TODO_URL } from '~/constants'
 import { Task } from '~/types/tasks'
 import { TaskForm } from './task-form'
 
@@ -20,7 +21,7 @@ export function TaskFormDialog({
   task,
   isOpen,
   onOpenChange,
-  returnUrl,
+  returnUrl = TODO_URL,
 }: TaskFormDialogProps) {
   const { t } = useTranslation()
 
@@ -36,7 +37,11 @@ export function TaskFormDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{desc}</DialogDescription>
         </DialogHeader>
-        <TaskForm task={task} returnUrl={returnUrl} />
+        <TaskForm
+          task={task}
+          onSubmit={() => onOpenChange(false)}
+          returnUrl={returnUrl}
+        />
       </DialogContent>
     </Dialog>
   )

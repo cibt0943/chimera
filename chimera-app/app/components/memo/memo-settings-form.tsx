@@ -42,7 +42,7 @@ function ShowArchivedSwith() {
 
   // 表示するメモのフィルタ
   function updateMemoSettingStatusFilter(statuses: MemoStatus[]) {
-    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+    const url = `${ACCOUNT_URL}/memo/settings`
 
     fetcher.submit(
       {
@@ -93,7 +93,7 @@ function ShowContentSwith() {
 
   // 表示するメモのフィルタ
   function updateMemoSettingDisplayContent(isShow: boolean) {
-    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+    const url = `${ACCOUNT_URL}/memo/settings`
 
     fetcher.submit(
       {
@@ -138,7 +138,7 @@ function AutoSaveSwith() {
 
   // 表示するメモのフィルタ
   function updateMemoSettingAutoSave(isAutoSave: boolean) {
-    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+    const url = `${ACCOUNT_URL}/memo/settings`
 
     fetcher.submit(
       {

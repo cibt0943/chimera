@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useLocation } from 'react-router'
 import { EVENT_URL } from '~/constants'
 import { sleep } from '~/lib/utils'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
@@ -25,6 +25,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 export default function Memo({ loaderData }: Route.ComponentProps) {
   const { memo } = loaderData
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
+  const location = useLocation()
   const navigate = useNavigate()
   const returnUrl = EVENT_URL + location.search
 
@@ -33,11 +34,10 @@ export default function Memo({ loaderData }: Route.ComponentProps) {
       memo={memo}
       isOpen={isOpenDialog}
       onOpenChange={async (open) => {
-        if (!open) {
-          setIsOpenDialog(false)
-          await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
-          navigate(returnUrl)
-        }
+        if (open) return
+        setIsOpenDialog(false)
+        await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
+        navigate(returnUrl)
       }}
       returnUrl={returnUrl}
     />

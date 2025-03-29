@@ -51,6 +51,8 @@ export interface UserAgent {
   OS: OS
   isWindows: boolean
   isMac: boolean
+  modifierKey: string
+  modifierKeyIcon: string
 }
 
 // ユーザーエージェント情報を取得する関数
@@ -60,11 +62,6 @@ export function getUserAgent(): UserAgent {
     OS: userOS,
     isWindows: userOS === OS.WIN,
     isMac: userOS === OS.MAC,
-  }
-}
-
-export function getModifierKeyInfo(userOS: OS) {
-  return {
     modifierKey: userOS === OS.WIN ? 'mod' : 'alt',
     modifierKeyIcon: userOS === OS.WIN ? 'alt' : '⌥',
   }

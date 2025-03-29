@@ -11,12 +11,12 @@ export function useUserAgentAtom() {
   return useAtomValue(userAgentAtom)
 }
 
-export function useSetUserAgentAtom() {
+export function useSetUserAgentAtom(userAgent: UserAgent) {
   const setUserAgent = useSetAtom(userAgentAtom)
   React.useEffect(() => {
     // クライアントサイドでユーザーエージェント情報を設定
-    setUserAgent(getUserAgent())
-  }, [setUserAgent])
+    setUserAgent(userAgent)
+  }, [setUserAgent, userAgent])
 }
 
 // ログインユーザーのアカウント情報を保持する

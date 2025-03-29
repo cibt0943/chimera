@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog'
+import { MEMO_URL } from '~/constants'
 import { Memo } from '~/types/memos'
 import { MemoForm } from './memo-form'
 import { useMemoSettingsAtom } from '~/lib/global-state'
@@ -21,7 +22,7 @@ export function MemoFormDialog({
   memo,
   isOpen,
   onOpenChange,
-  returnUrl,
+  returnUrl = MEMO_URL,
 }: MemoFormDialogProps) {
   const { t } = useTranslation()
   const memoSettings = useMemoSettingsAtom()
@@ -45,6 +46,7 @@ export function MemoFormDialog({
         <MemoForm
           memo={memo}
           isAutoSave={autoSave}
+          onSubmit={() => onOpenChange(false)}
           returnUrl={memoFormSubmitReturnUrl}
           textareaProps={{ className: 'h-[calc(100svh_-_360px)]' }}
         />

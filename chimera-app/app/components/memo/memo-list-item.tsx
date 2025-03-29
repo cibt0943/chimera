@@ -13,27 +13,22 @@ import { MEMO_URL } from '~/constants'
 function NavLinkClassName({
   item,
   isSelected,
-  isFocused,
 }: {
   item: Memo
   isSelected: boolean
-  isFocused: boolean
 }) {
   const selectedClassName = isSelected
     ? 'bg-muted'
     : 'bg-background hover:bg-muted'
-  const focusedClassName = isFocused ? 'ring-1 ring-inset ring-ring' : ''
 
   const archiveClassName =
     item.status === MemoStatus.ARCHIVED ? 'text-muted-foreground' : ''
 
   return cn(
     'flex flex-col gap-2 rounded-md border p-3 text-sm group',
-    'select-none outline-none',
-    // 'outline-none focus:ring-1 focus:ring-inset focus:ring-ring',
-    // 'select-none',
+    'outline-none focus:ring-1 focus:ring-inset focus:ring-ring',
+    'select-none',
     selectedClassName,
-    focusedClassName,
     archiveClassName,
   )
 }
@@ -43,13 +38,12 @@ interface ListItemProps {
   item: Memo
   onFocus: () => void
   isSelected: boolean
-  isFocused: boolean
   isPreview: boolean
   children: React.ReactNode
 }
 
 export function ListItem(props: ListItemProps) {
-  const { item, onFocus, isSelected, isFocused, isPreview, children } = props
+  const { item, onFocus, isSelected, isPreview, children } = props
 
   const { t } = useTranslation()
   const {
@@ -76,7 +70,7 @@ export function ListItem(props: ListItemProps) {
   // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
   const updatedAtDiff = useAgoFormat(item.updatedAt)
   const updatedAt = format(item.updatedAt, t('common.format.date_time_format'))
-  const to = [MEMO_URL, item.id].join('/')
+  const to = `${MEMO_URL}/${item.id}`
   const title = item.title || t('memo.message.un_titled')
   const content = isPreview ? item.content.substring(0, 300) || '　' : ''
 
@@ -86,7 +80,7 @@ export function ListItem(props: ListItemProps) {
       {...listeners}
       id={`memo-${item.id}`}
       ref={setNodeRef}
-      className={NavLinkClassName({ item, isSelected, isFocused })}
+      className={NavLinkClassName({ item, isSelected })}
       style={style}
       onFocus={onFocus}
       role="button"
@@ -97,7 +91,7 @@ export function ListItem(props: ListItemProps) {
           navigate(to, { replace: true })
         }
       }}
-      onClick={(e) => {
+      onClick={() => {
         navigate(to, { replace: true })
       }}
     >

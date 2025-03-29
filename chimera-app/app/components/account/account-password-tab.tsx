@@ -16,7 +16,7 @@ export function AccountPasswordTab({
   accountPassword,
 }: AccountPasswordTabProps) {
   const { t } = useTranslation()
-  const action = [ACCOUNT_URL, 'password'].join('/')
+  const action = `${ACCOUNT_URL}/password`
 
   return (
     <div className="space-y-6">

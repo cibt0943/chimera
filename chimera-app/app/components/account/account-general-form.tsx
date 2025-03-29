@@ -34,7 +34,7 @@ export function AccountGeneralForm({
 }: AccountFormProps) {
   const { t } = useTranslation()
 
-  const action = [ACCOUNT_URL, 'general'].join('/')
+  const action = `${ACCOUNT_URL}/general`
   const defaultValue = accountGeneral
 
   const [form, fields] = useForm<AccountGeneralSchemaType>({

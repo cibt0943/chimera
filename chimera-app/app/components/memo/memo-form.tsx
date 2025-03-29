@@ -6,7 +6,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { getFormProps } from '@conform-to/react'
 import { Button } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
-import { cn, getModifierKeyInfo } from '~/lib/utils'
+import { cn } from '~/lib/utils'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
 import {
   FormItem,
@@ -25,17 +25,20 @@ import { useUserAgentAtom } from '~/lib/global-state'
 export interface MemoFormProps {
   memo: Memo | undefined
   isAutoSave: boolean
-  returnUrl?: string
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  returnUrl: string
   textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>
 }
 
 export function MemoForm({
   memo,
   isAutoSave,
+  onSubmit,
   returnUrl,
   textareaProps = {},
 }: MemoFormProps) {
   const { t } = useTranslation()
+  const userAgent = useUserAgentAtom()
   const formRef = React.useRef<HTMLFormElement>(null)
   const { enqueue } = useApiQueue()
   // memoの状態を変更して保存したかどうか
@@ -75,7 +78,7 @@ export function MemoForm({
 
   // キーボード操作
   useHotkeys(
-    ['alt+s'],
+    [`${userAgent.modifierKey}+s`],
     (event, handler) => {
       switch (handler.keys?.join('')) {
         case 's':
@@ -91,9 +94,10 @@ export function MemoForm({
 
   const { form, fields } = useMemoConform({
     memo,
+    onSubmit,
   })
 
-  const action = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
+  const action = memo ? `${MEMO_URL}/${memo.id}` : MEMO_URL
 
   const { className, ...otherProps } = textareaProps
 
@@ -149,7 +153,11 @@ export function MemoForm({
       <input type="hidden" name="returnUrl" value={returnUrl} />
       <FormFooter className="sm:justify-between">
         {memo ? (
-          <MemoActionButton memo={memo} deleteReturnUrl={MEMO_URL} />
+          <MemoActionButton
+            memo={memo}
+            deleteOnSubmit={onSubmit}
+            deleteReturnUrl={returnUrl}
+          />
         ) : (
           <div>&nbsp;</div>
         )}
@@ -196,12 +204,11 @@ export function SaveButton({
 
 function SaveHotkeyIcon() {
   const userAgent = useUserAgentAtom()
-  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
 
   return (
     <p className="text-xs">
       <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-        <span>{modifierKeyIcon}</span>s
+        <span>{userAgent.modifierKeyIcon}</span>s
       </kbd>
     </p>
   )

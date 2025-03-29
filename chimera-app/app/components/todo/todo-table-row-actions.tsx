@@ -23,7 +23,6 @@ import {
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
 import { Task, TaskStatus } from '~/types/tasks'
-import { getModifierKeyInfo } from '~/lib/utils'
 import { useUserAgentAtom } from '~/lib/global-state'
 
 interface DataTableRowActionsProps<TData> {
@@ -37,7 +36,6 @@ export function TodoTableRowActions({
 }: DataTableRowActionsProps<Task>) {
   const { t } = useTranslation()
   const userAgent = useUserAgentAtom()
-  const { modifierKeyIcon } = getModifierKeyInfo(userAgent.OS)
 
   const task = row.original
 
@@ -57,7 +55,9 @@ export function TodoTableRowActions({
         >
           <LuArrowUpFromLine />
           {t('common.message.position_up')}
-          <DropdownMenuShortcut>{modifierKeyIcon + ' ↑'}</DropdownMenuShortcut>
+          <DropdownMenuShortcut>
+            {userAgent.modifierKeyIcon + ' ↑'}
+          </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
@@ -66,7 +66,9 @@ export function TodoTableRowActions({
         >
           <LuArrowDownFromLine />
           {t('common.message.position_down')}
-          <DropdownMenuShortcut>{modifierKeyIcon + ' ↓'}</DropdownMenuShortcut>
+          <DropdownMenuShortcut>
+            {userAgent.modifierKeyIcon + ' ↓'}
+          </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -78,7 +80,9 @@ export function TodoTableRowActions({
         >
           <LuCircleDot />
           {t('task.message.to_new')}
-          <DropdownMenuShortcut>{modifierKeyIcon + ' 1'}</DropdownMenuShortcut>
+          <DropdownMenuShortcut>
+            {userAgent.modifierKeyIcon + ' 1'}
+          </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={task.status === TaskStatus.DOING}
@@ -89,7 +93,9 @@ export function TodoTableRowActions({
         >
           <LuCirclePlay />
           {t('task.message.to_doing')}
-          <DropdownMenuShortcut>{modifierKeyIcon + ' 2'}</DropdownMenuShortcut>
+          <DropdownMenuShortcut>
+            {userAgent.modifierKeyIcon + ' 2'}
+          </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={task.status === TaskStatus.DONE}
@@ -100,7 +106,9 @@ export function TodoTableRowActions({
         >
           <LuCircleCheck />
           {t('task.message.to_done')}
-          <DropdownMenuShortcut>{modifierKeyIcon + ' 3'}</DropdownMenuShortcut>
+          <DropdownMenuShortcut>
+            {userAgent.modifierKeyIcon + ' 3'}
+          </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={task.status === TaskStatus.PENDING}
@@ -111,7 +119,9 @@ export function TodoTableRowActions({
         >
           <LuCirclePause />
           {t('task.message.to_pending')}
-          <DropdownMenuShortcut>{modifierKeyIcon + ' 4'}</DropdownMenuShortcut>
+          <DropdownMenuShortcut>
+            {userAgent.modifierKeyIcon + ' 4'}
+          </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
@@ -134,7 +144,7 @@ export function TodoTableRowActions({
           <LuTrash2 />
           {t('common.message.delete')}
           <DropdownMenuShortcut>
-            {modifierKeyIcon + ' '}
+            {userAgent.modifierKeyIcon + ' '}
             <LuDelete className="inline" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>

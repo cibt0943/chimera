@@ -15,11 +15,13 @@ import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 
 interface MemoActionButtonProps {
   memo: Memo | undefined
+  deleteOnSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
   deleteReturnUrl?: string
 }
 
 export function MemoActionButton({
   memo,
+  deleteOnSubmit,
   deleteReturnUrl = MEMO_URL,
 }: MemoActionButtonProps) {
   const { t } = useTranslation()
@@ -43,7 +45,7 @@ export function MemoActionButton({
                   .submit(
                     { status: archiveMenu.toStatus },
                     {
-                      action: [API_URL, MEMO_URL, `/${memo.id}`].join(''),
+                      action: `${API_URL}${MEMO_URL}/${memo.id}`,
                       method: 'post',
                       encType: 'application/json',
                     },
@@ -63,7 +65,11 @@ export function MemoActionButton({
           <TooltipContent>{archiveMenu.caption}</TooltipContent>
         </Tooltip>
         <Tooltip>
-          <MemoDeleteConfirmDialog memo={memo} returnUrl={deleteReturnUrl}>
+          <MemoDeleteConfirmDialog
+            memo={memo}
+            onSubmit={deleteOnSubmit}
+            returnUrl={deleteReturnUrl}
+          >
             <TooltipTrigger asChild>
               <Button variant="outline" size="icon">
                 <LuTrash2 />

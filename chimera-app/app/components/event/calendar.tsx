@@ -46,7 +46,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const [actionEvent, setActionEvent] = React.useState<Event>() // イベント作成用
-  const [isOpenEventDialog, setIsOpenEventDialog] = React.useState(false)
+  const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const location = useLocation()
   const isLaptop = useMedia('(min-width: 1024px)')
@@ -81,11 +81,11 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   function getEditUrl(type: CalendarEventType, id: string) {
     switch (type) {
       case CalendarEventType.EVENT:
-        return [EVENT_URL, `/${id}`].join('')
+        return `${EVENT_URL}/${id}`
       case CalendarEventType.TASK:
-        return [EVENT_URL, TODO_URL, `/${id}`].join('')
+        return `${EVENT_URL}${TODO_URL}/${id}`
       case CalendarEventType.MEMO:
-        return [EVENT_URL, MEMO_URL, `/${id}`].join('')
+        return `${EVENT_URL}${MEMO_URL}/${id}`
       default:
         return null
     }
@@ -95,7 +95,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   function handleSelect(arg: DateSelectArg) {
     const event = createNewEvent(arg.start, arg.end)
     setActionEvent(event)
-    setIsOpenEventDialog(true)
+    setIsOpenAddDialog(true)
   }
 
   // 新しいイベントを作成
@@ -175,7 +175,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
         ...(endDate && { endDate: endDate.toISOString() }),
       },
       {
-        action: [API_URL, EVENT_URL, `/${srcObj.id}`].join(''),
+        action: `${API_URL}${EVENT_URL}/${srcObj.id}`,
         method: 'post',
         encType: 'application/json',
       },
@@ -201,6 +201,8 @@ export function Calendar({ defaultEvents }: CalendarProps) {
       callenderRef.current.getApi().changeView(viewMode)
     })
   }, [viewMode])
+
+  const returnUrl = EVENT_URL + location.search
 
   return (
     <div className="h-[calc(100svh_-_68px)] lg:h-[calc(100svh_-_32px)]">
@@ -239,9 +241,9 @@ export function Calendar({ defaultEvents }: CalendarProps) {
       />
       <EventFormDialogMemo
         event={actionEvent}
-        isOpen={isOpenEventDialog}
-        setIsOpen={setIsOpenEventDialog}
-        returnUrl={EVENT_URL + location.search}
+        isOpen={isOpenAddDialog}
+        onOpenChange={setIsOpenAddDialog}
+        returnUrl={returnUrl}
       />
     </div>
   )
@@ -267,7 +269,7 @@ function createEventDropRequest(
     allDay: srcObj.allDay ? 'on' : '',
     ...(endDate && { endDate }),
   }
-  request.action = [API_URL, EVENT_URL, `/${srcObj.id}`].join('')
+  request.action = `${API_URL}${EVENT_URL}/${srcObj.id}`
   return request
 }
 
@@ -280,7 +282,7 @@ function createTaskDropRequest(startDate: Date, srcObj: Task) {
     dueDate: startDate,
     dueDateAllDay: srcObj.dueDateAllDay ? 'on' : '',
   }
-  request.action = [API_URL, TODO_URL, `/${srcObj.id}`].join('')
+  request.action = `${API_URL}${TODO_URL}/${srcObj.id}`
   return request
 }
 
@@ -293,7 +295,7 @@ function createMemoDropRequest(startDate: Date, srcObj: Memo) {
     relatedDate: startDate,
     relatedDateAllDay: srcObj.relatedDateAllDay ? 'on' : '',
   }
-  request.action = [API_URL, MEMO_URL, `/${srcObj.id}`].join('')
+  request.action = `${API_URL}${MEMO_URL}/${srcObj.id}`
   return request
 }
 

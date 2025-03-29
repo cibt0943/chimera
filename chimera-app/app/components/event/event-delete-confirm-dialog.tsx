@@ -13,7 +13,7 @@ import { Event } from '~/types/events'
 export interface EventDeleteConfirmDialogProps {
   event: Event | undefined
   isOpen?: boolean
-  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  onOpenChange?: (open: boolean) => void
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
   returnUrl?: string
   children?: React.ReactNode
@@ -22,7 +22,7 @@ export interface EventDeleteConfirmDialogProps {
 export function EventDeleteConfirmDialog({
   event,
   isOpen,
-  setIsOpen,
+  onOpenChange,
   onSubmit,
   returnUrl = EVENT_URL,
   children,
@@ -31,7 +31,7 @@ export function EventDeleteConfirmDialog({
 
   if (!event) return null
 
-  const action = [EVENT_URL, event.id, 'delete'].join('/')
+  const action = `${EVENT_URL}/${event.id}/delete`
   const desc = '「' + event.title + '」' + t('common.message.confirm_deletion')
 
   return (
@@ -39,11 +39,10 @@ export function EventDeleteConfirmDialog({
       title={t('event.message.event_deletion')}
       description={desc}
       isOpen={isOpen}
-      setIsOpen={setIsOpen}
+      onOpenChange={onOpenChange}
       torigger={children}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
-      {/* レスポンシブ対応のためにFormでButtonを囲まない */}
       <AlertDialogAction
         type="submit"
         className={buttonVariants({ variant: 'destructive' })}
@@ -51,11 +50,15 @@ export function EventDeleteConfirmDialog({
       >
         {t('common.message.delete')}
       </AlertDialogAction>
+      {/* レスポンシブ対応のためにFormでButtonを囲まない */}
       <Form
         id="delete-event-form"
         action={action}
         method="delete"
-        onSubmit={onSubmit}
+        onSubmit={(event) => {
+          event.stopPropagation() // これがないと「The submit event is dispatched by form#delete-event-form instead of 〜」というエラーが出る
+          onSubmit && onSubmit(event)
+        }}
       >
         <input type="hidden" name="returnUrl" value={returnUrl} />
       </Form>

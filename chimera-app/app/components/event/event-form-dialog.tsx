@@ -1,5 +1,3 @@
-import * as React from 'react'
-import { useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import {
   Dialog,
@@ -9,26 +7,23 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog'
 import { EVENT_URL } from '~/constants'
-import { sleep } from '~/lib/utils'
 import { Event } from '~/types/events'
 import { EventForm } from './event-form'
-import { EventDeleteButton } from './event-delete-button'
 
 export interface EventFormDialogProps {
   event: Event | undefined
   isOpen: boolean
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  onOpenChange: (open: boolean) => void
   returnUrl?: string
 }
 
 export function EventFormDialog({
   event,
   isOpen,
-  setIsOpen,
+  onOpenChange,
   returnUrl = EVENT_URL,
 }: EventFormDialogProps) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
 
   // 新規作成時であってもeventに初期値を埋めて送られてくるため、idがあるかどうかで判定
   const title = event?.id
@@ -37,16 +32,7 @@ export function EventFormDialog({
   const desc = t('event.message.set_event_info')
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={async (open) => {
-        setIsOpen(open)
-        if (!open) {
-          await sleep(200) // ダイアログが閉じるアニメーションが終わるまで待機
-          navigate(returnUrl)
-        }
-      }}
-    >
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[490px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -54,20 +40,9 @@ export function EventFormDialog({
         </DialogHeader>
         <EventForm
           event={event}
-          onSubmit={() => setIsOpen(false)}
+          onSubmit={() => onOpenChange(false)}
           returnUrl={returnUrl}
-        >
-          {event?.id && (
-            <EventDeleteButton
-              event={event}
-              onSubmit={(event) => {
-                event.stopPropagation() // これがないと「The submit event is dispatched by form#delete-event-form instead of 〜」というエラーが出る
-                setIsOpen(false)
-              }}
-              returnUrl={returnUrl}
-            />
-          )}
-        </EventForm>
+        />
       </DialogContent>
     </Dialog>
   )

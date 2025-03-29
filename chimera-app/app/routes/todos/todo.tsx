@@ -10,9 +10,7 @@ import type { Route } from './+types/todo'
 import { TaskSchema } from '~/types/tasks'
 
 export function meta({ data }: Route.MetaArgs) {
-  return data.task
-    ? [{ title: 'Todo ' + data.task?.id + ' Edit | IMA' }]
-    : [{ title: 'Todo Add | IMA' }]
+  return [{ title: 'Todo ' + data.task.id + ' Edit | IMA' }]
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
@@ -48,8 +46,6 @@ export async function action({ params, request }: Route.ActionArgs) {
 export async function loader({ params, request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
 
-  if (params.todoId === 'new') return { task: undefined }
-
   const task = await getTask(params.todoId || '')
   if (task.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
@@ -68,13 +64,11 @@ export default function Todo({ loaderData }: Route.ComponentProps) {
       task={task}
       isOpen={isOpenDialog}
       onOpenChange={async (open) => {
-        if (!open) {
-          setIsOpenDialog(false)
-          await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
-          navigate(TODO_URL)
-        }
+        if (open) return
+        setIsOpenDialog(false)
+        await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
+        navigate(TODO_URL)
       }}
-      returnUrl={TODO_URL}
     />
   )
 }

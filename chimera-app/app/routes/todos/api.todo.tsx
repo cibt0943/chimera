@@ -19,7 +19,7 @@ export async function action({ params, request }: Route.ActionArgs) {
     status: zod
       .preprocess((v) => Number(v), zod.nativeEnum(TaskStatus))
       .optional(),
-    dueDate: zod.preprocess((v) => new Date(v), zod.date()).optional(),
+    dueDate: zod.preprocess((v) => new Date(String(v)), zod.date()).optional(),
     dueDateAllDay: zod.preprocess((v) => v === 'on', zod.boolean()).optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
   })
 
