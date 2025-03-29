@@ -14,6 +14,7 @@ export interface MemoDeleteConfirmDialogProps {
   memo: Memo | undefined
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
   returnUrl?: string
   children?: React.ReactNode
 }
@@ -22,6 +23,7 @@ export function MemoDeleteConfirmDialog({
   memo,
   isOpen,
   onOpenChange,
+  onSubmit,
   returnUrl = MEMO_URL,
   children,
 }: MemoDeleteConfirmDialogProps) {
@@ -53,7 +55,15 @@ export function MemoDeleteConfirmDialog({
       >
         {t('common.message.delete')}
       </AlertDialogAction>
-      <Form id="delete-memo-form" action={action} method="delete">
+      <Form
+        id="delete-memo-form"
+        action={action}
+        method="delete"
+        onSubmit={(event) => {
+          event.stopPropagation() // これがないと「The submit event is dispatched by form#delete-event-form instead of 〜」というエラーが出る
+          onSubmit && onSubmit(event)
+        }}
+      >
         <input type="hidden" name="returnUrl" value={returnUrl} />
       </Form>
     </ConfirmDialog>

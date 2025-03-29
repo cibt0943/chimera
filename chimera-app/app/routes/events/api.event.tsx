@@ -16,8 +16,10 @@ export async function action({ params, request }: Route.ActionArgs) {
   const jsonData = await request.json()
 
   const scheme = zod.object({
-    startDate: zod.preprocess((v) => new Date(v), zod.date()).optional(),
-    endDate: zod.preprocess((v) => new Date(v), zod.date()).optional(),
+    startDate: zod
+      .preprocess((v) => new Date(String(v)), zod.date())
+      .optional(),
+    endDate: zod.preprocess((v) => new Date(String(v)), zod.date()).optional(),
     allDay: zod.preprocess((v) => v === 'on', zod.boolean()).optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
   })
 

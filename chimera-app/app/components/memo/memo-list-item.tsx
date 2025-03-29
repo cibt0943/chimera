@@ -91,7 +91,7 @@ export function ListItem(props: ListItemProps) {
           navigate(to, { replace: true })
         }
       }}
-      onClick={(e) => {
+      onClick={() => {
         navigate(to, { replace: true })
       }}
     >

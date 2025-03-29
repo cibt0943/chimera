@@ -19,7 +19,9 @@ export async function action({ params, request }: Route.ActionArgs) {
     status: zod
       .preprocess((v) => Number(v), zod.nativeEnum(MemoStatus))
       .optional(),
-    relatedDate: zod.preprocess((v) => new Date(v), zod.date()).optional(),
+    relatedDate: zod
+      .preprocess((v) => new Date(String(v)), zod.date())
+      .optional(),
     relatedDateAllDay: zod
       .preprocess((v) => v === 'on', zod.boolean())
       .optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要

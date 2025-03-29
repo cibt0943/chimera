@@ -23,21 +23,16 @@ import { Required } from '~/components/lib/required'
 import { InputConform } from '~/components/lib/conform/input'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePicker } from '~/components/lib/date-time-picker'
+import { EventDeleteButton } from './event-delete-button'
 import { Event, EventSchema, EventSchemaType } from '~/types/events'
 
 export interface EventFormProps {
   event: Event | undefined
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
-  returnUrl?: string
-  children?: React.ReactNode
+  returnUrl: string
 }
 
-export function EventForm({
-  event,
-  onSubmit,
-  returnUrl = EVENT_URL,
-  children,
-}: EventFormProps) {
+export function EventForm({ event, onSubmit, returnUrl }: EventFormProps) {
   const { t } = useTranslation()
 
   // 新規作成時であってもeventに初期値を埋めて送られてくるため、idがあるかどうかで判定
@@ -177,7 +172,15 @@ export function EventForm({
         <input type="hidden" name="returnUrl" value={returnUrl} />
       </div>
       <FormFooter className="sm:justify-between">
-        {children || <div>&nbsp;</div>}
+        {event?.id ? (
+          <EventDeleteButton
+            event={event}
+            onSubmit={onSubmit}
+            returnUrl={returnUrl}
+          />
+        ) : (
+          <div>&nbsp;</div>
+        )}
         <Button type="submit">{t('common.message.save')}</Button>
       </FormFooter>
     </Form>

@@ -53,6 +53,7 @@ import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
 import { TodoTableColumns } from './todo-table-columns'
+import { TaskFormDialog, TaskFormDialogProps } from './task-form-dialog'
 import {
   TaskDeleteConfirmDialog,
   TaskDeleteConfirmDialogProps,
@@ -101,6 +102,9 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
 
   // 編集・削除するタスク
   const [actionTask, setActionTask] = React.useState<Task>()
+
+  // 追加用ダイアログの表示・非表示
+  const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
 
   // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
@@ -164,7 +168,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
 
   // タスク追加ダイアログを開く
   function openAddTaskDialog() {
-    navigate('new')
+    setIsOpenAddDialog(true)
   }
 
   // タスク削除ダイアログを開く
@@ -350,6 +354,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
     MODIFIER_DELETE: `${userAgent.modifierKey}+delete`,
     MODIFIER_BACKSPACE: `${userAgent.modifierKey}+backspace`,
   }
+
   useHotkeys(
     Object.values(HOTKEYS),
     (_, { hotkey }) => {
@@ -523,6 +528,11 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.next')}
         </Button>
       </div>
+      <TaskFormDialogMemo
+        task={undefined}
+        isOpen={isOpenAddDialog}
+        onOpenChange={setIsOpenAddDialog}
+      />
       <TaskDeleteConfirmDialogMemo
         task={actionTask}
         isOpen={isOpenDeleteDialog}
@@ -564,6 +574,12 @@ function DraggableRow({ row }: { row: Row<Task> }) {
     </TableRow>
   )
 }
+
+// タスク追加ダイアログのメモ化
+const TaskFormDialogMemo = React.memo((props: TaskFormDialogProps) => {
+  return <TaskFormDialog {...props} />
+})
+TaskFormDialogMemo.displayName = 'TaskFormDialogMemo'
 
 // タスク削除ダイアログのメモ化
 const TaskDeleteConfirmDialogMemo = React.memo(

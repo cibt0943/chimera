@@ -25,13 +25,15 @@ import { useUserAgentAtom } from '~/lib/global-state'
 export interface MemoFormProps {
   memo: Memo | undefined
   isAutoSave: boolean
-  returnUrl?: string
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  returnUrl: string
   textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>
 }
 
 export function MemoForm({
   memo,
   isAutoSave,
+  onSubmit,
   returnUrl,
   textareaProps = {},
 }: MemoFormProps) {
@@ -92,6 +94,7 @@ export function MemoForm({
 
   const { form, fields } = useMemoConform({
     memo,
+    onSubmit,
   })
 
   const action = memo ? `${MEMO_URL}/${memo.id}` : MEMO_URL
@@ -150,7 +153,11 @@ export function MemoForm({
       <input type="hidden" name="returnUrl" value={returnUrl} />
       <FormFooter className="sm:justify-between">
         {memo ? (
-          <MemoActionButton memo={memo} deleteReturnUrl={returnUrl} />
+          <MemoActionButton
+            memo={memo}
+            deleteOnSubmit={onSubmit}
+            deleteReturnUrl={returnUrl}
+          />
         ) : (
           <div>&nbsp;</div>
         )}

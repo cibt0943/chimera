@@ -28,10 +28,11 @@ import {
 
 export interface TaskFormProps {
   task: Task | undefined
-  returnUrl?: string
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  returnUrl: string
 }
 
-export function TaskForm({ task, returnUrl }: TaskFormProps) {
+export function TaskForm({ task, onSubmit, returnUrl }: TaskFormProps) {
   const { t } = useTranslation()
 
   const action = task ? `${TODO_URL}/${task.id}` : TODO_URL
@@ -52,6 +53,7 @@ export function TaskForm({ task, returnUrl }: TaskFormProps) {
       return parseWithZod(formData, { schema: TaskSchema })
     },
     shouldRevalidate: 'onInput',
+    onSubmit: onSubmit,
   })
 
   return (
@@ -111,7 +113,11 @@ export function TaskForm({ task, returnUrl }: TaskFormProps) {
       </div>
       <FormFooter className="sm:justify-between">
         {task ? (
-          <TaskDeleteButton task={task} returnUrl={returnUrl} />
+          <TaskDeleteButton
+            task={task}
+            onSubmit={onSubmit}
+            returnUrl={returnUrl}
+          />
         ) : (
           <div>&nbsp;</div>
         )}
