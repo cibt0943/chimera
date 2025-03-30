@@ -22,7 +22,7 @@ export default function AccountPassword() {
     <div>
       <div className="space-y-6">
         <h2 className="text-xl font-bold">{t('account.message.password')}</h2>
-        <div className="flex flex-row items-center rounded-lg border p-3 text-sm shadow-sm">
+        <div className="flex flex-row items-center rounded-lg border p-3 text-sm shadow-xs">
           <LuMailWarning className="h-6 w-6" />
           <div className="ml-4">
             <AlertTitle>

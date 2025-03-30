@@ -59,7 +59,7 @@ function ShowArchivedSwith() {
   }
 
   return (
-    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-xs">
       <div>
         <Label htmlFor="show-archived">
           {t('memo_settings.message.list_show_archived')}
@@ -110,7 +110,7 @@ function ShowContentSwith() {
   }
 
   return (
-    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-xs">
       <div>
         <Label htmlFor="show-content">
           {t('memo_settings.message.list_show_content')}
@@ -153,7 +153,7 @@ function AutoSaveSwith() {
   }
 
   return (
-    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-xs">
       <div>
         <Label htmlFor="auto-save">
           {t('memo_settings.message.auto_save')}
