@@ -113,7 +113,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
                           : 'opacity-50 [&_svg]:invisible',
                       )}
                     >
-                      <LuCheck className="!h-3 !w-3" />
+                      <LuCheck className="h-3! w-3!" />
                     </div>
                     <span>{t(option.label)}</span>
                     {facets?.get(option.value) && (

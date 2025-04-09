@@ -1,13 +1,16 @@
+@reference "./tailwind.css";
+
 .fc-header-toolbar {
-  @apply mb-4 !important;
+  @apply mb-4!;
 }
 
 .fc-toolbar-title {
-  @apply text-lg font-semibold !important;
+  @apply text-lg! font-semibold!;
 }
 
 .fc-button.fc-button-primary {
-  @apply inline-flex h-8 items-center justify-center whitespace-nowrap rounded-md border-none bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground shadow-sm transition-colors hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 !important;
+  /* @apply bg-secondary! text-secondary-foreground! hover:bg-secondary/80! focus-visible:ring-ring! inline-flex h-8 items-center justify-center rounded-md border-none px-4 py-2 text-sm font-medium whitespace-nowrap shadow-none! transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50; */
+  @apply bg-secondary! text-secondary-foreground! rounded-md border-none text-sm font-medium;
 }
 
 .fc-daygrid-day-top {
@@ -18,16 +21,15 @@
   @apply text-muted-foreground;
 }
 
-/* リスト表示時の行に対するボーダー変更 */
-.fc-list {
-  @apply border-border !important;
+/* リスト表示時のイベント行に対するスタイル */
+.fc-list-event:hover td {
+  /* @apply bg-blue-100/50 !important; */
+  @apply bg-muted/50;
+}
 
-  .fc-list-table {
-    th,
-    td {
-      @apply border-border;
-    }
-  }
+/* リスト表示時のイベント行に対するスタイル */
+.dark .fc-list-event:hover td {
+  @apply bg-muted/50;
 }
 
 /* リスト表示時の日付行に対するスタイル */
@@ -37,35 +39,4 @@
 
 .dark .fc-list .fc-list-day-cushion {
   @apply bg-background/95;
-}
-
-/* リスト表示時のイベント行に対するスタイル */
-.fc-list-event:hover td {
-  /* @apply bg-blue-100/50 !important; */
-  @apply bg-muted/50 !important;
-}
-
-/* リスト表示時のイベント行に対するスタイル */
-.dark .fc-list-event:hover td {
-  @apply bg-muted/50 !important;
-}
-
-/* グリッド表示時のボーダー変更 */
-.fc-daygrid {
-  .fc-scrollgrid,
-  th,
-  td {
-    @apply border-slate-300;
-
-    /* @apply border-border; */
-  }
-}
-
-/* グリッド表示時のボーダー変更 */
-.dark .fc-daygrid {
-  .fc-scrollgrid,
-  th,
-  td {
-    @apply border-border;
-  }
 }

@@ -22,9 +22,9 @@ export function AppSidebar() {
           <SidebarMenuItem className="flex items-center">
             <SidebarMenuButton
               asChild
-              className={'group-data-[collapsible=icon]:!p-0'}
+              className={'group-data-[collapsible=icon]:p-0!'}
             >
-              <NavLink to="/" className="font-bold !text-yellow-500">
+              <NavLink to="/" className="font-bold text-yellow-500!">
                 <LuBird />
                 <LuFlower2 />
                 <LuFlameKindling />

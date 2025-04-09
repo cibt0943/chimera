@@ -26,7 +26,7 @@ function NavLinkClassName({
 
   return cn(
     'flex flex-col gap-2 rounded-md border p-3 text-sm group',
-    'outline-none focus:ring-1 focus:ring-inset focus:ring-ring',
+    'outline-hidden focus:ring-1 focus:ring-inset focus:ring-ring',
     'select-none',
     selectedClassName,
     archiveClassName,

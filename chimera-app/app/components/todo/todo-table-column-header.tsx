@@ -46,7 +46,7 @@ export function TodoTableColumnHeader<TData, TValue>({
             ) : column.getIsSorted() === 'asc' ? (
               <LuArrowUpNarrowWide />
             ) : (
-              <LuChevronsUpDown className="!h-3.5 !w-3.5" />
+              <LuChevronsUpDown className="h-3.5! w-3.5!" />
             )}
           </Button>
         </DropdownMenuTrigger>
