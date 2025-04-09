@@ -46,7 +46,7 @@ export function MemoFormDialog({
         <MemoForm
           memo={memo}
           isAutoSave={autoSave}
-          onSubmit={() => onOpenChange(false)}
+          // onSubmit={() => onOpenChange(false)}
           returnUrl={memoFormSubmitReturnUrl}
           textareaProps={{ className: 'h-[calc(100svh_-_360px)]' }}
         />

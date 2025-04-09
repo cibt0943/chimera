@@ -51,6 +51,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   const location = useLocation()
   const isLaptop = useMedia('(min-width: 1024px)')
   const callenderRef = React.useRef<FullCalendar>(null)
+  const returnUrl = EVENT_URL + location.search
 
   // 日付セット時の処理
   function handleDatesSet(arg: DatesSetArg) {
@@ -201,8 +202,6 @@ export function Calendar({ defaultEvents }: CalendarProps) {
       callenderRef.current.getApi().changeView(viewMode)
     })
   }, [viewMode])
-
-  const returnUrl = EVENT_URL + location.search
 
   return (
     <div className="h-[calc(100svh_-_68px)] lg:h-[calc(100svh_-_32px)]">

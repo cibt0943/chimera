@@ -39,7 +39,7 @@ export function TaskFormDialog({
         </DialogHeader>
         <TaskForm
           task={task}
-          onSubmit={() => onOpenChange(false)}
+          // onSubmit={() => onOpenChange(false)}
           returnUrl={returnUrl}
         />
       </DialogContent>

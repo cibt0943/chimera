@@ -40,7 +40,7 @@ export function EventFormDialog({
         </DialogHeader>
         <EventForm
           event={event}
-          onSubmit={() => onOpenChange(false)}
+          // onSubmit={() => onOpenChange(false)}
           returnUrl={returnUrl}
         />
       </DialogContent>
