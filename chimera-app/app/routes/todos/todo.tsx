@@ -10,7 +10,9 @@ import type { Route } from './+types/todo'
 import { TaskSchema } from '~/types/tasks'
 
 export function meta({ data }: Route.MetaArgs) {
-  return [{ title: 'Todo ' + data.task.id + ' Edit | IMA' }]
+  return data.task
+    ? [{ title: 'Todo ' + data.task?.id + ' Edit | IMA' }]
+    : [{ title: 'Todo Add | IMA' }]
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
@@ -45,6 +47,8 @@ export async function action({ params, request }: Route.ActionArgs) {
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
+
+  if (params.todoId === 'new') return { task: undefined }
 
   const task = await getTask(params.todoId || '')
   if (task.accountId !== loginInfo.account.id) {

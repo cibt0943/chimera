@@ -37,11 +37,7 @@ export function TaskFormDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{desc}</DialogDescription>
         </DialogHeader>
-        <TaskForm
-          task={task}
-          // onSubmit={() => onOpenChange(false)}
-          returnUrl={returnUrl}
-        />
+        <TaskForm task={task} returnUrl={returnUrl} />
       </DialogContent>
     </Dialog>
   )

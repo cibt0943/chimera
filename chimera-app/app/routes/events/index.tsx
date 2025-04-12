@@ -108,7 +108,7 @@ export default function Index({ loaderData }: Route.ComponentProps) {
   const { calendarEvents } = loaderData
 
   return (
-    <div className="p-4 pt-0 lg:pt-4">
+    <div className="p-4 pt-0 md:pt-4">
       <Calendar defaultEvents={calendarEvents} />
       <Outlet />
     </div>
