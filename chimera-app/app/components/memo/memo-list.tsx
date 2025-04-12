@@ -319,7 +319,7 @@ export function MemoList({
   const isPrevew = !!memoSettings.listDisplay.content
 
   return (
-    <div className="space-y-4 px-1 lg:py-4">
+    <div className="space-y-4 px-1 md:py-4">
       <div className="flex items-center gap-2 px-3">
         <Form action={MEMO_URL} method="post">
           <Button
@@ -330,8 +330,8 @@ export function MemoList({
           >
             <LuPlus />
             {t('common.message.add')}
-            <p className="text-xs text-muted-foreground">
-              <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
+            <p className="text-muted-foreground text-xs">
+              <kbd className="pointer-events-none inline-flex h-5 items-center gap-1 rounded border px-1.5 select-none">
                 <span>{userAgent.modifierKeyIcon}</span>n
               </kbd>
             </p>

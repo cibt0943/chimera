@@ -53,7 +53,6 @@ import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
 import { Task, Tasks, TaskStatus } from '~/types/tasks'
 import { TodoTableToolbar } from './todo-table-toolbar'
 import { TodoTableColumns } from './todo-table-columns'
-import { TaskFormDialog, TaskFormDialogProps } from './task-form-dialog'
 import {
   TaskDeleteConfirmDialog,
   TaskDeleteConfirmDialogProps,
@@ -102,9 +101,6 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
 
   // 編集・削除するタスク
   const [actionTask, setActionTask] = React.useState<Task>()
-
-  // 追加用ダイアログの表示・非表示
-  const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
 
   // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
@@ -168,7 +164,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
 
   // タスク追加ダイアログを開く
   function openAddTaskDialog() {
-    setIsOpenAddDialog(true)
+    navigate('new')
   }
 
   // タスク削除ダイアログを開く
@@ -443,8 +439,8 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
         >
           <LuPlus />
           {t('common.message.add')}
-          <p className="hidden text-xs text-muted-foreground sm:block">
-            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
+          <p className="text-muted-foreground hidden text-xs sm:block">
+            <kbd className="pointer-events-none inline-flex h-5 items-center gap-1 rounded border px-1.5 select-none">
               <span>{userAgent.modifierKeyIcon}</span>n
             </kbd>
           </p>
@@ -528,11 +524,6 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
           {t('common.message.next')}
         </Button>
       </div>
-      <TaskFormDialogMemo
-        task={undefined}
-        isOpen={isOpenAddDialog}
-        onOpenChange={setIsOpenAddDialog}
-      />
       <TaskDeleteConfirmDialogMemo
         task={actionTask}
         isOpen={isOpenDeleteDialog}
@@ -561,7 +552,7 @@ function DraggableRow({ row }: { row: Row<Task> }) {
       id={`row-${row.id}`}
       ref={setNodeRef}
       tabIndex={0}
-      className="rounded outline-hidden focus:ring-1 focus:ring-inset focus:ring-ring"
+      className="focus:ring-ring rounded outline-hidden focus:ring-1 focus:ring-inset"
       style={style}
       onFocus={() => row.toggleSelected(true)}
       data-state={row.getIsSelected() && 'selected'}
@@ -574,12 +565,6 @@ function DraggableRow({ row }: { row: Row<Task> }) {
     </TableRow>
   )
 }
-
-// タスク追加ダイアログのメモ化
-const TaskFormDialogMemo = React.memo((props: TaskFormDialogProps) => {
-  return <TaskFormDialog {...props} />
-})
-TaskFormDialogMemo.displayName = 'TaskFormDialogMemo'
 
 // タスク削除ダイアログのメモ化
 const TaskDeleteConfirmDialogMemo = React.memo(
