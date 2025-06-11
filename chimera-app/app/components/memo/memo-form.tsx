@@ -207,7 +207,7 @@ function SaveHotkeyIcon() {
 
   return (
     <p className="text-xs">
-      <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
+      <kbd className="inline-flex h-5 items-center gap-1 rounded border px-1.5 select-none">
         <span>{userAgent.modifierKeyIcon}</span>s
       </kbd>
     </p>
