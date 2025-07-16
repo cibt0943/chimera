@@ -99,12 +99,12 @@ export function ListItem(props: ListItemProps) {
         <div className="line-clamp-1">{title}</div>
         <div className="ml-auto">{children}</div>
       </div>
-      <div className="line-clamp-1 text-xs text-muted-foreground">
+      <div className="text-muted-foreground line-clamp-1 text-xs">
         {content}
       </div>
       <div className="flex items-center justify-between space-x-2">
         <div>{item.status === MemoStatus.ARCHIVED && <LuArchive />}</div>
-        <div className="ml-auto text-xs text-muted-foreground">
+        <div className="text-muted-foreground ml-auto text-xs">
           <ClientOnly fallback={<span>&nbsp;</span>}>
             {() => <span title={updatedAt}>{updatedAtDiff}</span>}
           </ClientOnly>

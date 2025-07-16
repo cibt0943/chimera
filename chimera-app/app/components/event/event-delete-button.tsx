@@ -25,7 +25,7 @@ export function EventDeleteButton({
       onSubmit={onSubmit}
       returnUrl={returnUrl}
     >
-      <Button type="button" variant="link" className="px-0 text-destructive">
+      <Button type="button" variant="link" className="text-destructive px-0">
         <LuTrash2 />
         {t('common.message.delete')}
       </Button>

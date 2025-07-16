@@ -98,7 +98,7 @@
   --sidebar-accent-foreground: oklch(21% 0.006 285.885deg);
   --sidebar-border: oklch(92% 0.004 286.32deg);
   --sidebar-ring: oklch(70.5% 0.015 286.067deg);
-  --sidebar: hsl(0 0% 98%);
+  --sidebar: hsl(0deg 0% 98%);
 }
 
 .dark {
@@ -133,7 +133,7 @@
   --sidebar-accent-foreground: oklch(98.5% 0 0deg);
   --sidebar-border: oklch(100% 0 0deg / 10%);
   --sidebar-ring: oklch(55.2% 0.016 285.938deg);
-  --sidebar: hsl(240 5.9% 10%);
+  --sidebar: hsl(240deg 5.9% 10%);
 }
 
 /* ダークモード対応 */
@@ -168,6 +168,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

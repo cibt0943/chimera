@@ -38,7 +38,7 @@ export function TodoTableColumnHeader<TData, TValue>({
           <Button
             variant="ghost"
             size="sm"
-            className="-ml-3 data-[state=open]:bg-accent"
+            className="data-[state=open]:bg-accent -ml-3"
           >
             <span>{title}</span>
             {column.getIsSorted() === 'desc' ? (

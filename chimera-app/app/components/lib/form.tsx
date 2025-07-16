@@ -46,7 +46,7 @@ export function FormMessage({
 
   return (
     <p
-      className={cn('text-[0.8rem] font-medium text-destructive', className)}
+      className={cn('text-destructive text-[0.8rem] font-medium', className)}
       {...props}
     >
       {messages}
@@ -61,7 +61,7 @@ export function FormDescription({
 }: React.ComponentProps<'p'>) {
   return (
     <p
-      className={cn('text-[0.8rem] text-muted-foreground', className)}
+      className={cn('text-muted-foreground text-[0.8rem]', className)}
       {...props}
     >
       {children}

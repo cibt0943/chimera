@@ -107,7 +107,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
                   >
                     <div
                       className={cn(
-                        'flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                        'border-primary flex h-4 w-4 items-center justify-center rounded-sm border',
                         isSelected
                           ? 'bg-primary text-primary-foreground'
                           : 'opacity-50 [&_svg]:invisible',
