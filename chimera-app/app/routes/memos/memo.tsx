@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { redirect, useNavigate } from 'react-router'
-import { parseWithZod } from '@conform-to/zod'
+import { parseWithZod } from '@conform-to/zod/v4'
 import { MEMO_URL } from '~/constants'
 import { sleep } from '~/lib/utils'
 import { useMedia } from '~/lib/hooks'

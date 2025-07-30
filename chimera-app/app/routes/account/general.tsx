@@ -1,5 +1,5 @@
 import { redirectWithInfo } from 'remix-toast'
-import { parseWithZod } from '@conform-to/zod'
+import { parseWithZod } from '@conform-to/zod/v4'
 import { ACCOUNT_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getAccount, updateAccount } from '~/models/account.server'

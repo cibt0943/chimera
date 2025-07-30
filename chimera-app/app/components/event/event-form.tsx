@@ -8,7 +8,7 @@ import {
   FieldMetadata,
   useInputControl,
 } from '@conform-to/react'
-import { parseWithZod, getZodConstraint } from '@conform-to/zod'
+import { parseWithZod, getZodConstraint } from '@conform-to/zod/v4'
 import { Matcher } from 'react-day-picker'
 import { Button } from '~/components/ui/button'
 import { Checkbox } from '~/components/ui/checkbox'
