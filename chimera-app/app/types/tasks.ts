@@ -80,9 +80,12 @@ export function TaskModel2Task(taskModel: TaskModel): Task {
 }
 
 export const TaskSchema = zod.object({
-  status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
+  status: zod.preprocess((v) => Number(v), zod.enum(TaskStatus)),
   title: zod
-    .string({ required_error: '必須項目です' })
+    .string({
+      error: (issue) =>
+        issue.input === undefined ? '必須項目です' : '入力値が不正です',
+    })
     .max(255, { message: '255文字以内で入力してください' }),
   memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
   dueDate: zod.date().optional(),

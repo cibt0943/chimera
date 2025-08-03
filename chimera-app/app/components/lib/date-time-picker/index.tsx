@@ -21,6 +21,7 @@ export interface DatePickerProps extends React.ComponentProps<'div'> {
   onChangeDate: (date: Date | undefined) => void
   placeholder?: string
   disabled?: Matcher
+  dropdown?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
 }
 
 export function DatePicker({
@@ -28,8 +29,9 @@ export function DatePicker({
   selectedDate,
   defaultMonth,
   onChangeDate,
-  placeholder = '',
+  placeholder,
   disabled,
+  dropdown,
   ...divProps
 }: DatePickerProps) {
   return (
@@ -43,6 +45,7 @@ export function DatePicker({
       triggerId={triggerId}
       placeholder={placeholder}
       disabled={disabled}
+      dropdown={dropdown}
       {...divProps}
     />
   )
@@ -64,8 +67,9 @@ export function DateTimePicker({
   includeAllDayComponent,
   onChangeDate,
   onChangeAllDay = () => {},
-  placeholder = '',
+  placeholder,
   disabled,
+  dropdown,
   ...divProps
 }: DateTimePickerProps) {
   const { i18n } = useTranslation()
@@ -118,7 +122,7 @@ export function DateTimePicker({
           <Calendar
             mode="single"
             defaultMonth={defaultMonth}
-            initialFocus={true}
+            captionLayout={dropdown}
             locale={locale}
             selected={selectedDate}
             onSelect={(selectedDay: Date | undefined) => {

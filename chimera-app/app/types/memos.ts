@@ -62,9 +62,7 @@ export function MemoModel2Memo(memoModel: MemoModel): Memo {
 }
 
 export const MemoSchema = zod.object({
-  status: zod
-    .preprocess((v) => Number(v), zod.nativeEnum(MemoStatus))
-    .optional(),
+  status: zod.preprocess((v) => Number(v), zod.enum(MemoStatus)).optional(),
   content: zod
     .string()
     .max(60000, '60000文字以内で入力してください')

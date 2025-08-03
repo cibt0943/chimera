@@ -16,9 +16,7 @@ export async function action({ params, request }: Route.ActionArgs) {
   const jsonData = await request.json()
 
   const scheme = zod.object({
-    status: zod
-      .preprocess((v) => Number(v), zod.nativeEnum(MemoStatus))
-      .optional(),
+    status: zod.preprocess((v) => Number(v), zod.enum(MemoStatus)).optional(),
     relatedDate: zod
       .preprocess((v) => new Date(String(v)), zod.date())
       .optional(),

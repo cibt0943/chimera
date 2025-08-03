@@ -2,15 +2,25 @@ import * as React from 'react'
 import { toDate } from 'date-fns'
 import { FieldMetadata, useInputControl } from '@conform-to/react'
 import { DatePicker } from '~/components/lib/date-time-picker'
+import { Matcher } from 'react-day-picker'
 
 export interface DatePickerConformProps extends React.ComponentProps<'div'> {
   dateMeta: FieldMetadata<Date | undefined>
   onChangeData?: (date: Date | undefined) => void
   placeholder?: string
+  disabled?: Matcher
+  dropdown?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
 }
 
 export function DateTimePickerConform(props: DatePickerConformProps) {
-  const { dateMeta, onChangeData, placeholder, ...divProps } = props
+  const {
+    dateMeta,
+    onChangeData,
+    placeholder,
+    disabled,
+    dropdown,
+    ...divProps
+  } = props
 
   const dateValue = dateMeta.value ? toDate(dateMeta.value) : undefined
   const dateControl = useInputControl(dateMeta)
@@ -31,6 +41,8 @@ export function DateTimePickerConform(props: DatePickerConformProps) {
       onChangeDate={handleChangeDate}
       triggerId={dateMeta.id}
       placeholder={placeholder}
+      disabled={disabled}
+      dropdown={dropdown}
       {...divProps}
     />
   )

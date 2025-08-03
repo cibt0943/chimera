@@ -43,11 +43,17 @@ export function EventModel2Event(eventModel: EventModel): Event {
 
 export const EventSchema = zod
   .object({
-    startDate: zod.date({ required_error: '必須項目です' }),
+    startDate: zod.date({
+      error: (issue) =>
+        issue.input === undefined ? '必須項目です' : '入力値が不正です',
+    }),
     endDate: zod.date().optional(),
     allDay: zod.boolean().optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
     title: zod
-      .string({ required_error: '必須項目です' })
+      .string({
+        error: (issue) =>
+          issue.input === undefined ? '必須項目です' : '入力値が不正です',
+      })
       .max(255, { message: '255文字以内で入力してください' }),
     memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
     location: zod
