@@ -57,12 +57,7 @@ export function TaskForm({ task, onSubmit, returnUrl }: TaskFormProps) {
   })
 
   return (
-    <Form
-      method="post"
-      className="space-y-8"
-      {...getFormProps(form)}
-      action={action}
-    >
+    <Form method="post" {...getFormProps(form)} action={action}>
       <div className="max-h-[calc(100svh_-_240px)] space-y-8 overflow-y-auto p-0.5">
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
@@ -110,19 +105,19 @@ export function TaskForm({ task, onSubmit, returnUrl }: TaskFormProps) {
           <FormMessage message={fields.status.errors} />
         </FormItem>
         <input type="hidden" name="returnUrl" value={returnUrl} />
+        <FormFooter className="sm:justify-between">
+          {task ? (
+            <TaskDeleteButton
+              task={task}
+              onSubmit={onSubmit}
+              returnUrl={returnUrl}
+            />
+          ) : (
+            <div>&nbsp;</div>
+          )}
+          <Button type="submit">{t('common.message.save')}</Button>
+        </FormFooter>
       </div>
-      <FormFooter className="sm:justify-between">
-        {task ? (
-          <TaskDeleteButton
-            task={task}
-            onSubmit={onSubmit}
-            returnUrl={returnUrl}
-          />
-        ) : (
-          <div>&nbsp;</div>
-        )}
-        <Button type="submit">{t('common.message.save')}</Button>
-      </FormFooter>
     </Form>
   )
 }
