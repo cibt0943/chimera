@@ -54,6 +54,7 @@ export class Auth0Strategy<U> extends Strategy<U, Auth0StrategyVerifyOptions> {
       const state = generateState()
       const url = this.client.createAuthorizationURL(
         state,
+        null,
         this.options.scopes ?? ['openid', 'profile', 'email'],
       )
 
