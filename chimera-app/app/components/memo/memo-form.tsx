@@ -104,69 +104,70 @@ export function MemoForm({
   return (
     <fetcher.Form
       method="post"
-      className="space-y-6"
       {...getFormProps(form)}
       action={action}
       onChange={handleChangeMemo}
       ref={formRef}
     >
-      <FormItem>
-        <FormDescription>
-          {t('memo.message.first_line_is_title')}
-        </FormDescription>
-        <TextareaConform
-          meta={fields.content}
-          key={fields.content.key}
-          className={cn(
-            'resize-none bg-[#303841] text-white focus-visible:ring-0',
-            className,
-          )}
-          {...otherProps}
-        />
-        <FormMessage message={fields.content.errors} />
-      </FormItem>
-      <FormItem>
-        <ClientOnly
-          fallback={
-            <DummyDateTimePicker
-              placeholder={t('memo.model.related_date')}
-              className="w-52"
-            />
-          }
-        >
-          {() => (
-            <DateTimePickerConform
-              dateMeta={fields.relatedDate}
-              allDayMeta={fields.relatedDateAllDay}
-              defaultAllDay={true}
-              includeAllDayComponent={true}
-              onChangeData={handleChangeMemo}
-              onChangeAllDay={handleChangeMemo}
-              placeholder={t('memo.model.related_date')}
-              className="w-52"
-            />
-          )}
-        </ClientOnly>
-        <FormMessage message={fields.relatedDate.errors} />
-      </FormItem>
-      {/* 戻り先を切り替えるための値 */}
-      <input type="hidden" name="returnUrl" value={returnUrl} />
-      <FormFooter className="sm:justify-between">
-        {memo ? (
-          <MemoActionButton
-            memo={memo}
-            deleteOnSubmit={onSubmit}
-            deleteReturnUrl={returnUrl}
+      <div className="space-y-6">
+        <FormItem>
+          <FormDescription>
+            {t('memo.message.first_line_is_title')}
+          </FormDescription>
+          <TextareaConform
+            meta={fields.content}
+            key={fields.content.key}
+            className={cn(
+              'resize-none bg-[#303841] text-white focus-visible:ring-0',
+              className,
+            )}
+            {...otherProps}
           />
-        ) : (
-          <div>&nbsp;</div>
-        )}
-        <SaveButton
-          isChangedMemo={isChangedMemo}
-          isSubmitting={fetcher.state === 'submitting'}
-          isAutoSave={isAutoSave}
-        />
-      </FormFooter>
+          <FormMessage message={fields.content.errors} />
+        </FormItem>
+        <FormItem>
+          <ClientOnly
+            fallback={
+              <DummyDateTimePicker
+                placeholder={t('memo.model.related_date')}
+                className="w-52"
+              />
+            }
+          >
+            {() => (
+              <DateTimePickerConform
+                dateMeta={fields.relatedDate}
+                allDayMeta={fields.relatedDateAllDay}
+                defaultAllDay={true}
+                includeAllDayComponent={true}
+                onChangeData={handleChangeMemo}
+                onChangeAllDay={handleChangeMemo}
+                placeholder={t('memo.model.related_date')}
+                className="w-52"
+              />
+            )}
+          </ClientOnly>
+          <FormMessage message={fields.relatedDate.errors} />
+        </FormItem>
+        {/* 戻り先を切り替えるための値 */}
+        <input type="hidden" name="returnUrl" value={returnUrl} />
+        <FormFooter className="sm:justify-between">
+          {memo ? (
+            <MemoActionButton
+              memo={memo}
+              deleteOnSubmit={onSubmit}
+              deleteReturnUrl={returnUrl}
+            />
+          ) : (
+            <div>&nbsp;</div>
+          )}
+          <SaveButton
+            isChangedMemo={isChangedMemo}
+            isSubmitting={fetcher.state === 'submitting'}
+            isAutoSave={isAutoSave}
+          />
+        </FormFooter>
+      </div>
     </fetcher.Form>
   )
 }

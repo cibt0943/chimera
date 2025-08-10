@@ -1,5 +1,5 @@
 import { useParams, Outlet, redirect } from 'react-router'
-import { parseWithZod } from '@conform-to/zod'
+import { parseWithZod } from '@conform-to/zod/v4'
 import { TODO_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getTasks, insertTask } from '~/models/task.server'

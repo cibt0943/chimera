@@ -16,9 +16,7 @@ export async function action({ params, request }: Route.ActionArgs) {
   const jsonData = await request.json()
 
   const scheme = zod.object({
-    status: zod
-      .preprocess((v) => Number(v), zod.nativeEnum(TaskStatus))
-      .optional(),
+    status: zod.preprocess((v) => Number(v), zod.enum(TaskStatus)).optional(),
     dueDate: zod.preprocess((v) => new Date(String(v)), zod.date()).optional(),
     dueDateAllDay: zod.preprocess((v) => v === 'on', zod.boolean()).optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
   })

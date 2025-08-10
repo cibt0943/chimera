@@ -17,7 +17,7 @@ export function AccounyDeleteButton({
       <Button
         type="button"
         variant="link"
-        className="mt-2 border-destructive/50 px-0 text-destructive sm:mt-0"
+        className="border-destructive/50 text-destructive mt-2 px-0 sm:mt-0"
       >
         {t('account.message.do_delete')}
       </Button>

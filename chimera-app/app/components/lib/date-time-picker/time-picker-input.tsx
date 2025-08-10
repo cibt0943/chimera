@@ -18,22 +18,28 @@ export interface TimePickerInputProps
   step?: number
 }
 
-export function TimePickerInput({
-  className,
-  type = 'tel',
-  value,
-  id,
-  name,
-  date = new Date(new Date().setHours(9, 0, 0, 0)),
-  setDate,
-  onChange,
-  onKeyDown,
-  picker,
-  onLeftFocus,
-  onRightFocus,
-  step = 1,
-  ...props
-}: TimePickerInputProps) {
+export const TimePickerInput = React.forwardRef<
+  HTMLInputElement,
+  TimePickerInputProps
+>(function TimePickerInput(
+  {
+    className,
+    type = 'tel',
+    value,
+    id,
+    name,
+    date = new Date(new Date().setHours(9, 0, 0, 0)),
+    setDate,
+    onChange,
+    onKeyDown,
+    picker,
+    onLeftFocus,
+    onRightFocus,
+    step = 1,
+    ...props
+  },
+  ref,
+) {
   const [flag, setFlag] = React.useState<boolean>(false)
 
   /**
@@ -78,6 +84,7 @@ export function TimePickerInput({
 
   return (
     <Input
+      ref={ref}
       id={id || picker}
       name={name || picker}
       className={cn(
@@ -98,4 +105,6 @@ export function TimePickerInput({
       {...props}
     />
   )
-}
+})
+
+TimePickerInput.displayName = 'TimePickerInput'

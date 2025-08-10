@@ -2,6 +2,7 @@ import * as React from 'react'
 import { toDate } from 'date-fns'
 import { FieldMetadata, useInputControl } from '@conform-to/react'
 import { DateTimePicker } from '~/components/lib/date-time-picker'
+import { Matcher } from 'react-day-picker'
 
 export interface DateTimePickerConformProps
   extends React.ComponentProps<'div'> {
@@ -12,6 +13,8 @@ export interface DateTimePickerConformProps
   onChangeData?: (date: Date | undefined) => void
   onChangeAllDay?: (isAllDay: boolean) => void
   placeholder?: string
+  disabled?: Matcher
+  dropdown?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
 }
 
 export function DateTimePickerConform(props: DateTimePickerConformProps) {
@@ -23,6 +26,8 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
     onChangeData,
     onChangeAllDay,
     placeholder,
+    disabled,
+    dropdown,
     ...divProps
   } = props
 
@@ -61,6 +66,8 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
       onChangeAllDay={handleChangeAllDay}
       triggerId={dateMeta.id}
       placeholder={placeholder}
+      disabled={disabled}
+      dropdown={dropdown}
       {...divProps}
     />
   )

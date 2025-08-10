@@ -1,5 +1,5 @@
 import { useForm } from '@conform-to/react'
-import { parseWithZod, getZodConstraint } from '@conform-to/zod'
+import { parseWithZod, getZodConstraint } from '@conform-to/zod/v4'
 import { Memo, MemoSchema, MemoSchemaType } from '~/types/memos'
 
 export interface useMemoConformProps {

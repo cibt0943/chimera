@@ -1,5 +1,5 @@
 import { redirect } from 'react-router'
-import { parseWithZod } from '@conform-to/zod'
+import { parseWithZod } from '@conform-to/zod/v4'
 import { MEMO_URL } from '~/constants'
 import { useMedia } from '~/lib/hooks'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'

@@ -107,12 +107,15 @@ export type AccountPassword = {
 
 export const AccountGeneralSchema = zod.object({
   name: zod
-    .string({ required_error: '必須項目です' })
+    .string({
+      error: (issue) =>
+        issue.input === undefined ? '必須項目です' : '入力値が不正です',
+    })
     .max(255, { message: '255文字以内で入力してください' }),
-  language: zod.nativeEnum(Language, {
+  language: zod.enum(Language, {
     message: '不正な値が選択されています。',
   }),
-  theme: zod.nativeEnum(Theme, {
+  theme: zod.enum(Theme, {
     message: '不正な値が選択されています。',
   }),
 })

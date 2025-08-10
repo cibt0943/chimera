@@ -21,7 +21,7 @@ export function TimePicker({
     <div
       className={cn(
         'flex items-center',
-        'gap-0.5 rounded-md border border-input bg-transparent p-px focus-within:outline-hidden focus-within:ring-1 focus-within:ring-ring',
+        'border-input focus-within:ring-ring gap-0.5 rounded-md border bg-transparent p-px focus-within:ring-1 focus-within:outline-hidden',
       )}
     >
       <div className="px-1">

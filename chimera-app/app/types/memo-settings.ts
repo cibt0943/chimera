@@ -45,7 +45,7 @@ export type UpdateParams = {
 
 const ListFilterSchema = zod.object({
   statuses: zod.array(
-    zod.nativeEnum(MemoStatus, {
+    zod.enum(MemoStatus, {
       message: '不正な値が選択されています。',
     }),
   ),

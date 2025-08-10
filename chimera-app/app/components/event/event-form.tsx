@@ -8,7 +8,7 @@ import {
   FieldMetadata,
   useInputControl,
 } from '@conform-to/react'
-import { parseWithZod, getZodConstraint } from '@conform-to/zod'
+import { parseWithZod, getZodConstraint } from '@conform-to/zod/v4'
 import { Matcher } from 'react-day-picker'
 import { Button } from '~/components/ui/button'
 import { Checkbox } from '~/components/ui/checkbox'
@@ -93,12 +93,7 @@ export function EventForm({ event, onSubmit, returnUrl }: EventFormProps) {
   const endDateDisabled = startDate ? { before: startDate } : undefined
 
   return (
-    <Form
-      method="post"
-      className="space-y-8"
-      {...getFormProps(form)}
-      action={action}
-    >
+    <Form method="post" {...getFormProps(form)} action={action}>
       <div className="max-h-[calc(100svh_-_240px)] space-y-8 overflow-y-auto p-0.5">
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
@@ -170,19 +165,19 @@ export function EventForm({ event, onSubmit, returnUrl }: EventFormProps) {
           <FormMessage message={fields.location.errors} />
         </FormItem>
         <input type="hidden" name="returnUrl" value={returnUrl} />
+        <FormFooter className="sm:justify-between">
+          {event?.id ? (
+            <EventDeleteButton
+              event={event}
+              onSubmit={onSubmit}
+              returnUrl={returnUrl}
+            />
+          ) : (
+            <div>&nbsp;</div>
+          )}
+          <Button type="submit">{t('common.message.save')}</Button>
+        </FormFooter>
       </div>
-      <FormFooter className="sm:justify-between">
-        {event?.id ? (
-          <EventDeleteButton
-            event={event}
-            onSubmit={onSubmit}
-            returnUrl={returnUrl}
-          />
-        ) : (
-          <div>&nbsp;</div>
-        )}
-        <Button type="submit">{t('common.message.save')}</Button>
-      </FormFooter>
     </Form>
   )
 }

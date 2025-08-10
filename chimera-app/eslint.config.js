@@ -1,18 +1,18 @@
+// eslint.config.js
 import globals from 'globals'
 import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import pluginReact from 'eslint-plugin-react'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
 import pluginJsxA11y from 'eslint-plugin-jsx-a11y'
-import configPrettier from 'eslint-config-prettier'
-// ES9に対応したらしいので有効にしたけどちゃんと動いてるか後で確認する
 import pluginImport from 'eslint-plugin-import'
+import configPrettier from 'eslint-config-prettier'
 
 /**
- * @type {import('eslint').Linter.Config}
+ * @type {import('eslint').Linter.FlatConfig[]}
  */
 export default tseslint.config(
-  // base
+  // ベース構成
   {
     ignores: ['build/', '.react-router', 'app/components/ui/'],
   },
@@ -20,6 +20,8 @@ export default tseslint.config(
   ...tseslint.configs.recommended, // @typescript-eslint/eslint-plugin を適用する
   pluginImport.flatConfigs.recommended,
   configPrettier, // eslint-config-prettier を適用する
+
+  // 共通設定（全ファイルに適用される）
   {
     languageOptions: {
       ecmaVersion: 'latest',
@@ -31,9 +33,14 @@ export default tseslint.config(
         ...globals.es6,
       },
     },
+    settings: {
+      'import/resolver': {
+        typescript: {}, // tsconfig.json に基づいてモジュール解決
+      },
+    },
   },
 
-  // custom rules
+  // カスタムルール
   {
     rules: {
       '@typescript-eslint/no-unused-expressions': [
@@ -45,7 +52,6 @@ export default tseslint.config(
           allowTernary: true,
         },
       ],
-
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
@@ -57,7 +63,7 @@ export default tseslint.config(
     },
   },
 
-  // React
+  // JSX/TSX ファイル用の React 設定（overrides 形式）
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     plugins: {
@@ -81,9 +87,6 @@ export default tseslint.config(
         { name: 'Link', linkAttribute: 'to' },
         { name: 'NavLink', linkAttribute: 'to' },
       ],
-      'import/resolver': {
-        typescript: {},
-      },
     },
   },
 )

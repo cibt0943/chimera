@@ -1,6 +1,6 @@
 import { Outlet, redirect } from 'react-router'
 import { startOfMonth, addMonths, subMonths } from 'date-fns'
-import { parseWithZod } from '@conform-to/zod'
+import { parseWithZod } from '@conform-to/zod/v4'
 import { EVENT_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getEvents, insertEvent } from '~/models/event.server'
