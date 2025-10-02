@@ -9,20 +9,20 @@ import {
 } from '~/components/ui/alert-dialog'
 
 interface ConfirmDialogProps {
-  isOpen?: boolean
-  onOpenChange?: (open: boolean) => void
   title: React.ReactNode | string
   description: React.ReactNode | string
+  isOpen?: boolean
+  onOpenChange?: (open: boolean) => void
   torigger?: React.ReactNode
   children?: React.ReactNode
 }
 
 export function ConfirmDialog({
   title,
-  torigger,
   description,
   isOpen,
   onOpenChange,
+  torigger,
   children,
 }: ConfirmDialogProps) {
   return (

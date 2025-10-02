@@ -40,7 +40,7 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
       <MemoForm
         memo={memo}
         isAutoSave={autoSave}
-        returnUrl={''}
+        redirectUrl={''}
         textareaProps={{
           className: 'h-[calc(100svh_-_216px)]',
         }}

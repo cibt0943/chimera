@@ -389,6 +389,7 @@ export function MemoList({
       </ScrollArea>
       <MemoDeleteConfirmDialog
         memo={actionMemo}
+        redirectUrl={MEMO_URL}
         isOpen={isOpenDeleteDialog}
         onOpenChange={setIsOpenDeleteDialog}
       />

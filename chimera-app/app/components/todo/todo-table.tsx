@@ -526,6 +526,7 @@ export function TodoTable({ originalTasks, showId }: TodoTableProps<Task>) {
       </div>
       <TaskDeleteConfirmDialogMemo
         task={actionTask}
+        redirectUrl={TODO_URL}
         isOpen={isOpenDeleteDialog}
         onOpenChange={setIsOpenDeleteDialog}
       />

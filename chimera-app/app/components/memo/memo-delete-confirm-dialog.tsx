@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form } from 'react-router'
+import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import {
   AlertDialogCancel,
@@ -7,27 +7,27 @@ import {
 } from '~/components/ui/alert-dialog'
 import { buttonVariants } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
+import { sleep } from '~/lib/utils'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
 import { Memo } from '~/types/memos'
 
 export interface MemoDeleteConfirmDialogProps {
   memo: Memo | undefined
+  redirectUrl: string
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
-  returnUrl?: string
   children?: React.ReactNode
 }
 
 export function MemoDeleteConfirmDialog({
   memo,
+  redirectUrl,
   isOpen,
   onOpenChange,
-  onSubmit,
-  returnUrl = MEMO_URL,
   children,
 }: MemoDeleteConfirmDialogProps) {
   const { t } = useTranslation()
+  const fetcher = useFetcher()
 
   if (!memo) return null
 
@@ -49,23 +49,14 @@ export function MemoDeleteConfirmDialog({
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       {/* レスポンシブ対応のためにFormでButtonを囲まない */}
       <AlertDialogAction
-        type="submit"
         className={buttonVariants({ variant: 'destructive' })}
-        form="delete-memo-form"
+        onClick={async () => {
+          await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
+          fetcher.submit({ redirectUrl }, { method: 'delete', action })
+        }}
       >
         {t('common.message.delete')}
       </AlertDialogAction>
-      <Form
-        id="delete-memo-form"
-        action={action}
-        method="delete"
-        onSubmit={(event) => {
-          event.stopPropagation() // これがないと「The submit event is dispatched by form#delete-event-form instead of 〜」というエラーが出る
-          onSubmit && onSubmit(event)
-        }}
-      >
-        <input type="hidden" name="returnUrl" value={returnUrl} />
-      </Form>
     </ConfirmDialog>
   )
 }

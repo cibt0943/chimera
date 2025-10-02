@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form } from 'react-router'
+import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import {
   AlertDialogCancel,
@@ -7,32 +7,32 @@ import {
 } from '~/components/ui/alert-dialog'
 import { buttonVariants } from '~/components/ui/button'
 import { TODO_URL } from '~/constants'
+import { sleep } from '~/lib/utils'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
 import { Task } from '~/types/tasks'
 
 export interface TaskDeleteConfirmDialogProps {
   task: Task | undefined
+  redirectUrl: string
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
-  returnUrl?: string
   children?: React.ReactNode
 }
 
 export function TaskDeleteConfirmDialog({
   task,
+  redirectUrl,
   isOpen,
   onOpenChange,
-  onSubmit,
-  returnUrl = TODO_URL,
   children,
 }: TaskDeleteConfirmDialogProps) {
   const { t } = useTranslation()
+  const fetcher = useFetcher()
 
   if (!task) return null
 
-  const action = `${TODO_URL}/${task.id}/delete`
   const desc = '「' + task.title + '」' + t('common.message.confirm_deletion')
+  const action = `${TODO_URL}/${task.id}/delete`
 
   return (
     <ConfirmDialog
@@ -44,24 +44,14 @@ export function TaskDeleteConfirmDialog({
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <AlertDialogAction
-        type="submit"
         className={buttonVariants({ variant: 'destructive' })}
-        form="delete-task-form"
+        onClick={async () => {
+          await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
+          fetcher.submit({ redirectUrl }, { method: 'delete', action })
+        }}
       >
         {t('common.message.delete')}
       </AlertDialogAction>
-      {/* レスポンシブ対応のためにFormでButtonを囲まない */}
-      <Form
-        id="delete-task-form"
-        action={action}
-        method="delete"
-        onSubmit={(event) => {
-          event.stopPropagation() // これがないと「The submit event is dispatched by form#delete-event-form instead of 〜」というエラーが出る
-          onSubmit && onSubmit(event)
-        }}
-      >
-        <input type="hidden" name="returnUrl" value={returnUrl} />
-      </Form>
     </ConfirmDialog>
   )
 }

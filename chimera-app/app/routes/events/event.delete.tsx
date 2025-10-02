@@ -15,6 +15,6 @@ export async function action({ params, request }: Route.ActionArgs) {
   await deleteEvent(event.id)
 
   const formData = await request.formData()
-  const returnUrl = formData.get('returnUrl') as string | null
-  return redirectWithInfo(returnUrl || EVENT_URL, 'event.message.deleted')
+  const redirectUrl = (formData.get('returnUrl') as string) || EVENT_URL
+  return redirectWithInfo(redirectUrl, 'event.message.deleted')
 }

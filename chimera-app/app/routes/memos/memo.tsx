@@ -11,8 +11,8 @@ import { MemoFormDialog } from '~/components/memo/memo-form-dialog'
 import type { Route } from './+types/memo'
 import { MemoSchema } from '~/types/memos'
 
-export function meta({ data }: Route.MetaArgs) {
-  return [{ title: 'Memo ' + data?.memo.id + ' | IMA' }]
+export function meta({ params }: Route.MetaArgs) {
+  return [{ title: 'Memo ' + params.memoId + ' | IMA' }]
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
@@ -41,7 +41,7 @@ export async function action({ params, request }: Route.ActionArgs) {
     related_date_all_day: !!data.relatedDateAllDay,
   })
 
-  const redirectUrl = formData.get('returnUrl') as string
+  const redirectUrl = formData.get('redirectUrl') as string
   return redirectUrl ? redirect(redirectUrl) : { updatedMemo }
 }
 
@@ -61,6 +61,7 @@ export default function Memo({ loaderData }: Route.ComponentProps) {
   const isLaptop = useMedia('(min-width: 1024px)', true)
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
   const navigate = useNavigate()
+  const redirectUrl = MEMO_URL
 
   if (isLaptop) {
     return <MemoFormView memo={memo} />
@@ -71,12 +72,12 @@ export default function Memo({ loaderData }: Route.ComponentProps) {
       memo={memo}
       isOpen={isOpenDialog}
       onOpenChange={async (open) => {
+        setIsOpenDialog(open)
         if (open) return
-        setIsOpenDialog(false)
         await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
-        navigate(MEMO_URL)
+        navigate(redirectUrl)
       }}
-      returnUrl={MEMO_URL}
+      redirectUrl={redirectUrl}
     />
   )
 }

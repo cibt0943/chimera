@@ -51,24 +51,19 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   const location = useLocation()
   const isLaptop = useMedia('(min-width: 1024px)')
   const callenderRef = React.useRef<FullCalendar>(null)
-  const returnUrl = EVENT_URL + location.search
+  const redirectUrl = EVENT_URL + location.search
 
   // 日付セット時の処理
   function handleDatesSet(arg: DatesSetArg) {
-    if (viewMode !== arg.view.type) {
-      setSearchParams((prev) => {
-        prev.set('view', arg.view.type)
-        return prev
-      })
-    }
-
     const startStr = format(arg.view.currentStart, 'yyyy-MM-dd')
-    if (startDate !== startStr) {
-      setSearchParams((prev) => {
-        prev.set('start', startStr)
-        return prev
-      })
-    }
+
+    if (viewMode === arg.view.type && startDate === startStr) return
+
+    setSearchParams((prev) => {
+      prev.set('view', arg.view.type)
+      prev.set('start', startStr)
+      return prev
+    })
   }
 
   // イベント編集
@@ -186,11 +181,11 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   const viewMode = isLaptop
     ? searchParams.get('view') || 'dayGridMonth'
     : 'listMonth'
-  const defaultStartDate = format(startOfMonth(new Date()), 'yyyy-MM-dd')
-  const startDate = searchParams.get('start') || defaultStartDate
   const headerToolbarRight = isLaptop
     ? 'dayGridMonth dayGridWeek listMonth'
     : ''
+  const defaultStartDate = format(startOfMonth(new Date()), 'yyyy-MM-dd')
+  const startDate = searchParams.get('start') || defaultStartDate
 
   React.useEffect(() => {
     // 以下のワーニングを回避するために非同期でviewModeを変更
@@ -241,8 +236,12 @@ export function Calendar({ defaultEvents }: CalendarProps) {
       <EventFormDialogMemo
         event={actionEvent}
         isOpen={isOpenAddDialog}
-        onOpenChange={setIsOpenAddDialog}
-        returnUrl={returnUrl}
+        onOpenChange={async (open) => {
+          setIsOpenAddDialog(open)
+          if (open) return
+          navigate(redirectUrl)
+        }}
+        redirectUrl={redirectUrl}
       />
     </div>
   )

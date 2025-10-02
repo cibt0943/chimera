@@ -2,15 +2,14 @@ import * as React from 'react'
 import { useLocation, redirect, useNavigate } from 'react-router'
 import { parseWithZod } from '@conform-to/zod/v4'
 import { EVENT_URL } from '~/constants'
-import { sleep } from '~/lib/utils'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getEvent, updateEvent } from '~/models/event.server'
 import { EventFormDialog } from '~/components/event/event-form-dialog'
 import type { Route } from './+types/event'
 import { EventSchema } from '~/types/events'
 
-export function meta({ data }: Route.MetaArgs) {
-  return [{ title: 'Event ' + data?.event.id + ' Edit | IMA' }]
+export function meta({ params }: Route.MetaArgs) {
+  return [{ title: 'Event ' + params.eventId + ' Edit | IMA' }]
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
@@ -46,12 +45,14 @@ export async function action({ params, request }: Route.ActionArgs) {
     location: data.location || '',
   })
 
-  const redirectUrl = (formData.get('returnUrl') as string) || EVENT_URL
+  const redirectUrl = (formData.get('redirectUrl') as string) || EVENT_URL
   return redirect(redirectUrl)
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
+
+  if (params.eventId === 'new') return { eventId: undefined }
 
   const event = await getEvent(params.eventId || '')
   if (event.accountId !== loginInfo.account.id) {
@@ -66,19 +67,18 @@ export default function Event({ loaderData }: Route.ComponentProps) {
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
   const location = useLocation()
   const navigate = useNavigate()
-  const returnUrl = EVENT_URL + location.search
+  const redirectUrl = EVENT_URL + location.search
 
   return (
     <EventFormDialog
       event={event}
       isOpen={isOpenDialog}
       onOpenChange={async (open) => {
+        setIsOpenDialog(open)
         if (open) return
-        setIsOpenDialog(false)
-        await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
-        navigate(returnUrl)
+        navigate(redirectUrl)
       }}
-      returnUrl={returnUrl}
+      redirectUrl={redirectUrl}
     />
   )
 }
