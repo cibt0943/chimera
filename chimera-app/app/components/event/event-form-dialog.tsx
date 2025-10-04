@@ -14,6 +14,7 @@ export interface EventFormDialogProps {
   redirectUrl: string
   isOpen: boolean
   onOpenChange: (open: boolean) => void
+  onSubmit?: () => void
 }
 
 export function EventFormDialog({
@@ -21,6 +22,7 @@ export function EventFormDialog({
   redirectUrl,
   isOpen,
   onOpenChange,
+  onSubmit,
 }: EventFormDialogProps) {
   const { t } = useTranslation()
 
@@ -37,7 +39,11 @@ export function EventFormDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{desc}</DialogDescription>
         </DialogHeader>
-        <EventForm event={event} redirectUrl={redirectUrl} />
+        <EventForm
+          event={event}
+          redirectUrl={redirectUrl}
+          onSubmit={onSubmit}
+        />
       </DialogContent>
     </Dialog>
   )

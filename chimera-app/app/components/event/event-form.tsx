@@ -29,9 +29,10 @@ import { Event, EventSchema, EventSchemaType } from '~/types/events'
 export interface EventFormProps {
   event: Event | undefined
   redirectUrl: string
+  onSubmit?: () => void
 }
 
-export function EventForm({ event, redirectUrl }: EventFormProps) {
+export function EventForm({ event, redirectUrl, onSubmit }: EventFormProps) {
   const { t } = useTranslation()
   const fetcher = useFetcher()
 
@@ -47,6 +48,7 @@ export function EventForm({ event, redirectUrl }: EventFormProps) {
       return parseWithZod(formData, { schema: EventSchema })
     },
     shouldRevalidate: 'onInput',
+    onSubmit: onSubmit,
   })
 
   const startDateControl = useInputControl(fields.startDate)

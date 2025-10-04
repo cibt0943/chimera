@@ -235,13 +235,14 @@ export function Calendar({ defaultEvents }: CalendarProps) {
       />
       <EventFormDialogMemo
         event={actionEvent}
+        redirectUrl={redirectUrl}
         isOpen={isOpenAddDialog}
         onOpenChange={async (open) => {
           setIsOpenAddDialog(open)
           if (open) return
           navigate(redirectUrl)
         }}
-        redirectUrl={redirectUrl}
+        onSubmit={() => setIsOpenAddDialog(false)} // 追加保存後にダイアログを閉じる
       />
     </div>
   )
