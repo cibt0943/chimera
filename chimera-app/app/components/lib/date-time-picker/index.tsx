@@ -21,7 +21,7 @@ export interface DatePickerProps extends React.ComponentProps<'div'> {
   onChangeDate: (date: Date | undefined) => void
   placeholder?: string
   disabled?: Matcher
-  dropdown?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
+  captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
 }
 
 export function DatePicker({
@@ -31,7 +31,7 @@ export function DatePicker({
   onChangeDate,
   placeholder,
   disabled,
-  dropdown,
+  captionLayout,
   ...divProps
 }: DatePickerProps) {
   return (
@@ -45,7 +45,7 @@ export function DatePicker({
       triggerId={triggerId}
       placeholder={placeholder}
       disabled={disabled}
-      dropdown={dropdown}
+      captionLayout={captionLayout}
       {...divProps}
     />
   )
@@ -69,29 +69,42 @@ export function DateTimePicker({
   onChangeAllDay = () => {},
   placeholder,
   disabled,
-  dropdown,
+  captionLayout = 'dropdown',
   ...divProps
 }: DateTimePickerProps) {
   const { i18n } = useTranslation()
   const locale = getLocale(i18n.language)
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
+  const [localDate, setLocalDate] = React.useState<Date | undefined>(
+    selectedDate,
+  )
+
+  React.useEffect(() => {
+    setLocalDate(selectedDate)
+  }, [selectedDate])
 
   const { className, ...otherDivProps } = divProps || {}
 
   const handleChangeDate = React.useCallback(
     (newDate: Date | undefined) => {
-      if (selectedDate !== newDate) onChangeDate(newDate)
+      if (selectedDate !== newDate) {
+        setLocalDate(newDate)
+        onChangeDate(newDate)
+      }
     },
     [selectedDate, onChangeDate],
   )
 
   const handleChangeAllDay = React.useCallback(
     (newAllDay: boolean) => {
-      if (allDay !== newAllDay) onChangeAllDay(newAllDay)
+      if (allDay !== newAllDay) {
+        onChangeAllDay(newAllDay)
+      }
 
       if (newAllDay && selectedDate) {
         const updatedDate = new Date(selectedDate)
         updatedDate.setHours(9, 0)
+        setLocalDate(updatedDate)
         onChangeDate(updatedDate)
       }
     },
@@ -112,7 +125,7 @@ export function DateTimePicker({
           >
             <LuCalendar className="text-muted-foreground" />
             <DispValue
-              date={selectedDate}
+              date={localDate}
               allDay={allDay}
               placeholder={placeholder}
             />
@@ -122,23 +135,23 @@ export function DateTimePicker({
           <Calendar
             mode="single"
             defaultMonth={defaultMonth}
-            captionLayout={dropdown}
+            captionLayout={captionLayout}
             locale={locale}
-            selected={selectedDate}
-            onSelect={(selectedDay: Date | undefined) => {
-              if (selectedDay) {
+            selected={localDate}
+            onSelect={(date: Date | undefined) => {
+              if (date) {
                 // 日付が変更されても時分は維持（デフォルトは9:00）
-                selectedDay.setHours(
+                date.setHours(
                   selectedDate?.getHours() || 9,
                   selectedDate?.getMinutes() || 0,
                 )
               }
-              handleChangeDate(selectedDay)
+              handleChangeDate(date)
             }}
             disabled={disabled}
           />
           <TimeControl
-            date={selectedDate}
+            date={localDate}
             allDay={allDay}
             includeAllDayComponent={includeAllDayComponent}
             onChangeDate={handleChangeDate}
@@ -146,7 +159,7 @@ export function DateTimePicker({
           />
         </PopoverContent>
       </Popover>
-      {selectedDate && (
+      {localDate && (
         <Button
           type="button"
           variant="ghost"

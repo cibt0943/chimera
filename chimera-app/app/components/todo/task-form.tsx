@@ -1,4 +1,4 @@
-import { Form } from 'react-router'
+import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod/v4'
@@ -28,36 +28,34 @@ import {
 
 export interface TaskFormProps {
   task: Task | undefined
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
-  returnUrl: string
+  redirectUrl: string
 }
 
-export function TaskForm({ task, onSubmit, returnUrl }: TaskFormProps) {
+export function TaskForm({ task, redirectUrl }: TaskFormProps) {
   const { t } = useTranslation()
+  const fetcher = useFetcher()
 
   const action = task ? `${TODO_URL}/${task.id}` : TODO_URL
   const formId = task ? `task-form-${task.id}` : 'task-form-new'
-  const defaultValue = task || {
-    title: '',
-    memo: '',
-    status: TaskStatus.NEW,
-    dueDate: null,
-    dueDateAllDay: false,
-  }
 
   const [form, fields] = useForm<TaskSchemaType>({
     id: formId,
-    defaultValue: defaultValue,
+    defaultValue: task || {
+      title: '',
+      memo: '',
+      status: TaskStatus.NEW,
+      dueDate: null,
+      dueDateAllDay: false,
+    },
     constraint: getZodConstraint(TaskSchema),
     onValidate: ({ formData }) => {
       return parseWithZod(formData, { schema: TaskSchema })
     },
     shouldRevalidate: 'onInput',
-    onSubmit: onSubmit,
   })
 
   return (
-    <Form method="post" {...getFormProps(form)} action={action}>
+    <fetcher.Form method="post" {...getFormProps(form)} action={action}>
       <div className="max-h-[calc(100svh_-_240px)] space-y-8 overflow-y-auto p-0.5">
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
@@ -104,21 +102,17 @@ export function TaskForm({ task, onSubmit, returnUrl }: TaskFormProps) {
           </FormDescription>
           <FormMessage message={fields.status.errors} />
         </FormItem>
-        <input type="hidden" name="returnUrl" value={returnUrl} />
+        <input type="hidden" name="redirectUrl" value={redirectUrl} />
         <FormFooter className="sm:justify-between">
-          {task ? (
-            <TaskDeleteButton
-              task={task}
-              onSubmit={onSubmit}
-              returnUrl={returnUrl}
-            />
-          ) : (
-            <div>&nbsp;</div>
-          )}
-          <Button type="submit">{t('common.message.save')}</Button>
+          <div>
+            {task && <TaskDeleteButton task={task} redirectUrl={redirectUrl} />}
+          </div>
+          <Button type="submit" disabled={fetcher.state !== 'idle'}>
+            {t('common.message.save')}
+          </Button>
         </FormFooter>
       </div>
-    </Form>
+    </fetcher.Form>
   )
 }
 

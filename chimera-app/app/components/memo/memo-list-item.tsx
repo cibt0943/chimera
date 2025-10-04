@@ -88,12 +88,10 @@ export function ListItem(props: ListItemProps) {
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' && !e.altKey) {
-          navigate(to, { replace: true })
+          navigate(to)
         }
       }}
-      onClick={() => {
-        navigate(to, { replace: true })
-      }}
+      onClick={() => navigate(to)}
     >
       <div className="flex items-center">
         <div className="line-clamp-1">{title}</div>

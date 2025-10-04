@@ -83,7 +83,8 @@ export class Auth0Strategy<U> extends Strategy<U, Auth0StrategyVerifyOptions> {
     if (!code) throw new ReferenceError('Missing code in the URL')
 
     const cookie = new Cookie(request.headers.get('cookie') ?? '')
-    const params = new URLSearchParams(cookie.get(this.cookieName))
+    const raw = cookie.get(this.cookieName) ?? ''
+    const params = new URLSearchParams(raw)
 
     if (!params.has('state')) {
       throw new ReferenceError('Missing state on cookie.')
@@ -93,7 +94,11 @@ export class Auth0Strategy<U> extends Strategy<U, Auth0StrategyVerifyOptions> {
       throw new RangeError("State in URL doesn't match state in cookie.")
     }
 
-    const tokens = await this.client.validateAuthorizationCode(code)
+    // Arctic's Auth0 client requires a code verifier when exchanging the
+    // authorization code if PKCE was used. We stored only the `state` in the
+    // cookie here, so we can't provide a verifier — pass `null` to match the
+    // library signature which accepts `string | null`.
+    const tokens = await this.client.validateAuthorizationCode(code, null)
     return await this.verify({ request, tokens })
   }
 

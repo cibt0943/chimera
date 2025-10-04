@@ -6,25 +6,19 @@ import { EventDeleteConfirmDialog } from './event-delete-confirm-dialog'
 
 export interface EventDeleteButtonProps {
   event: Event | undefined
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
-  returnUrl?: string
+  redirectUrl: string
 }
 
 export function EventDeleteButton({
   event,
-  onSubmit,
-  returnUrl,
+  redirectUrl,
 }: EventDeleteButtonProps) {
   const { t } = useTranslation()
 
   if (!event) return null
 
   return (
-    <EventDeleteConfirmDialog
-      event={event}
-      onSubmit={onSubmit}
-      returnUrl={returnUrl}
-    >
+    <EventDeleteConfirmDialog event={event} redirectUrl={redirectUrl}>
       <Button type="button" variant="link" className="text-destructive px-0">
         <LuTrash2 />
         {t('common.message.delete')}

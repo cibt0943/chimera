@@ -9,9 +9,9 @@ import { TaskFormDialog } from '~/components/todo/task-form-dialog'
 import type { Route } from './+types/todo'
 import { TaskSchema } from '~/types/tasks'
 
-export function meta({ data }: Route.MetaArgs) {
-  return data.task
-    ? [{ title: 'Todo ' + data.task?.id + ' Edit | IMA' }]
+export function meta({ loaderData }: Route.MetaArgs) {
+  return loaderData?.task
+    ? [{ title: 'Todo ' + loaderData?.task.id + ' Edit | IMA' }]
     : [{ title: 'Todo Add | IMA' }]
 }
 
@@ -41,7 +41,7 @@ export async function action({ params, request }: Route.ActionArgs) {
     due_date_all_day: !!data.dueDateAllDay,
   })
 
-  const redirectUrl = (formData.get('returnUrl') as string) || TODO_URL
+  const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
   return redirect(redirectUrl)
 }
 
@@ -62,17 +62,19 @@ export default function Todo({ loaderData }: Route.ComponentProps) {
   const { task } = loaderData
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
   const navigate = useNavigate()
+  const redirectUrl = TODO_URL
 
   return (
     <TaskFormDialog
       task={task}
       isOpen={isOpenDialog}
       onOpenChange={async (open) => {
+        setIsOpenDialog(open)
         if (open) return
-        setIsOpenDialog(false)
         await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
-        navigate(TODO_URL)
+        navigate(redirectUrl)
       }}
+      redirectUrl={redirectUrl}
     />
   )
 }

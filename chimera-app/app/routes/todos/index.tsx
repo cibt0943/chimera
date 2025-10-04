@@ -32,7 +32,8 @@ export async function action({ request }: Route.ActionArgs) {
     due_date_all_day: !!data.dueDateAllDay,
   })
 
-  return redirect(TODO_URL)
+  const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
+  return redirect(redirectUrl)
 }
 
 export async function loader({ request }: Route.LoaderArgs) {

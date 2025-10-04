@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form } from 'react-router'
+import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { toDate } from 'date-fns'
 import {
@@ -28,17 +28,13 @@ import { Event, EventSchema, EventSchemaType } from '~/types/events'
 
 export interface EventFormProps {
   event: Event | undefined
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
-  returnUrl: string
+  redirectUrl: string
+  onSubmit?: () => void
 }
 
-export function EventForm({ event, onSubmit, returnUrl }: EventFormProps) {
+export function EventForm({ event, redirectUrl, onSubmit }: EventFormProps) {
   const { t } = useTranslation()
-
-  // 新規作成時であってもeventに初期値を埋めて送られてくるため、idがあるかどうかで判定
-  function isNew(event: Event | undefined): event is undefined {
-    return !event?.id
-  }
+  const fetcher = useFetcher()
 
   const action = isNew(event) ? EVENT_URL : `${EVENT_URL}/${event.id}`
   const formId = isNew(event) ? 'event-form-new' : `event-form-${event.id}`
@@ -93,7 +89,7 @@ export function EventForm({ event, onSubmit, returnUrl }: EventFormProps) {
   const endDateDisabled = startDate ? { before: startDate } : undefined
 
   return (
-    <Form method="post" {...getFormProps(form)} action={action}>
+    <fetcher.Form method="post" {...getFormProps(form)} action={action}>
       <div className="max-h-[calc(100svh_-_240px)] space-y-8 overflow-y-auto p-0.5">
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
@@ -164,21 +160,19 @@ export function EventForm({ event, onSubmit, returnUrl }: EventFormProps) {
           <InputConform meta={fields.location} type="text" />
           <FormMessage message={fields.location.errors} />
         </FormItem>
-        <input type="hidden" name="returnUrl" value={returnUrl} />
+        <input type="hidden" name="redirectUrl" value={redirectUrl} />
         <FormFooter className="sm:justify-between">
-          {event?.id ? (
-            <EventDeleteButton
-              event={event}
-              onSubmit={onSubmit}
-              returnUrl={returnUrl}
-            />
-          ) : (
-            <div>&nbsp;</div>
-          )}
-          <Button type="submit">{t('common.message.save')}</Button>
+          <div>
+            {event?.id && (
+              <EventDeleteButton event={event} redirectUrl={redirectUrl} />
+            )}
+          </div>
+          <Button type="submit" disabled={fetcher.state !== 'idle'}>
+            {t('common.message.save')}
+          </Button>
         </FormFooter>
       </div>
-    </Form>
+    </fetcher.Form>
   )
 }
 
@@ -222,4 +216,9 @@ function DateTimePickerField({
       <FormMessage message={fieldMeta.errors} />
     </FormItem>
   )
+}
+
+// 新規作成時であってもeventに初期値を埋めて送られてくるため、idがあるかどうかで判定
+function isNew(event: Event | undefined): event is undefined {
+  return !event?.id
 }

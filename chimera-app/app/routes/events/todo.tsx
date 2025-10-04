@@ -1,14 +1,13 @@
 import * as React from 'react'
 import { useNavigate, useLocation } from 'react-router'
 import { EVENT_URL } from '~/constants'
-import { sleep } from '~/lib/utils'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getTask } from '~/models/task.server'
 import { TaskFormDialog } from '~/components/todo/task-form-dialog'
 import type { Route } from './+types/todo'
 
-export function meta({ data }: Route.MetaArgs) {
-  return [{ title: 'Todo ' + data?.task.id + ' Edit | IMA' }]
+export function meta({ params }: Route.MetaArgs) {
+  return [{ title: 'Todo ' + params.todoId + ' Edit | IMA' }]
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
@@ -27,19 +26,18 @@ export default function Todo({ loaderData }: Route.ComponentProps) {
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
   const location = useLocation()
   const navigate = useNavigate()
-  const returnUrl = EVENT_URL + location.search
+  const redirectUrl = EVENT_URL + location.search
 
   return (
     <TaskFormDialog
       task={task}
       isOpen={isOpenDialog}
       onOpenChange={async (open) => {
+        setIsOpenDialog(open)
         if (open) return
-        setIsOpenDialog(false)
-        await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
-        navigate(returnUrl)
+        navigate(redirectUrl)
       }}
-      returnUrl={returnUrl}
+      redirectUrl={redirectUrl}
     />
   )
 }

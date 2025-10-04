@@ -6,25 +6,16 @@ import { TaskDeleteConfirmDialog } from './task-delete-confirm-dialog'
 
 export interface TaskDeleteButtonProps {
   task: Task | undefined
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
-  returnUrl?: string
+  redirectUrl: string
 }
 
-export function TaskDeleteButton({
-  task,
-  onSubmit,
-  returnUrl,
-}: TaskDeleteButtonProps) {
+export function TaskDeleteButton({ task, redirectUrl }: TaskDeleteButtonProps) {
   const { t } = useTranslation()
 
   if (!task) return null
 
   return (
-    <TaskDeleteConfirmDialog
-      task={task}
-      onSubmit={onSubmit}
-      returnUrl={returnUrl}
-    >
+    <TaskDeleteConfirmDialog task={task} redirectUrl={redirectUrl}>
       <Button type="button" variant="link" className="text-destructive px-0">
         <LuTrash2 />
         {t('common.message.delete')}

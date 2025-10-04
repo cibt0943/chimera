@@ -6,22 +6,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog'
-import { EVENT_URL } from '~/constants'
 import { Event } from '~/types/events'
 import { EventForm } from './event-form'
 
 export interface EventFormDialogProps {
   event: Event | undefined
+  redirectUrl: string
   isOpen: boolean
   onOpenChange: (open: boolean) => void
-  returnUrl?: string
+  onSubmit?: () => void
 }
 
 export function EventFormDialog({
   event,
+  redirectUrl,
   isOpen,
   onOpenChange,
-  returnUrl = EVENT_URL,
+  onSubmit,
 }: EventFormDialogProps) {
   const { t } = useTranslation()
 
@@ -33,15 +34,15 @@ export function EventFormDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[490px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{desc}</DialogDescription>
         </DialogHeader>
         <EventForm
           event={event}
-          // onSubmit={() => onOpenChange(false)}
-          returnUrl={returnUrl}
+          redirectUrl={redirectUrl}
+          onSubmit={onSubmit}
         />
       </DialogContent>
     </Dialog>

@@ -25,16 +25,14 @@ import { useUserAgentAtom } from '~/lib/global-state'
 export interface MemoFormProps {
   memo: Memo | undefined
   isAutoSave: boolean
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
-  returnUrl: string
+  redirectUrl: string
   textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>
 }
 
 export function MemoForm({
   memo,
   isAutoSave,
-  onSubmit,
-  returnUrl,
+  redirectUrl,
   textareaProps = {},
 }: MemoFormProps) {
   const { t } = useTranslation()
@@ -70,7 +68,7 @@ export function MemoForm({
     enqueue(() => saveMemoApi())
   }, 1000)
 
-  // メモ情報が更新されていた保存する
+  // メモ情報が更新されていたら保存する
   function handleChangeMemo() {
     setIsChangedMemo(true)
     isAutoSave && saveMemoDebounce()
@@ -92,10 +90,7 @@ export function MemoForm({
     },
   )
 
-  const { form, fields } = useMemoConform({
-    memo,
-    onSubmit,
-  })
+  const { form, fields } = useMemoConform({ memo })
 
   const action = memo ? `${MEMO_URL}/${memo.id}` : MEMO_URL
 
@@ -108,6 +103,9 @@ export function MemoForm({
       action={action}
       onChange={handleChangeMemo}
       ref={formRef}
+      onSubmit={() => {
+        setIsChangedMemo(false)
+      }}
     >
       <div className="space-y-6">
         <FormItem>
@@ -150,14 +148,10 @@ export function MemoForm({
           <FormMessage message={fields.relatedDate.errors} />
         </FormItem>
         {/* 戻り先を切り替えるための値 */}
-        <input type="hidden" name="returnUrl" value={returnUrl} />
+        <input type="hidden" name="redirectUrl" value={redirectUrl} />
         <FormFooter className="sm:justify-between">
           {memo ? (
-            <MemoActionButton
-              memo={memo}
-              deleteOnSubmit={onSubmit}
-              deleteReturnUrl={returnUrl}
-            />
+            <MemoActionButton memo={memo} redirectUrl={redirectUrl} />
           ) : (
             <div>&nbsp;</div>
           )}

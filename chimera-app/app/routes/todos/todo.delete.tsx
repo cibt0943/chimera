@@ -15,6 +15,6 @@ export async function action({ params, request }: Route.ActionArgs) {
   await deleteTask(task.id)
 
   const formData = await request.formData()
-  const returnUrl = formData.get('returnUrl') as string | undefined
-  return redirectWithInfo(returnUrl || TODO_URL, 'task.message.deleted')
+  const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
+  return redirectWithInfo(redirectUrl, 'task.message.deleted')
 }
