@@ -12,7 +12,7 @@ export interface DatePickerConformProps extends React.ComponentProps<'div'> {
   captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
 }
 
-export function DateTimePickerConform(props: DatePickerConformProps) {
+export function DatePickerConform(props: DatePickerConformProps) {
   const {
     dateMeta,
     onChangeData,
@@ -22,12 +22,25 @@ export function DateTimePickerConform(props: DatePickerConformProps) {
     ...divProps
   } = props
 
-  const dateValue = dateMeta.value ? toDate(dateMeta.value) : undefined
+  const dateValue = React.useMemo(
+    () => (dateMeta.value ? toDate(dateMeta.value) : undefined),
+    [dateMeta.value],
+  )
+
   const dateControl = useInputControl(dateMeta)
+
+  const [internalDate, setInternalDate] = React.useState<Date | undefined>(
+    dateValue,
+  )
+
+  React.useEffect(() => {
+    setInternalDate(dateValue)
+  }, [dateValue])
 
   // 選択された日時が変更されたときに呼ばれるコールバック
   const handleChangeDate = React.useCallback(
     (date: Date | undefined) => {
+      setInternalDate(date)
       dateControl.change(date?.toISOString() || '')
       onChangeData && onChangeData(date)
     },
@@ -36,8 +49,8 @@ export function DateTimePickerConform(props: DatePickerConformProps) {
 
   return (
     <DatePicker
-      selectedDate={dateValue}
-      defaultMonth={dateValue}
+      selectedDate={internalDate}
+      defaultMonth={internalDate}
       onChangeDate={handleChangeDate}
       triggerId={dateMeta.id}
       placeholder={placeholder}

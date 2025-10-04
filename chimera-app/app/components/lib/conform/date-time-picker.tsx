@@ -31,22 +31,32 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
     ...divProps
   } = props
 
-  const dateValue = dateMeta.value ? toDate(dateMeta.value) : undefined
+  const dateValue = React.useMemo(
+    () => (dateMeta.value ? toDate(dateMeta.value) : undefined),
+    [dateMeta.value],
+  )
   const allDayValue = allDayMeta.value === 'on'
 
   const dateControl = useInputControl(dateMeta)
   const allDayControl = useInputControl(allDayMeta)
 
-  // 選択された日時が変更されたときに呼ばれるコールバック
+  const [internalDate, setInternalDate] = React.useState<Date | undefined>(
+    dateValue,
+  )
+
+  React.useEffect(() => {
+    setInternalDate(dateValue)
+  }, [dateValue])
+
   const handleChangeDate = React.useCallback(
     (date: Date | undefined) => {
+      setInternalDate(date)
       dateControl.change(date?.toISOString() || '')
       onChangeData && onChangeData(date)
     },
     [dateControl, onChangeData],
   )
 
-  // 終日か否かが変更されたときに呼ばれるコールバック
   const handleChangeAllDay = React.useCallback(
     (isAllDay: boolean) => {
       allDayControl.change(isAllDay ? 'on' : '')
@@ -57,8 +67,8 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
 
   return (
     <DateTimePicker
-      selectedDate={dateValue}
-      defaultMonth={dateValue}
+      selectedDate={internalDate}
+      defaultMonth={internalDate}
       allDay={allDayValue}
       defaultAllDay={defaultAllDay}
       includeAllDayComponent={includeAllDayComponent}
