@@ -9,7 +9,7 @@ export interface DatePickerConformProps extends React.ComponentProps<'div'> {
   onChangeData?: (date: Date | undefined) => void
   placeholder?: string
   disabled?: Matcher
-  dropdown?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
+  captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
 }
 
 export function DateTimePickerConform(props: DatePickerConformProps) {
@@ -18,7 +18,7 @@ export function DateTimePickerConform(props: DatePickerConformProps) {
     onChangeData,
     placeholder,
     disabled,
-    dropdown,
+    captionLayout,
     ...divProps
   } = props
 
@@ -42,7 +42,7 @@ export function DateTimePickerConform(props: DatePickerConformProps) {
       triggerId={dateMeta.id}
       placeholder={placeholder}
       disabled={disabled}
-      dropdown={dropdown}
+      captionLayout={captionLayout}
       {...divProps}
     />
   )

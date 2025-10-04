@@ -14,7 +14,7 @@ export interface DateTimePickerConformProps
   onChangeAllDay?: (isAllDay: boolean) => void
   placeholder?: string
   disabled?: Matcher
-  dropdown?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
+  captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
 }
 
 export function DateTimePickerConform(props: DateTimePickerConformProps) {
@@ -27,7 +27,7 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
     onChangeAllDay,
     placeholder,
     disabled,
-    dropdown,
+    captionLayout,
     ...divProps
   } = props
 
@@ -67,7 +67,7 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
       triggerId={dateMeta.id}
       placeholder={placeholder}
       disabled={disabled}
-      dropdown={dropdown}
+      captionLayout={captionLayout}
       {...divProps}
     />
   )
