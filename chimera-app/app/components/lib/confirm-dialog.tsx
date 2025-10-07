@@ -13,7 +13,7 @@ interface ConfirmDialogProps {
   description: React.ReactNode | string
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void
-  torigger?: React.ReactNode
+  trigger?: React.ReactNode
   children?: React.ReactNode
 }
 
@@ -22,12 +22,12 @@ export function ConfirmDialog({
   description,
   isOpen,
   onOpenChange,
-  torigger,
+  trigger,
   children,
 }: ConfirmDialogProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogTrigger asChild>{torigger}</AlertDialogTrigger>
+      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>

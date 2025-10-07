@@ -29,7 +29,7 @@ export function AccountDeleteConfirmDialog({
     <ConfirmDialog
       title={t('account.message.account_deletion')}
       description={desc}
-      torigger={children}
+      trigger={children}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <AlertDialogAction

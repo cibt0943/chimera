@@ -40,7 +40,7 @@ export function TaskDeleteConfirmDialog({
       description={desc}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      torigger={children}
+      trigger={children}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <AlertDialogAction
