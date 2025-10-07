@@ -49,7 +49,7 @@ export async function action({ request }: Route.ActionArgs) {
     location: data.location || '',
   })
 
-  const redirectUrl = (formData.get('returnUrl') as string) || EVENT_URL
+  const redirectUrl = (formData.get('redirectUrl') as string) || EVENT_URL
   return redirect(redirectUrl)
 }
 
