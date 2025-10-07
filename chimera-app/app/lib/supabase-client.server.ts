@@ -4,7 +4,7 @@ import type { Database } from '~/types/schema'
 // Create a single supabase client for interacting with your database
 export const supabase = createClient<Database>(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!,
+  process.env.SUPABASE_PUBLISHABLE_KEY!,
   {
     global: {
       fetch: (...args) => fetch(...args),
