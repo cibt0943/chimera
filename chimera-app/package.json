@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
-    "dev": "cross-env NODE_ENV=development node ./server.js",
+    "start:local": "cross-env NODE_ENV=development node --env-file-if-exists=.env.local ./server.js",
+    "start:dev": "cross-env NODE_ENV=development node --env-file-if-exists=.env.development ./server.js",
+    "start": "cross-env NODE_ENV=production node ./server.js",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "eslint-inspector": "npx @eslint/config-inspector@latest --host 0.0.0.0",
-    "start": "cross-env NODE_ENV=production node ./server.js",
     "typecheck": "react-router typegen && tsc",
     "format": "prettier --write .",
     "style": "stylelint --fix '**/*.{css,scss,sass}'",

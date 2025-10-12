@@ -12,6 +12,13 @@ const app = express()
 app.use(compression())
 app.disable('x-powered-by')
 
+// Chrome DevTools（または React DevTools）による自動アクセスが原因で
+// 以下のようなエラーが発生するので、.well-known へのアクセスを204で応答して無視する。
+// Error: No route matches URL "/.well-known/appspecific/com.chrome.devtools.json"。
+app.use('/.well-known', (req, res) => {
+  res.status(204).end()
+})
+
 if (DEVELOPMENT) {
   console.log('Starting development server')
   const viteDevServer = await import('vite').then((vite) =>
