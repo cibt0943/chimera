@@ -7,6 +7,7 @@ import { TaskStatus } from '~/types/tasks'
 export type ViewTodoModel = Database['public']['Views']['view_todos']['Row']
 
 export type ViewTodo = {
+  id: string // Alias for todoId for backward compatibility
   todoId: string
   createdAt: Date
   updatedAt: Date
@@ -24,14 +25,16 @@ export type ViewTodo = {
 export type ViewTodos = ViewTodo[]
 
 export function ViewTodoModel2ViewTodo(viewTodoModel: ViewTodoModel): ViewTodo {
+  const todoId = viewTodoModel.todo_id || ''
   return {
-    todoId: viewTodoModel.todo_id || '',
+    id: todoId, // Alias for todoId for backward compatibility
+    todoId,
     createdAt: toDate(viewTodoModel.created_at),
     updatedAt: toDate(viewTodoModel.updated_at),
     accountId: viewTodoModel.account_id,
     type: viewTodoModel.type as TodoType,
     position: viewTodoModel.position,
-    title: viewTodoModel.title,
+    title: viewTodoModel.title || '',
     status: viewTodoModel.status as TaskStatus,
     memo: viewTodoModel.memo,
     dueDate: viewTodoModel.due_date ? toDate(viewTodoModel.due_date) : null,

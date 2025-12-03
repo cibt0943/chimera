@@ -10,9 +10,10 @@ import { TODO_URL } from '~/constants'
 import { sleep } from '~/lib/utils'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
 import { ViewTodo } from '~/types/view-todos'
+import { Task } from '~/types/tasks'
 
 export interface TodoDeleteConfirmDialogProps {
-  viewTodo: ViewTodo | undefined
+  viewTodo: ViewTodo | Task | undefined
   redirectUrl: string
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void

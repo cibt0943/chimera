@@ -1,14 +1,58 @@
 import { format } from 'date-fns'
 import {
   Task,
-  TaskModel,
+  Tasks,
   InsertTaskModel,
   UpdateTaskModel,
-  mergeTaskModel,
+  ViewTodo2Task,
 } from '~/types/tasks'
 import { TodoType } from '~/types/todos'
+import { ViewTodoModel } from '~/types/view-todos'
 import { supabase } from '~/lib/supabase-client.server'
-import { addTodo } from '~/models/todo.server'
+import { addTodo, getTodo, updateTodoPosition } from '~/models/todo.server'
+
+// タスクの取得
+export async function getTask(todoId: string): Promise<Task> {
+  const viewTodo = await getTodo(todoId)
+  return ViewTodo2Task(viewTodo)
+}
+
+interface GetTasksOptionParams {
+  dueDateStart?: Date
+  dueDateEnd?: Date
+}
+
+// タスク一覧を取得
+export async function getTasks(
+  accountId: string,
+  options?: GetTasksOptionParams,
+): Promise<Tasks> {
+  const { dueDateStart, dueDateEnd } = options || {}
+
+  let query = supabase
+    .from('view_todos')
+    .select()
+    .eq('account_id', accountId)
+    .eq('type', TodoType.TASK)
+    .order('position', { ascending: false })
+
+  if (dueDateStart) {
+    query = query.gt('due_date', format(dueDateStart, 'yyyy-MM-dd'))
+  }
+
+  if (dueDateEnd) {
+    query = query.lt('due_date', format(dueDateEnd, 'yyyy-MM-dd'))
+  }
+
+  const { data, error } = await query
+  if (error) throw error
+
+  const viewTodos = data.map((viewTodo) => {
+    return ViewTodo2Task(viewTodo as ViewTodoModel)
+  })
+
+  return viewTodos
+}
 
 // タスクの追加
 export async function addTask(task: InsertTaskModel): Promise<Task> {
@@ -17,16 +61,20 @@ export async function addTask(task: InsertTaskModel): Promise<Task> {
     type: TodoType.TASK,
   })
 
-  // タスクの表示位置を計算
+  // タスクの追加
   const { data: newTask, error: errorNewTask } = await supabase
     .from('tasks')
-    .insert({ ...task })
+    .insert({ ...task, todo_id: newTodo.id })
     .select()
     .single()
-  if (errorNewTask || !newTask) throw errorNewTask || new Error('erorr')
+  if (errorNewTask || !newTask) throw errorNewTask || new Error('error')
 
-  return mergeTaskModel(newTodo, newTask)
+  // 追加されたタスクを取得して返す
+  return await getTask(newTodo.id)
 }
+
+// 後方互換性のためのエイリアス
+export const insertTask = addTask
 
 // タスクの更新
 export async function updateTask(
@@ -41,15 +89,32 @@ export async function updateTask(
     .eq('id', task.id)
     .select()
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('error')
 
-  return mergeTaskModel(task, data)
+  // 更新されたタスクをview_todosから取得して返す
+  return await getTask(data.todo_id)
 }
 
 // タスクの削除
 export async function deleteTask(taskId: string): Promise<void> {
+  // まずtodo_idを取得
+  const { data: taskData, error: taskError } = await supabase
+    .from('tasks')
+    .select('todo_id')
+    .eq('id', taskId)
+    .single()
+  if (taskError) throw taskError
+
+  // タスクを削除
   const { error } = await supabase.from('tasks').delete().eq('id', taskId)
   if (error) throw error
+
+  // 対応するtodoも削除
+  const { error: todoError } = await supabase
+    .from('todos')
+    .delete()
+    .eq('id', taskData.todo_id)
+  if (todoError) throw todoError
 }
 
 // タスクの位置を変更
@@ -61,34 +126,8 @@ export async function updateTaskPosition(
 ): Promise<Task> {
   const fromTask = await getTask(taskId)
 
-  const isUp = fromTask.position < position
-  const [fromOperator, toOperator] = isUp ? ['gt', 'lte'] : ['lt', 'gte']
+  // todosテーブルのpositionを更新
+  await updateTodoPosition(fromTask.todoId, position)
 
-  const { data: tasksToUpdate, error: errorTasksToUpdate } = await supabase
-    .from('tasks')
-    .select()
-    .filter('position', fromOperator, fromTask.position)
-    .filter('position', toOperator, position)
-    .order('position')
-  if (errorTasksToUpdate) throw errorTasksToUpdate
-
-  // 間のタスクの位置を変更
-  await updateTasksPosition(tasksToUpdate, isUp)
-  // 移動するタスクの位置を変更
-  return await updateTask({
-    id: fromTask.id,
-    position,
-  })
-}
-
-async function updateTasksPosition(tasksToUpdate: TaskModel[], isUp: boolean) {
-  const updatedTasks = tasksToUpdate.map((task) => ({
-    ...task,
-    position: isUp ? task.position - 1 : task.position + 1,
-  }))
-
-  const { error } = await supabase
-    .from('tasks')
-    .upsert(updatedTasks, { onConflict: 'id' })
-  if (error) throw error
+  return await getTask(taskId)
 }

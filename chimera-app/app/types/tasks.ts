@@ -1,7 +1,6 @@
-import { toDate } from 'date-fns'
 import * as zod from 'zod'
 import type { Database } from '~/types/schema'
-import type { Todo } from '~/types/todos'
+import type { ViewTodo } from '~/types/view-todos'
 
 export const TaskStatus = {
   NEW: 0,
@@ -46,7 +45,10 @@ export const TaskStatusListByDispOrder = TaskStatusList.slice().sort(
 
 // DBのタスクテーブルの型
 export type TaskModel = Database['public']['Tables']['tasks']['Row']
-export type InsertTaskModel = Database['public']['Tables']['tasks']['Insert']
+export type InsertTaskModel = Omit<
+  Database['public']['Tables']['tasks']['Insert'],
+  'todo_id'
+> // todo_idは自動生成されるため除外
 export type UpdateTaskModel =
   Database['public']['Tables']['tasks']['Update'] & { id: string } // idを必須で上書き
 
@@ -67,22 +69,22 @@ export type Task = {
 export type Tasks = Task[]
 
 /**
- * DBから取得した taskModel と todoModel を統合して
+ * DBのview_todosから取得した ViewTodo を
  * アプリケーションで扱う Task 型に変換する
  */
-export function mergeTaskModel(todo: Todo, taskModel: TaskModel): Task {
+export function ViewTodo2Task(viewTodo: ViewTodo): Task {
   return {
-    todoId: todo.id,
-    position: todo.position,
-    id: taskModel.id,
-    createdAt: toDate(taskModel.created_at),
-    updatedAt: toDate(taskModel.updated_at),
-    accountId: taskModel.account_id,
-    status: taskModel.status as TaskStatus,
-    title: taskModel.title,
-    memo: taskModel.memo,
-    dueDate: taskModel.due_date ? toDate(taskModel.due_date) : null,
-    dueDateAllDay: taskModel.due_date_all_day,
+    id: viewTodo.todoId,
+    createdAt: viewTodo.createdAt,
+    updatedAt: viewTodo.updatedAt,
+    accountId: viewTodo.accountId,
+    todoId: viewTodo.todoId,
+    position: viewTodo.position,
+    status: viewTodo.status ?? TaskStatus.NEW,
+    title: viewTodo.title,
+    memo: viewTodo.memo ?? '',
+    dueDate: viewTodo.dueDate,
+    dueDateAllDay: viewTodo.dueDateAllDay ?? false,
   }
 }
 

@@ -23,6 +23,7 @@ import {
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
 import { ViewTodo } from '~/types/view-todos'
+import { TaskStatus } from '~/types/tasks'
 import { useUserAgentAtom } from '~/lib/global-state'
 
 interface DataTableRowActionsProps<TData> {
@@ -50,7 +51,7 @@ export function TodoTableRowActions({
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem
           onClick={() => {
-            table.options.meta?.moveTask(viewTodo, true)
+            table.options.meta?.moveViewTodo(viewTodo, true)
           }}
         >
           <LuArrowUpFromLine />
@@ -61,7 +62,7 @@ export function TodoTableRowActions({
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
-            table.options.meta?.moveTask(viewTodo, false)
+            table.options.meta?.moveViewTodo(viewTodo, false)
           }}
         >
           <LuArrowDownFromLine />
@@ -75,7 +76,7 @@ export function TodoTableRowActions({
           disabled={viewTodo.status === TaskStatus.NEW}
           onClick={() => {
             const upateTask = { ...viewTodo, status: TaskStatus.NEW }
-            table.options.meta?.updateTaskStatus(upateTask)
+            table.options.meta?.updateViewTodoStatus(upateTask)
           }}
         >
           <LuCircleDot />
@@ -88,7 +89,7 @@ export function TodoTableRowActions({
           disabled={viewTodo.status === TaskStatus.DOING}
           onClick={() => {
             const upateTask = { ...viewTodo, status: TaskStatus.DOING }
-            table.options.meta?.updateTaskStatus(upateTask)
+            table.options.meta?.updateViewTodoStatus(upateTask)
           }}
         >
           <LuCirclePlay />
@@ -101,7 +102,7 @@ export function TodoTableRowActions({
           disabled={viewTodo.status === TaskStatus.DONE}
           onClick={() => {
             const upateTask = { ...viewTodo, status: TaskStatus.DONE }
-            table.options.meta?.updateTaskStatus(upateTask)
+            table.options.meta?.updateViewTodoStatus(upateTask)
           }}
         >
           <LuCircleCheck />
@@ -114,7 +115,7 @@ export function TodoTableRowActions({
           disabled={viewTodo.status === TaskStatus.PENDING}
           onClick={() => {
             const upateTask = { ...viewTodo, status: TaskStatus.PENDING }
-            table.options.meta?.updateTaskStatus(upateTask)
+            table.options.meta?.updateViewTodoStatus(upateTask)
           }}
         >
           <LuCirclePause />
@@ -125,7 +126,7 @@ export function TodoTableRowActions({
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
-            table.options.meta?.editTask(viewTodo)
+            table.options.meta?.editViewTodo(viewTodo)
           }}
         >
           <LuPencilLine />
@@ -138,7 +139,7 @@ export function TodoTableRowActions({
         <DropdownMenuItem
           className="text-red-600 focus:text-red-600"
           onClick={() => {
-            table.options.meta?.deleteTask(viewTodo)
+            table.options.meta?.deleteViewTodo(viewTodo)
           }}
         >
           <LuTrash2 />

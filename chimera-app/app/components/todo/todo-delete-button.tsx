@@ -5,17 +5,17 @@ import { Task } from '~/types/tasks'
 import { TodoDeleteConfirmDialog } from './todo-delete-confirm-dialog'
 
 export interface TodoDeleteButtonProps {
-  todo: Todo | undefined
+  task: Task | undefined
   redirectUrl: string
 }
 
-export function TodoDeleteButton({ todo, redirectUrl }: TodoDeleteButtonProps) {
+export function TodoDeleteButton({ task, redirectUrl }: TodoDeleteButtonProps) {
   const { t } = useTranslation()
 
-  if (!todo) return null
+  if (!task) return null
 
   return (
-    <TodoDeleteConfirmDialog viewTodo={todo} redirectUrl={redirectUrl}>
+    <TodoDeleteConfirmDialog viewTodo={task} redirectUrl={redirectUrl}>
       <Button type="button" variant="link" className="text-destructive px-0">
         <LuTrash2 />
         {t('common.message.delete')}

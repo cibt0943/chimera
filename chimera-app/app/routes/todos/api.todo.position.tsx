@@ -11,7 +11,7 @@ export async function action({ params, request }: Route.ActionArgs) {
   }
 
   const data = await request.json()
-  const toTask = await getTask(data.toTaskId)
+  const toTask = await getTask(data.toViewTodoId || data.toTaskId)
   if (toTask.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
