@@ -17,7 +17,7 @@ import { InputConform } from '~/components/lib/conform/input'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { SelectConform } from '~/components/lib/conform/select'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
-import { TaskDeleteButton } from './task-delete-button'
+import { TodoDeleteButton } from './todo-delete-button'
 import {
   Task,
   TaskStatus,
@@ -105,7 +105,7 @@ export function TaskForm({ task, redirectUrl }: TaskFormProps) {
         <input type="hidden" name="redirectUrl" value={redirectUrl} />
         <FormFooter className="sm:justify-between">
           <div>
-            {task && <TaskDeleteButton task={task} redirectUrl={redirectUrl} />}
+            {task && <TodoDeleteButton task={task} redirectUrl={redirectUrl} />}
           </div>
           <Button type="submit" disabled={fetcher.state !== 'idle'}>
             {t('common.message.save')}

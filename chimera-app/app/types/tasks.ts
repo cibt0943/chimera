@@ -1,6 +1,7 @@
 import { toDate } from 'date-fns'
 import * as zod from 'zod'
 import type { Database } from '~/types/schema'
+import type { Todo } from '~/types/todos'
 
 export const TaskStatus = {
   NEW: 0,
@@ -54,8 +55,9 @@ export type Task = {
   createdAt: Date
   updatedAt: Date
   accountId: string
-  status: TaskStatus
+  todoId: string
   position: number
+  status: TaskStatus
   title: string
   memo: string
   dueDate: Date | null
@@ -64,14 +66,19 @@ export type Task = {
 
 export type Tasks = Task[]
 
-export function TaskModel2Task(taskModel: TaskModel): Task {
+/**
+ * DBから取得した taskModel と todoModel を統合して
+ * アプリケーションで扱う Task 型に変換する
+ */
+export function mergeTaskModel(todo: Todo, taskModel: TaskModel): Task {
   return {
+    todoId: todo.id,
+    position: todo.position,
     id: taskModel.id,
     createdAt: toDate(taskModel.created_at),
     updatedAt: toDate(taskModel.updated_at),
     accountId: taskModel.account_id,
     status: taskModel.status as TaskStatus,
-    position: taskModel.position,
     title: taskModel.title,
     memo: taskModel.memo,
     dueDate: taskModel.due_date ? toDate(taskModel.due_date) : null,

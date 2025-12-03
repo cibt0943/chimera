@@ -1,82 +1,31 @@
 import { format } from 'date-fns'
 import {
-  Tasks,
   Task,
   TaskModel,
   InsertTaskModel,
   UpdateTaskModel,
-  TaskModel2Task,
+  mergeTaskModel,
 } from '~/types/tasks'
+import { TodoType } from '~/types/todos'
 import { supabase } from '~/lib/supabase-client.server'
-
-// タスク一覧を取得
-interface GetTasksOptionParams {
-  dueDateStart?: Date
-  dueDateEnd?: Date
-}
-export async function getTasks(
-  accountId: string,
-  options?: GetTasksOptionParams,
-): Promise<Tasks> {
-  const { dueDateStart, dueDateEnd } = options || {}
-
-  let query = supabase
-    .from('tasks')
-    .select()
-    .eq('account_id', accountId)
-    .order('position', { ascending: false })
-    .order('id')
-
-  if (dueDateStart) {
-    query = query.gt('due_date', format(dueDateStart, 'yyyy-MM-dd'))
-  }
-
-  if (dueDateEnd) {
-    query = query.lt('due_date', format(dueDateEnd, 'yyyy-MM-dd'))
-  }
-
-  const { data, error } = await query
-  if (error) throw error
-
-  const tasks = data.map((task) => {
-    return TaskModel2Task(task)
-  })
-
-  return tasks
-}
-
-// タスクを取得
-export async function getTask(taskId: string): Promise<Task> {
-  const { data, error } = await supabase
-    .from('tasks')
-    .select()
-    .eq('id', taskId)
-    .single()
-  if (error || !data) throw error || new Error('erorr')
-
-  return TaskModel2Task(data)
-}
+import { addTodo } from '~/models/todo.server'
 
 // タスクの追加
-export async function insertTask(task: InsertTaskModel): Promise<Task> {
-  const { data: maxTask, error: errorMaxTask } = await supabase
-    .from('tasks')
-    .select()
-    .eq('account_id', task.account_id)
-    .order('position', { ascending: false })
-    .limit(1)
-  if (errorMaxTask) throw errorMaxTask
+export async function addTask(task: InsertTaskModel): Promise<Task> {
+  const newTodo = await addTodo({
+    account_id: task.account_id,
+    type: TodoType.TASK,
+  })
 
-  const position = maxTask.length > 0 ? maxTask[0].position + 1 : 1
-
+  // タスクの表示位置を計算
   const { data: newTask, error: errorNewTask } = await supabase
     .from('tasks')
-    .insert({ ...task, position })
+    .insert({ ...task })
     .select()
     .single()
   if (errorNewTask || !newTask) throw errorNewTask || new Error('erorr')
 
-  return TaskModel2Task(newTask)
+  return mergeTaskModel(newTodo, newTask)
 }
 
 // タスクの更新
@@ -94,7 +43,7 @@ export async function updateTask(
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return TaskModel2Task(data)
+  return mergeTaskModel(task, data)
 }
 
 // タスクの削除

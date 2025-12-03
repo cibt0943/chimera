@@ -9,7 +9,8 @@ import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { TODO_URL } from '~/constants'
 import { cn } from '~/lib/utils'
-import { Task, TaskStatusList } from '~/types/tasks'
+import { TaskStatusList } from '~/types/tasks'
+import { ViewTodo } from '~/types/view-todos'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
 
@@ -36,20 +37,20 @@ function ColumnHeader({
   column,
   title,
 }: {
-  column: Column<Task, unknown>
+  column: Column<ViewTodo, unknown>
   title: string
 }) {
   const { t } = useTranslation()
   return <TodoTableColumnHeader column={column} title={t(title)} />
 }
 
-function DueDateCell({ row }: { row: Row<Task> }) {
+function DueDateCell({ row }: { row: Row<ViewTodo> }) {
   const { t } = useTranslation()
-  const task = row.original
-  const dueDateStr = task.dueDate
+  const viewTodo = row.original
+  const dueDateStr = viewTodo.dueDate
     ? format(
-        task.dueDate,
-        task.dueDateAllDay
+        viewTodo.dueDate,
+        viewTodo.dueDateAllDay
           ? t('common.format.date_format')
           : t('common.format.date_time_short_format'),
       )
@@ -61,9 +62,14 @@ function DueDateCell({ row }: { row: Row<Task> }) {
   )
 }
 
-function StatusCell({ row }: { row: Row<Task> }) {
+function StatusCell({ row }: { row: Row<ViewTodo> }) {
   const { t } = useTranslation()
-  const status = TaskStatusList[row.original.status]
+
+  let status = null
+  if (row.original.status) {
+    status = TaskStatusList[row.original.status]
+  }
+
   return status ? (
     <Badge className={cn(status.color, 'break-keep')}>{t(status.label)}</Badge>
   ) : (
@@ -71,7 +77,7 @@ function StatusCell({ row }: { row: Row<Task> }) {
   )
 }
 
-export const TodoTableColumns: ColumnDef<Task>[] = [
+export const TodoTableColumns: ColumnDef<ViewTodo>[] = [
   {
     id: 'dragHandle',
     size: 40,
