@@ -25,7 +25,10 @@ export type ViewTodo = {
 export type ViewTodos = ViewTodo[]
 
 export function ViewTodoModel2ViewTodo(viewTodoModel: ViewTodoModel): ViewTodo {
-  const todoId = viewTodoModel.todo_id || ''
+  if (!viewTodoModel.todo_id) {
+    throw new Error('ViewTodoModel is missing required todo_id')
+  }
+  const todoId = viewTodoModel.todo_id
   return {
     id: todoId, // Alias for todoId for backward compatibility
     todoId,

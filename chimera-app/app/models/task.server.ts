@@ -7,7 +7,7 @@ import {
   ViewTodo2Task,
 } from '~/types/tasks'
 import { TodoType } from '~/types/todos'
-import { ViewTodoModel } from '~/types/view-todos'
+import { ViewTodoModel, ViewTodoModel2ViewTodo } from '~/types/view-todos'
 import { supabase } from '~/lib/supabase-client.server'
 import { addTodo, getTodo, updateTodoPosition } from '~/models/todo.server'
 
@@ -48,7 +48,7 @@ export async function getTasks(
   if (error) throw error
 
   const viewTodos = data.map((viewTodo) => {
-    return ViewTodo2Task(viewTodo as ViewTodoModel)
+    return ViewTodo2Task(ViewTodoModel2ViewTodo(viewTodo as ViewTodoModel))
   })
 
   return viewTodos
@@ -67,7 +67,8 @@ export async function addTask(task: InsertTaskModel): Promise<Task> {
     .insert({ ...task, todo_id: newTodo.id })
     .select()
     .single()
-  if (errorNewTask || !newTask) throw errorNewTask || new Error('error')
+  if (errorNewTask || !newTask)
+    throw errorNewTask || new Error('Failed to insert task')
 
   // 追加されたタスクを取得して返す
   return await getTask(newTodo.id)
@@ -89,7 +90,7 @@ export async function updateTask(
     .eq('id', task.id)
     .select()
     .single()
-  if (error || !data) throw error || new Error('error')
+  if (error || !data) throw error || new Error('Failed to update task')
 
   // 更新されたタスクをview_todosから取得して返す
   return await getTask(data.todo_id)
@@ -129,5 +130,5 @@ export async function updateTaskPosition(
   // todosテーブルのpositionを更新
   await updateTodoPosition(fromTask.todoId, position)
 
-  return await getTask(taskId)
+  return await getTask(fromTask.todoId)
 }
