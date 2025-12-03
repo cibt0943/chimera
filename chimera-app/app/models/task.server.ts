@@ -10,7 +10,9 @@ import { supabase } from '~/lib/supabase-client.server'
 import { addTodo } from '~/models/todo.server'
 
 // タスクの追加
-export async function addTask(task: InsertTaskModel): Promise<Task> {
+export async function addTask(
+  task: Omit<InsertTaskModel, 'todo_id'>,
+): Promise<Task> {
   const newTodo = await addTodo({
     account_id: task.account_id,
     type: TodoType.TASK,
@@ -22,7 +24,7 @@ export async function addTask(task: InsertTaskModel): Promise<Task> {
     .insert({ ...task, todo_id: newTodo.id })
     .select()
     .single()
-  if (errorNewTask || !newTask) throw errorNewTask || new Error('erorr')
+  if (errorNewTask || !newTask) throw errorNewTask || new Error('error')
 
   return mergeTaskModel(newTodo, newTask)
 }
@@ -34,14 +36,14 @@ export async function getTask(taskId: string): Promise<Task> {
     .select()
     .eq('id', taskId)
     .single()
-  if (taskError || !taskData) throw taskError || new Error('erorr')
+  if (taskError || !taskData) throw taskError || new Error('error')
 
   const { data: todoData, error: todoError } = await supabase
     .from('todos')
     .select()
     .eq('id', taskData.todo_id)
     .single()
-  if (todoError || !todoData) throw todoError || new Error('erorr')
+  if (todoError || !todoData) throw todoError || new Error('error')
 
   return mergeTaskModel(TodoModel2Todo(todoData), taskData)
 }
@@ -73,6 +75,7 @@ export async function getTasks(
 
   const { data: tasks, error } = await query
   if (error) throw error
+  if (!tasks) return []
 
   // Fetch all corresponding todos
   const todoIds = [...new Set(tasks.map((task) => task.todo_id))]
@@ -106,7 +109,7 @@ export async function updateTask(
     .eq('id', task.id)
     .select()
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('error')
 
   // Fetch the corresponding todo to get position information
   const { data: todoData, error: todoError } = await supabase
@@ -114,7 +117,7 @@ export async function updateTask(
     .select()
     .eq('id', data.todo_id)
     .single()
-  if (todoError || !todoData) throw todoError || new Error('erorr')
+  if (todoError || !todoData) throw todoError || new Error('error')
 
   return mergeTaskModel(TodoModel2Todo(todoData), data)
 }
@@ -148,7 +151,7 @@ export async function updateTaskPosition(
 
   // Update positions of todos in between
   await updateTodosPosition(todosToUpdate, isUp)
-  
+
   // Update the moved todo's position
   const { error: updateError } = await supabase
     .from('todos')
