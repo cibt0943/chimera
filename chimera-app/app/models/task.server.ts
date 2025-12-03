@@ -1,12 +1,11 @@
 import { format } from 'date-fns'
 import {
   Task,
-  TaskModel,
   InsertTaskModel,
   UpdateTaskModel,
   mergeTaskModel,
 } from '~/types/tasks'
-import { TodoType } from '~/types/todos'
+import { TodoType, TodoModel2Todo, TodoModel } from '~/types/todos'
 import { supabase } from '~/lib/supabase-client.server'
 import { addTodo } from '~/models/todo.server'
 
@@ -20,12 +19,78 @@ export async function addTask(task: InsertTaskModel): Promise<Task> {
   // タスクの表示位置を計算
   const { data: newTask, error: errorNewTask } = await supabase
     .from('tasks')
-    .insert({ ...task })
+    .insert({ ...task, todo_id: newTodo.id })
     .select()
     .single()
   if (errorNewTask || !newTask) throw errorNewTask || new Error('erorr')
 
   return mergeTaskModel(newTodo, newTask)
+}
+
+// タスクの取得
+export async function getTask(taskId: string): Promise<Task> {
+  const { data: taskData, error: taskError } = await supabase
+    .from('tasks')
+    .select()
+    .eq('id', taskId)
+    .single()
+  if (taskError || !taskData) throw taskError || new Error('erorr')
+
+  const { data: todoData, error: todoError } = await supabase
+    .from('todos')
+    .select()
+    .eq('id', taskData.todo_id)
+    .single()
+  if (todoError || !todoData) throw todoError || new Error('erorr')
+
+  return mergeTaskModel(TodoModel2Todo(todoData), taskData)
+}
+
+// タスクの一覧取得
+interface GetTasksOptionParams {
+  dueDateStart?: Date
+  dueDateEnd?: Date
+}
+
+export async function getTasks(
+  accountId: string,
+  options?: GetTasksOptionParams,
+): Promise<Task[]> {
+  const { dueDateStart, dueDateEnd } = options || {}
+
+  let query = supabase
+    .from('tasks')
+    .select()
+    .eq('account_id', accountId)
+
+  if (dueDateStart) {
+    query = query.gte('due_date', format(dueDateStart, 'yyyy-MM-dd'))
+  }
+
+  if (dueDateEnd) {
+    query = query.lte('due_date', format(dueDateEnd, 'yyyy-MM-dd'))
+  }
+
+  const { data: tasks, error } = await query
+  if (error) throw error
+
+  // Fetch all corresponding todos
+  const todoIds = [...new Set(tasks.map((task) => task.todo_id))]
+  const { data: todos, error: todoError } = await supabase
+    .from('todos')
+    .select()
+    .in('id', todoIds)
+  if (todoError) throw todoError
+
+  // Create a map of todos by id for quick lookup
+  const todoMap = new Map(todos.map((todo) => [todo.id, TodoModel2Todo(todo)]))
+
+  // Merge tasks with their corresponding todos
+  return tasks.map((task) => {
+    const todo = todoMap.get(task.todo_id)
+    if (!todo) throw new Error(`Todo not found for task ${task.id}`)
+    return mergeTaskModel(todo, task)
+  })
 }
 
 // タスクの更新
@@ -43,7 +108,15 @@ export async function updateTask(
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return mergeTaskModel(task, data)
+  // Fetch the corresponding todo to get position information
+  const { data: todoData, error: todoError } = await supabase
+    .from('todos')
+    .select()
+    .eq('id', data.todo_id)
+    .single()
+  if (todoError || !todoData) throw todoError || new Error('erorr')
+
+  return mergeTaskModel(TodoModel2Todo(todoData), data)
 }
 
 // タスクの削除
@@ -64,31 +137,40 @@ export async function updateTaskPosition(
   const isUp = fromTask.position < position
   const [fromOperator, toOperator] = isUp ? ['gt', 'lte'] : ['lt', 'gte']
 
-  const { data: tasksToUpdate, error: errorTasksToUpdate } = await supabase
-    .from('tasks')
+  // Get todos that need position adjustment
+  const { data: todosToUpdate, error: errorTodosToUpdate } = await supabase
+    .from('todos')
     .select()
     .filter('position', fromOperator, fromTask.position)
     .filter('position', toOperator, position)
     .order('position')
-  if (errorTasksToUpdate) throw errorTasksToUpdate
+  if (errorTodosToUpdate) throw errorTodosToUpdate
 
-  // 間のタスクの位置を変更
-  await updateTasksPosition(tasksToUpdate, isUp)
-  // 移動するタスクの位置を変更
-  return await updateTask({
-    id: fromTask.id,
-    position,
-  })
+  // Update positions of todos in between
+  await updateTodosPosition(todosToUpdate, isUp)
+  
+  // Update the moved todo's position
+  const { error: updateError } = await supabase
+    .from('todos')
+    .update({ position })
+    .eq('id', fromTask.todoId)
+  if (updateError) throw updateError
+
+  // Return the updated task
+  return await getTask(taskId)
 }
 
-async function updateTasksPosition(tasksToUpdate: TaskModel[], isUp: boolean) {
-  const updatedTasks = tasksToUpdate.map((task) => ({
-    ...task,
-    position: isUp ? task.position - 1 : task.position + 1,
+async function updateTodosPosition(todosToUpdate: TodoModel[], isUp: boolean) {
+  const updatedTodos = todosToUpdate.map((todo) => ({
+    ...todo,
+    position: isUp ? todo.position - 1 : todo.position + 1,
   }))
 
   const { error } = await supabase
-    .from('tasks')
-    .upsert(updatedTasks, { onConflict: 'id' })
+    .from('todos')
+    .upsert(updatedTodos, { onConflict: 'id' })
   if (error) throw error
 }
+
+// Alias for addTask for backward compatibility
+export const insertTask = addTask
