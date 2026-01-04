@@ -209,9 +209,9 @@ export type Database = {
           due_date_all_day: boolean
           id: string
           memo: string
-          position: number
           status: number
           title: string
+          todo_id: string
           updated_at: string
         }
         Insert: {
@@ -221,9 +221,9 @@ export type Database = {
           due_date_all_day?: boolean
           id?: string
           memo?: string
-          position?: number
           status?: number
           title: string
+          todo_id: string
           updated_at?: string
         }
         Update: {
@@ -233,9 +233,9 @@ export type Database = {
           due_date_all_day?: boolean
           id?: string
           memo?: string
-          position?: number
           status?: number
           title?: string
+          todo_id?: string
           updated_at?: string
         }
         Relationships: [
@@ -246,11 +246,136 @@ export type Database = {
             referencedRelation: 'accounts'
             referencedColumns: ['id']
           },
+          {
+            foreignKeyName: 'tasks_todo_id_fkey'
+            columns: ['todo_id']
+            isOneToOne: true
+            referencedRelation: 'todos'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'tasks_todo_id_fkey'
+            columns: ['todo_id']
+            isOneToOne: true
+            referencedRelation: 'view_todos'
+            referencedColumns: ['todo_id']
+          },
+        ]
+      }
+      todo_bars: {
+        Row: {
+          account_id: string
+          color: string
+          created_at: string
+          id: string
+          title: string
+          todo_id: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          color?: string
+          created_at?: string
+          id?: string
+          title?: string
+          todo_id: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          color?: string
+          created_at?: string
+          id?: string
+          title?: string
+          todo_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'todo_bars_account_id_fkey'
+            columns: ['account_id']
+            isOneToOne: false
+            referencedRelation: 'accounts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'todo_bars_todo_id_fkey'
+            columns: ['todo_id']
+            isOneToOne: true
+            referencedRelation: 'todos'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'todo_bars_todo_id_fkey'
+            columns: ['todo_id']
+            isOneToOne: true
+            referencedRelation: 'view_todos'
+            referencedColumns: ['todo_id']
+          },
+        ]
+      }
+      todos: {
+        Row: {
+          account_id: string
+          created_at: string
+          id: string
+          position: number
+          type: number
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          id?: string
+          position?: number
+          type?: number
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          id?: string
+          position?: number
+          type?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'todos_account_id_fkey'
+            columns: ['account_id']
+            isOneToOne: false
+            referencedRelation: 'accounts'
+            referencedColumns: ['id']
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      view_todos: {
+        Row: {
+          account_id: string
+          color: string | null
+          created_at: string
+          due_date: string | null
+          due_date_all_day: boolean | null
+          memo: string | null
+          position: number
+          status: number | null
+          title: string
+          todo_id: string
+          type: number
+          updated_at: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'todos_account_id_fkey'
+            columns: ['account_id']
+            isOneToOne: false
+            referencedRelation: 'accounts'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never

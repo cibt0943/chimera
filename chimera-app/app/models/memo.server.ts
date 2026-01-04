@@ -1,21 +1,21 @@
-import { format } from 'date-fns'
-import {
-  Memos,
-  Memo,
-  MemoModel,
-  InsertMemoModel,
-  UpdateMemoModel,
-  MemoModel2Memo,
-  MemoStatus,
-} from '~/types/memos'
+import { format, toDate } from 'date-fns'
+import type { Database } from '~/types/schema'
+import { Memos, Memo, MemoStatus } from '~/types/memos'
 import { supabase } from '~/lib/supabase-client.server'
 
-// メモ一覧を取得
+// DBのメモテーブルの型
+export type MemoModel = Database['public']['Tables']['memos']['Row']
+export type InsertMemoModel = Database['public']['Tables']['memos']['Insert']
+export type UpdateMemoModel =
+  Database['public']['Tables']['memos']['Update'] & { id: string } // idを必須で上書き
+
 interface GetMemosOptionParams {
   statuses?: MemoStatus[]
   relatedDateStart?: Date
   relatedDateEnd?: Date
 }
+
+// メモ一覧を取得
 export async function getMemos(
   accountId: string,
   options?: GetMemosOptionParams,
@@ -45,7 +45,7 @@ export async function getMemos(
   if (error) throw error
 
   const memos = data.map((memo) => {
-    return MemoModel2Memo(memo)
+    return convertToMemo(memo)
   })
 
   return memos
@@ -60,11 +60,11 @@ export async function getMemo(memoId: string): Promise<Memo> {
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return MemoModel2Memo(data)
+  return convertToMemo(data)
 }
 
 // メモの追加
-export async function insertMemo(memo: InsertMemoModel): Promise<Memo> {
+export async function addMemo(memo: InsertMemoModel): Promise<Memo> {
   const { data: maxMemo, error: errorMaxMemo } = await supabase
     .from('memos')
     .select()
@@ -82,7 +82,7 @@ export async function insertMemo(memo: InsertMemoModel): Promise<Memo> {
     .single()
   if (errorNewMemo || !newMemo) throw errorNewMemo || new Error('erorr')
 
-  return MemoModel2Memo(newMemo)
+  return getMemo(newMemo.id)
 }
 
 // メモの更新
@@ -100,7 +100,7 @@ export async function updateMemo(
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return MemoModel2Memo(data)
+  return getMemo(data.id)
 }
 
 // メモの削除
@@ -131,6 +131,7 @@ export async function updateMemoPosition(
 
   // 間のメモの位置を変更
   await updateMemosPosition(memosToUpdate, isUp)
+
   // 移動するメモの位置を変更
   return await updateMemo({
     id: fromMemo.id,
@@ -148,4 +149,19 @@ async function updateMemosPosition(memosToUpdate: MemoModel[], isUp: boolean) {
     .from('memos')
     .upsert(updatedMemos, { onConflict: 'id' })
   if (error) throw error
+}
+
+export function convertToMemo(memoModel: MemoModel): Memo {
+  return {
+    id: memoModel.id,
+    createdAt: toDate(memoModel.created_at),
+    updatedAt: toDate(memoModel.updated_at),
+    accountId: memoModel.account_id,
+    status: memoModel.status as MemoStatus,
+    position: memoModel.position,
+    title: memoModel.title,
+    content: memoModel.content,
+    relatedDate: memoModel.related_date ? toDate(memoModel.related_date) : null,
+    relatedDateAllDay: memoModel.related_date_all_day,
+  }
 }

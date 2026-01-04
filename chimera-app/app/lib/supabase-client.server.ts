@@ -5,9 +5,4 @@ import type { Database } from '~/types/schema'
 export const supabase = createClient<Database>(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_PUBLISHABLE_KEY!,
-  {
-    global: {
-      fetch: (...args) => fetch(...args),
-    },
-  },
 )

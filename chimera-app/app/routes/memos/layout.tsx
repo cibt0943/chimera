@@ -2,7 +2,7 @@ import { Outlet, useParams } from 'react-router'
 import { useMedia } from '~/lib/hooks'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getMemos } from '~/models/memo.server'
-import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
+import { getOrAddMemoSettings } from '~/models/memo-settings.server'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -18,7 +18,7 @@ export function meta() {
 export async function loader({ request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
 
-  const memoSettings = await getOrInsertMemoSettings(loginInfo.account.id)
+  const memoSettings = await getOrAddMemoSettings(loginInfo.account.id)
   const memos = await getMemos(loginInfo.account.id, {
     statuses: memoSettings.listFilter.statuses,
   })

@@ -141,6 +141,19 @@
       "deleted": "Task has been deleted"
     }
   },
+  "todoBar": {
+    "model": {
+      "title": "Title",
+      "color": "Color"
+    },
+    "message": {
+      "todo_bar_creation": "Create Todo bar",
+      "todo_bar_editing": "Edit Todo bar",
+      "todo_bar_deletion": "Delete Todo bar",
+      "set_todo_bar_info": "Set todo bar information",
+      "deleted": "Deleted todo bar"
+    }
+  },
   "memo": {
     "menu_label": "Memo",
     "page_title": "Memo",

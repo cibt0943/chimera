@@ -12,7 +12,7 @@ import styles from '~/styles/tailwind.css?url'
 import i18n, { useLanguage } from '~/lib/i18n/i18n'
 import { useTheme, useSonner } from '~/lib/hooks'
 import { getSession } from '~/lib/session.server'
-import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
+import { getOrAddMemoSettings } from '~/models/memo-settings.server'
 import {
   useSetUserAgentAtom,
   useSetLoginInfoAtom,
@@ -51,7 +51,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   // メモ設定を取得
   const memoSettings =
-    loginInfo && (await getOrInsertMemoSettings(loginInfo.account.id))
+    loginInfo && (await getOrAddMemoSettings(loginInfo.account.id))
 
   // トーストメッセージを取得
   const { toast, headers } = await getToast(request)

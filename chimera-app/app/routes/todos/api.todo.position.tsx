@@ -1,22 +1,22 @@
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
-import { getTask, updateTaskPosition } from '~/models/task.server'
+import { getTodo, setTodoPosition } from '~/models/todo.server'
 import type { Route } from './+types/api.todo.position'
 
 export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
 
-  const fromTask = await getTask(params.todoId || '')
-  if (fromTask.accountId !== loginInfo.account.id) {
+  const fromTodo = await getTodo(params.todoId || '')
+  if (fromTodo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
   const data = await request.json()
-  const toTask = await getTask(data.toTaskId)
-  if (toTask.accountId !== loginInfo.account.id) {
+  const toTodo = await getTodo(data.toTodoId)
+  if (toTodo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  const updatedTask = await updateTaskPosition(fromTask.id, toTask.position)
+  const updatedTodo = await setTodoPosition(fromTodo.id, toTodo.position)
 
-  return Response.json({ task: updatedTask })
+  return Response.json({ todo: updatedTodo })
 }

@@ -9,34 +9,41 @@ import { buttonVariants } from '~/components/ui/button'
 import { TODO_URL } from '~/constants'
 import { sleep } from '~/lib/utils'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
-import { Task } from '~/types/tasks'
+import { ViewTodo } from '~/types/view-todos'
+import { TodoType } from '~/types/todos'
 
-export interface TaskDeleteConfirmDialogProps {
-  task: Task | undefined
+export interface TodoDeleteConfirmDialogProps {
+  viewTodo: ViewTodo | undefined
   redirectUrl: string
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void
   children?: React.ReactNode
 }
 
-export function TaskDeleteConfirmDialog({
-  task,
+export function TodoDeleteConfirmDialog({
+  viewTodo,
   redirectUrl,
   isOpen,
   onOpenChange,
   children,
-}: TaskDeleteConfirmDialogProps) {
+}: TodoDeleteConfirmDialogProps) {
   const { t } = useTranslation()
   const fetcher = useFetcher()
 
-  if (!task) return null
+  if (!viewTodo) return null
 
-  const desc = '「' + task.title + '」' + t('common.message.confirm_deletion')
-  const action = `${TODO_URL}/${task.id}/delete`
+  const desc =
+    '「' + viewTodo.title + '」' + t('common.message.confirm_deletion')
+  const action = `${TODO_URL}/${viewTodo.todoId}/delete`
+
+  const title =
+    viewTodo.type === TodoType.BAR
+      ? t('todoBar.message.todo_bar_deletion')
+      : t('task.message.task_deletion')
 
   return (
     <ConfirmDialog
-      title={t('task.message.task_deletion')}
+      title={title}
       description={desc}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
