@@ -11,6 +11,7 @@ export type ViewTodoModel = Database['public']['Views']['view_todos']['Row']
 interface GetViewTodosOptionParams {
   dueDateStart?: Date
   dueDateEnd?: Date
+  type?: TodoType
 }
 
 // ViewTodo一覧を取得
@@ -32,6 +33,10 @@ export async function getViewTodos(
 
   if (dueDateEnd) {
     query = query.lt('due_date', format(dueDateEnd, 'yyyy-MM-dd'))
+  }
+
+  if (options?.type) {
+    query = query.eq('type', options.type)
   }
 
   const { data, error } = await query

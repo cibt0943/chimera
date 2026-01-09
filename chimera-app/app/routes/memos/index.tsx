@@ -4,7 +4,7 @@ import { MEMO_URL } from '~/constants'
 import { useMedia } from '~/lib/hooks'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { MemoFormView } from '~/components/memo/memo-form-view'
-import { insertMemo } from '~/models/memo.server'
+import { addMemo } from '~/models/memo.server'
 import { MemoSchema, MemoStatus } from '~/types/memos'
 import type { Route } from './+types/index'
 
@@ -21,7 +21,7 @@ export async function action({ request }: Route.ActionArgs) {
   const data = submission.value
 
   const [title, ...content] = (data.content || '').split('\n')
-  const newMemo = await insertMemo({
+  const newMemo = await addMemo({
     account_id: loginInfo.account.id,
     title: title,
     content: content.join('\n'),

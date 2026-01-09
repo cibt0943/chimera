@@ -3,7 +3,7 @@ import { startOfMonth, addMonths, subMonths } from 'date-fns'
 import { parseWithZod } from '@conform-to/zod/v4'
 import { EVENT_URL } from '~/constants'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
-import { getEvents, insertEvent } from '~/models/event.server'
+import { getEvents, addEvent } from '~/models/event.server'
 import { getTasks } from '~/models/task.server'
 import { getMemos } from '~/models/memo.server'
 import { Calendar } from '~/components/event/calendar'
@@ -39,7 +39,7 @@ export async function action({ request }: Route.ActionArgs) {
 
   const data = submission.value
 
-  await insertEvent({
+  await addEvent({
     account_id: loginInfo.account.id,
     start_datetime: data.startDate.toISOString(),
     end_datetime: data.endDate?.toISOString() || null,
