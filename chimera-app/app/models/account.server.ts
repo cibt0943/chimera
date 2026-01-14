@@ -32,11 +32,7 @@ export async function getAccountBySub(sub: string): Promise<Account | null> {
 }
 
 // アカウント情報の取得、なければ追加
-export async function getOrInsertAccount({
-  sub,
-}: {
-  sub: string
-}): Promise<Account> {
+export async function getOrInsertAccount(sub: string): Promise<Account> {
   const account = await getAccountBySub(sub)
   if (account) return account
 

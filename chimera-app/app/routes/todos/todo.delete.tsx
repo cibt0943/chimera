@@ -7,28 +7,33 @@ import { getTodo } from '~/models/todo.server'
 import type { Route } from './+types/todo.delete'
 import { TodoType } from '~/types/todos'
 
-export async function action({ params, request }: Route.ActionArgs) {
-  const loginInfo = await isAuthenticated(request)
+async function requireAuthorizedTodo(request: Request, todoId?: string) {
+  if (!todoId) throw new Response('Not Found', { status: 404 })
 
-  const todo = await getTodo(params.todoId || '')
+  const loginInfo = await isAuthenticated(request)
+  const todo = await getTodo(todoId)
   if (todo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  if (todo.type === TodoType.TASK) {
-    await deleteTaskFromTodoId(todo.id)
-  } else if (todo.type === TodoType.BAR) {
-    await deleteTodoBarFromTodoId(todo.id)
-  } else {
-    throw new Response('Not Found', { status: 404 })
-  }
+  return { todo }
+}
 
+export async function action({ params, request }: Route.ActionArgs) {
+  const { todo } = await requireAuthorizedTodo(request, params.todoId)
   const formData = await request.formData()
   const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
-  const message =
-    todo.type === TodoType.BAR
-      ? 'todoBar.message.deleted'
-      : 'task.message.deleted'
 
-  return redirectWithInfo(redirectUrl, message)
+  switch (todo.type) {
+    case TodoType.TASK:
+      await deleteTaskFromTodoId(todo.id)
+      return redirectWithInfo(redirectUrl, 'task.message.deleted')
+
+    case TodoType.BAR:
+      await deleteTodoBarFromTodoId(todo.id)
+      return redirectWithInfo(redirectUrl, 'todoBar.message.deleted')
+
+    default:
+      throw new Response('Not Found', { status: 404 })
+  }
 }

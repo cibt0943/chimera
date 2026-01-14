@@ -10,16 +10,12 @@ export function meta() {
 
 export async function loader({ request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
-
-  const todos = await getViewTodos(loginInfo.account.id)
-  return { todos }
+  return { todos: await getViewTodos(loginInfo.account.id) }
 }
 
 export default function Index({ loaderData }: Route.ComponentProps) {
   const { todos } = loaderData
-
-  const params = useParams()
-  const { todoId } = params
+  const { todoId } = useParams()
 
   return (
     <div className="p-4 pt-0 md:pt-4">

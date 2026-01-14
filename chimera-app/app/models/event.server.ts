@@ -19,7 +19,7 @@ export async function getEvents(
   accountId: string,
   options?: GetEventsOptionParams,
 ): Promise<Events> {
-  const { startDateStart, startDateEnd } = options || {}
+  const { startDateStart, startDateEnd } = options ?? {}
 
   let query = supabase
     .from('events')
@@ -38,11 +38,7 @@ export async function getEvents(
   const { data, error } = await query
   if (error) throw error
 
-  const events = data.map((event) => {
-    return convertToEvent(event)
-  })
-
-  return events
+  return data.map(convertToEvent)
 }
 
 // イベントを取得

@@ -15,9 +15,7 @@ export function meta() {
 
 export async function action({ request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
-
   const formData = await request.formData()
-
   const submission = parseWithZod(formData, { schema: TaskSchema })
 
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
@@ -32,7 +30,6 @@ export async function action({ request }: Route.ActionArgs) {
 
   await addTask({
     account_id: loginInfo.account.id,
-    todo_id: '',
     status: data.status,
     title: data.title,
     memo: data.memo || '',

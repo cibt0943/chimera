@@ -19,7 +19,7 @@ export async function getViewTodos(
   accountId: string,
   options?: GetViewTodosOptionParams,
 ): Promise<ViewTodos> {
-  const { dueDateStart, dueDateEnd } = options || {}
+  const { dueDateStart, dueDateEnd, type } = options || {}
 
   let query = supabase
     .from('view_todos')
@@ -35,18 +35,14 @@ export async function getViewTodos(
     query = query.lt('due_date', format(dueDateEnd, 'yyyy-MM-dd'))
   }
 
-  if (options?.type) {
-    query = query.eq('type', options.type)
+  if (type) {
+    query = query.eq('type', type)
   }
 
   const { data, error } = await query
   if (error) throw error
 
-  const todos = data.map((viewTodoModel) => {
-    return convertToViewTodo(viewTodoModel)
-  })
-
-  return todos
+  return data.map(convertToViewTodo)
 }
 
 // ViewTodoを取得

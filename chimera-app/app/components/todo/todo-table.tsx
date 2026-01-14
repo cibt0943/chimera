@@ -69,32 +69,30 @@ declare module '@tanstack/table-core' {
   }
 }
 
-interface TodoTableProps<TData extends RowData> {
-  originalTodos: TData[]
+interface TodoTableProps {
+  originalTodos: ViewTodo[]
   showId: string
 }
 
-export function TodoTable({ originalTodos, showId }: TodoTableProps<ViewTodo>) {
+const PAGE_SIZE = 20
+const DEFAULT_COLUMN_FILTERS: ColumnFiltersState = [
+  { id: 'status', value: [0, 2] },
+]
+
+export function TodoTable({ originalTodos, showId }: TodoTableProps) {
   const { t } = useTranslation()
   const userAgent = useUserAgentAtom()
   const { enqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const isLoading = useIsLoading()
-  const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { distance: 10 } }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  )
 
   // tanstack/react-table
   const [viewTodos, setViewTodos] = React.useState<ViewTodos>(originalTodos)
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
-    { id: 'status', value: [0, 2] },
-  ])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    DEFAULT_COLUMN_FILTERS,
+  )
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({
     [showId]: true,
   })
@@ -110,6 +108,15 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps<ViewTodo>) {
   // tbody要素参照用
   const tBodyRef = React.useRef<HTMLTableSectionElement>(null)
 
+  const hotkeysEnabled = !(isLoading || isOpenDeleteDialog || showId)
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { distance: 10 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
+
   const table = useReactTable({
     data: viewTodos,
     columns: TodoTableColumns,
@@ -121,7 +128,7 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps<ViewTodo>) {
     },
     initialState: {
       pagination: {
-        pageSize: 20,
+        pageSize: PAGE_SIZE,
       },
     },
     enableRowSelection: true,
@@ -138,18 +145,12 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps<ViewTodo>) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getPaginationRowModel: getPaginationRowModel(),
     meta: {
-      moveTodo: (viewTodo: ViewTodo, isUp: boolean) => {
-        moveTodoOneStep(viewTodo, isUp)
-      },
-      updateTodoStatus: (updateViewTodo: ViewTodo) => {
-        updateTodoStatusApi(updateViewTodo)
-      },
+      moveTodo: moveTodoOneStep,
+      updateTodoStatus: updateTodoStatusApi,
       editTodo: (viewTodo: ViewTodo) => {
         navigate(viewTodo.todoId)
       },
-      deleteTodo: (viewTodo: ViewTodo) => {
-        openDeleteTodoDialog(viewTodo)
-      },
+      deleteTodo: openDeleteTodoDialog,
     },
   })
 
@@ -352,97 +353,22 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps<ViewTodo>) {
   }
 
   // キーボードショートカット(スコープあり)
-  const HOTKEYS = {
-    ENTER: 'enter',
-    UP: 'up',
-    DOWN: 'down',
-    MODIFIER_UP: `${userAgent.modifierKey}+up`,
-    MODIFIER_DOWN: `${userAgent.modifierKey}+down`,
-    MODIFIER_1: `${userAgent.modifierKey}+1`,
-    MODIFIER_2: `${userAgent.modifierKey}+2`,
-    MODIFIER_3: `${userAgent.modifierKey}+3`,
-    MODIFIER_4: `${userAgent.modifierKey}+4`,
-    MODIFIER_DELETE: `${userAgent.modifierKey}+delete`,
-    MODIFIER_BACKSPACE: `${userAgent.modifierKey}+backspace`,
-  }
+  useTodoTableScopedHotkeys({
+    modifierKey: userAgent.modifierKey,
+    enabled: hotkeysEnabled,
+    showSelectedTodoEdit,
+    changeSelectedTodoOneStep,
+    moveSelectedTodoOneStep,
+    updateSelectedTodoStatus,
+    deleteSelectedTodo,
+  })
 
-  useHotkeys(
-    Object.values(HOTKEYS),
-    (_, { hotkey }) => {
-      switch (hotkey) {
-        case HOTKEYS.ENTER:
-          showSelectedTodoEdit()
-          break
-        case HOTKEYS.UP:
-          changeSelectedTodoOneStep(true)
-          break
-        case HOTKEYS.MODIFIER_UP:
-          moveSelectedTodoOneStep(true)
-          break
-        case HOTKEYS.DOWN:
-          changeSelectedTodoOneStep(false)
-          break
-        case HOTKEYS.MODIFIER_DOWN:
-          moveSelectedTodoOneStep(false)
-          break
-        case HOTKEYS.MODIFIER_1:
-          updateSelectedTodoStatus(TaskStatus.NEW)
-          break
-        case HOTKEYS.MODIFIER_2:
-          updateSelectedTodoStatus(TaskStatus.DOING)
-          break
-        case HOTKEYS.MODIFIER_3:
-          updateSelectedTodoStatus(TaskStatus.DONE)
-          break
-        case HOTKEYS.MODIFIER_4:
-          updateSelectedTodoStatus(TaskStatus.PENDING)
-          break
-        case HOTKEYS.MODIFIER_DELETE:
-        case HOTKEYS.MODIFIER_BACKSPACE:
-          deleteSelectedTodo()
-          break
-      }
-    },
-    {
-      preventDefault: true,
-      ignoreEventWhen: (e) => {
-        const target = e.target as HTMLElement
-        return !['tr', 'body'].includes(target.tagName.toLowerCase())
-      },
-      // ローディング中、ダイアログが開いている場合は何もしない
-      enabled: !(isLoading || isOpenDeleteDialog || showId),
-    },
-  )
-
-  // キーボードショートカット(スコープなし)
-  useHotkeys(
-    [
-      `${userAgent.modifierKey}+n`,
-      `${userAgent.modifierKey}+left`,
-      `${userAgent.modifierKey}+right`,
-    ],
-    (_, handler) => {
-      switch (handler.keys?.join('')) {
-        // タスク追加ダイアログを開く
-        case 'n':
-          openAddTaskDialog()
-          break
-        // フォーカスを一覧へ移動
-        case 'left': {
-          changeSelectedTodoOneStep(true)
-          break
-        }
-        case 'right': {
-          changeSelectedTodoOneStep(false)
-          break
-        }
-      }
-    },
-    {
-      // ローディング中、ダイアログが開いている場合は何もしない
-      enabled: !(isLoading || isOpenDeleteDialog || showId),
-    },
-  )
+  useTodoTableGlobalHotkeys({
+    modifierKey: userAgent.modifierKey,
+    enabled: hotkeysEnabled,
+    openAddTaskDialog,
+    changeSelectedTodoOneStep,
+  })
 
   return (
     <div className="space-y-4">
@@ -450,7 +376,7 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps<ViewTodo>) {
         <Button
           variant="secondary"
           className="h-8 px-3"
-          onClick={() => openAddTaskDialog()}
+          onClick={openAddTaskDialog}
         >
           <LuPlus />
           {t('task.message.task_creation')}
@@ -463,7 +389,7 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps<ViewTodo>) {
         <Button
           variant="secondary"
           className="h-8 px-3"
-          onClick={() => openAddTodoBarDialog()}
+          onClick={openAddTodoBarDialog}
         >
           <LuPlus />
           {t('todoBar.message.todo_bar_creation')}
@@ -554,6 +480,117 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps<ViewTodo>) {
         onOpenChange={setIsOpenDeleteDialog}
       />
     </div>
+  )
+}
+
+function useTodoTableScopedHotkeys(params: {
+  modifierKey: string
+  enabled: boolean
+  showSelectedTodoEdit: () => void
+  changeSelectedTodoOneStep: (isUp: boolean) => void
+  moveSelectedTodoOneStep: (isUp: boolean) => void
+  updateSelectedTodoStatus: (status: TaskStatus) => void
+  deleteSelectedTodo: () => void
+}) {
+  const {
+    modifierKey,
+    enabled,
+    showSelectedTodoEdit,
+    changeSelectedTodoOneStep,
+    moveSelectedTodoOneStep,
+    updateSelectedTodoStatus,
+    deleteSelectedTodo,
+  } = params
+
+  const HOTKEYS = {
+    ENTER: 'enter',
+    UP: 'up',
+    DOWN: 'down',
+    MODIFIER_UP: `${modifierKey}+up`,
+    MODIFIER_DOWN: `${modifierKey}+down`,
+    MODIFIER_1: `${modifierKey}+1`,
+    MODIFIER_2: `${modifierKey}+2`,
+    MODIFIER_3: `${modifierKey}+3`,
+    MODIFIER_4: `${modifierKey}+4`,
+    MODIFIER_DELETE: `${modifierKey}+delete`,
+    MODIFIER_BACKSPACE: `${modifierKey}+backspace`,
+  }
+
+  useHotkeys(
+    Object.values(HOTKEYS),
+    (_, { hotkey }) => {
+      switch (hotkey) {
+        case HOTKEYS.ENTER:
+          showSelectedTodoEdit()
+          break
+        case HOTKEYS.UP:
+          changeSelectedTodoOneStep(true)
+          break
+        case HOTKEYS.MODIFIER_UP:
+          moveSelectedTodoOneStep(true)
+          break
+        case HOTKEYS.DOWN:
+          changeSelectedTodoOneStep(false)
+          break
+        case HOTKEYS.MODIFIER_DOWN:
+          moveSelectedTodoOneStep(false)
+          break
+        case HOTKEYS.MODIFIER_1:
+          updateSelectedTodoStatus(TaskStatus.NEW)
+          break
+        case HOTKEYS.MODIFIER_2:
+          updateSelectedTodoStatus(TaskStatus.DOING)
+          break
+        case HOTKEYS.MODIFIER_3:
+          updateSelectedTodoStatus(TaskStatus.DONE)
+          break
+        case HOTKEYS.MODIFIER_4:
+          updateSelectedTodoStatus(TaskStatus.PENDING)
+          break
+        case HOTKEYS.MODIFIER_DELETE:
+        case HOTKEYS.MODIFIER_BACKSPACE:
+          deleteSelectedTodo()
+          break
+      }
+    },
+    {
+      preventDefault: true,
+      ignoreEventWhen: (e) => {
+        const target = e.target as HTMLElement
+        return !['tr', 'body'].includes(target.tagName.toLowerCase())
+      },
+      enabled,
+    },
+  )
+}
+
+function useTodoTableGlobalHotkeys(params: {
+  modifierKey: string
+  enabled: boolean
+  openAddTaskDialog: () => void
+  changeSelectedTodoOneStep: (isUp: boolean) => void
+}) {
+  const { modifierKey, enabled, openAddTaskDialog, changeSelectedTodoOneStep } =
+    params
+
+  useHotkeys(
+    [`${modifierKey}+n`, `${modifierKey}+left`, `${modifierKey}+right`],
+    (_, handler) => {
+      switch (handler.keys?.join('')) {
+        case 'n':
+          openAddTaskDialog()
+          break
+        case 'left': {
+          changeSelectedTodoOneStep(true)
+          break
+        }
+        case 'right': {
+          changeSelectedTodoOneStep(false)
+          break
+        }
+      }
+    },
+    { enabled },
   )
 }
 

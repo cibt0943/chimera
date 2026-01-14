@@ -31,7 +31,6 @@ export async function getOrAddMemoSettings(
     const memoSettings = await getMemoSettings(accountId)
     if (memoSettings) return memoSettings
   } catch (error) {
-    //accountIdが空以外は握りつぶす
     if (accountId === '') throw error
   }
 
@@ -73,15 +72,15 @@ export async function deleteMemoSettings(accountId: string): Promise<void> {
 }
 
 export function convertToMemoSettings(
-  MemoSettingsModel: MemoSettingsModel,
+  memoSettingsModel: MemoSettingsModel,
 ): MemoSettings {
   return {
-    id: MemoSettingsModel.id,
-    createdAt: toDate(MemoSettingsModel.created_at),
-    updatedAt: toDate(MemoSettingsModel.updated_at),
-    accountId: MemoSettingsModel.account_id,
-    listFilter: MemoSettingsModel.list_filter as MemoSettings['listFilter'],
-    listDisplay: MemoSettingsModel.list_display as MemoSettings['listDisplay'],
-    autoSave: MemoSettingsModel.auto_save,
+    id: memoSettingsModel.id,
+    createdAt: toDate(memoSettingsModel.created_at),
+    updatedAt: toDate(memoSettingsModel.updated_at),
+    accountId: memoSettingsModel.account_id,
+    listFilter: memoSettingsModel.list_filter as MemoSettings['listFilter'],
+    listDisplay: memoSettingsModel.list_display as MemoSettings['listDisplay'],
+    autoSave: memoSettingsModel.auto_save,
   }
 }

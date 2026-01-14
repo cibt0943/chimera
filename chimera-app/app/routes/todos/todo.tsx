@@ -14,55 +14,68 @@ import { TodoType } from '~/types/todos'
 import { TaskSchema } from '~/types/tasks'
 import { TodoBarSchema } from '~/types/todo-bars'
 
-export function meta({ loaderData }: Route.MetaArgs) {
-  return loaderData.todoType === TodoType.TASK
-    ? [{ title: 'Task ' + loaderData.todoId + ' Edit | IMA' }]
-    : [{ title: 'Todo Bar ' + loaderData.todoId + ' Edit | IMA' }]
-}
+async function requireAuthorizedTodo(request: Request, todoId?: string) {
+  if (!todoId) throw new Response('Not Found', { status: 404 })
 
-export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
-
-  const todo = await getTodo(params.todoId)
+  const todo = await getTodo(todoId)
   if (todo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
+  return { loginInfo, todo }
+}
+
+export function meta({ loaderData }: Route.MetaArgs) {
+  const prefix = loaderData.todoType === TodoType.TASK ? 'Task' : 'Todo Bar'
+  return [{ title: `${prefix} ${loaderData.todoId} Edit | IMA` }]
+}
+
+export async function action({ params, request }: Route.ActionArgs) {
+  const { todo } = await requireAuthorizedTodo(request, params.todoId)
   const formData = await request.formData()
-  if (todo.type === TodoType.TASK) {
-    const submission = parseWithZod(formData, { schema: TaskSchema })
-    // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
-    if (submission.status !== 'success') {
-      throw new Response('Invalid submission data.', { status: 400 })
+
+  switch (todo.type) {
+    case TodoType.TASK: {
+      const submission = parseWithZod(formData, { schema: TaskSchema })
+      // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
+      if (submission.status !== 'success') {
+        throw new Response('Invalid submission data.', { status: 400 })
+      }
+
+      const data = submission.value
+      const task = await getTaskFromTodoId(todo.id)
+
+      await updateTask({
+        id: task.id,
+        status: data.status,
+        title: data.title,
+        memo: data.memo || '',
+        due_date: data.dueDate?.toISOString() || null,
+        due_date_all_day: !!data.dueDateAllDay,
+      })
+      break
     }
 
-    const data = submission.value
-    const task = await getTaskFromTodoId(todo.id)
+    case TodoType.BAR: {
+      const submission = parseWithZod(formData, { schema: TodoBarSchema })
+      if (submission.status !== 'success') {
+        throw new Response('Invalid submission data.', { status: 400 })
+      }
 
-    await updateTask({
-      id: task.id,
-      status: data.status,
-      title: data.title,
-      memo: data.memo || '',
-      due_date: data.dueDate?.toISOString() || null,
-      due_date_all_day: !!data.dueDateAllDay,
-    })
-  } else if (todo.type === TodoType.BAR) {
-    const submission = parseWithZod(formData, { schema: TodoBarSchema })
-    if (submission.status !== 'success') {
-      throw new Response('Invalid submission data.', { status: 400 })
+      const data = submission.value
+      const todoBar = await getTodoBarFromTodoId(todo.id)
+
+      await updateTodoBar({
+        id: todoBar.id,
+        title: data.title,
+        color: data.color || '',
+      })
+      break
     }
 
-    const data = submission.value
-    const todoBar = await getTodoBarFromTodoId(todo.id)
-
-    await updateTodoBar({
-      id: todoBar.id,
-      title: data.title,
-      color: data.color || '',
-    })
-  } else {
-    throw new Response('Not Found', { status: 404 })
+    default:
+      throw new Response('Not Found', { status: 404 })
   }
 
   const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
@@ -70,28 +83,25 @@ export async function action({ params, request }: Route.ActionArgs) {
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
-  const loginInfo = await isAuthenticated(request)
+  const { todo } = await requireAuthorizedTodo(request, params.todoId)
 
-  const todo = await getTodo(params.todoId)
-  if (todo.accountId !== loginInfo.account.id) {
-    throw new Response('Forbidden', { status: 403 })
+  switch (todo.type) {
+    case TodoType.TASK: {
+      const task = await getTaskFromTodoId(todo.id)
+      return { todoType: TodoType.TASK, todoId: todo.id, task }
+    }
+
+    case TodoType.BAR: {
+      const todoBar = await getTodoBarFromTodoId(todo.id)
+      return { todoType: TodoType.BAR, todoId: todo.id, todoBar }
+    }
+
+    default:
+      throw new Response('Not Found', { status: 404 })
   }
-
-  if (todo.type === TodoType.TASK) {
-    const task = await getTaskFromTodoId(todo.id)
-    return { todoType: TodoType.TASK, todoId: todo.id, task }
-  }
-
-  if (todo.type === TodoType.BAR) {
-    const todoBar = await getTodoBarFromTodoId(todo.id)
-    return { todoType: TodoType.BAR, todoId: todo.id, todoBar }
-  }
-
-  throw new Response('Not Found', { status: 404 })
 }
 
 export default function Todo({ loaderData }: Route.ComponentProps) {
-  const { todoType } = loaderData
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
   const navigate = useNavigate()
   const redirectUrl = TODO_URL
@@ -103,23 +113,28 @@ export default function Todo({ loaderData }: Route.ComponentProps) {
     navigate(redirectUrl)
   }
 
-  if (todoType === TodoType.BAR) {
-    return (
-      <TodoBarFormDialog
-        todoBar={loaderData.todoBar}
-        isOpen={isOpenDialog}
-        onOpenChange={onOpenChange}
-        redirectUrl={redirectUrl}
-      />
-    )
-  }
+  switch (loaderData.todoType) {
+    case TodoType.BAR:
+      return (
+        <TodoBarFormDialog
+          todoBar={loaderData.todoBar}
+          isOpen={isOpenDialog}
+          onOpenChange={onOpenChange}
+          redirectUrl={redirectUrl}
+        />
+      )
 
-  return (
-    <TaskFormDialog
-      task={loaderData.task}
-      isOpen={isOpenDialog}
-      onOpenChange={onOpenChange}
-      redirectUrl={redirectUrl}
-    />
-  )
+    case TodoType.TASK:
+      return (
+        <TaskFormDialog
+          task={loaderData.task}
+          isOpen={isOpenDialog}
+          onOpenChange={onOpenChange}
+          redirectUrl={redirectUrl}
+        />
+      )
+
+    default:
+      return null
+  }
 }

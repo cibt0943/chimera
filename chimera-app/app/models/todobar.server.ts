@@ -11,6 +11,8 @@ export type InsertTodoBarModel =
 export type UpdateTodoBarModel =
   Database['public']['Tables']['todo_bars']['Update'] & { id: string } // idを必須で上書き
 
+export type AddTodoBarModel = Omit<InsertTodoBarModel, 'todo_id'>
+
 // TodoBarを取得
 export async function getTodoBar(todoBarId: string): Promise<TodoBar> {
   const { data: todoBarData, error: todoBarError } = await supabase
@@ -44,21 +46,17 @@ export async function getTodoBarFromTodoId(todoId: string): Promise<TodoBar> {
 }
 
 // TodoBarの追加
-export async function addTodoBar(
-  todoBar: InsertTodoBarModel,
-): Promise<TodoBar> {
+export async function addTodoBar(todoBar: AddTodoBarModel): Promise<TodoBar> {
   // まずはTodoを追加
   const newTodo = await addTodo({
     account_id: todoBar.account_id,
     type: TodoType.BAR,
   })
 
-  todoBar.todo_id = newTodo.id
-
   // TodoBarを追加
   const { data: newTodoBar, error: errorNewTodoBar } = await supabase
     .from('todo_bars')
-    .insert({ ...todoBar })
+    .insert({ ...todoBar, todo_id: newTodo.id })
     .select()
     .single()
   if (errorNewTodoBar || !newTodoBar)
@@ -88,7 +86,7 @@ export async function updateTodoBar(
 // TodoBarの削除
 export async function deleteTodoBar(todoBarId: string): Promise<void> {
   const todoBar = await getTodoBar(todoBarId)
-  deleteTodoBarFromTodoId(todoBar.todoId)
+  await deleteTodoBarFromTodoId(todoBar.todoId)
 }
 
 // TodoIdからTodoBarの削除

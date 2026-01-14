@@ -3,7 +3,7 @@ import type { Database } from '~/types/schema'
 import { TodoType, Todo, Todos } from '~/types/todos'
 import { supabase } from '~/lib/supabase-client.server'
 
-// DBのタスクテーブルの型
+// DBのTodoテーブルの型
 export type TodoModel = Database['public']['Tables']['todos']['Row']
 export type InsertTodoModel = Omit<
   Database['public']['Tables']['todos']['Insert'],
@@ -22,7 +22,7 @@ export async function getTodos(
   accountId: string,
   options?: GetTodosOptionParams,
 ): Promise<Todos> {
-  const { dueDateStart, dueDateEnd } = options || {}
+  const { dueDateStart, dueDateEnd } = options ?? {}
 
   let query = supabase
     .from('todos')
@@ -41,11 +41,7 @@ export async function getTodos(
   const { data, error } = await query
   if (error) throw error
 
-  const todos = data.map((todoModel) => {
-    return convertToTodo(todoModel)
-  })
-
-  return todos
+  return data.map(convertToTodo)
 }
 
 // Todoを取得
@@ -65,14 +61,14 @@ export async function addTodo(todo: InsertTodoModel): Promise<Todo> {
   // 現在の最大表示位置を取得
   const { data: maxTodo, error: errorMaxTodo } = await supabase
     .from('todos')
-    .select()
+    .select('position')
     .eq('account_id', todo.account_id)
     .order('position', { ascending: false })
     .limit(1)
   if (errorMaxTodo) throw errorMaxTodo
 
   // 新しい表示位置を計算
-  const newPosition = maxTodo.length > 0 ? maxTodo[0].position + 1 : 1
+  const newPosition = (maxTodo?.[0]?.position ?? 0) + 1
 
   // Todoを追加
   const { data: newTodo, error: errorNewTodo } = await supabase
@@ -140,7 +136,7 @@ export async function setTodoPosition(
     .order('position')
   if (errorTodosToUpdate) throw errorTodosToUpdate
 
-  // 間のタスクの位置を変更
+  // 間のTodoの位置を変更
   await updateTodosPosition(todosToUpdate, isUp)
 
   // 移動するタスクの位置を変更

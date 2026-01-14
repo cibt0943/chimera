@@ -20,7 +20,7 @@ export async function getMemos(
   accountId: string,
   options?: GetMemosOptionParams,
 ): Promise<Memos> {
-  const { statuses, relatedDateStart, relatedDateEnd } = options || {}
+  const { statuses, relatedDateStart, relatedDateEnd } = options ?? {}
 
   let query = supabase
     .from('memos')
@@ -44,11 +44,7 @@ export async function getMemos(
   const { data, error } = await query
   if (error) throw error
 
-  const memos = data.map((memo) => {
-    return convertToMemo(memo)
-  })
-
-  return memos
+  return data.map(convertToMemo)
 }
 
 // メモを取得
@@ -67,13 +63,13 @@ export async function getMemo(memoId: string): Promise<Memo> {
 export async function addMemo(memo: InsertMemoModel): Promise<Memo> {
   const { data: maxMemo, error: errorMaxMemo } = await supabase
     .from('memos')
-    .select()
+    .select('position')
     .eq('account_id', memo.account_id)
     .order('position', { ascending: false })
     .limit(1)
   if (errorMaxMemo) throw errorMaxMemo
 
-  const position = maxMemo.length > 0 ? maxMemo[0].position + 1 : 1
+  const position = (maxMemo?.[0]?.position ?? 0) + 1
 
   const { data: newMemo, error: errorNewMemo } = await supabase
     .from('memos')
@@ -133,7 +129,7 @@ export async function updateMemoPosition(
   await updateMemosPosition(memosToUpdate, isUp)
 
   // 移動するメモの位置を変更
-  return await updateMemo({
+  return updateMemo({
     id: fromMemo.id,
     position,
   })

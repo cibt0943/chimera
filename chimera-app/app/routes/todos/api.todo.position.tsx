@@ -5,14 +5,24 @@ import type { Route } from './+types/api.todo.position'
 export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
 
-  const fromTodo = await getTodo(params.todoId || '')
-  if (fromTodo.accountId !== loginInfo.account.id) {
-    throw new Response('Forbidden', { status: 403 })
+  if (!params.todoId) {
+    throw new Response('Not Found', { status: 404 })
   }
 
-  const data = await request.json()
-  const toTodo = await getTodo(data.toTodoId)
-  if (toTodo.accountId !== loginInfo.account.id) {
+  const { toTodoId } = (await request.json()) as { toTodoId?: string }
+  if (!toTodoId) {
+    throw new Response('Invalid submission data.', { status: 400 })
+  }
+
+  const [fromTodo, toTodo] = await Promise.all([
+    getTodo(params.todoId),
+    getTodo(toTodoId),
+  ])
+
+  if (
+    fromTodo.accountId !== loginInfo.account.id ||
+    toTodo.accountId !== loginInfo.account.id
+  ) {
     throw new Response('Forbidden', { status: 403 })
   }
 

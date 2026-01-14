@@ -15,9 +15,7 @@ export function meta() {
 
 export async function action({ request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
-
   const formData = await request.formData()
-
   const submission = parseWithZod(formData, { schema: TodoBarSchema })
 
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
@@ -32,7 +30,6 @@ export async function action({ request }: Route.ActionArgs) {
 
   await addTodoBar({
     account_id: loginInfo.account.id,
-    todo_id: '',
     title: data.title,
     color: data.color || '',
   })
@@ -46,7 +43,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   return {}
 }
 
-export default function TaskCreate() {
+export default function TodoBarCreate() {
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
   const navigate = useNavigate()
   const redirectUrl = TODO_URL
