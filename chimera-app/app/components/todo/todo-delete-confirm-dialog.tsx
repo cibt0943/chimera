@@ -5,7 +5,6 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '~/components/ui/alert-dialog'
-import { buttonVariants } from '~/components/ui/button'
 import { TODO_URL } from '~/constants'
 import { sleep } from '~/lib/utils'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
@@ -51,7 +50,7 @@ export function TodoDeleteConfirmDialog({
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <AlertDialogAction
-        className={buttonVariants({ variant: 'destructive' })}
+        variant="destructive"
         onClick={async () => {
           await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
           fetcher.submit({ redirectUrl }, { method: 'delete', action })

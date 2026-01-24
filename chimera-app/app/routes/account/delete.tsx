@@ -13,6 +13,5 @@ export async function action({ request }: Route.ActionArgs) {
   // DBからアカウントを削除
   await deleteAccount(loginInfo.account.id)
 
-  const url = `${AUTH_URL}/logout`
-  return redirect(url)
+  return redirect(`${AUTH_URL}/logout`)
 }

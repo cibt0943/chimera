@@ -1,4 +1,4 @@
-import { format, toDate } from 'date-fns'
+import { toDate } from 'date-fns'
 import type { Database } from '~/types/schema'
 import { TodoType, Todo, Todos } from '~/types/todos'
 import { supabase } from '~/lib/supabase-client.server'
@@ -12,33 +12,13 @@ export type InsertTodoModel = Omit<
 export type UpdateTodoModel =
   Database['public']['Tables']['todos']['Update'] & { id: string } // idを必須で上書き
 
-interface GetTodosOptionParams {
-  dueDateStart?: Date
-  dueDateEnd?: Date
-}
-
 // Todo一覧を取得
-export async function getTodos(
-  accountId: string,
-  options?: GetTodosOptionParams,
-): Promise<Todos> {
-  const { dueDateStart, dueDateEnd } = options ?? {}
-
-  let query = supabase
+export async function getTodos(accountId: string): Promise<Todos> {
+  const { data, error } = await supabase
     .from('todos')
     .select()
     .eq('account_id', accountId)
     .order('position', { ascending: false })
-
-  if (dueDateStart) {
-    query = query.gt('due_date', format(dueDateStart, 'yyyy-MM-dd'))
-  }
-
-  if (dueDateEnd) {
-    query = query.lt('due_date', format(dueDateEnd, 'yyyy-MM-dd'))
-  }
-
-  const { data, error } = await query
   if (error) throw error
 
   return data.map(convertToTodo)

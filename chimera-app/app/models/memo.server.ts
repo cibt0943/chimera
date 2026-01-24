@@ -74,7 +74,7 @@ export async function addMemo(memo: InsertMemoModel): Promise<Memo> {
   const { data: newMemo, error: errorNewMemo } = await supabase
     .from('memos')
     .insert({ ...memo, position })
-    .select()
+    .select('id')
     .single()
   if (errorNewMemo || !newMemo) throw errorNewMemo || new Error('erorr')
 
@@ -92,7 +92,7 @@ export async function updateMemo(
     .from('memos')
     .update(memo)
     .eq('id', memo.id)
-    .select()
+    .select('id')
     .single()
   if (error || !data) throw error || new Error('erorr')
 
@@ -108,7 +108,7 @@ export async function deleteMemo(memoId: string): Promise<void> {
 // メモの位置を変更
 // memoIdにて指定されたメモの位置をpositionに変更します。
 // この変更による他のメモの位置の変更もあわせて行います。
-export async function updateMemoPosition(
+export async function setMemoPosition(
   memoId: string,
   position: number,
 ): Promise<Memo> {

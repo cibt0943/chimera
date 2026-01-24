@@ -1,6 +1,5 @@
 import * as zod from 'zod'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
-import { TaskStatus } from '~/types/tasks'
 import { getTodo } from '~/models/todo.server'
 import {
   getTaskFromTodoId,
@@ -8,8 +7,9 @@ import {
   UpdateTaskModel,
 } from '~/models/task.server'
 import { getTodoBarFromTodoId } from '~/models/todobar.server'
-import type { Route } from './+types/api.todo'
 import { TodoType } from '~/types/todos'
+import { TaskStatus } from '~/types/tasks'
+import type { Route } from './+types/api.todo'
 
 const updateTaskSchema = zod.object({
   status: zod.preprocess((v) => Number(v), zod.enum(TaskStatus)).optional(),
@@ -17,9 +17,7 @@ const updateTaskSchema = zod.object({
   dueDateAllDay: zod.preprocess((v) => v === 'on', zod.boolean()).optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
 })
 
-async function requireAuthorizedTodo(request: Request, todoId?: string) {
-  if (!todoId) throw new Response('Not Found', { status: 404 })
-
+async function requireAuthorizedTodo(request: Request, todoId: string) {
   const loginInfo = await isAuthenticated(request)
   const todo = await getTodo(todoId)
   if (todo.accountId !== loginInfo.account.id) {

@@ -8,20 +8,25 @@ import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getMemo, updateMemo } from '~/models/memo.server'
 import { MemoFormView } from '~/components/memo/memo-form-view'
 import { MemoFormDialog } from '~/components/memo/memo-form-dialog'
-import type { Route } from './+types/memo'
 import { MemoSchema } from '~/types/memos'
+import type { Route } from './+types/memo'
 
 export function meta({ params }: Route.MetaArgs) {
-  return [{ title: 'Memo ' + params.memoId + ' | IMA' }]
+  return [{ title: `Memo ${params.memoId} | IMA` }]
 }
 
-export async function action({ params, request }: Route.ActionArgs) {
+async function requireAuthorizedMemo(request: Request, memoId: string) {
   const loginInfo = await isAuthenticated(request)
-
-  const memo = await getMemo(params.memoId || '')
+  const memo = await getMemo(memoId)
   if (memo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
+
+  return { memo }
+}
+
+export async function action({ params, request }: Route.ActionArgs) {
+  const { memo } = await requireAuthorizedMemo(request, params.memoId)
 
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: MemoSchema })
@@ -32,28 +37,21 @@ export async function action({ params, request }: Route.ActionArgs) {
 
   const data = submission.value
 
-  const [title, ...content] = (data.content || '').split('\n')
+  const [title, ...content] = (data.content ?? '').split('\n')
   const updatedMemo = await updateMemo({
     id: memo.id,
-    title: title,
+    title,
     content: content.join('\n'),
-    related_date: data.relatedDate?.toISOString() || null,
-    related_date_all_day: !!data.relatedDateAllDay,
+    related_date: data.relatedDate?.toISOString() ?? null,
+    related_date_all_day: Boolean(data.relatedDateAllDay),
   })
 
-  const redirectUrl = formData.get('redirectUrl') as string
+  const redirectUrl = formData.get('redirectUrl')?.toString()
   return redirectUrl ? redirect(redirectUrl) : { updatedMemo }
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
-  const loginInfo = await isAuthenticated(request)
-
-  const memo = await getMemo(params.memoId || '')
-  if (memo.accountId !== loginInfo.account.id) {
-    throw new Response('Forbidden', { status: 403 })
-  }
-
-  return { memo }
+  return await requireAuthorizedMemo(request, params.memoId)
 }
 
 export default function Memo({ loaderData }: Route.ComponentProps) {
@@ -63,6 +61,13 @@ export default function Memo({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate()
   const redirectUrl = MEMO_URL
 
+  const onOpenChange = async (open: boolean) => {
+    setIsOpenDialog(open)
+    if (open) return
+    await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
+    navigate(redirectUrl)
+  }
+
   if (isLaptop) {
     return <MemoFormView memo={memo} />
   }
@@ -71,12 +76,7 @@ export default function Memo({ loaderData }: Route.ComponentProps) {
     <MemoFormDialog
       memo={memo}
       isOpen={isOpenDialog}
-      onOpenChange={async (open) => {
-        setIsOpenDialog(open)
-        if (open) return
-        await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
-        navigate(redirectUrl)
-      }}
+      onOpenChange={onOpenChange}
       redirectUrl={redirectUrl}
     />
   )

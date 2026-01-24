@@ -20,15 +20,14 @@ export async function action({ request }: Route.ActionArgs) {
 
   const data = submission.value
 
-  const [title, ...content] = (data.content || '').split('\n')
+  const [title, ...content] = (data.content ?? '').split('\n')
   const newMemo = await addMemo({
     account_id: loginInfo.account.id,
-    title: title,
+    title,
     content: content.join('\n'),
     status: MemoStatus.NOMAL,
-    related_date: data.relatedDate?.toISOString() || null,
-    related_date_all_day:
-      data.relatedDateAllDay === undefined ? true : data.relatedDateAllDay,
+    related_date: data.relatedDate?.toISOString() ?? null,
+    related_date_all_day: data.relatedDateAllDay ?? true,
   })
 
   return redirect(`${MEMO_URL}/${newMemo.id}`)

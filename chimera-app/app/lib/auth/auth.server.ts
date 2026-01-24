@@ -24,7 +24,7 @@ async function getUser(tokens: OAuth2Tokens, _request: Request) {
   const auth0User = (await response.json()) as Auth0User
 
   // DBからアカウント情報を取得または作成
-  const account = await getOrInsertAccount({ sub: auth0User.sub })
+  const account = await getOrInsertAccount(auth0User.sub)
 
   // Auth0Userの情報とDBにて独自に管理しているアカウント情報を返す
   return { auth0User, account }

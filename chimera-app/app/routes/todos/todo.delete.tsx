@@ -4,12 +4,10 @@ import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { deleteTaskFromTodoId } from '~/models/task.server'
 import { deleteTodoBarFromTodoId } from '~/models/todobar.server'
 import { getTodo } from '~/models/todo.server'
-import type { Route } from './+types/todo.delete'
 import { TodoType } from '~/types/todos'
+import type { Route } from './+types/todo.delete'
 
-async function requireAuthorizedTodo(request: Request, todoId?: string) {
-  if (!todoId) throw new Response('Not Found', { status: 404 })
-
+async function requireAuthorizedTodo(request: Request, todoId: string) {
   const loginInfo = await isAuthenticated(request)
   const todo = await getTodo(todoId)
   if (todo.accountId !== loginInfo.account.id) {
@@ -21,6 +19,7 @@ async function requireAuthorizedTodo(request: Request, todoId?: string) {
 
 export async function action({ params, request }: Route.ActionArgs) {
   const { todo } = await requireAuthorizedTodo(request, params.todoId)
+
   const formData = await request.formData()
   const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
 

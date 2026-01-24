@@ -1,3 +1,4 @@
+import { toDate } from 'date-fns'
 import { supabase } from '~/lib/supabase-client.server'
 import { addTodo, deleteTodo, TodoModel } from '~/models/todo.server'
 import type { Database } from '~/types/schema'
@@ -13,31 +14,31 @@ export type UpdateTodoBarModel =
 
 export type AddTodoBarModel = Omit<InsertTodoBarModel, 'todo_id'>
 
+type TodoBarJoinTodoModel = TodoBarModel & { todos: TodoModel | null }
+
+const TODOBAR_WITH_TODO_SELECT = '*, todos!todo_bars_todo_id_fkey(*)'
+
 // TodoBarを取得
 export async function getTodoBar(todoBarId: string): Promise<TodoBar> {
   const { data: todoBarData, error: todoBarError } = await supabase
     .from('todo_bars')
-    .select()
+    .select(TODOBAR_WITH_TODO_SELECT)
     .eq('id', todoBarId)
     .single()
   if (todoBarError || !todoBarData) throw todoBarError || new Error('erorr')
 
-  // 関連するTodoを取得
-  const { data: todoData, error: todoError } = await supabase
-    .from('todos')
-    .select()
-    .eq('id', todoBarData.todo_id)
-    .single()
-  if (todoError || !todoData) throw todoError || new Error('erorr')
+  const { todos: todoModel, ...todoBarModel } =
+    todoBarData as TodoBarJoinTodoModel
+  if (!todoModel) throw new Error('todo not found')
 
-  return convertToTodoBar(todoData, todoBarData)
+  return convertToTodoBar(todoModel, todoBarModel as TodoBarModel)
 }
 
 // TodoIdからTodoBarを取得
 export async function getTodoBarFromTodoId(todoId: string): Promise<TodoBar> {
   const { data: todoBarData, error: todoBarError } = await supabase
     .from('todo_bars')
-    .select()
+    .select('id')
     .eq('todo_id', todoId)
     .single()
   if (todoBarError || !todoBarData) throw todoBarError || new Error('erorr')
@@ -57,7 +58,7 @@ export async function addTodoBar(todoBar: AddTodoBarModel): Promise<TodoBar> {
   const { data: newTodoBar, error: errorNewTodoBar } = await supabase
     .from('todo_bars')
     .insert({ ...todoBar, todo_id: newTodo.id })
-    .select()
+    .select('id')
     .single()
   if (errorNewTodoBar || !newTodoBar)
     throw errorNewTodoBar || new Error('erorr')
@@ -76,7 +77,7 @@ export async function updateTodoBar(
     .from('todo_bars')
     .update(todoBar)
     .eq('id', todoBar.id)
-    .select()
+    .select('id')
     .single()
   if (error || !data) throw error || new Error('erorr')
 
@@ -109,8 +110,8 @@ function convertToTodoBar(
 ): TodoBar {
   return {
     id: todoBarModel.id,
-    createdAt: new Date(todoBarModel.created_at),
-    updatedAt: new Date(todoBarModel.updated_at),
+    createdAt: toDate(todoBarModel.created_at),
+    updatedAt: toDate(todoBarModel.updated_at),
     accountId: todoBarModel.account_id,
     todoId: todoModel.id,
     type: TodoType.BAR,

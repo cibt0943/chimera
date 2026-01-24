@@ -5,7 +5,6 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '~/components/ui/alert-dialog'
-import { buttonVariants } from '~/components/ui/button'
 import { ACCOUNT_URL } from '~/constants'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
 import type { AccountGeneral } from '~/types/accounts'
@@ -34,7 +33,7 @@ export function AccountDeleteConfirmDialog({
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <AlertDialogAction
         type="submit"
-        className={buttonVariants({ variant: 'destructive' })}
+        variant="destructive"
         form="delete-account-form"
       >
         {t('common.message.delete')}

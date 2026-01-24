@@ -10,10 +10,9 @@ export function meta() {
 
 export async function loader({ request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
-  // セッションに保存している情報はセッションの値を使う
-  // const account = await getAccount(loginInfo.account.id)
   const auth0User = await getAuth0User(loginInfo.auth0User.sub)
-  const accountSettings = {
+
+  const accountSettings: AccountSettings = {
     general: {
       name: loginInfo.auth0User.name,
       language: loginInfo.account.language,

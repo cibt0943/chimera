@@ -9,32 +9,30 @@ import { getTaskFromTodoId, updateTask } from '~/models/task.server'
 import { getTodoBarFromTodoId, updateTodoBar } from '~/models/todobar.server'
 import { TaskFormDialog } from '~/components/todo/task-form-dialog'
 import { TodoBarFormDialog } from '~/components/todo/todo-bar-form-dialog'
-import type { Route } from './+types/todo'
 import { TodoType } from '~/types/todos'
 import { TaskSchema } from '~/types/tasks'
 import { TodoBarSchema } from '~/types/todo-bars'
-
-async function requireAuthorizedTodo(request: Request, todoId?: string) {
-  if (!todoId) throw new Response('Not Found', { status: 404 })
-
-  const loginInfo = await isAuthenticated(request)
-  const todo = await getTodo(todoId)
-  if (todo.accountId !== loginInfo.account.id) {
-    throw new Response('Forbidden', { status: 403 })
-  }
-
-  return { loginInfo, todo }
-}
+import type { Route } from './+types/todo'
 
 export function meta({ loaderData }: Route.MetaArgs) {
   const prefix = loaderData.todoType === TodoType.TASK ? 'Task' : 'Todo Bar'
   return [{ title: `${prefix} ${loaderData.todoId} Edit | IMA` }]
 }
 
+async function requireAuthorizedTodo(request: Request, todoId: string) {
+  const loginInfo = await isAuthenticated(request)
+  const todo = await getTodo(todoId)
+  if (todo.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
+
+  return { todo }
+}
+
 export async function action({ params, request }: Route.ActionArgs) {
   const { todo } = await requireAuthorizedTodo(request, params.todoId)
-  const formData = await request.formData()
 
+  const formData = await request.formData()
   switch (todo.type) {
     case TodoType.TASK: {
       const submission = parseWithZod(formData, { schema: TaskSchema })
