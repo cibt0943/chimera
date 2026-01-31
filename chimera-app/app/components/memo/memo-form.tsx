@@ -115,10 +115,7 @@ export function MemoForm({
           <TextareaConform
             meta={fields.content}
             key={fields.content.key}
-            className={cn(
-              'resize-none bg-[#303841] text-white focus-visible:ring-0',
-              className,
-            )}
+            className={cn('resize-none bg-[#303841] text-white', className)}
             {...otherProps}
           />
           <FormMessage message={fields.content.errors} />
@@ -128,7 +125,7 @@ export function MemoForm({
             fallback={
               <DummyDateTimePicker
                 placeholder={t('memo.model.related_date')}
-                className="w-52"
+                className="w-56"
               />
             }
           >
@@ -141,7 +138,7 @@ export function MemoForm({
                 onChangeData={handleChangeMemo}
                 onChangeAllDay={handleChangeMemo}
                 placeholder={t('memo.model.related_date')}
-                className="w-52"
+                className="w-56"
               />
             )}
           </ClientOnly>

@@ -75,7 +75,7 @@ export function TaskForm({ task, redirectUrl }: TaskFormProps) {
 
   return (
     <fetcher.Form method="post" {...getFormProps(form)} action={action}>
-      <div className="max-h-[calc(100svh_-_240px)] space-y-8 overflow-y-auto p-0.5">
+      <div className="max-h-[calc(100svh-240px)] space-y-8 overflow-y-auto p-0.5">
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
             {t('task.model.title')}

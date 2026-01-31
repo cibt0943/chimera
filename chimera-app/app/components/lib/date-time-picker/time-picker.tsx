@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { LuClock9 } from 'react-icons/lu'
-import { cn } from '~/lib/utils'
-import { TimePickerInput } from './time-picker-input'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '~/components/ui/input-group'
 
 interface TimePickerProps {
   date: Date | undefined
@@ -9,44 +12,28 @@ interface TimePickerProps {
   minuteStep?: number
 }
 
-export function TimePicker({
-  date,
-  setDate,
-  minuteStep = 15,
-}: TimePickerProps) {
-  const hourRef = React.useRef<HTMLInputElement>(null)
-  const minuteRef = React.useRef<HTMLInputElement>(null)
-
+export function TimePicker({ date, setDate }: TimePickerProps) {
   return (
-    <div
-      className={cn(
-        'flex items-center',
-        'border-input focus-within:ring-ring gap-0.5 rounded-md border bg-transparent p-px focus-within:ring-1 focus-within:outline-hidden',
-      )}
-    >
-      <div className="px-1">
+    <InputGroup>
+      <InputGroupInput
+        type="time"
+        step="900"
+        defaultValue={date?.toTimeString().substring(0, 5)}
+        onChange={(e) => {
+          if (e.target.value) {
+            const [hours, minutes] = e.target.value.split(':').map(Number)
+            const newDate = date ? new Date(date) : new Date()
+            newDate.setHours(hours, minutes, 0, 0)
+            setDate(newDate)
+          } else {
+            setDate(undefined)
+          }
+        }}
+        className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+      />
+      <InputGroupAddon>
         <LuClock9 className="text-muted-foreground" />
-      </div>
-      <div className="text-center">
-        <TimePickerInput
-          picker="hours"
-          date={date}
-          setDate={setDate}
-          ref={hourRef}
-          onRightFocus={() => minuteRef.current?.focus()}
-        />
-      </div>
-      <div className="text-center">:</div>
-      <div className="text-center">
-        <TimePickerInput
-          picker="minutes"
-          date={date}
-          setDate={setDate}
-          ref={minuteRef}
-          onLeftFocus={() => hourRef.current?.focus()}
-          step={minuteStep}
-        />
-      </div>
-    </div>
+      </InputGroupAddon>
+    </InputGroup>
   )
 }

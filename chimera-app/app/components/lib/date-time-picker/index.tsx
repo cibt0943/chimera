@@ -118,11 +118,7 @@ export function DateTimePicker({
     >
       <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
         <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
-            id={triggerId}
-            className="grow justify-start px-2"
-          >
+          <Button variant="ghost" id={triggerId} className="grow justify-start">
             <LuCalendar className="text-muted-foreground" />
             <DispValue
               date={localDate}
@@ -202,7 +198,11 @@ function TimeControl({
       {includeAllDayComponent && (
         <ToggleAllDay allDay={allDay} onChangeAllDay={onChangeAllDay} />
       )}
-      {!allDay && <TimePicker date={date} setDate={onChangeDate} />}
+      {!allDay && (
+        <div>
+          <TimePicker date={date} setDate={onChangeDate} />
+        </div>
+      )}
     </div>
   )
 }
@@ -263,7 +263,7 @@ export function DummyDateTimePicker({
 }: DummyDateTimePickerProps) {
   return (
     <div className={cn('flex items-center rounded-md border', className)}>
-      <Button variant="ghost" className="grow justify-start px-2">
+      <Button variant="ghost" className="grow justify-start">
         <LuCalendar className="text-muted-foreground" />
         <DispValue placeholder={placeholder} />
       </Button>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Input } from '~/components/ui/input'
+import { InputGroupInput } from '~/components/ui/input-group'
 import { cn } from '~/lib/utils'
 import {
   TimePickerType,
@@ -8,8 +8,7 @@ import {
   setDateByType,
 } from './time-picker-utils'
 
-export interface TimePickerInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface TimePickerInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   picker: TimePickerType
   date: Date | undefined
   setDate: (date: Date | undefined) => void
@@ -83,7 +82,7 @@ export const TimePickerInput = React.forwardRef<
   }
 
   return (
-    <Input
+    <InputGroupInput
       ref={ref}
       id={id || picker}
       name={name || picker}
