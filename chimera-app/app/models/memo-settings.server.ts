@@ -1,5 +1,5 @@
 import { toDate } from 'date-fns'
-import type { Database } from '~/types/schema'
+import type { Database } from '~/types/database'
 import { MemoSettings } from '~/types/memo-settings'
 import { supabase } from '~/lib/supabase-client.server'
 

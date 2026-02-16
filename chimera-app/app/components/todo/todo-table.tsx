@@ -48,6 +48,14 @@ import {
   TableRow,
 } from '~/components/ui/table'
 import { Button } from '~/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from '~//components/ui/dropdown-menu'
 import { API_URL, TODO_URL } from '~/constants'
 import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
 import { TaskStatus } from '~/types/tasks'
@@ -59,6 +67,7 @@ import {
   TodoDeleteConfirmDialogProps,
 } from './todo-delete-confirm-dialog'
 import { useUserAgentAtom } from '~/lib/global-state'
+import { TodoType } from '~/types/todos'
 
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
@@ -373,27 +382,29 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <Button
-          variant="secondary"
-          className="h-8 px-3"
-          onClick={openAddTaskDialog}
-        >
-          <LuPlus />
-          {t('task.message.task_creation')}
-          <p className="text-muted-foreground hidden text-xs sm:block">
-            <kbd className="pointer-events-none inline-flex h-5 items-center gap-1 rounded border px-1.5 select-none">
-              <span>{userAgent.modifierKeyIcon}</span>n
-            </kbd>
-          </p>
-        </Button>
-        <Button
-          variant="secondary"
-          className="h-8 px-3"
-          onClick={openAddTodoBarDialog}
-        >
-          <LuPlus />
-          {t('todoBar.message.todo_bar_creation')}
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="default" size="icon-sm" className="rounded-full">
+              <LuPlus />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={openAddTaskDialog}>
+                {t('task.message.task_creation')}
+                <DropdownMenuShortcut>
+                  {userAgent.modifierKeyIcon} n
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={openAddTodoBarDialog}>
+                {t('todoBar.message.todo_bar_creation')}
+                <DropdownMenuShortcut>
+                  {userAgent.modifierKeyIcon} b
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <TodoTableToolbar table={table} />
       </div>
       <div className="rounded-md border">
@@ -594,19 +605,12 @@ function useTodoTableGlobalHotkeys(params: {
   )
 }
 
-// D&D用の行コンポーネント
-function DraggableRow({ row }: { row: Row<ViewTodo> }) {
-  const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: row.original.todoId,
-  })
-
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition: transition,
-    opacity: isDragging ? 0.8 : 1,
-    zIndex: isDragging ? 1 : 0,
-    position: 'relative',
-  }
+function renderDraggableTaskRow(params: {
+  row: Row<ViewTodo>
+  setNodeRef: (node: HTMLElement | null) => void
+  style: React.CSSProperties
+}) {
+  const { row, setNodeRef, style } = params
 
   return (
     <TableRow
@@ -625,6 +629,71 @@ function DraggableRow({ row }: { row: Row<ViewTodo> }) {
       ))}
     </TableRow>
   )
+}
+
+function renderDraggableBarRow(params: {
+  row: Row<ViewTodo>
+  setNodeRef: (node: HTMLElement | null) => void
+  style: React.CSSProperties
+}) {
+  const { row, setNodeRef, style } = params
+
+  const cells = row.getVisibleCells()
+  const firstCell = cells[0]
+  const lastCell = cells[cells.length - 1]
+  const middleColSpan = cells.length - 2
+
+  const viewTodo = row.original
+  const colorStyle = {
+    backgroundColor: viewTodo.bgColor ?? undefined,
+    color: viewTodo.textColor ?? undefined,
+  }
+
+  return (
+    <TableRow
+      id={`row-${row.id}`}
+      ref={setNodeRef}
+      tabIndex={0}
+      className="focus:ring-ring rounded outline-hidden focus:ring-1 focus:ring-inset"
+      style={{ ...style }}
+      onFocus={() => row.toggleSelected(true)}
+      data-state={row.getIsSelected() && 'selected'}
+    >
+      <TableCell key={firstCell.id} className="py-1" style={{ ...colorStyle }}>
+        {flexRender(firstCell.column.columnDef.cell, firstCell.getContext())}
+      </TableCell>
+      <TableCell
+        key={cells[1].id}
+        colSpan={middleColSpan}
+        className="py-1"
+        style={{ ...colorStyle }}
+      >
+        {flexRender(cells[1].column.columnDef.cell, cells[1].getContext())}
+      </TableCell>
+      <TableCell key={lastCell.id} className="py-1" style={{ ...colorStyle }}>
+        {flexRender(lastCell.column.columnDef.cell, lastCell.getContext())}
+      </TableCell>
+    </TableRow>
+  )
+}
+
+// D&D用の行コンポーネント
+function DraggableRow({ row }: { row: Row<ViewTodo> }) {
+  const { transform, transition, setNodeRef, isDragging } = useSortable({
+    id: row.original.todoId,
+  })
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition: transition,
+    opacity: isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 1 : 0,
+    position: 'relative',
+  }
+
+  return row.original.type === TodoType.TASK
+    ? renderDraggableTaskRow({ row, setNodeRef, style })
+    : renderDraggableBarRow({ row, setNodeRef, style })
 }
 
 // タスク削除ダイアログのメモ化

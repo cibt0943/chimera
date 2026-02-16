@@ -31,7 +31,8 @@ export async function action({ request }: Route.ActionArgs) {
   await addTodoBar({
     account_id: loginInfo.account.id,
     title: data.title,
-    color: data.color || '',
+    bg_color: data.bgColor || '',
+    text_color: data.textColor || '',
   })
 
   const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL

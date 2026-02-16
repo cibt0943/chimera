@@ -15,25 +15,6 @@ import { TodoType } from '~/types/todos'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
 
-// Cell Component
-function RowDragHandleCell({ rowId }: { rowId: string }) {
-  const { attributes, listeners, isDragging } = useSortable({
-    id: rowId,
-  })
-  return (
-    // Alternatively, you could set these attributes on the rows themselves
-    <Button
-      variant="ghost"
-      {...attributes}
-      {...listeners}
-      size="icon"
-      className={`touch-none select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-    >
-      <LuEqual />
-    </Button>
-  )
-}
-
 function ColumnHeader({
   column,
   title,
@@ -43,6 +24,39 @@ function ColumnHeader({
 }) {
   const { t } = useTranslation()
   return <TodoTableColumnHeader column={column} title={t(title)} />
+}
+
+function DragHandleCell({ row }: { row: Row<ViewTodo> }) {
+  const { attributes, listeners, isDragging } = useSortable({
+    id: row.id,
+  })
+
+  const viewTodo = row.original
+  const isTask = viewTodo.type === TodoType.TASK
+  const heightCss = isTask ? '' : 'h-6'
+
+  return (
+    // Alternatively, you could set these attributes on the rows themselves
+    <Button
+      variant="ghost"
+      {...attributes}
+      {...listeners}
+      size="icon"
+      className={`touch-none select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} ${heightCss}`}
+    >
+      <LuEqual />
+    </Button>
+  )
+}
+
+function TitleCell({ row }: { row: Row<ViewTodo> }) {
+  const viewTodo = row.original
+
+  return (
+    <NavLink to={`${TODO_URL}/${row.id}`} className="truncate font-medium">
+      {viewTodo.title}
+    </NavLink>
+  )
 }
 
 function DueDateCell({ row }: { row: Row<ViewTodo> }) {
@@ -66,9 +80,10 @@ function DueDateCell({ row }: { row: Row<ViewTodo> }) {
 function StatusCell({ row }: { row: Row<ViewTodo> }) {
   const { t } = useTranslation()
 
+  const viewTodo = row.original
   let status = null
-  if (row.original.status) {
-    status = TaskStatusList[row.original.status]
+  if (viewTodo.status) {
+    status = TaskStatusList[viewTodo.status]
   }
 
   return status ? (
@@ -83,16 +98,8 @@ export const TodoTableColumns: ColumnDef<ViewTodo>[] = [
     id: 'dragHandle',
     size: 40,
     header: '',
-    cell: ({ row }) => <RowDragHandleCell rowId={row.id} />,
+    cell: DragHandleCell,
   },
-  // {
-  //   accessorKey: 'id',
-  //   size: 65,
-  //   header: ({ column }) => {
-  //     return ColumnHeader({ column, title: 'task.model.id' })
-  //   },
-  //   cell: ({ row }) => <span className="">{row.id}</span>,
-  // },
   {
     accessorKey: 'title',
     size: undefined,
@@ -100,13 +107,7 @@ export const TodoTableColumns: ColumnDef<ViewTodo>[] = [
     header: ({ column }) => {
       return ColumnHeader({ column, title: 'task.model.title' })
     },
-    cell: ({ row }) => {
-      return (
-        <NavLink to={`${TODO_URL}/${row.id}`} className="truncate font-medium">
-          {row.original.title}
-        </NavLink>
-      )
-    },
+    cell: TitleCell,
     sortingFn: 'alphanumeric',
   },
   {
@@ -132,6 +133,6 @@ export const TodoTableColumns: ColumnDef<ViewTodo>[] = [
   {
     id: 'actions',
     size: 60,
-    cell: ({ row, table }) => <TodoTableRowActions row={row} table={table} />,
+    cell: TodoTableRowActions,
   },
 ]

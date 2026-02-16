@@ -4,8 +4,9 @@ create table "public"."todo_bars" (
     "updated_at" timestamp without time zone not null default now(),
     "account_id" uuid not null,
     "todo_id" uuid not null,
-    "title" text not null default ''::text,
-    "color" text not null default ''::text
+    "title" text not null,
+    "bg_color" text not null default ''::text,
+    "text_color" text not null default ''::text
 );
 
 
@@ -44,27 +45,6 @@ alter table public.tasks alter column todo_id set not null;
 -- tasksテーブルのpositionカラムを削除
 alter table "public"."tasks" drop column "position";
 -- end --
-
--- create view view_todos --
-create or replace view public.view_todos as
-select
-    t.id as todo_id,
-    t.created_at,
-    t.updated_at,
-    t.account_id,
-    t.type,
-    t.position,
-    coalesce(ts.title, b.title) as title,
-    ts.status,
-    ts.memo,
-    ts.due_date,
-    ts.due_date_all_day,
-    b.color
-from public.todos t
-left join public.tasks ts on ts.todo_id = t.id
-left join public.todo_bars b on b.todo_id = t.id;
--- end --
-
 
 CREATE UNIQUE INDEX tasks_todo_id_key ON public.tasks USING btree (todo_id);
 

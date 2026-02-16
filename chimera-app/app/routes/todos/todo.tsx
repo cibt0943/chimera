@@ -67,7 +67,8 @@ export async function action({ params, request }: Route.ActionArgs) {
       await updateTodoBar({
         id: todoBar.id,
         title: data.title,
-        color: data.color || '',
+        bg_color: data.bgColor || '',
+        text_color: data.textColor || '',
       })
       break
     }

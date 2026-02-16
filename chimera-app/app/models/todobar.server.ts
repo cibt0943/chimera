@@ -1,7 +1,7 @@
 import { toDate } from 'date-fns'
 import { supabase } from '~/lib/supabase-client.server'
 import { addTodo, deleteTodo, TodoModel } from '~/models/todo.server'
-import type { Database } from '~/types/schema'
+import type { Database } from '~/types/database'
 import { TodoType } from '~/types/todos'
 import { TodoBar } from '~/types/todo-bars'
 
@@ -117,6 +117,7 @@ function convertToTodoBar(
     type: TodoType.BAR,
     position: todoModel.position,
     title: todoBarModel.title,
-    color: todoBarModel.color,
+    bgColor: todoBarModel.bg_color,
+    textColor: todoBarModel.text_color,
   }
 }

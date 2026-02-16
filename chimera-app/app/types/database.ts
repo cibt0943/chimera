@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: '13.0.5'
-  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -91,7 +86,7 @@ export type Database = {
           location?: string
           memo?: string
           start_datetime: string
-          title?: string
+          title: string
           updated_at?: string
         }
         Update: {
@@ -265,27 +260,30 @@ export type Database = {
       todo_bars: {
         Row: {
           account_id: string
-          color: string
+          bg_color: string
           created_at: string
           id: string
+          text_color: string
           title: string
           todo_id: string
           updated_at: string
         }
         Insert: {
           account_id: string
-          color?: string
+          bg_color?: string
           created_at?: string
           id?: string
-          title?: string
+          text_color?: string
+          title: string
           todo_id: string
           updated_at?: string
         }
         Update: {
           account_id?: string
-          color?: string
+          bg_color?: string
           created_at?: string
           id?: string
+          text_color?: string
           title?: string
           todo_id?: string
           updated_at?: string
@@ -354,16 +352,17 @@ export type Database = {
       view_todos: {
         Row: {
           account_id: string
-          color: string | null
+          bg_color: string | null
           created_at: string
           due_date: string | null
           due_date_all_day: boolean | null
           memo: string | null
           position: number
           status: number | null
+          text_color: string | null
           title: string
           todo_id: string
-          type: number
+          type: number | null
           updated_at: string
         }
         Relationships: [

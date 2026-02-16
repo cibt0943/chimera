@@ -1,7 +1,7 @@
 import { format, toDate } from 'date-fns'
 import { supabase } from '~/lib/supabase-client.server'
 import { addTodo, deleteTodo, TodoModel } from '~/models/todo.server'
-import type { Database } from '~/types/schema'
+import type { Database } from '~/types/database'
 import { TodoType } from '~/types/todos'
 import { Task, TaskStatus } from '~/types/tasks'
 

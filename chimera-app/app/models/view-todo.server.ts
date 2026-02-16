@@ -1,5 +1,5 @@
 import { format, toDate } from 'date-fns'
-import type { Database } from '~/types/schema'
+import type { Database } from '~/types/database'
 import { TaskStatus } from '~/types/tasks'
 import { TodoType } from '~/types/todos'
 import { ViewTodo, ViewTodos } from '~/types/view-todos'
@@ -71,6 +71,7 @@ export function convertToViewTodo(viewTodoModel: ViewTodoModel): ViewTodo {
     memo: viewTodoModel.memo,
     dueDate: viewTodoModel.due_date ? toDate(viewTodoModel.due_date) : null,
     dueDateAllDay: viewTodoModel.due_date_all_day,
-    color: viewTodoModel.color,
+    bgColor: viewTodoModel.bg_color,
+    textColor: viewTodoModel.text_color,
   }
 }

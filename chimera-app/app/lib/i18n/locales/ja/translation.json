@@ -144,7 +144,8 @@
   "todoBar": {
     "model": {
       "title": "タイトル",
-      "color": "カラー"
+      "bgColor": "背景色",
+      "textColor": "文字色"
     },
     "message": {
       "todo_bar_creation": "バーの作成",

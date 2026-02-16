@@ -69,7 +69,8 @@ export function TaskForm({ task, redirectUrl }: TaskFormProps) {
         memo: task.memo,
         dueDate: task.dueDate,
         dueDateAllDay: task.dueDateAllDay,
-        color: null,
+        bgColor: null,
+        textColor: null,
       }
     : undefined
 

@@ -1,5 +1,5 @@
 import { toDate } from 'date-fns'
-import type { Database } from '~/types/schema'
+import type { Database } from '~/types/database'
 import { TodoType, Todo, Todos } from '~/types/todos'
 import { supabase } from '~/lib/supabase-client.server'
 

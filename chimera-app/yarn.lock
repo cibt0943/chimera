@@ -2280,6 +2280,41 @@
     "@typescript-eslint/types" "8.54.0"
     eslint-visitor-keys "^4.2.1"
 
+"@uiw/color-convert@2.9.5":
+  version "2.9.5"
+  resolved "https://registry.yarnpkg.com/@uiw/color-convert/-/color-convert-2.9.5.tgz#6b6cf276074a71ef66a58c45cc2d43b1a6c418ac"
+  integrity sha512-h0PJU/wEfuCPYwY4Lcj8soGKndXq/NIOMkOfKajW4C8JmuyMbsViXSQs3c8c7auztxhQyKMDoSQ8U8kprlLUYw==
+
+"@uiw/react-color-compact@^2.9.5":
+  version "2.9.5"
+  resolved "https://registry.yarnpkg.com/@uiw/react-color-compact/-/react-color-compact-2.9.5.tgz#410e57158b8a2710fef603f7f53550c79f85459e"
+  integrity sha512-n+sXEx3ME0JShElFmH/ZAcLnaU2e1nE7+Z+9P+ZLMXEPwKpNsOPfdnZhSqfNFkbWUFdOwY3tBEwoe4jMAUpLZg==
+  dependencies:
+    "@uiw/color-convert" "2.9.5"
+    "@uiw/react-color-editable-input" "2.9.5"
+    "@uiw/react-color-editable-input-rgba" "2.9.5"
+    "@uiw/react-color-swatch" "2.9.5"
+
+"@uiw/react-color-editable-input-rgba@2.9.5":
+  version "2.9.5"
+  resolved "https://registry.yarnpkg.com/@uiw/react-color-editable-input-rgba/-/react-color-editable-input-rgba-2.9.5.tgz#f184e5e4177356135954efbced790363d8b0e51a"
+  integrity sha512-l4XZlyopZpfMLzKL0YLk/i9AcQb3wN33oBXOw8jqCVvFTIejpfMa5iqhuGA+e4UdYvTXFv/y1nwUN1xSxSpGrQ==
+  dependencies:
+    "@uiw/color-convert" "2.9.5"
+    "@uiw/react-color-editable-input" "2.9.5"
+
+"@uiw/react-color-editable-input@2.9.5":
+  version "2.9.5"
+  resolved "https://registry.yarnpkg.com/@uiw/react-color-editable-input/-/react-color-editable-input-2.9.5.tgz#20e7cf339da8258edd2e0b2c6d259a53dbff08a1"
+  integrity sha512-zg/TQvp/VuALhOdihLb/bmp+7lXGuEYQz79MDfeEd8t9epQjM2tpvX4hd6MmYwDZiVOhZJhMnLWcX4Br6cm8CQ==
+
+"@uiw/react-color-swatch@2.9.5":
+  version "2.9.5"
+  resolved "https://registry.yarnpkg.com/@uiw/react-color-swatch/-/react-color-swatch-2.9.5.tgz#8152b97a6940b524fd537730e193101e4b7220cf"
+  integrity sha512-Jp5sUR0WsKZmNo7A/DAZe7TER8cjEjMffTD+UPWVYWbj59wzEiEKMGy2VtdD9RGE1RKAXla9Qd2gXxVVXiOZBg==
+  dependencies:
+    "@uiw/color-convert" "2.9.5"
+
 "@unrs/resolver-binding-android-arm-eabi@1.11.1":
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/@unrs/resolver-binding-android-arm-eabi/-/resolver-binding-android-arm-eabi-1.11.1.tgz#9f5b04503088e6a354295e8ea8fe3cb99e43af81"

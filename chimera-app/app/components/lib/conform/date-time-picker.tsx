@@ -4,8 +4,7 @@ import { FieldMetadata, useInputControl } from '@conform-to/react'
 import { DateTimePicker } from '~/components/lib/date-time-picker'
 import { Matcher } from 'react-day-picker'
 
-export interface DateTimePickerConformProps
-  extends React.ComponentProps<'div'> {
+export interface DateTimePickerConformProps extends React.ComponentProps<'div'> {
   dateMeta: FieldMetadata<Date | undefined>
   allDayMeta: FieldMetadata<boolean | undefined>
   defaultAllDay: boolean

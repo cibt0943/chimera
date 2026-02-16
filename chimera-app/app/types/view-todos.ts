@@ -13,7 +13,8 @@ export type ViewTodo = {
   memo: string | null
   dueDate: Date | null
   dueDateAllDay: boolean | null
-  color: string | null
+  bgColor: string | null
+  textColor: string | null
 }
 
 export type ViewTodos = ViewTodo[]

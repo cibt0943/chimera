@@ -144,7 +144,8 @@
   "todoBar": {
     "model": {
       "title": "Title",
-      "color": "Color"
+      "bgColor": "Background Color",
+      "textColor": "Text Color"
     },
     "message": {
       "todo_bar_creation": "Create Todo bar",

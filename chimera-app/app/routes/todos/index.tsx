@@ -18,7 +18,7 @@ export default function Index({ loaderData }: Route.ComponentProps) {
   const { todoId } = useParams()
 
   return (
-    <div className="p-4 pt-0 md:pt-4">
+    <div className="p-4 pt-1 md:pt-4">
       <TodoTable originalTodos={todos} showId={todoId || ''} />
       <Outlet />
     </div>

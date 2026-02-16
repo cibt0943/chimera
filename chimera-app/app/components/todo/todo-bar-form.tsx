@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useForm, getFormProps } from '@conform-to/react'
@@ -12,6 +13,7 @@ import {
 } from '~/components/lib/form'
 import { Required } from '~/components/lib/required'
 import { InputConform } from '~/components/lib/conform/input'
+import { CompactColorPickerConform } from '~/components/lib/conform/compact-color-picker'
 import { TodoDeleteButton } from './todo-delete-button'
 import { TodoType } from '~/types/todos'
 import { ViewTodo } from '~/types/view-todos'
@@ -35,7 +37,8 @@ export function TodoBarForm({ todoBar, redirectUrl }: TodoBarFormProps) {
     id: formId,
     defaultValue: todoBar || {
       title: '',
-      color: '',
+      bgColor: '',
+      textColor: '',
     },
     constraint: getZodConstraint(TodoBarSchema),
     onValidate: ({ formData }) => {
@@ -57,13 +60,14 @@ export function TodoBarForm({ todoBar, redirectUrl }: TodoBarFormProps) {
         memo: null,
         dueDate: null,
         dueDateAllDay: null,
-        color: todoBar.color,
+        bgColor: todoBar.bgColor,
+        textColor: todoBar.textColor,
       }
     : undefined
 
   return (
     <fetcher.Form method="post" {...getFormProps(form)} action={action}>
-      <div className="max-h-[calc(100svh_-_240px)] space-y-8 overflow-y-auto p-0.5">
+      <div className="max-h-[calc(100svh-240px)] space-y-8 overflow-y-auto p-0.5">
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
             {t('todoBar.model.title')}
@@ -73,16 +77,21 @@ export function TodoBarForm({ todoBar, redirectUrl }: TodoBarFormProps) {
           <FormMessage message={fields.title.errors} />
         </FormItem>
         <FormItem>
-          <FormLabel htmlFor={fields.color.id}>
-            {t('todoBar.model.color')}
+          <FormLabel htmlFor={fields.bgColor.id}>
+            {t('todoBar.model.bgColor')}
           </FormLabel>
-          <InputConform meta={fields.color} type="text" />
-          <FormMessage message={fields.color.errors} />
+          <CompactColorPickerConform meta={fields.bgColor} allowClear />
+          <FormMessage message={fields.bgColor.errors} />
         </FormItem>
-
+        <FormItem>
+          <FormLabel htmlFor={fields.textColor.id}>
+            {t('todoBar.model.textColor')}
+          </FormLabel>
+          <CompactColorPickerConform meta={fields.textColor} allowClear />
+          <FormMessage message={fields.textColor.errors} />
+        </FormItem>
         <input type="hidden" name="type" value={TodoType.BAR} />
         <input type="hidden" name="redirectUrl" value={redirectUrl} />
-
         <FormFooter className="sm:justify-between">
           <div>
             {todoBar && (

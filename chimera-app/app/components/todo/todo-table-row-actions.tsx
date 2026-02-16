@@ -41,11 +41,12 @@ export function TodoTableRowActions({
 
   const viewTodo = row.original
   const isTask = viewTodo.type === TodoType.TASK
+  const heightCss = isTask ? '' : 'h-6'
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className={heightCss}>
           <LuEllipsis />
           <span className="sr-only">Open menu</span>
         </Button>
@@ -74,62 +75,65 @@ export function TodoTableRowActions({
           </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          disabled={!isTask || viewTodo.status === TaskStatus.NEW}
-          onClick={() => {
-            if (!isTask) return
-            const upateTask = { ...viewTodo, status: TaskStatus.NEW }
-            table.options.meta?.updateTodoStatus(upateTask)
-          }}
-        >
-          <LuCircleDot />
-          {t('task.message.to_new')}
-          <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' 1'}
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          disabled={!isTask || viewTodo.status === TaskStatus.DOING}
-          onClick={() => {
-            if (!isTask) return
-            const upateTask = { ...viewTodo, status: TaskStatus.DOING }
-            table.options.meta?.updateTodoStatus(upateTask)
-          }}
-        >
-          <LuCirclePlay />
-          {t('task.message.to_doing')}
-          <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' 2'}
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          disabled={!isTask || viewTodo.status === TaskStatus.DONE}
-          onClick={() => {
-            if (!isTask) return
-            const upateTask = { ...viewTodo, status: TaskStatus.DONE }
-            table.options.meta?.updateTodoStatus(upateTask)
-          }}
-        >
-          <LuCircleCheck />
-          {t('task.message.to_done')}
-          <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' 3'}
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          disabled={!isTask || viewTodo.status === TaskStatus.PENDING}
-          onClick={() => {
-            if (!isTask) return
-            const upateTask = { ...viewTodo, status: TaskStatus.PENDING }
-            table.options.meta?.updateTodoStatus(upateTask)
-          }}
-        >
-          <LuCirclePause />
-          {t('task.message.to_pending')}
-          <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' 4'}
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
+
+        {isTask && (
+          <>
+            <DropdownMenuItem
+              disabled={viewTodo.status === TaskStatus.NEW}
+              onClick={() => {
+                const upateTask = { ...viewTodo, status: TaskStatus.NEW }
+                table.options.meta?.updateTodoStatus(upateTask)
+              }}
+            >
+              <LuCircleDot />
+              {t('task.message.to_new')}
+              <DropdownMenuShortcut>
+                {userAgent.modifierKeyIcon + ' 1'}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={viewTodo.status === TaskStatus.DOING}
+              onClick={() => {
+                const upateTask = { ...viewTodo, status: TaskStatus.DOING }
+                table.options.meta?.updateTodoStatus(upateTask)
+              }}
+            >
+              <LuCirclePlay />
+              {t('task.message.to_doing')}
+              <DropdownMenuShortcut>
+                {userAgent.modifierKeyIcon + ' 2'}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={viewTodo.status === TaskStatus.DONE}
+              onClick={() => {
+                const upateTask = { ...viewTodo, status: TaskStatus.DONE }
+                table.options.meta?.updateTodoStatus(upateTask)
+              }}
+            >
+              <LuCircleCheck />
+              {t('task.message.to_done')}
+              <DropdownMenuShortcut>
+                {userAgent.modifierKeyIcon + ' 3'}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={viewTodo.status === TaskStatus.PENDING}
+              onClick={() => {
+                const upateTask = { ...viewTodo, status: TaskStatus.PENDING }
+                table.options.meta?.updateTodoStatus(upateTask)
+              }}
+            >
+              <LuCirclePause />
+              {t('task.message.to_pending')}
+              <DropdownMenuShortcut>
+                {userAgent.modifierKeyIcon + ' 4'}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+
         <DropdownMenuItem
           onClick={() => {
             table.options.meta?.editTodo(viewTodo)

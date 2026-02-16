@@ -3,7 +3,7 @@ create table "public"."events" (
     "created_at" timestamp with time zone not null default now(),
     "updated_at" timestamp with time zone not null default now(),
     "account_id" uuid not null,
-    "title" text not null default ''::text,
+    "title" text not null,
     "start_datetime" timestamp with time zone not null,
     "end_datetime" timestamp with time zone,
     "all_day" boolean not null default false,

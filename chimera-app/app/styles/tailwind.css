@@ -2,10 +2,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:is(.dark *));
-
-/* @custom-variant dark (&:where(.dark, .dark *)); */
-
 :root {
   --radius: 0.625rem;
   --background: oklch(100% 0 0deg);

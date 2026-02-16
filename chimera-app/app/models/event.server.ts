@@ -1,5 +1,5 @@
 import { format, toDate } from 'date-fns'
-import type { Database } from '~/types/schema'
+import type { Database } from '~/types/database'
 import { Events, Event } from '~/types/events'
 import { supabase } from '~/lib/supabase-client.server'
 
