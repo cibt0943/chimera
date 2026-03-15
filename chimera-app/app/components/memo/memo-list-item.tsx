@@ -3,8 +3,7 @@ import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { LuArchive } from 'react-icons/lu'
-import { CSS } from '@dnd-kit/utilities'
-import { useSortable } from '@dnd-kit/sortable'
+import { useSortable } from '@dnd-kit/react/sortable'
 import { cn } from '~/lib/utils'
 import { useAgoFormat } from '~/lib/hooks'
 import { Memo, MemoStatus } from '~/types/memos'
@@ -36,6 +35,7 @@ function NavLinkClassName({
 // Item Component
 interface ListItemProps {
   item: Memo
+  index: number
   onFocus: () => void
   isSelected: boolean
   isPreview: boolean
@@ -43,28 +43,27 @@ interface ListItemProps {
 }
 
 export function ListItem(props: ListItemProps) {
-  const { item, onFocus, isSelected, isPreview, children } = props
+  const { item, index, onFocus, isSelected, isPreview, children } = props
 
   const { t } = useTranslation()
-  const {
-    transform,
-    transition,
-    setNodeRef,
-    isDragging,
-    attributes,
-    listeners,
-  } = useSortable({
+  const { ref, isDragging } = useSortable({
     id: item.id,
+    index,
   })
   const navigate = useNavigate()
 
+  // const style: React.CSSProperties = {
+  //   zIndex: isDragging ? 1 : 0,
+  //   position: 'relative',
+  //   WebkitTouchCallout: 'none', // iOSの長押し時のコンテキストメニューの表示を防ぐ
+  //   cursor: isDragging ? 'grabbing' : 'pointer',
+  // }
+
   const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition: transition,
-    zIndex: isDragging ? 1 : 0,
-    position: 'relative',
-    WebkitTouchCallout: 'none', // iOSの長押し時のコンテキストメニューの表示を防ぐ
-    cursor: isDragging ? 'grabbing' : 'pointer',
+    backdropFilter: isDragging ? 'blur(5px)' : undefined,
+    boxShadow: isDragging
+      ? 'inset 0 0 1px rgba(0,0,0,0.5), -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25)'
+      : undefined,
   }
 
   // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
@@ -76,10 +75,8 @@ export function ListItem(props: ListItemProps) {
 
   return (
     <div
-      {...attributes}
-      {...listeners}
       id={`memo-${item.id}`}
-      ref={setNodeRef}
+      ref={ref as React.Ref<HTMLDivElement>}
       className={NavLinkClassName({ item, isSelected })}
       style={style}
       onFocus={onFocus}

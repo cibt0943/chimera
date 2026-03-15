@@ -4,26 +4,18 @@ import { useTranslation } from 'react-i18next'
 import { LuPlus } from 'react-icons/lu'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
-  DndContext,
-  MouseSensor,
-  TouchSensor,
-  closestCenter,
-  type DragEndEvent,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+  DragDropProvider,
+  type DragEndEvent as DragEndHandler,
+  PointerSensor,
+} from '@dnd-kit/react'
+import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
 import { toast } from 'sonner'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
 import { API_URL, MEMO_URL } from '~/constants'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
+import { arrayMove } from '~/lib/utils'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
 import { MemoSettings } from '~/types/memo-settings'
 import { ListItem } from './memo-list-item'
@@ -49,17 +41,6 @@ export function MemoList({
   const { enqueue: moveMemoEnqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: { distance: 5 },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 1000,
-        tolerance: 10,
-      },
-    }),
-  )
 
   // メモ一覧データ
   const [memos, setMemos] = React.useState(originalMemos)
@@ -173,15 +154,32 @@ export function MemoList({
   }
 
   // ドラッグ&ドロップによるメモの表示順変更
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
-    if (over && active.id !== over.id) {
-      // フィルタリング後のメモデータ(dispMemos)を元に表示順更新対象のメモを取得
-      const fromMemo = dispMemos.find((memo) => memo.id === active.id)
-      const toMemo = dispMemos.find((memo) => memo.id === over.id)
-      if (!fromMemo || !toMemo) return
-      moveMemo(fromMemo, toMemo)
-    }
+  const handleDragEnd: DragEndHandler = (event) => {
+    if (event.canceled) return
+
+    // @dnd-kit/react v0.3.0 では
+    // event.operation.source、event.operation.targetともに
+    // ドロップ元のid, indexを保持しているので、
+    // event.operation.sourceからドロップ元、先情報を取得する
+
+    const source = event.operation.source
+    if (!source) return
+
+    const fromId = String(source.id)
+
+    const toIndex = (source as { index?: unknown }).index
+    if (typeof toIndex !== 'number') return
+
+    const toMemo = dispMemos[toIndex]
+    if (!toMemo) return
+
+    if (toMemo.id === fromId) return
+
+    // フィルタリング後のメモデータ(dispMemos)を元に表示順更新対象のメモを取得
+    const fromMemo = dispMemos.find((memo) => memo.id === fromId)
+    if (!fromMemo) return
+
+    moveMemo(fromMemo, toMemo)
   }
 
   // メモの表示順を変更
@@ -346,46 +344,40 @@ export function MemoList({
         />
         <MemoSettingsForm />
       </div>
-      <ScrollArea className="h-[calc(100svh_-_115px)]">
-        <DndContext
-          collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis]}
+      <ScrollArea className="h-[calc(100svh-115px)]">
+        <DragDropProvider
+          sensors={[PointerSensor]}
+          modifiers={(defaults) => [...defaults, RestrictToVerticalAxis]}
           onDragEnd={handleDragEnd}
-          sensors={sensors}
-          id="dnd-context-for-memos"
         >
           <div
             className="flex flex-col gap-2 px-3"
             id="memos"
             ref={useMemosRef}
           >
-            <SortableContext
-              items={dispMemos}
-              strategy={verticalListSortingStrategy}
-            >
-              {dispMemos.length ? (
-                dispMemos.map((item: Memo) => (
-                  <ListItem
-                    key={item.id}
-                    item={item}
-                    onFocus={() => (focusedMemoRef.current = item)}
-                    isSelected={item.id === selectedMemo?.id}
-                    isPreview={isPrevew}
-                  >
-                    <MemoActionMenu
-                      memo={item}
-                      handleMoveMemo={moveMemoOneStep}
-                      handleUpdateMemoStatus={updateMemoStatusApi}
-                      handleDeleteMemo={openDeleteMemoDialog}
-                    />
-                  </ListItem>
-                ))
-              ) : (
-                <div className="text-sm">{t('common.message.no_data')}</div>
-              )}
-            </SortableContext>
+            {dispMemos.length ? (
+              dispMemos.map((item: Memo, index) => (
+                <ListItem
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  onFocus={() => (focusedMemoRef.current = item)}
+                  isSelected={item.id === selectedMemo?.id}
+                  isPreview={isPrevew}
+                >
+                  <MemoActionMenu
+                    memo={item}
+                    handleMoveMemo={moveMemoOneStep}
+                    handleUpdateMemoStatus={updateMemoStatusApi}
+                    handleDeleteMemo={openDeleteMemoDialog}
+                  />
+                </ListItem>
+              ))
+            ) : (
+              <div className="text-sm">{t('common.message.no_data')}</div>
+            )}
           </div>
-        </DndContext>
+        </DragDropProvider>
       </ScrollArea>
       <MemoDeleteConfirmDialog
         memo={actionMemo}

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useNavigate, useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
-import { LuPlus } from 'react-icons/lu'
+import { LuEqual, LuPlus } from 'react-icons/lu'
 import {
   ColumnFiltersState,
   VisibilityState,
@@ -20,24 +20,12 @@ import {
 } from '@tanstack/react-table'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
-  DndContext,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-  closestCenter,
-  type DragEndEvent,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable,
-  sortableKeyboardCoordinates,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+  DragDropProvider,
+  type DragEndEvent as DragEndHandler,
+  PointerSensor,
+} from '@dnd-kit/react'
+import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
+import { useSortable } from '@dnd-kit/react/sortable'
 import { toast } from 'sonner'
 import {
   Table,
@@ -68,6 +56,7 @@ import {
 } from './todo-delete-confirm-dialog'
 import { useUserAgentAtom } from '~/lib/global-state'
 import { TodoType } from '~/types/todos'
+import { arrayMove } from '~/lib/utils'
 
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
@@ -118,13 +107,6 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps) {
   const tBodyRef = React.useRef<HTMLTableSectionElement>(null)
 
   const hotkeysEnabled = !(isLoading || isOpenDeleteDialog || showId)
-  const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { distance: 10 } }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  )
 
   const table = useReactTable({
     data: viewTodos,
@@ -216,12 +198,34 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps) {
   }
 
   // ドラッグ&ドロップによるタスクの表示順変更
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
+  const handleDragEnd: DragEndHandler = (event) => {
+    if (event.canceled) return
+
+    // @dnd-kit/react v0.3.0 では
+    // event.operation.source、event.operation.targetともに
+    // ドロップ元のid, indexを保持しているので、
+    // event.operation.sourceからドロップ元、先情報を取得する
+
+    const source = event.operation.source
+    if (!source) return
+
+    const fromTodoId = String(source.id)
+
+    const toIndex = (source as { index?: unknown }).index
+    if (typeof toIndex !== 'number') return
+
+    // ソートやフィルタが実施された後の現在表示されている行情報を取得
+    const toRow = table.getRowModel().rows[toIndex]
+    if (!toRow) return
+
+    const toTodoId = toRow.id
+    if (fromTodoId === toTodoId) return
+
     // ソートやフィルタが実施されていないリストからインデックス情報を取得
-    const fromViewTodo = viewTodos.find((data) => data.todoId === active.id)
-    const toViewTodo = viewTodos.find((data) => data.todoId === over?.id)
+    const fromViewTodo = viewTodos.find((data) => data.todoId === fromTodoId)
+    const toViewTodo = viewTodos.find((data) => data.todoId === toTodoId)
     if (!fromViewTodo || !toViewTodo) return
+
     moveViewTodo(fromViewTodo, toViewTodo)
   }
 
@@ -324,7 +328,7 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps) {
   // 選択行を編集
   function showSelectedTodoEdit() {
     const nowSelectedRow = table.getSelectedRowModel().rows[0]
-    nowSelectedRow && navigate(nowSelectedRow.original.todoId)
+    nowSelectedRow && navigate(nowSelectedRow.id)
   }
 
   // 選択行を削除
@@ -408,14 +412,16 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps) {
         <TodoTableToolbar table={table} />
       </div>
       <div className="rounded-md border">
-        <DndContext
-          collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis]}
-          cancelDrop={cannotMoveTodo}
+        <DragDropProvider
+          sensors={[PointerSensor]}
+          modifiers={(defaults) => [...defaults, RestrictToVerticalAxis]}
+          onBeforeDragStart={(event) => {
+            if (cannotMoveTodo()) {
+              event.preventDefault()
+              clearSortToast()
+            }
+          }}
           onDragEnd={handleDragEnd}
-          onDragCancel={clearSortToast}
-          sensors={sensors}
-          id="dnd-context-for-todo-table"
         >
           <Table>
             <TableHeader>
@@ -443,28 +449,29 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps) {
               ))}
             </TableHeader>
             <TableBody ref={tBodyRef}>
-              <SortableContext
-                items={viewTodos.map((todo) => todo.todoId)}
-                strategy={verticalListSortingStrategy}
-              >
-                {table.getRowModel().rows?.length ? (
-                  table
-                    .getRowModel()
-                    .rows.map((row) => <DraggableRow key={row.id} row={row} />)
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={table.getAllColumns().length}
-                      className="h-24 text-center"
-                    >
-                      {t('common.message.no_data')}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </SortableContext>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row, index) => (
+                  <DraggableRow
+                    key={row.id}
+                    row={row}
+                    index={index}
+                    // disabled={cannotMoveTodo()}
+                    disabled={false}
+                  />
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={table.getAllColumns().length}
+                    className="h-24 text-center"
+                  >
+                    {t('common.message.no_data')}
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
-        </DndContext>
+        </DragDropProvider>
       </div>
       <div className="flex items-center justify-end gap-2">
         <Button
@@ -607,24 +614,37 @@ function useTodoTableGlobalHotkeys(params: {
 
 function renderDraggableTaskRow(params: {
   row: Row<ViewTodo>
-  setNodeRef: (node: HTMLElement | null) => void
+  ref: React.Ref<HTMLTableRowElement>
   style: React.CSSProperties
+  handleRef: React.RefCallback<Element> | null
+  isDragging: boolean
 }) {
-  const { row, setNodeRef, style } = params
+  const { row, ref, style, handleRef, isDragging } = params
 
   return (
     <TableRow
       id={`row-${row.id}`}
-      ref={setNodeRef}
+      ref={ref}
       tabIndex={0}
-      className="focus:ring-ring rounded outline-hidden focus:ring-1 focus:ring-inset"
-      style={style}
+      className="focus:ring-ring rounded bg-white outline-hidden focus:ring-1 focus:ring-inset"
+      style={{ ...style }}
       onFocus={() => row.toggleSelected(true)}
       data-state={row.getIsSelected() && 'selected'}
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          {cell.column.id === 'dragHandle' ? (
+            <Button
+              variant="ghost"
+              ref={handleRef ?? undefined}
+              size="icon"
+              className={`touch-none select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            >
+              <LuEqual />
+            </Button>
+          ) : (
+            flexRender(cell.column.columnDef.cell, cell.getContext())
+          )}
         </TableCell>
       ))}
     </TableRow>
@@ -633,10 +653,12 @@ function renderDraggableTaskRow(params: {
 
 function renderDraggableBarRow(params: {
   row: Row<ViewTodo>
-  setNodeRef: (node: HTMLElement | null) => void
+  ref: React.Ref<HTMLTableRowElement>
   style: React.CSSProperties
+  handleRef: React.RefCallback<Element> | null
+  isDragging: boolean
 }) {
-  const { row, setNodeRef, style } = params
+  const { row, ref, style, handleRef, isDragging } = params
 
   const cells = row.getVisibleCells()
   const firstCell = cells[0]
@@ -652,25 +674,27 @@ function renderDraggableBarRow(params: {
   return (
     <TableRow
       id={`row-${row.id}`}
-      ref={setNodeRef}
+      ref={ref}
       tabIndex={0}
       className="focus:ring-ring rounded outline-hidden focus:ring-1 focus:ring-inset"
-      style={{ ...style }}
+      style={{ ...style, ...colorStyle }}
       onFocus={() => row.toggleSelected(true)}
       data-state={row.getIsSelected() && 'selected'}
     >
-      <TableCell key={firstCell.id} className="py-1" style={{ ...colorStyle }}>
-        {flexRender(firstCell.column.columnDef.cell, firstCell.getContext())}
+      <TableCell key={firstCell.id} className="py-1">
+        <Button
+          variant="ghost"
+          ref={handleRef ?? undefined}
+          size="icon"
+          className={`h-6 touch-none select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        >
+          <LuEqual />
+        </Button>
       </TableCell>
-      <TableCell
-        key={cells[1].id}
-        colSpan={middleColSpan}
-        className="py-1"
-        style={{ ...colorStyle }}
-      >
+      <TableCell key={cells[1].id} colSpan={middleColSpan} className="py-1">
         {flexRender(cells[1].column.columnDef.cell, cells[1].getContext())}
       </TableCell>
-      <TableCell key={lastCell.id} className="py-1" style={{ ...colorStyle }}>
+      <TableCell key={lastCell.id} className="py-1">
         {flexRender(lastCell.column.columnDef.cell, lastCell.getContext())}
       </TableCell>
     </TableRow>
@@ -678,22 +702,43 @@ function renderDraggableBarRow(params: {
 }
 
 // D&D用の行コンポーネント
-function DraggableRow({ row }: { row: Row<ViewTodo> }) {
-  const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: row.original.todoId,
+function DraggableRow({
+  row,
+  index,
+  disabled,
+}: {
+  row: Row<ViewTodo>
+  index: number
+  disabled: boolean
+}) {
+  const { ref, handleRef, isDragging } = useSortable({
+    id: row.id,
+    index,
+    disabled,
   })
 
   const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition: transition,
-    opacity: isDragging ? 0.8 : 1,
-    zIndex: isDragging ? 1 : 0,
-    position: 'relative',
+    backdropFilter: isDragging ? 'blur(5px)' : undefined,
+    boxShadow: isDragging
+      ? 'inset 0 0 1px rgba(0,0,0,0.5), -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25)'
+      : undefined,
   }
 
   return row.original.type === TodoType.TASK
-    ? renderDraggableTaskRow({ row, setNodeRef, style })
-    : renderDraggableBarRow({ row, setNodeRef, style })
+    ? renderDraggableTaskRow({
+        row,
+        ref,
+        style,
+        handleRef,
+        isDragging,
+      })
+    : renderDraggableBarRow({
+        row,
+        ref,
+        style,
+        handleRef,
+        isDragging,
+      })
 }
 
 // タスク削除ダイアログのメモ化

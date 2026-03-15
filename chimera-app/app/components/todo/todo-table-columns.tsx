@@ -1,12 +1,9 @@
 import { NavLink } from 'react-router'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
-import { LuEqual } from 'react-icons/lu'
 import { format } from 'date-fns'
 import { ColumnDef, Column, Row } from '@tanstack/react-table'
-import { useSortable } from '@dnd-kit/sortable'
 import { Badge } from '~/components/ui/badge'
-import { Button } from '~/components/ui/button'
 import { TODO_URL } from '~/constants'
 import { cn } from '~/lib/utils'
 import { TaskStatusList } from '~/types/tasks'
@@ -24,29 +21,6 @@ function ColumnHeader({
 }) {
   const { t } = useTranslation()
   return <TodoTableColumnHeader column={column} title={t(title)} />
-}
-
-function DragHandleCell({ row }: { row: Row<ViewTodo> }) {
-  const { attributes, listeners, isDragging } = useSortable({
-    id: row.id,
-  })
-
-  const viewTodo = row.original
-  const isTask = viewTodo.type === TodoType.TASK
-  const heightCss = isTask ? '' : 'h-6'
-
-  return (
-    // Alternatively, you could set these attributes on the rows themselves
-    <Button
-      variant="ghost"
-      {...attributes}
-      {...listeners}
-      size="icon"
-      className={`touch-none select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} ${heightCss}`}
-    >
-      <LuEqual />
-    </Button>
-  )
 }
 
 function TitleCell({ row }: { row: Row<ViewTodo> }) {
@@ -81,16 +55,12 @@ function StatusCell({ row }: { row: Row<ViewTodo> }) {
   const { t } = useTranslation()
 
   const viewTodo = row.original
-  let status = null
-  if (viewTodo.status) {
-    status = TaskStatusList[viewTodo.status]
-  }
+  const status =
+    viewTodo.status != null ? TaskStatusList[viewTodo.status] : null
 
   return status ? (
     <Badge className={cn(status.color, 'break-keep')}>{t(status.label)}</Badge>
-  ) : (
-    ''
-  )
+  ) : null
 }
 
 export const TodoTableColumns: ColumnDef<ViewTodo>[] = [
@@ -98,7 +68,7 @@ export const TodoTableColumns: ColumnDef<ViewTodo>[] = [
     id: 'dragHandle',
     size: 40,
     header: '',
-    cell: DragHandleCell,
+    cell: () => null,
   },
   {
     accessorKey: 'title',

@@ -23,7 +23,19 @@ import type { Route } from './+types/root'
 import { Theme, Language } from '~/types/accounts'
 
 export function links() {
-  return [{ rel: 'stylesheet', href: styles }]
+  return [
+    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    {
+      rel: 'preconnect',
+      href: 'https://fonts.gstatic.com',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+Mono:wght@400;700&display=swap',
+    },
+    { rel: 'stylesheet', href: styles },
+  ]
 }
 
 function getLanguageFromHeader(request: Request) {

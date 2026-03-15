@@ -66,3 +66,19 @@ export function getUserAgent(): UserAgent {
     modifierKeyIcon: userOS === OS.WIN ? 'alt' : '⌥',
   }
 }
+
+export function arrayMove<T>(
+  array: readonly T[],
+  fromIndex: number,
+  toIndex: number,
+): T[] {
+  const copy = array.slice()
+  const startIndex = fromIndex < 0 ? copy.length + fromIndex : fromIndex
+
+  if (startIndex < 0 || startIndex >= copy.length) return copy
+
+  const endIndex = toIndex < 0 ? copy.length + toIndex : toIndex
+  const [item] = copy.splice(startIndex, 1)
+  copy.splice(endIndex, 0, item)
+  return copy
+}
