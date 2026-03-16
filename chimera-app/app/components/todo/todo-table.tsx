@@ -666,8 +666,10 @@ function renderDraggableBarRow(params: {
   const middleColSpan = cells.length - 2
 
   const viewTodo = row.original
+  const isSelected = row.getIsSelected()
   const colorStyle = {
-    backgroundColor: viewTodo.bgColor ?? undefined,
+    // inline style は selected 背景色を上書きしてしまうため、selected のときは背景色を指定しない
+    backgroundColor: isSelected ? undefined : viewTodo.bgColor || 'white',
     color: viewTodo.textColor ?? undefined,
   }
 
