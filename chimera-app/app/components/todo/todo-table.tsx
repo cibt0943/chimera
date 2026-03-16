@@ -704,44 +704,51 @@ function renderDraggableBarRow(params: {
 }
 
 // D&D用の行コンポーネント
-function DraggableRow({
-  row,
-  index,
-  disabled,
-}: {
-  row: Row<ViewTodo>
-  index: number
-  disabled: boolean
-}) {
-  const { ref, handleRef, isDragging } = useSortable({
-    id: row.id,
+const DraggableRow = React.memo(
+  function DraggableRow({
+    row,
     index,
     disabled,
-  })
+  }: {
+    row: Row<ViewTodo>
+    index: number
+    disabled: boolean
+  }) {
+    const { ref, handleRef, isDragging } = useSortable({
+      id: row.id,
+      index,
+      disabled,
+    })
 
-  const style: React.CSSProperties = {
-    backdropFilter: isDragging ? 'blur(5px)' : undefined,
-    boxShadow: isDragging
-      ? 'inset 0 0 1px rgba(0,0,0,0.5), -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25)'
-      : undefined,
-  }
+    const style: React.CSSProperties = {
+      backdropFilter: isDragging ? 'blur(5px)' : undefined,
+      boxShadow: isDragging
+        ? 'inset 0 0 1px rgba(0,0,0,0.5), -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25)'
+        : undefined,
+    }
 
-  return row.original.type === TodoType.TASK
-    ? renderDraggableTaskRow({
-        row,
-        ref,
-        style,
-        handleRef,
-        isDragging,
-      })
-    : renderDraggableBarRow({
-        row,
-        ref,
-        style,
-        handleRef,
-        isDragging,
-      })
-}
+    return row.original.type === TodoType.TASK
+      ? renderDraggableTaskRow({
+          row,
+          ref,
+          style,
+          handleRef,
+          isDragging,
+        })
+      : renderDraggableBarRow({
+          row,
+          ref,
+          style,
+          handleRef,
+          isDragging,
+        })
+  },
+  (prev, next) =>
+    prev.row.original === next.row.original &&
+    prev.row.getIsSelected() === next.row.getIsSelected() &&
+    prev.index === next.index &&
+    prev.disabled === next.disabled,
+)
 
 // タスク削除ダイアログのメモ化
 const TodoDeleteConfirmDialogMemo = React.memo(
