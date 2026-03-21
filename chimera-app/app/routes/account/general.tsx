@@ -41,11 +41,14 @@ export async function action({ request }: Route.ActionArgs) {
   const session = await getSession(request.headers.get('cookie'))
   session.set('loginInfo', loginInfo)
 
-  const toastMsg = 'account.message.updated'
-  return redirectWithInfo(`${ACCOUNT_URL}/settings`, toastMsg, {
-    headers: {
-      // 新しいセッション情報をクッキーとして設定するように指示
-      'Set-Cookie': await commitSession(session),
+  return redirectWithInfo(
+    `${ACCOUNT_URL}/settings`,
+    'account.message.updated',
+    {
+      headers: {
+        // 新しいセッション情報をクッキーとして設定するように指示
+        'Set-Cookie': await commitSession(session),
+      },
     },
-  })
+  )
 }

@@ -141,6 +141,20 @@
       "deleted": "タスクを削除しました"
     }
   },
+  "todoBar": {
+    "model": {
+      "title": "タイトル",
+      "bgColor": "背景色",
+      "textColor": "文字色"
+    },
+    "message": {
+      "todo_bar_creation": "バーの作成",
+      "todo_bar_editing": "バーの編集",
+      "todo_bar_deletion": "バーの削除",
+      "set_todo_bar_info": "バーの情報を設定してください",
+      "deleted": "バーを削除しました"
+    }
+  },
   "memo": {
     "menu_label": "Memo",
     "page_title": "Memo",

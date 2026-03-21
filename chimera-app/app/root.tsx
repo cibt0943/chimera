@@ -12,7 +12,7 @@ import styles from '~/styles/tailwind.css?url'
 import i18n, { useLanguage } from '~/lib/i18n/i18n'
 import { useTheme, useSonner } from '~/lib/hooks'
 import { getSession } from '~/lib/session.server'
-import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
+import { getOrAddMemoSettings } from '~/models/memo-settings.server'
 import {
   useSetUserAgentAtom,
   useSetLoginInfoAtom,
@@ -23,7 +23,19 @@ import type { Route } from './+types/root'
 import { Theme, Language } from '~/types/accounts'
 
 export function links() {
-  return [{ rel: 'stylesheet', href: styles }]
+  return [
+    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    {
+      rel: 'preconnect',
+      href: 'https://fonts.gstatic.com',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+Mono:wght@400;700&display=swap',
+    },
+    { rel: 'stylesheet', href: styles },
+  ]
 }
 
 function getLanguageFromHeader(request: Request) {
@@ -51,7 +63,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   // メモ設定を取得
   const memoSettings =
-    loginInfo && (await getOrInsertMemoSettings(loginInfo.account.id))
+    loginInfo && (await getOrAddMemoSettings(loginInfo.account.id))
 
   // トーストメッセージを取得
   const { toast, headers } = await getToast(request)

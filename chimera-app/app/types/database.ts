@@ -17,10 +17,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
+          extensions?: Json
           operationName?: string
           query?: string
           variables?: Json
-          extensions?: Json
         }
         Returns: Json
       }
@@ -86,7 +86,7 @@ export type Database = {
           location?: string
           memo?: string
           start_datetime: string
-          title?: string
+          title: string
           updated_at?: string
         }
         Update: {
@@ -204,9 +204,9 @@ export type Database = {
           due_date_all_day: boolean
           id: string
           memo: string
-          position: number
           status: number
           title: string
+          todo_id: string
           updated_at: string
         }
         Insert: {
@@ -216,9 +216,9 @@ export type Database = {
           due_date_all_day?: boolean
           id?: string
           memo?: string
-          position?: number
           status?: number
           title: string
+          todo_id: string
           updated_at?: string
         }
         Update: {
@@ -228,9 +228,9 @@ export type Database = {
           due_date_all_day?: boolean
           id?: string
           memo?: string
-          position?: number
           status?: number
           title?: string
+          todo_id?: string
           updated_at?: string
         }
         Relationships: [
@@ -241,11 +241,140 @@ export type Database = {
             referencedRelation: 'accounts'
             referencedColumns: ['id']
           },
+          {
+            foreignKeyName: 'tasks_todo_id_fkey'
+            columns: ['todo_id']
+            isOneToOne: true
+            referencedRelation: 'todos'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'tasks_todo_id_fkey'
+            columns: ['todo_id']
+            isOneToOne: true
+            referencedRelation: 'view_todos'
+            referencedColumns: ['todo_id']
+          },
+        ]
+      }
+      todo_bars: {
+        Row: {
+          account_id: string
+          bg_color: string
+          created_at: string
+          id: string
+          text_color: string
+          title: string
+          todo_id: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          bg_color?: string
+          created_at?: string
+          id?: string
+          text_color?: string
+          title: string
+          todo_id: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          bg_color?: string
+          created_at?: string
+          id?: string
+          text_color?: string
+          title?: string
+          todo_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'todo_bars_account_id_fkey'
+            columns: ['account_id']
+            isOneToOne: false
+            referencedRelation: 'accounts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'todo_bars_todo_id_fkey'
+            columns: ['todo_id']
+            isOneToOne: true
+            referencedRelation: 'todos'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'todo_bars_todo_id_fkey'
+            columns: ['todo_id']
+            isOneToOne: true
+            referencedRelation: 'view_todos'
+            referencedColumns: ['todo_id']
+          },
+        ]
+      }
+      todos: {
+        Row: {
+          account_id: string
+          created_at: string
+          id: string
+          position: number
+          type: number
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          id?: string
+          position?: number
+          type?: number
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          id?: string
+          position?: number
+          type?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'todos_account_id_fkey'
+            columns: ['account_id']
+            isOneToOne: false
+            referencedRelation: 'accounts'
+            referencedColumns: ['id']
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      view_todos: {
+        Row: {
+          account_id: string
+          bg_color: string | null
+          created_at: string
+          due_date: string | null
+          due_date_all_day: boolean | null
+          memo: string | null
+          position: number
+          status: number | null
+          text_color: string | null
+          title: string
+          todo_id: string
+          type: number | null
+          updated_at: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'todos_account_id_fkey'
+            columns: ['account_id']
+            isOneToOne: false
+            referencedRelation: 'accounts'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
@@ -259,21 +388,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, 'public'>]
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -291,14 +424,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema['Tables']
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -314,14 +449,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema['Tables']
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U
     }
     ? U
@@ -337,14 +474,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema['Enums']
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
     ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never
@@ -352,14 +491,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema['CompositeTypes']
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
     ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never

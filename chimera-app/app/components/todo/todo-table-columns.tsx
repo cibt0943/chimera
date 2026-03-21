@@ -1,55 +1,45 @@
 import { NavLink } from 'react-router'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
-import { LuEqual } from 'react-icons/lu'
 import { format } from 'date-fns'
 import { ColumnDef, Column, Row } from '@tanstack/react-table'
-import { useSortable } from '@dnd-kit/sortable'
 import { Badge } from '~/components/ui/badge'
-import { Button } from '~/components/ui/button'
 import { TODO_URL } from '~/constants'
 import { cn } from '~/lib/utils'
-import { Task, TaskStatusList } from '~/types/tasks'
+import { TaskStatusList } from '~/types/tasks'
+import { ViewTodo } from '~/types/view-todos'
+import { TodoType } from '~/types/todos'
 import { TodoTableColumnHeader } from './todo-table-column-header'
 import { TodoTableRowActions } from './todo-table-row-actions'
-
-// Cell Component
-function RowDragHandleCell({ rowId }: { rowId: string }) {
-  const { attributes, listeners, isDragging } = useSortable({
-    id: rowId,
-  })
-  return (
-    // Alternatively, you could set these attributes on the rows themselves
-    <Button
-      variant="ghost"
-      {...attributes}
-      {...listeners}
-      size="icon"
-      className={`touch-none select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-    >
-      <LuEqual />
-    </Button>
-  )
-}
 
 function ColumnHeader({
   column,
   title,
 }: {
-  column: Column<Task, unknown>
+  column: Column<ViewTodo, unknown>
   title: string
 }) {
   const { t } = useTranslation()
   return <TodoTableColumnHeader column={column} title={t(title)} />
 }
 
-function DueDateCell({ row }: { row: Row<Task> }) {
+function TitleCell({ row }: { row: Row<ViewTodo> }) {
+  const viewTodo = row.original
+
+  return (
+    <NavLink to={`${TODO_URL}/${row.id}`} className="truncate font-medium">
+      {viewTodo.title}
+    </NavLink>
+  )
+}
+
+function DueDateCell({ row }: { row: Row<ViewTodo> }) {
   const { t } = useTranslation()
-  const task = row.original
-  const dueDateStr = task.dueDate
+  const viewTodo = row.original
+  const dueDateStr = viewTodo.dueDate
     ? format(
-        task.dueDate,
-        task.dueDateAllDay
+        viewTodo.dueDate,
+        viewTodo.dueDateAllDay
           ? t('common.format.date_format')
           : t('common.format.date_time_short_format'),
       )
@@ -61,31 +51,25 @@ function DueDateCell({ row }: { row: Row<Task> }) {
   )
 }
 
-function StatusCell({ row }: { row: Row<Task> }) {
+function StatusCell({ row }: { row: Row<ViewTodo> }) {
   const { t } = useTranslation()
-  const status = TaskStatusList[row.original.status]
+
+  const viewTodo = row.original
+  const status =
+    viewTodo.status != null ? TaskStatusList[viewTodo.status] : null
+
   return status ? (
     <Badge className={cn(status.color, 'break-keep')}>{t(status.label)}</Badge>
-  ) : (
-    ''
-  )
+  ) : null
 }
 
-export const TodoTableColumns: ColumnDef<Task>[] = [
+export const TodoTableColumns: ColumnDef<ViewTodo>[] = [
   {
     id: 'dragHandle',
     size: 40,
     header: '',
-    cell: ({ row }) => <RowDragHandleCell rowId={row.original.id} />,
+    cell: () => null,
   },
-  // {
-  //   accessorKey: 'id',
-  //   size: 65,
-  //   header: ({ column }) => {
-  //     return ColumnHeader({ column, title: 'task.model.id' })
-  //   },
-  //   cell: ({ row }) => <span className="">{row.original.id}</span>,
-  // },
   {
     accessorKey: 'title',
     size: undefined,
@@ -93,13 +77,7 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
     header: ({ column }) => {
       return ColumnHeader({ column, title: 'task.model.title' })
     },
-    cell: ({ row }) => {
-      return (
-        <NavLink to={`${TODO_URL}/${row.id}`} className="truncate font-medium">
-          {row.original.title}
-        </NavLink>
-      )
-    },
+    cell: TitleCell,
     sortingFn: 'alphanumeric',
   },
   {
@@ -110,6 +88,7 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
     },
     cell: StatusCell,
     filterFn: (row, id, value) => {
+      if (row.original.type === TodoType.BAR) return true
       return value.includes(row.original.status) //id="status"
     },
   },
@@ -124,6 +103,6 @@ export const TodoTableColumns: ColumnDef<Task>[] = [
   {
     id: 'actions',
     size: 60,
-    cell: ({ row, table }) => <TodoTableRowActions row={row} table={table} />,
+    cell: TodoTableRowActions,
   },
 ]

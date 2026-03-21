@@ -5,7 +5,6 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '~/components/ui/alert-dialog'
-import { buttonVariants } from '~/components/ui/button'
 import { EVENT_URL } from '~/constants'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
 import { Event } from '~/types/events'
@@ -39,11 +38,11 @@ export function EventDeleteConfirmDialog({
       description={desc}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      torigger={children}
+      trigger={children}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <AlertDialogAction
-        className={buttonVariants({ variant: 'destructive' })}
+        variant="destructive"
         onClick={() =>
           fetcher.submit({ redirectUrl }, { method: 'delete', action })
         }

@@ -17,13 +17,15 @@ import { InputConform } from '~/components/lib/conform/input'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { SelectConform } from '~/components/lib/conform/select'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
-import { TaskDeleteButton } from './task-delete-button'
+import { TodoDeleteButton } from './todo-delete-button'
+import { TodoType } from '~/types/todos'
+import { ViewTodo } from '~/types/view-todos'
 import {
-  Task,
   TaskStatus,
   TaskSchema,
   TaskSchemaType,
   TaskStatusListByDispOrder,
+  Task,
 } from '~/types/tasks'
 
 export interface TaskFormProps {
@@ -35,8 +37,8 @@ export function TaskForm({ task, redirectUrl }: TaskFormProps) {
   const { t } = useTranslation()
   const fetcher = useFetcher()
 
-  const action = task ? `${TODO_URL}/${task.id}` : TODO_URL
-  const formId = task ? `task-form-${task.id}` : 'task-form-new'
+  const action = task ? `${TODO_URL}/${task.todoId}` : `${TODO_URL}/task`
+  const formId = task ? `task-form-${task.todoId}` : 'task-form-new'
 
   const [form, fields] = useForm<TaskSchemaType>({
     id: formId,
@@ -54,9 +56,27 @@ export function TaskForm({ task, redirectUrl }: TaskFormProps) {
     shouldRevalidate: 'onInput',
   })
 
+  const viewTodo: ViewTodo | undefined = task
+    ? {
+        todoId: task.todoId,
+        createdAt: task.createdAt,
+        updatedAt: task.updatedAt,
+        accountId: task.accountId,
+        type: TodoType.TASK,
+        position: task.position,
+        title: task.title,
+        status: task.status,
+        memo: task.memo,
+        dueDate: task.dueDate,
+        dueDateAllDay: task.dueDateAllDay,
+        bgColor: null,
+        textColor: null,
+      }
+    : undefined
+
   return (
     <fetcher.Form method="post" {...getFormProps(form)} action={action}>
-      <div className="max-h-[calc(100svh_-_240px)] space-y-8 overflow-y-auto p-0.5">
+      <div className="max-h-[calc(100svh-240px)] space-y-8 overflow-y-auto p-0.5">
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
             {t('task.model.title')}
@@ -102,10 +122,13 @@ export function TaskForm({ task, redirectUrl }: TaskFormProps) {
           </FormDescription>
           <FormMessage message={fields.status.errors} />
         </FormItem>
+        <input type="hidden" name="type" value={TodoType.TASK} />
         <input type="hidden" name="redirectUrl" value={redirectUrl} />
         <FormFooter className="sm:justify-between">
           <div>
-            {task && <TaskDeleteButton task={task} redirectUrl={redirectUrl} />}
+            {task && (
+              <TodoDeleteButton viewTodo={viewTodo} redirectUrl={redirectUrl} />
+            )}
           </div>
           <Button type="submit" disabled={fetcher.state !== 'idle'}>
             {t('common.message.save')}

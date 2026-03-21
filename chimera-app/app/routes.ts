@@ -24,6 +24,9 @@ export default [
     ]),
 
     route('todos', './routes/todos/index.tsx', [
+      route('task', './routes/todos/task.create.tsx'),
+      route('bar', './routes/todos/todo-bar.create.tsx'),
+
       route(':todoId', './routes/todos/todo.tsx'),
       route(':todoId/delete', './routes/todos/todo.delete.tsx'),
     ]),
@@ -39,7 +42,7 @@ export default [
     route('events', './routes/events/index.tsx', [
       route(':eventId', './routes/events/event.tsx'),
       route(':eventId/delete', './routes/events/event.delete.tsx'),
-      route('todos/:todoId', './routes/events/todo.tsx'),
+      route('tasks/:taskId', './routes/events/task.tsx'),
       route('memos/:memoId', './routes/events/memo.tsx'),
     ]),
 

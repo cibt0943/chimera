@@ -1,7 +1,5 @@
 import { LuSun, LuMoonStar, LuMonitor } from 'react-icons/lu'
-import { toDate } from 'date-fns'
 import * as zod from 'zod'
-import type { Database } from '~/types/schema'
 
 export const Language = {
   AUTO: 'auto',
@@ -43,11 +41,6 @@ export const ThemeList = [
   },
 ]
 
-// DBのアカウントテーブルの型
-export type AccountModel = Database['public']['Tables']['accounts']['Row']
-export type UpdateAccountModel =
-  Database['public']['Tables']['accounts']['Update'] & { id: string } // idを必須で上書き
-
 // アカウントの型
 export type Account = {
   id: string
@@ -57,18 +50,6 @@ export type Account = {
   language: Language
   timezone: string
   theme: Theme
-}
-
-export function AccountModel2Account(accountModel: AccountModel): Account {
-  return {
-    id: accountModel.id,
-    createdAt: toDate(accountModel.created_at),
-    updatedAt: toDate(accountModel.updated_at),
-    sub: accountModel.sub,
-    language: accountModel.language as Language,
-    timezone: accountModel.timezone,
-    theme: accountModel.theme as Theme,
-  }
 }
 
 // Auth0ユーザーの型

@@ -5,7 +5,6 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '~/components/ui/alert-dialog'
-import { buttonVariants } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
 import { sleep } from '~/lib/utils'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
@@ -44,12 +43,12 @@ export function MemoDeleteConfirmDialog({
       description={desc}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      torigger={children}
+      trigger={children}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       {/* レスポンシブ対応のためにFormでButtonを囲まない */}
       <AlertDialogAction
-        className={buttonVariants({ variant: 'destructive' })}
+        variant="destructive"
         onClick={async () => {
           await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
           fetcher.submit({ redirectUrl }, { method: 'delete', action })

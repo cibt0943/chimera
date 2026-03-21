@@ -7,7 +7,7 @@ import { MemoFormDialog } from '~/components/memo/memo-form-dialog'
 import type { Route } from './+types/memo'
 
 export function meta({ params }: Route.MetaArgs) {
-  return [{ title: 'Memo ' + params.memoId + ' Edit | IMA' }]
+  return [{ title: `Memo ${params.memoId} Edit | IMA` }]
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
@@ -26,17 +26,19 @@ export default function Memo({ loaderData }: Route.ComponentProps) {
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
   const location = useLocation()
   const navigate = useNavigate()
-  const redirectUrl = EVENT_URL + location.search
+  const redirectUrl = `${EVENT_URL}${location.search}`
+
+  const onOpenChange = (open: boolean) => {
+    setIsOpenDialog(open)
+    if (open) return
+    navigate(redirectUrl)
+  }
 
   return (
     <MemoFormDialog
       memo={memo}
       isOpen={isOpenDialog}
-      onOpenChange={async (open) => {
-        setIsOpenDialog(open)
-        if (open) return
-        navigate(redirectUrl)
-      }}
+      onOpenChange={onOpenChange}
       redirectUrl={redirectUrl}
     />
   )

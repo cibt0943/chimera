@@ -1,31 +1,39 @@
-import { format } from 'date-fns'
-import {
-  Tasks,
-  Task,
-  TaskModel,
-  InsertTaskModel,
-  UpdateTaskModel,
-  TaskModel2Task,
-} from '~/types/tasks'
+import { format, toDate } from 'date-fns'
 import { supabase } from '~/lib/supabase-client.server'
+import { addTodo, deleteTodo, TodoModel } from '~/models/todo.server'
+import type { Database } from '~/types/database'
+import { TodoType } from '~/types/todos'
+import { Task, TaskStatus } from '~/types/tasks'
 
-// タスク一覧を取得
-interface GetTasksOptionParams {
+// DBのタスクテーブルの型
+export type TaskModel = Database['public']['Tables']['tasks']['Row']
+export type InsertTaskModel = Database['public']['Tables']['tasks']['Insert']
+export type UpdateTaskModel =
+  Database['public']['Tables']['tasks']['Update'] & { id: string } // idを必須で上書き
+
+export type AddTaskModel = Omit<InsertTaskModel, 'todo_id'>
+
+type TaskJoinTodoModel = TaskModel & { todos: TodoModel | null }
+
+const TASK_WITH_TODO_SELECT = '*, todos!tasks_todo_id_fkey!inner(*)'
+
+interface GetTodosOptionParams {
   dueDateStart?: Date
   dueDateEnd?: Date
 }
+
+// タスク一覧の取得
 export async function getTasks(
   accountId: string,
-  options?: GetTasksOptionParams,
-): Promise<Tasks> {
-  const { dueDateStart, dueDateEnd } = options || {}
+  options?: GetTodosOptionParams,
+): Promise<Task[]> {
+  const { dueDateStart, dueDateEnd } = options ?? {}
 
   let query = supabase
     .from('tasks')
-    .select()
+    .select(TASK_WITH_TODO_SELECT)
     .eq('account_id', accountId)
-    .order('position', { ascending: false })
-    .order('id')
+    .order('position', { ascending: false, referencedTable: 'todos' })
 
   if (dueDateStart) {
     query = query.gt('due_date', format(dueDateStart, 'yyyy-MM-dd'))
@@ -38,45 +46,59 @@ export async function getTasks(
   const { data, error } = await query
   if (error) throw error
 
-  const tasks = data.map((task) => {
-    return TaskModel2Task(task)
-  })
+  const rows = (data ?? []) as TaskJoinTodoModel[]
 
-  return tasks
+  return rows.map((row) => {
+    const { todos: todoModel, ...taskModel } = row
+    if (!todoModel) throw new Error('todo not found')
+    return convertToTask(todoModel, taskModel as TaskModel)
+  })
 }
 
-// タスクを取得
+// タスクの取得
 export async function getTask(taskId: string): Promise<Task> {
-  const { data, error } = await supabase
+  const { data: taskData, error: taskError } = await supabase
     .from('tasks')
-    .select()
+    .select(TASK_WITH_TODO_SELECT)
     .eq('id', taskId)
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (taskError || !taskData) throw taskError || new Error('erorr')
 
-  return TaskModel2Task(data)
+  const { todos: todoModel, ...taskModel } = taskData as TaskJoinTodoModel
+  if (!todoModel) throw new Error('todo not found')
+
+  return convertToTask(todoModel, taskModel as TaskModel)
+}
+
+// TodoIdからタスクを取得
+export async function getTaskFromTodoId(todoId: string): Promise<Task> {
+  const { data: taskData, error: taskError } = await supabase
+    .from('tasks')
+    .select('id')
+    .eq('todo_id', todoId)
+    .single()
+  if (taskError || !taskData) throw taskError || new Error('erorr')
+
+  return getTask(taskData.id)
 }
 
 // タスクの追加
-export async function insertTask(task: InsertTaskModel): Promise<Task> {
-  const { data: maxTask, error: errorMaxTask } = await supabase
-    .from('tasks')
-    .select()
-    .eq('account_id', task.account_id)
-    .order('position', { ascending: false })
-    .limit(1)
-  if (errorMaxTask) throw errorMaxTask
+export async function addTask(task: AddTaskModel): Promise<Task> {
+  // まずはTodoを追加
+  const newTodo = await addTodo({
+    account_id: task.account_id,
+    type: TodoType.TASK,
+  })
 
-  const position = maxTask.length > 0 ? maxTask[0].position + 1 : 1
-
+  // タスクを追加
   const { data: newTask, error: errorNewTask } = await supabase
     .from('tasks')
-    .insert({ ...task, position })
-    .select()
+    .insert({ ...task, todo_id: newTodo.id })
+    .select('id')
     .single()
   if (errorNewTask || !newTask) throw errorNewTask || new Error('erorr')
 
-  return TaskModel2Task(newTask)
+  return getTask(newTask.id)
 }
 
 // タスクの更新
@@ -90,56 +112,43 @@ export async function updateTask(
     .from('tasks')
     .update(task)
     .eq('id', task.id)
-    .select()
+    .select('id')
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return TaskModel2Task(data)
+  return getTask(task.id)
 }
 
 // タスクの削除
 export async function deleteTask(taskId: string): Promise<void> {
-  const { error } = await supabase.from('tasks').delete().eq('id', taskId)
+  const task = await getTask(taskId)
+  await deleteTaskFromTodoId(task.todoId)
+}
+
+// TodoIdからタスクの削除
+export async function deleteTaskFromTodoId(todoId: string): Promise<void> {
+  // まずはTodoを削除
+  await deleteTodo(todoId)
+
+  // タスクをTodoIdにて削除
+  const { error } = await supabase.from('tasks').delete().eq('todo_id', todoId)
   if (error) throw error
 }
 
-// タスクの位置を変更
-// taskIdにて指定されたタスクの位置をpositionに変更します。
-// この変更による他のタスクの位置の変更もあわせて行います。
-export async function updateTaskPosition(
-  taskId: string,
-  position: number,
-): Promise<Task> {
-  const fromTask = await getTask(taskId)
-
-  const isUp = fromTask.position < position
-  const [fromOperator, toOperator] = isUp ? ['gt', 'lte'] : ['lt', 'gte']
-
-  const { data: tasksToUpdate, error: errorTasksToUpdate } = await supabase
-    .from('tasks')
-    .select()
-    .filter('position', fromOperator, fromTask.position)
-    .filter('position', toOperator, position)
-    .order('position')
-  if (errorTasksToUpdate) throw errorTasksToUpdate
-
-  // 間のタスクの位置を変更
-  await updateTasksPosition(tasksToUpdate, isUp)
-  // 移動するタスクの位置を変更
-  return await updateTask({
-    id: fromTask.id,
-    position,
-  })
-}
-
-async function updateTasksPosition(tasksToUpdate: TaskModel[], isUp: boolean) {
-  const updatedTasks = tasksToUpdate.map((task) => ({
-    ...task,
-    position: isUp ? task.position - 1 : task.position + 1,
-  }))
-
-  const { error } = await supabase
-    .from('tasks')
-    .upsert(updatedTasks, { onConflict: 'id' })
-  if (error) throw error
+// TodoModelとTaskModelからTaskに変換
+function convertToTask(todoModel: TodoModel, taskModel: TaskModel): Task {
+  return {
+    id: taskModel.id,
+    createdAt: toDate(taskModel.created_at),
+    updatedAt: toDate(taskModel.updated_at),
+    accountId: taskModel.account_id,
+    todoId: todoModel.id,
+    type: TodoType.TASK,
+    position: todoModel.position,
+    status: taskModel.status as TaskStatus,
+    title: taskModel.title,
+    memo: taskModel.memo,
+    dueDate: taskModel.due_date ? toDate(taskModel.due_date) : null,
+    dueDateAllDay: taskModel.due_date_all_day,
+  }
 }

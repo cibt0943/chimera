@@ -8,12 +8,14 @@ export async function loader({ request }: Route.LoaderArgs) {
   // 認証されている場合はルートページへリダイレクト
   const loginInfo = await authenticator.authenticate('auth0', request)
 
+  if (!loginInfo) {
+    return redirect('/login')
+  }
+
   const session = await getSession(request.headers.get('cookie'))
   session.set('loginInfo', loginInfo)
 
-  return loginInfo
-    ? redirect('/', {
-        headers: { 'Set-Cookie': await commitSession(session) },
-      })
-    : redirect('/login')
+  return redirect('/', {
+    headers: { 'Set-Cookie': await commitSession(session) },
+  })
 }

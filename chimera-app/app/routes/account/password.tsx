@@ -12,7 +12,7 @@ export async function action({ request }: Route.ActionArgs) {
   // Auth0のパスワードリセットAPIを呼び出す
   await changePasswordAuth0User(loginInfo.auth0User.email)
 
-  return redirect(`/account/password`)
+  return redirect('/account/password')
 }
 
 export default function AccountPassword() {

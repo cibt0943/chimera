@@ -9,13 +9,12 @@ import type { Route } from './+types/event'
 import { EventSchema } from '~/types/events'
 
 export function meta({ params }: Route.MetaArgs) {
-  return [{ title: 'Event ' + params.eventId + ' Edit | IMA' }]
+  return [{ title: `Event ${params.eventId} Edit | IMA` }]
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
-
-  const event = await getEvent(params.eventId || '')
+  const event = await getEvent(params.eventId)
   if (event.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
@@ -29,9 +28,8 @@ export async function action({ params, request }: Route.ActionArgs) {
 
   const data = submission.value
 
-  const endDate = !data.endDate
-    ? null
-    : data.startDate.getTime() === data.endDate.getTime()
+  const endDate =
+    !data.endDate || data.startDate.getTime() === data.endDate.getTime()
       ? null
       : data.endDate
 
@@ -39,22 +37,24 @@ export async function action({ params, request }: Route.ActionArgs) {
     id: event.id,
     title: data.title,
     start_datetime: data.startDate.toISOString(),
-    end_datetime: endDate?.toISOString() || null,
-    all_day: !!data.allDay,
-    memo: data.memo || '',
-    location: data.location || '',
+    end_datetime: endDate?.toISOString() ?? null,
+    all_day: Boolean(data.allDay),
+    memo: data.memo ?? '',
+    location: data.location ?? '',
   })
 
-  const redirectUrl = (formData.get('redirectUrl') as string) || EVENT_URL
+  const redirectUrl = formData.get('redirectUrl')?.toString() || EVENT_URL
   return redirect(redirectUrl)
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
 
-  if (params.eventId === 'new') return { eventId: undefined }
+  if (params.eventId === 'new') {
+    return { event: undefined }
+  }
 
-  const event = await getEvent(params.eventId || '')
+  const event = await getEvent(params.eventId)
   if (event.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
@@ -67,17 +67,19 @@ export default function Event({ loaderData }: Route.ComponentProps) {
   const [isOpenDialog, setIsOpenDialog] = React.useState(true)
   const location = useLocation()
   const navigate = useNavigate()
-  const redirectUrl = EVENT_URL + location.search
+  const redirectUrl = `${EVENT_URL}${location.search}`
+
+  const onOpenChange = (open: boolean) => {
+    setIsOpenDialog(open)
+    if (open) return
+    navigate(redirectUrl)
+  }
 
   return (
     <EventFormDialog
       event={event}
       isOpen={isOpenDialog}
-      onOpenChange={async (open) => {
-        setIsOpenDialog(open)
-        if (open) return
-        navigate(redirectUrl)
-      }}
+      onOpenChange={onOpenChange}
       redirectUrl={redirectUrl}
     />
   )

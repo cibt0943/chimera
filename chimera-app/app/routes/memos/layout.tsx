@@ -2,7 +2,7 @@ import { Outlet, useParams } from 'react-router'
 import { useMedia } from '~/lib/hooks'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getMemos } from '~/models/memo.server'
-import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
+import { getOrAddMemoSettings } from '~/models/memo-settings.server'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -18,7 +18,7 @@ export function meta() {
 export async function loader({ request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
 
-  const memoSettings = await getOrInsertMemoSettings(loginInfo.account.id)
+  const memoSettings = await getOrAddMemoSettings(loginInfo.account.id)
   const memos = await getMemos(loginInfo.account.id, {
     statuses: memoSettings.listFilter.statuses,
   })
@@ -31,22 +31,24 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
   const { memos, memoSettings } = loaderData
-
-  const params = useParams()
-  const { memoId } = params
-
   const isLaptop = useMedia('(min-width: 1024px)', true)
 
+  const { memoId } = useParams()
+
   const memo = memos.find((m) => m.id === memoId)
+
+  const memoList = (
+    <MemoList
+      originalMemos={memos}
+      selectedMemo={memo}
+      memoSettings={memoSettings}
+    />
+  )
 
   if (!isLaptop) {
     return (
       <>
-        <MemoList
-          originalMemos={memos}
-          selectedMemo={memo}
-          memoSettings={memoSettings}
-        />
+        {memoList}
         <Outlet />
       </>
     )
@@ -55,13 +57,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   return (
     <div className="p-4">
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
-        <ResizablePanel defaultSize={35}>
-          <MemoList
-            originalMemos={memos}
-            selectedMemo={memo}
-            memoSettings={memoSettings}
-          />
-        </ResizablePanel>
+        <ResizablePanel defaultSize={35}>{memoList}</ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={65}>
           <Outlet />

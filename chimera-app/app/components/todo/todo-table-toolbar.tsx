@@ -26,7 +26,7 @@ export function TodoTableToolbar<TData>({
         onChange={(event) =>
           table.getColumn('title')?.setFilterValue(event.target.value)
         }
-        className="h-8 w-full sm:w-[240px] lg:w-[280px]"
+        className="h-8 w-64"
         id="tasks-title-search"
       />
       {table.getColumn('status') && (
@@ -40,7 +40,7 @@ export function TodoTableToolbar<TData>({
         <Button
           variant="ghost"
           onClick={() => table.resetColumnFilters()}
-          className="hidden h-8 px-2 md:inline-flex"
+          className="hidden h-8 px-2 lg:inline-flex"
           size="sm"
         >
           {t('common.message.reset')}

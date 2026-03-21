@@ -30,7 +30,7 @@ import interactionPlugin, {
   EventResizeDoneArg,
 } from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
-import { API_URL, TODO_URL, MEMO_URL, EVENT_URL } from '~/constants'
+import { API_URL, TODO_URL, TASK_URL, MEMO_URL, EVENT_URL } from '~/constants'
 import { useMedia } from '~/lib/hooks'
 import { Event, CalendarEvents, CalendarEventType } from '~/types/events'
 import { Task, TaskStatus } from '~/types/tasks'
@@ -79,7 +79,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
       case CalendarEventType.EVENT:
         return `${EVENT_URL}/${id}`
       case CalendarEventType.TASK:
-        return `${EVENT_URL}${TODO_URL}/${id}`
+        return `${EVENT_URL}${TASK_URL}/${id}`
       case CalendarEventType.MEMO:
         return `${EVENT_URL}${MEMO_URL}/${id}`
       default:
@@ -199,7 +199,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   }, [viewMode])
 
   return (
-    <div className="h-[calc(100svh_-_68px)] lg:h-[calc(100svh_-_32px)]">
+    <div className="h-[calc(100svh-68px)] lg:h-[calc(100svh-32px)]">
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
         height={'100%'}
@@ -281,7 +281,7 @@ function createTaskDropRequest(startDate: Date, srcObj: Task) {
     dueDate: startDate,
     dueDateAllDay: srcObj.dueDateAllDay ? 'on' : '',
   }
-  request.action = `${API_URL}${TODO_URL}/${srcObj.id}`
+  request.action = `${API_URL}${TODO_URL}/${srcObj.todoId}`
   return request
 }
 
