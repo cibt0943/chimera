@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useNavigate, useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
-import { LuEqual, LuPlus } from 'react-icons/lu'
+import { LuPlus } from 'react-icons/lu'
 import {
   ColumnFiltersState,
   VisibilityState,
@@ -15,17 +15,14 @@ import {
   getPaginationRowModel,
   useReactTable,
   RowData,
-  Row,
   RowSelectionState,
 } from '@tanstack/react-table'
-import { useHotkeys } from 'react-hotkeys-hook'
 import {
   DragDropProvider,
   type DragEndEvent as DragEndHandler,
   PointerSensor,
 } from '@dnd-kit/react'
 import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
-import { useSortable } from '@dnd-kit/react/sortable'
 import { toast } from 'sonner'
 import {
   Table,
@@ -55,8 +52,12 @@ import {
   TodoDeleteConfirmDialogProps,
 } from './todo-delete-confirm-dialog'
 import { useUserAgentAtom } from '~/lib/global-state'
-import { TodoType } from '~/types/todos'
 import { arrayMove } from '~/lib/utils'
+import {
+  useTodoTableScopedHotkeys,
+  useTodoTableGlobalHotkeys,
+} from './todo-table-hotkeys'
+import { DraggableRow } from './todo-table-draggable-row'
 
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
@@ -457,6 +458,7 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps) {
                     index={index}
                     // disabled={cannotMoveTodo()}
                     disabled={false}
+                    isSelected={row.getIsSelected()}
                   />
                 ))
               ) : (
@@ -500,255 +502,6 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps) {
     </div>
   )
 }
-
-function useTodoTableScopedHotkeys(params: {
-  modifierKey: string
-  enabled: boolean
-  showSelectedTodoEdit: () => void
-  changeSelectedTodoOneStep: (isUp: boolean) => void
-  moveSelectedTodoOneStep: (isUp: boolean) => void
-  updateSelectedTodoStatus: (status: TaskStatus) => void
-  deleteSelectedTodo: () => void
-}) {
-  const {
-    modifierKey,
-    enabled,
-    showSelectedTodoEdit,
-    changeSelectedTodoOneStep,
-    moveSelectedTodoOneStep,
-    updateSelectedTodoStatus,
-    deleteSelectedTodo,
-  } = params
-
-  const HOTKEYS = {
-    ENTER: 'enter',
-    UP: 'up',
-    DOWN: 'down',
-    MODIFIER_UP: `${modifierKey}+up`,
-    MODIFIER_DOWN: `${modifierKey}+down`,
-    MODIFIER_1: `${modifierKey}+1`,
-    MODIFIER_2: `${modifierKey}+2`,
-    MODIFIER_3: `${modifierKey}+3`,
-    MODIFIER_4: `${modifierKey}+4`,
-    MODIFIER_DELETE: `${modifierKey}+delete`,
-    MODIFIER_BACKSPACE: `${modifierKey}+backspace`,
-  }
-
-  useHotkeys(
-    Object.values(HOTKEYS),
-    (_, { hotkey }) => {
-      switch (hotkey) {
-        case HOTKEYS.ENTER:
-          showSelectedTodoEdit()
-          break
-        case HOTKEYS.UP:
-          changeSelectedTodoOneStep(true)
-          break
-        case HOTKEYS.MODIFIER_UP:
-          moveSelectedTodoOneStep(true)
-          break
-        case HOTKEYS.DOWN:
-          changeSelectedTodoOneStep(false)
-          break
-        case HOTKEYS.MODIFIER_DOWN:
-          moveSelectedTodoOneStep(false)
-          break
-        case HOTKEYS.MODIFIER_1:
-          updateSelectedTodoStatus(TaskStatus.NEW)
-          break
-        case HOTKEYS.MODIFIER_2:
-          updateSelectedTodoStatus(TaskStatus.DOING)
-          break
-        case HOTKEYS.MODIFIER_3:
-          updateSelectedTodoStatus(TaskStatus.DONE)
-          break
-        case HOTKEYS.MODIFIER_4:
-          updateSelectedTodoStatus(TaskStatus.PENDING)
-          break
-        case HOTKEYS.MODIFIER_DELETE:
-        case HOTKEYS.MODIFIER_BACKSPACE:
-          deleteSelectedTodo()
-          break
-      }
-    },
-    {
-      preventDefault: true,
-      ignoreEventWhen: (e) => {
-        const target = e.target as HTMLElement
-        return !['tr', 'body'].includes(target.tagName.toLowerCase())
-      },
-      enabled,
-    },
-  )
-}
-
-function useTodoTableGlobalHotkeys(params: {
-  modifierKey: string
-  enabled: boolean
-  openAddTaskDialog: () => void
-  changeSelectedTodoOneStep: (isUp: boolean) => void
-}) {
-  const { modifierKey, enabled, openAddTaskDialog, changeSelectedTodoOneStep } =
-    params
-
-  useHotkeys(
-    [`${modifierKey}+n`, `${modifierKey}+left`, `${modifierKey}+right`],
-    (_, handler) => {
-      switch (handler.keys?.join('')) {
-        case 'n':
-          openAddTaskDialog()
-          break
-        case 'left': {
-          changeSelectedTodoOneStep(true)
-          break
-        }
-        case 'right': {
-          changeSelectedTodoOneStep(false)
-          break
-        }
-      }
-    },
-    { enabled },
-  )
-}
-
-function renderDraggableTaskRow(params: {
-  row: Row<ViewTodo>
-  ref: React.Ref<HTMLTableRowElement>
-  style: React.CSSProperties
-  handleRef: React.RefCallback<Element> | null
-  isDragging: boolean
-}) {
-  const { row, ref, style, handleRef, isDragging } = params
-
-  return (
-    <TableRow
-      id={`row-${row.id}`}
-      ref={ref}
-      tabIndex={0}
-      className="focus:ring-ring rounded bg-white outline-hidden focus:ring-1 focus:ring-inset"
-      style={{ ...style }}
-      onFocus={() => row.toggleSelected(true)}
-      data-state={row.getIsSelected() && 'selected'}
-    >
-      {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id}>
-          {cell.column.id === 'dragHandle' ? (
-            <Button
-              variant="ghost"
-              ref={handleRef ?? undefined}
-              size="icon"
-              className={`touch-none select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-            >
-              <LuEqual />
-            </Button>
-          ) : (
-            flexRender(cell.column.columnDef.cell, cell.getContext())
-          )}
-        </TableCell>
-      ))}
-    </TableRow>
-  )
-}
-
-function renderDraggableBarRow(params: {
-  row: Row<ViewTodo>
-  ref: React.Ref<HTMLTableRowElement>
-  style: React.CSSProperties
-  handleRef: React.RefCallback<Element> | null
-  isDragging: boolean
-}) {
-  const { row, ref, style, handleRef, isDragging } = params
-
-  const cells = row.getVisibleCells()
-  const firstCell = cells[0]
-  const lastCell = cells[cells.length - 1]
-  const middleColSpan = cells.length - 2
-
-  const viewTodo = row.original
-  const isSelected = row.getIsSelected()
-  const colorStyle = {
-    // inline style は selected 背景色を上書きしてしまうため、selected のときは背景色を指定しない
-    backgroundColor: isSelected ? undefined : viewTodo.bgColor || 'white',
-    color: viewTodo.textColor ?? undefined,
-  }
-
-  return (
-    <TableRow
-      id={`row-${row.id}`}
-      ref={ref}
-      tabIndex={0}
-      className="focus:ring-ring rounded outline-hidden focus:ring-1 focus:ring-inset"
-      style={{ ...style, ...colorStyle }}
-      onFocus={() => row.toggleSelected(true)}
-      data-state={row.getIsSelected() && 'selected'}
-    >
-      <TableCell key={firstCell.id} className="py-1">
-        <Button
-          variant="ghost"
-          ref={handleRef ?? undefined}
-          size="icon"
-          className={`h-6 touch-none select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-        >
-          <LuEqual />
-        </Button>
-      </TableCell>
-      <TableCell key={cells[1].id} colSpan={middleColSpan} className="py-1">
-        {flexRender(cells[1].column.columnDef.cell, cells[1].getContext())}
-      </TableCell>
-      <TableCell key={lastCell.id} className="py-1">
-        {flexRender(lastCell.column.columnDef.cell, lastCell.getContext())}
-      </TableCell>
-    </TableRow>
-  )
-}
-
-// D&D用の行コンポーネント
-const DraggableRow = React.memo(
-  function DraggableRow({
-    row,
-    index,
-    disabled,
-  }: {
-    row: Row<ViewTodo>
-    index: number
-    disabled: boolean
-  }) {
-    const { ref, handleRef, isDragging } = useSortable({
-      id: row.id,
-      index,
-      disabled,
-    })
-
-    const style: React.CSSProperties = {
-      backdropFilter: isDragging ? 'blur(5px)' : undefined,
-      boxShadow: isDragging
-        ? 'inset 0 0 1px rgba(0,0,0,0.5), -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25)'
-        : undefined,
-    }
-
-    return row.original.type === TodoType.TASK
-      ? renderDraggableTaskRow({
-          row,
-          ref,
-          style,
-          handleRef,
-          isDragging,
-        })
-      : renderDraggableBarRow({
-          row,
-          ref,
-          style,
-          handleRef,
-          isDragging,
-        })
-  },
-  (prev, next) =>
-    prev.row.original === next.row.original &&
-    prev.row.getIsSelected() === next.row.getIsSelected() &&
-    prev.index === next.index &&
-    prev.disabled === next.disabled,
-)
 
 // タスク削除ダイアログのメモ化
 const TodoDeleteConfirmDialogMemo = React.memo(
