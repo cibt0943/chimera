@@ -25,7 +25,7 @@ function NavLinkClassName({
 
   return cn(
     'flex flex-col gap-2 rounded-md border p-3 text-sm group',
-    'outline-hidden focus:ring-1 focus:ring-inset focus:ring-ring',
+    'focus:inset-ring-ring outline-hidden focus:inset-ring',
     'select-none',
     selectedClassName,
     archiveClassName,
@@ -52,19 +52,13 @@ export function ListItem(props: ListItemProps) {
   })
   const navigate = useNavigate()
 
-  // const style: React.CSSProperties = {
-  //   zIndex: isDragging ? 1 : 0,
-  //   position: 'relative',
-  //   WebkitTouchCallout: 'none', // iOSの長押し時のコンテキストメニューの表示を防ぐ
-  //   cursor: isDragging ? 'grabbing' : 'pointer',
-  // }
-
-  const style: React.CSSProperties = {
-    backdropFilter: isDragging ? 'blur(5px)' : undefined,
-    boxShadow: isDragging
-      ? 'inset 0 0 1px rgba(0,0,0,0.5), -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25)'
-      : undefined,
-  }
+  const style: React.CSSProperties = isDragging
+    ? {
+        backdropFilter: 'blur(5px)',
+        boxShadow:
+          'inset 0 0 1px rgba(0,0,0,0.5), -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25)',
+      }
+    : {}
 
   // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
   const updatedAtDiff = useAgoFormat(item.updatedAt)
