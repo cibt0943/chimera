@@ -4363,9 +4363,9 @@ i18next-browser-languagedetector@^8.2.0:
     "@babel/runtime" "^7.23.2"
 
 i18next@^25.7.4:
-  version "25.10.2"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-25.10.2.tgz#d8aa16ff84b76d1811fa7935dede1868da8fe2fd"
-  integrity sha512-eI/yYvivefa3sX6kRRhIuAHFNWS3NVa5joa0I80tDZ2Kw6uI2Cjhxb9R89A1f06N4DcryQbdGUieMitMnDA+1A==
+  version "25.10.4"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-25.10.4.tgz#42787a089ed062cb8ca8140d9c30de4ca96ada0a"
+  integrity sha512-XsE/6eawy090meuFU0BTY9BtmWr1m9NSwLr0NK7/A04LA58wdAvDsi9WNOJ40Qb1E9NIPbvnVLZEN2fWDd3/3Q==
   dependencies:
     "@babel/runtime" "^7.29.2"
 
@@ -5695,9 +5695,9 @@ react-dom@^19.2.3:
     scheduler "^0.27.0"
 
 react-hook-form@^7.71.1:
-  version "7.71.2"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.71.2.tgz#a5f1d2b855be9ecf1af6e74df9b80f54beae7e35"
-  integrity sha512-1CHvcDYzuRUNOflt4MOq3ZM46AronNJtQ1S7tnX6YN4y72qhgiUItpacZUAQ0TyWYci3yz1X+rXaSxiuEm86PA==
+  version "7.72.0"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.72.0.tgz#995a655b894249fd8798f36383e43f55ed66ae25"
+  integrity sha512-V4v6jubaf6JAurEaVnT9aUPKFbNtDgohj5CIgVGyPHvT9wRx5OZHVjz31GsxnPNI278XMu+ruFz+wGOscHaLKw==
 
 react-hotkeys-hook@^5.2.1:
   version "5.2.4"
@@ -5705,9 +5705,9 @@ react-hotkeys-hook@^5.2.1:
   integrity sha512-BgKg+A1+TawkYluh5Bo4cTmcgMN5L29uhJbDUQdHwPX+qgXRjIPYU5kIDHyxnAwCkCBiu9V5OpB2mpyeluVF2A==
 
 react-i18next@^16.5.1:
-  version "16.6.0"
-  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-16.6.0.tgz#8f8c852ad0e54bd9935416bef251ba21b88705db"
-  integrity sha512-bxVftl2q/pfupKVmBH80ui1rHl3ia2sdcR0Yhn6cr0PyoHfO8JLZ19fccwOIH+0dMBCIkdO5gAmEQFCTAggeQg==
+  version "16.6.1"
+  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-16.6.1.tgz#15ccaf472e9da4aae0fe5bda420f0c5ab0c398d4"
+  integrity sha512-izjXh+AkBLy3h3xe3sh6Gg1flhFHc3UyzsMftMKYJr2Z7WvAZQIdjjpHypctN41zFoeLdJUNGDgP1+Qich2fYg==
   dependencies:
     "@babel/runtime" "^7.29.2"
     html-parse-stringify "^3.0.1"
