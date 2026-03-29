@@ -21,7 +21,7 @@ function renderDraggableTaskRow(params: {
       id={`row-${row.id}`}
       ref={ref}
       tabIndex={0}
-      className="focus:inset-ring-ring bg-white outline-hidden focus:inset-ring"
+      className="bg-white outline-hidden"
       style={{ ...style }}
       onFocus={() => row.toggleSelected(true)}
       data-state={isSelected && 'selected'}
@@ -62,8 +62,8 @@ function renderDraggableBarRow(params: {
 
   const viewTodo = row.original
   const colorStyle: React.CSSProperties = {
-    backgroundColor: viewTodo.bgColor || 'white',
-    color: viewTodo.textColor || 'unset',
+    ...(viewTodo.bgColor && { backgroundColor: viewTodo.bgColor }),
+    ...(viewTodo.textColor && { color: viewTodo.textColor }),
   }
 
   return (
@@ -71,7 +71,7 @@ function renderDraggableBarRow(params: {
       id={`row-${row.id}`}
       ref={ref}
       tabIndex={0}
-      className="focus:inset-ring-ring outline-hidden focus:inset-ring"
+      className="bg-white outline-hidden"
       style={{ ...style, ...colorStyle }}
       onFocus={() => row.toggleSelected(true)}
       data-state={isSelected && 'selected'}

@@ -69,7 +69,7 @@ declare module '@tanstack/table-core' {
 }
 
 interface TodoTableProps {
-  originalTodos: ViewTodo[]
+  todos: ViewTodos
   showId: string
 }
 
@@ -78,7 +78,7 @@ const DEFAULT_COLUMN_FILTERS: ColumnFiltersState = [
   { id: 'status', value: [0, 2] },
 ]
 
-export function TodoTable({ originalTodos, showId }: TodoTableProps) {
+export function TodoTable({ todos, showId }: TodoTableProps) {
   const { t } = useTranslation()
   const userAgent = useUserAgentAtom()
   const { enqueue } = useApiQueue()
@@ -87,7 +87,7 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps) {
   const isLoading = useIsLoading()
 
   // tanstack/react-table
-  const [viewTodos, setViewTodos] = React.useState<ViewTodos>(originalTodos)
+  const [viewTodos, setViewTodos] = React.useState<ViewTodos>(todos)
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     DEFAULT_COLUMN_FILTERS,
@@ -148,8 +148,8 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps) {
 
   // タスクデータが変更されたらテーブルデータを更新
   React.useEffect(() => {
-    setViewTodos(originalTodos)
-  }, [originalTodos])
+    setViewTodos(todos)
+  }, [todos])
 
   // 選択行にフォーカスを設定
   React.useEffect(() => {
@@ -412,7 +412,7 @@ export function TodoTable({ originalTodos, showId }: TodoTableProps) {
         </DropdownMenu>
         <TodoTableToolbar table={table} />
       </div>
-      <div className="rounded-md border">
+      <div className="overflow-hidden rounded-md border">
         <DragDropProvider
           sensors={[PointerSensor]}
           modifiers={(defaults) => [...defaults, RestrictToVerticalAxis]}
