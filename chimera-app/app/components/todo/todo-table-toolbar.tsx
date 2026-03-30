@@ -15,7 +15,6 @@ export function TodoTableToolbar<TData>({
   table,
 }: TodoTableToolbarProps<TData>) {
   const { t } = useTranslation()
-  const isFiltered = table.getState().columnFilters.length > 0
 
   return (
     <div className="flex flex-1 items-center justify-between gap-2">
@@ -35,17 +34,6 @@ export function TodoTableToolbar<TData>({
           title={t('task.message.status_filter')}
           options={TaskStatusListByDispOrder}
         />
-      )}
-      {isFiltered && (
-        <Button
-          variant="ghost"
-          onClick={() => table.resetColumnFilters()}
-          className="hidden h-8 px-2 lg:inline-flex"
-          size="sm"
-        >
-          {t('common.message.reset')}
-          <LuCircleX />
-        </Button>
       )}
       <TodoTableViewOptions table={table} />
     </div>
