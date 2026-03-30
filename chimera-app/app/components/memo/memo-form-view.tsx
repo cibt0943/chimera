@@ -22,12 +22,8 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
   // キーボード操作
   useHotkeys(
     [`${userAgent.modifierKey}+right`],
-    (event, handler) => {
-      switch (handler.keys?.join('')) {
-        case 'right':
-          setTextAreaFocus()
-          break
-      }
+    () => {
+      setTextAreaFocus()
     },
     {
       preventDefault: true, // テキストエリアにフォーカスがある時にalt+sを押すと変なドイツ語がテキストエリアに入力されるのを防ぐ

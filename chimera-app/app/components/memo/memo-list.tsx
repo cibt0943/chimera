@@ -24,6 +24,20 @@ import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 import { MemoSettingsForm } from './memo-settings-form'
 import { useUserAgentAtom } from '~/lib/global-state'
 
+function getHotkeys(modifierKey: string) {
+  return {
+    UP: 'up',
+    DOWN: 'down',
+    MODIFIER_UP: `${modifierKey}+up`,
+    MODIFIER_DOWN: `${modifierKey}+down`,
+    MODIFIER_ENTER: `${modifierKey}+enter`,
+    MODIFIER_DELETE: `${modifierKey}+delete`,
+    MODIFIER_BACKSPACE: `${modifierKey}+backspace`,
+    MODIFIER_N: `${modifierKey}+n`,
+    MODIFIER_LEFT: `${modifierKey}+left`,
+  }
+}
+
 interface MemoListProps {
   originalMemos: Memos
   selectedMemo: Memo | undefined
@@ -58,10 +72,10 @@ export function MemoList({
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   // メモ一覧要素参照用
-  const useMemosRef = React.useRef<HTMLDivElement>(null)
+  const memosRef = React.useRef<HTMLDivElement>(null)
 
   // メモ追加ボタン参照用
-  const useAddButtonRef = React.useRef<HTMLButtonElement>(null)
+  const addButtonRef = React.useRef<HTMLButtonElement>(null)
 
   // フィルタリング後のメモ一覧データ
   const dispMemos = React.useMemo(() => {
@@ -234,22 +248,14 @@ export function MemoList({
   function setListFocus(memo: Memo | undefined) {
     const targetMemo = memo ? memo : dispMemos[0]
     if (!targetMemo) return
-    useMemosRef.current
+    memosRef.current
       ?.querySelector<HTMLElement>(`#memo-${targetMemo.id}`)
       ?.focus()
   }
 
-  // キーボードショートカット(スコープあり)
-  const HOTKEYS = {
-    UP: 'up',
-    DOWN: 'down',
-    MODIFIER_UP: `${userAgent.modifierKey}+up`,
-    MODIFIER_DOWN: `${userAgent.modifierKey}+down`,
-    MODIFIER_ENTER: `${userAgent.modifierKey}+enter`,
-    MODIFIER_DELETE: `${userAgent.modifierKey}+delete`,
-    MODIFIER_BACKSPACE: `${userAgent.modifierKey}+backspace`,
-  }
+  const HOTKEYS = getHotkeys(userAgent.modifierKey)
 
+  // キーボードショートカット(スコープあり)
   useHotkeys(
     Object.values(HOTKEYS),
     (_, { hotkey }) => {
@@ -296,15 +302,15 @@ export function MemoList({
 
   // キーボードショートカット(スコープなし)
   useHotkeys(
-    [`${userAgent.modifierKey}+n`, `${userAgent.modifierKey}+left`],
-    (_, handler) => {
-      switch (handler.keys?.join('')) {
+    [HOTKEYS.MODIFIER_N, HOTKEYS.MODIFIER_LEFT],
+    (_, { hotkey }) => {
+      switch (hotkey) {
         // メモ追加
-        case 'n':
-          useAddButtonRef.current?.click()
+        case HOTKEYS.MODIFIER_N:
+          addButtonRef.current?.click()
           break
         // フォーカスを一覧へ移動
-        case 'left':
+        case HOTKEYS.MODIFIER_LEFT:
           setListFocus(focusedMemoRef.current)
           break
       }
@@ -324,7 +330,7 @@ export function MemoList({
             type="submit"
             variant="secondary"
             className="h-8 px-3"
-            ref={useAddButtonRef}
+            ref={addButtonRef}
           >
             <LuPlus />
             {t('common.message.add')}
@@ -350,11 +356,7 @@ export function MemoList({
           modifiers={(defaults) => [...defaults, RestrictToVerticalAxis]}
           onDragEnd={handleDragEnd}
         >
-          <div
-            className="flex flex-col gap-2 px-3"
-            id="memos"
-            ref={useMemosRef}
-          >
+          <div className="flex flex-col gap-2 px-3" id="memos" ref={memosRef}>
             {dispMemos.length ? (
               dispMemos.map((item: Memo, index) => (
                 <ListItem
