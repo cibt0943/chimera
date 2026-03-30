@@ -39,8 +39,8 @@ You can access the service here: [IMA](https://ima.fly.dev)
 #### Event
 
 - [x] カレンダーへ イベントの追加、編集、削除が行える
-- [x] カレンダーから Todo の参照、追加、編集、削除が行える
-- [x] カレンダーから Memo の参照、追加、編集、削除が行える
+- [x] カレンダーから Todo の参照、編集、削除が行える
+- [x] カレンダーから Memo の参照、編集、削除が行える
 
 #### Daily Note
 
