@@ -7,36 +7,48 @@ import { TableCell, TableRow } from '~/components/ui/table'
 import { ViewTodo } from '~/types/view-todos'
 import { TodoType } from '~/types/todos'
 
-function renderDraggableTaskRow(params: {
+interface RowProps {
   row: Row<ViewTodo>
   ref: React.Ref<HTMLTableRowElement>
   style: React.CSSProperties
   handleRef: React.RefCallback<Element> | null
   isSelected: boolean
-}) {
-  const { row, ref, style, handleRef, isSelected } = params
+}
 
+function DragHandle({
+  handleRef,
+  className,
+}: {
+  handleRef: React.RefCallback<Element> | null
+  className?: string
+}) {
+  return (
+    <Button
+      variant="ghost"
+      ref={handleRef ?? undefined}
+      size="icon"
+      className={`cursor-grab touch-none select-none${className ? ` ${className}` : ''}`}
+    >
+      <LuEqual />
+    </Button>
+  )
+}
+
+function TaskRow({ row, ref, style, handleRef, isSelected }: RowProps) {
   return (
     <TableRow
       id={`row-${row.id}`}
       ref={ref}
       tabIndex={0}
       className="bg-white outline-hidden"
-      style={{ ...style }}
+      style={style}
       onFocus={() => row.toggleSelected(true)}
       data-state={isSelected && 'selected'}
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>
           {cell.column.id === 'dragHandle' ? (
-            <Button
-              variant="ghost"
-              ref={handleRef ?? undefined}
-              size="icon"
-              className={'cursor-grab touch-none select-none'}
-            >
-              <LuEqual />
-            </Button>
+            <DragHandle handleRef={handleRef} />
           ) : (
             flexRender(cell.column.columnDef.cell, cell.getContext())
           )}
@@ -46,24 +58,16 @@ function renderDraggableTaskRow(params: {
   )
 }
 
-function renderDraggableBarRow(params: {
-  row: Row<ViewTodo>
-  ref: React.Ref<HTMLTableRowElement>
-  style: React.CSSProperties
-  handleRef: React.RefCallback<Element> | null
-  isSelected: boolean
-}) {
-  const { row, ref, style, handleRef, isSelected } = params
-
+function BarRow({ row, ref, style, handleRef, isSelected }: RowProps) {
   const cells = row.getVisibleCells()
   const firstCell = cells[0]
   const lastCell = cells[cells.length - 1]
   const middleColSpan = cells.length - 2
 
-  const viewTodo = row.original
+  const { bgColor, textColor } = row.original
   const colorStyle: React.CSSProperties = {
-    ...(viewTodo.bgColor && { backgroundColor: viewTodo.bgColor }),
-    ...(viewTodo.textColor && { color: viewTodo.textColor }),
+    ...(bgColor && { backgroundColor: bgColor }),
+    ...(textColor && { color: textColor }),
   }
 
   return (
@@ -77,14 +81,7 @@ function renderDraggableBarRow(params: {
       data-state={isSelected && 'selected'}
     >
       <TableCell key={firstCell.id} className="py-1">
-        <Button
-          variant="ghost"
-          ref={handleRef ?? undefined}
-          size="icon"
-          className={'h-6 cursor-grab touch-none select-none'}
-        >
-          <LuEqual />
-        </Button>
+        <DragHandle handleRef={handleRef} className="h-6" />
       </TableCell>
       <TableCell key={cells[1].id} colSpan={middleColSpan} className="py-1">
         {flexRender(cells[1].column.columnDef.cell, cells[1].getContext())}
@@ -123,21 +120,17 @@ export const DraggableRow = React.memo(
         }
       : {}
 
-    return row.original.type === TodoType.TASK
-      ? renderDraggableTaskRow({
-          row,
-          ref,
-          style,
-          handleRef,
-          isSelected,
-        })
-      : renderDraggableBarRow({
-          row,
-          ref,
-          style,
-          handleRef,
-          isSelected,
-        })
+    const RowComponent = row.original.type === TodoType.TASK ? TaskRow : BarRow
+
+    return (
+      <RowComponent
+        row={row}
+        ref={ref}
+        style={style}
+        handleRef={handleRef}
+        isSelected={isSelected}
+      />
+    )
   },
   (prev, next) =>
     prev.row.original === next.row.original &&
