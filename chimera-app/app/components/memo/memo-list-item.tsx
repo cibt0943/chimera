@@ -9,7 +9,7 @@ import { useAgoFormat } from '~/lib/hooks'
 import { Memo, MemoStatus } from '~/types/memos'
 import { MEMO_URL } from '~/constants'
 
-function NavLinkClassName({
+function getListItemClassName({
   item,
   isSelected,
 }: {
@@ -54,9 +54,8 @@ export function ListItem(props: ListItemProps) {
 
   const style: React.CSSProperties = isDragging
     ? {
-        backdropFilter: 'blur(5px)',
         boxShadow:
-          'inset 0 0 1px rgba(0,0,0,0.5), -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25)',
+          '-1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25)',
       }
     : {}
 
@@ -71,7 +70,7 @@ export function ListItem(props: ListItemProps) {
     <div
       id={`memo-${item.id}`}
       ref={ref as React.Ref<HTMLDivElement>}
-      className={NavLinkClassName({ item, isSelected })}
+      className={getListItemClassName({ item, isSelected })}
       style={style}
       onFocus={onFocus}
       role="button"
