@@ -1,6 +1,6 @@
-import { useFetcher } from '@remix-run/react'
+import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
-import { RiListSettingsLine } from 'react-icons/ri'
+import { LuSettings } from 'react-icons/lu'
 import { Button } from '~/components/ui/button'
 import { Label } from '~/components/ui/label'
 import { Switch } from '~/components/ui/switch'
@@ -11,8 +11,7 @@ import {
 } from '~/components/ui/popover'
 import { ACCOUNT_URL } from '~/constants'
 import { MemoStatus } from '~/types/memos'
-import { useAtomValue } from 'jotai'
-import { memoSettingsAtom } from '~/lib/state'
+import { useMemoSettingsAtom } from '~/lib/global-state'
 
 export function MemoSettingsForm() {
   const { t } = useTranslation()
@@ -21,7 +20,7 @@ export function MemoSettingsForm() {
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="flex h-8 px-2">
-          <RiListSettingsLine className="h-4 w-4 text-primary/80" />
+          <LuSettings className="text-primary/80" />
           <span className="sr-only">{t('common.message.settings')}</span>
         </Button>
       </PopoverTrigger>
@@ -38,12 +37,12 @@ export function MemoSettingsForm() {
 function ShowArchivedSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
-  const memoSettings = useAtomValue(memoSettingsAtom)
+  const memoSettings = useMemoSettingsAtom()
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ
   function updateMemoSettingStatusFilter(statuses: MemoStatus[]) {
-    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+    const url = `${ACCOUNT_URL}/memo/settings`
 
     fetcher.submit(
       {
@@ -60,7 +59,7 @@ function ShowArchivedSwith() {
   }
 
   return (
-    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-xs">
       <div>
         <Label htmlFor="show-archived">
           {t('memo_settings.message.list_show_archived')}
@@ -89,12 +88,12 @@ function ShowArchivedSwith() {
 function ShowContentSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
-  const memoSettings = useAtomValue(memoSettingsAtom)
+  const memoSettings = useMemoSettingsAtom()
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ
   function updateMemoSettingDisplayContent(isShow: boolean) {
-    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+    const url = `${ACCOUNT_URL}/memo/settings`
 
     fetcher.submit(
       {
@@ -111,7 +110,7 @@ function ShowContentSwith() {
   }
 
   return (
-    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-xs">
       <div>
         <Label htmlFor="show-content">
           {t('memo_settings.message.list_show_content')}
@@ -134,12 +133,12 @@ function ShowContentSwith() {
 function AutoSaveSwith() {
   const { t } = useTranslation()
   const fetcher = useFetcher()
-  const memoSettings = useAtomValue(memoSettingsAtom)
+  const memoSettings = useMemoSettingsAtom()
   if (!memoSettings) return null
 
   // 表示するメモのフィルタ
   function updateMemoSettingAutoSave(isAutoSave: boolean) {
-    const url = [ACCOUNT_URL, 'memo', 'settings'].join('/')
+    const url = `${ACCOUNT_URL}/memo/settings`
 
     fetcher.submit(
       {
@@ -154,7 +153,7 @@ function AutoSaveSwith() {
   }
 
   return (
-    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-xs">
       <div>
         <Label htmlFor="auto-save">
           {t('memo_settings.message.auto_save')}

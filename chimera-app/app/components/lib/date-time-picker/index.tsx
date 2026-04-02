@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { RiCloseLine } from 'react-icons/ri'
-import { RxCalendar } from 'react-icons/rx'
+import { LuCalendar, LuX } from 'react-icons/lu'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
+import { Matcher } from 'react-day-picker'
 import { Button } from '~/components/ui/button'
 import { Calendar } from '~/components/ui/calendar'
 import {
@@ -15,28 +15,37 @@ import { cn, getLocale } from '~/lib/utils'
 import { TimePicker } from './time-picker'
 
 export interface DatePickerProps extends React.ComponentProps<'div'> {
-  date: Date | undefined
-  onChangeDate: (date: Date | undefined) => void
   triggerId?: string
+  selectedDate: Date | undefined
+  defaultMonth: Date | undefined
+  onChangeDate: (date: Date | undefined) => void
   placeholder?: string
+  disabled?: Matcher
+  captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
 }
 
 export function DatePicker({
-  date,
-  onChangeDate,
   triggerId,
-  placeholder = '',
+  selectedDate,
+  defaultMonth,
+  onChangeDate,
+  placeholder,
+  disabled,
+  captionLayout,
   ...divProps
 }: DatePickerProps) {
   return (
     <DateTimePicker
-      date={date}
+      selectedDate={selectedDate}
+      defaultMonth={defaultMonth}
       allDay={true}
       defaultAllDay={true}
       includeAllDayComponent={false}
       onChangeDate={onChangeDate}
       triggerId={triggerId}
       placeholder={placeholder}
+      disabled={disabled}
+      captionLayout={captionLayout}
       {...divProps}
     />
   )
@@ -50,40 +59,56 @@ export interface DateTimePickerProps extends DatePickerProps {
 }
 
 export function DateTimePicker({
-  date,
+  triggerId,
+  selectedDate,
+  defaultMonth,
   allDay,
   defaultAllDay,
   includeAllDayComponent,
   onChangeDate,
   onChangeAllDay = () => {},
-  triggerId,
-  placeholder = '',
+  placeholder,
+  disabled,
+  captionLayout = 'dropdown',
   ...divProps
 }: DateTimePickerProps) {
   const { i18n } = useTranslation()
   const locale = getLocale(i18n.language)
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
+  const [localDate, setLocalDate] = React.useState<Date | undefined>(
+    selectedDate,
+  )
+
+  React.useEffect(() => {
+    setLocalDate(selectedDate)
+  }, [selectedDate])
 
   const { className, ...otherDivProps } = divProps || {}
 
   const handleChangeDate = React.useCallback(
     (newDate: Date | undefined) => {
-      if (date !== newDate) onChangeDate(newDate)
+      if (selectedDate !== newDate) {
+        setLocalDate(newDate)
+        onChangeDate(newDate)
+      }
     },
-    [date, onChangeDate],
+    [selectedDate, onChangeDate],
   )
 
   const handleChangeAllDay = React.useCallback(
     (newAllDay: boolean) => {
-      if (allDay !== newAllDay) onChangeAllDay(newAllDay)
+      if (allDay !== newAllDay) {
+        onChangeAllDay(newAllDay)
+      }
 
-      if (newAllDay && date) {
-        const updatedDate = new Date(date)
+      if (newAllDay && selectedDate) {
+        const updatedDate = new Date(selectedDate)
         updatedDate.setHours(9, 0)
+        setLocalDate(updatedDate)
         onChangeDate(updatedDate)
       }
     },
-    [allDay, date, onChangeAllDay, onChangeDate],
+    [allDay, selectedDate, onChangeAllDay, onChangeDate],
   )
 
   return (
@@ -93,35 +118,36 @@ export function DateTimePicker({
     >
       <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
         <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
-            id={triggerId}
-            className="grow justify-start px-2"
-          >
-            <RxCalendar className="mr-2 h-5 w-5 text-muted-foreground" />
-            <DispValue date={date} allDay={allDay} placeholder={placeholder} />
+          <Button variant="ghost" id={triggerId} className="grow justify-start">
+            <LuCalendar className="text-muted-foreground" />
+            <DispValue
+              date={localDate}
+              allDay={allDay}
+              placeholder={placeholder}
+            />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
-            defaultMonth={date}
-            initialFocus={true}
+            defaultMonth={defaultMonth}
+            captionLayout={captionLayout}
             locale={locale}
-            selected={date}
-            onSelect={(selectedDay: Date | undefined) => {
-              if (selectedDay) {
+            selected={localDate}
+            onSelect={(date: Date | undefined) => {
+              if (date) {
                 // 日付が変更されても時分は維持（デフォルトは9:00）
-                selectedDay.setHours(
-                  date?.getHours() || 9,
-                  date?.getMinutes() || 0,
+                date.setHours(
+                  selectedDate?.getHours() || 9,
+                  selectedDate?.getMinutes() || 0,
                 )
               }
-              handleChangeDate(selectedDay)
+              handleChangeDate(date)
             }}
+            disabled={disabled}
           />
           <TimeControl
-            date={date}
+            date={localDate}
             allDay={allDay}
             includeAllDayComponent={includeAllDayComponent}
             onChangeDate={handleChangeDate}
@@ -129,7 +155,7 @@ export function DateTimePicker({
           />
         </PopoverContent>
       </Popover>
-      {date && (
+      {localDate && (
         <Button
           type="button"
           variant="ghost"
@@ -141,7 +167,7 @@ export function DateTimePicker({
             handleChangeDate(undefined)
           }}
         >
-          <RiCloseLine className="h-4 w-4 text-muted-foreground" />
+          <LuX className="text-muted-foreground" />
         </Button>
       )}
     </div>
@@ -168,13 +194,15 @@ function TimeControl({
   const className = includeAllDayComponent ? 'justify-between' : 'justify-end'
 
   return (
-    <div
-      className={cn('flex items-center justify-between p-3 pt-0', className)}
-    >
+    <div className={cn('flex items-center justify-between p-3', className)}>
       {includeAllDayComponent && (
         <ToggleAllDay allDay={allDay} onChangeAllDay={onChangeAllDay} />
       )}
-      {!allDay && <TimePicker date={date} setDate={onChangeDate} />}
+      {!allDay && (
+        <div>
+          <TimePicker date={date} setDate={onChangeDate} />
+        </div>
+      )}
     </div>
   )
 }
@@ -235,8 +263,8 @@ export function DummyDateTimePicker({
 }: DummyDateTimePickerProps) {
   return (
     <div className={cn('flex items-center rounded-md border', className)}>
-      <Button variant="ghost" className="grow justify-start px-2">
-        <RxCalendar className="mr-2 h-5 w-5 text-muted-foreground" />
+      <Button variant="ghost" className="grow justify-start">
+        <LuCalendar className="text-muted-foreground" />
         <DispValue placeholder={placeholder} />
       </Button>
     </div>

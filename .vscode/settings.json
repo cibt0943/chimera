@@ -35,5 +35,6 @@
   "css.validate": false,
   "scss.validate": false,
   "stylelint.validate": ["css", "scss"],
-  "eslint.workingDirectories": ["./chimera-app"]
+  "eslint.workingDirectories": ["./chimera-app"],
+  "prettier.ignorePath": "./chimera-app/.prettierignore"
 }

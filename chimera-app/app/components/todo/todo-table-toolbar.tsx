@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { RiCloseLine } from 'react-icons/ri'
+import { LuCircleX } from 'react-icons/lu'
 import { Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -15,40 +15,26 @@ export function TodoTableToolbar<TData>({
   table,
 }: TodoTableToolbarProps<TData>) {
   const { t } = useTranslation()
-  const isFiltered = table.getState().columnFilters.length > 0
 
   return (
-    <div className="flex flex-1 items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
-        <Input
-          type="search"
-          placeholder={t('task.message.title_search')}
-          value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('title')?.setFilterValue(event.target.value)
-          }
-          className="h-8 w-full sm:w-[240px] lg:w-[280px]"
-          id="tasks-title-search"
+    <div className="flex flex-1 items-center justify-between gap-2">
+      <Input
+        type="search"
+        placeholder={t('task.message.title_search')}
+        value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
+        onChange={(event) =>
+          table.getColumn('title')?.setFilterValue(event.target.value)
+        }
+        className="h-8 w-64"
+        id="tasks-title-search"
+      />
+      {table.getColumn('status') && (
+        <TodoTableFacetedFilter
+          column={table.getColumn('status')}
+          title={t('task.message.status_filter')}
+          options={TaskStatusListByDispOrder}
         />
-        {table.getColumn('status') && (
-          <TodoTableFacetedFilter
-            column={table.getColumn('status')}
-            title={t('task.message.status_filter')}
-            options={TaskStatusListByDispOrder}
-          />
-        )}
-        {isFiltered && (
-          <Button
-            variant="ghost"
-            onClick={() => table.resetColumnFilters()}
-            className="hidden h-8 px-2 md:inline-flex"
-            size="sm"
-          >
-            {t('common.message.reset')}
-            <RiCloseLine className="ml-2 h-3 w-3" />
-          </Button>
-        )}
-      </div>
+      )}
       <TodoTableViewOptions table={table} />
     </div>
   )

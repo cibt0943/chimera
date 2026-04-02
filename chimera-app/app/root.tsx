@@ -1,34 +1,42 @@
-import * as React from 'react'
-import { cssBundleHref } from '@remix-run/css-bundle'
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
 import {
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-} from '@remix-run/react'
+  data,
+} from 'react-router'
 import { I18nextProvider } from 'react-i18next'
-import { typedjson, useTypedLoaderData } from 'remix-typedjson'
 import { getToast } from 'remix-toast'
-import { Toaster } from '~/components/ui/toaster'
-import styles from '~/styles/tailwind.css'
+import styles from '~/styles/tailwind.css?url'
 import i18n, { useLanguage } from '~/lib/i18n/i18n'
-import { authenticator } from '~/lib/auth.server'
-import { useTheme, useSonner, Sonner } from './lib/hooks'
+import { useTheme, useSonner } from '~/lib/hooks'
+import { getSession } from '~/lib/session.server'
+import { getOrAddMemoSettings } from '~/models/memo-settings.server'
+import {
+  useSetUserAgentAtom,
+  useSetLoginInfoAtom,
+  useSetMemoSettingsAtom,
+} from '~/lib/global-state'
+import { getUserAgent } from '~/lib/utils'
+import type { Route } from './+types/root'
 import { Theme, Language } from '~/types/accounts'
-import { getOrInsertMemoSettings } from '~/models/memo-settings.server'
-import { LoadingEffect } from '~/components/loading-effect'
-import { Navbar } from '~/components/navbar'
-import { Sidebar } from '~/components/sidebar'
-import { useSetAtom } from 'jotai'
-import { loginSessionAtom, memoSettingsAtom } from '~/lib/state'
 
-export const links: LinksFunction = () => [
-  { rel: 'stylesheet', href: styles },
-  ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
-]
+export function links() {
+  return [
+    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    {
+      rel: 'preconnect',
+      href: 'https://fonts.gstatic.com',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+Mono:wght@400;700&display=swap',
+    },
+    { rel: 'stylesheet', href: styles },
+  ]
+}
 
 function getLanguageFromHeader(request: Request) {
   // リクエストヘッダから言語を取得
@@ -43,29 +51,29 @@ function getLanguageFromHeader(request: Request) {
   }
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   // セッションから認証情報を取得
-  const loginSession = await authenticator.isAuthenticated(request)
+  const session = await getSession(request.headers.get('cookie'))
+  const loginInfo = session.get('loginInfo')
 
   // 言語を設定
-  let language = loginSession?.account.language || 'auto'
+  let language = loginInfo?.account.language || 'auto'
   language = language === 'auto' ? getLanguageFromHeader(request) : language
   i18n.changeLanguage(language)
 
   // メモ設定を取得
   const memoSettings =
-    loginSession && (await getOrInsertMemoSettings(loginSession.account.id))
+    loginInfo && (await getOrAddMemoSettings(loginInfo.account.id))
 
   // トーストメッセージを取得
   const { toast, headers } = await getToast(request)
 
-  return typedjson({ loginSession, language, memoSettings, toast }, { headers })
+  return data({ loginInfo, language, memoSettings, toast }, { headers })
 }
 
-export default function App() {
-  const { loginSession, language, memoSettings, toast } =
-    useTypedLoaderData<typeof loader>()
-  const theme = loginSession?.account.theme || Theme.SYSTEM
+export default function App({ loaderData }: Route.ComponentProps) {
+  const { loginInfo, language, memoSettings, toast } = loaderData
+  const theme = loginInfo?.account.theme || Theme.SYSTEM
 
   // useEffectにてOSのテーマ設定に合わせてテーマを変更
   useTheme(theme)
@@ -73,23 +81,20 @@ export default function App() {
   // クライアントサイドでの言語設定
   useLanguage(language)
 
-  // ログインユーザーのアカウント情報をグローバルステートに保存
-  const setLoginAccount = useSetAtom(loginSessionAtom)
-  React.useEffect(() => {
-    setLoginAccount(loginSession)
-  }, [setLoginAccount, loginSession])
-
-  // ログインユーザーのメモ設定情報をグローバルステートに保存
-  const setMemoSettings = useSetAtom(memoSettingsAtom)
-  React.useEffect(() => {
-    setMemoSettings(memoSettings)
-  }, [setMemoSettings, memoSettings])
-
   // トーストメッセージを表示
   useSonner(toast)
 
+  // ユーザーエージェント情報をグローバルステートに保存
+  useSetUserAgentAtom(getUserAgent())
+
+  // ログインユーザーのアカウント情報をグローバルステートに保存
+  useSetLoginInfoAtom(loginInfo)
+
+  // ログインユーザーのメモ設定情報をグローバルステートに保存
+  useSetMemoSettingsAtom(memoSettings)
+
   return (
-    <html lang={language} className="" suppressHydrationWarning={true}>
+    <html lang={language} suppressHydrationWarning={true}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -114,27 +119,12 @@ export default function App() {
           }}
         />
       </head>
-      <body className="overflow-y-hidden">
+      <body>
         <I18nextProvider i18n={i18n}>
-          <div className="flex">
-            <aside className="h-dvh overflow-auto">
-              <Sidebar />
-            </aside>
-            <div className="h-dvh flex-1 overflow-auto">
-              <Navbar />
-              <main>
-                <LoadingEffect>
-                  <Outlet />
-                </LoadingEffect>
-              </main>
-            </div>
-            <Toaster />
-            <Sonner closeButton />
-          </div>
+          <Outlet />
         </I18nextProvider>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   )

@@ -1,8 +1,7 @@
-import * as React from 'react'
-import { Form } from '@remix-run/react'
+import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useForm, getFormProps } from '@conform-to/react'
-import { parseWithZod, getZodConstraint } from '@conform-to/zod'
+import { parseWithZod, getZodConstraint } from '@conform-to/zod/v4'
 import { Button } from '~/components/ui/button'
 import { SelectItem } from '~/components/ui/select'
 import { TODO_URL } from '~/constants'
@@ -18,58 +17,66 @@ import { InputConform } from '~/components/lib/conform/input'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { SelectConform } from '~/components/lib/conform/select'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
+import { TodoDeleteButton } from './todo-delete-button'
+import { TodoType } from '~/types/todos'
+import { ViewTodo } from '~/types/view-todos'
 import {
-  Task,
   TaskStatus,
   TaskSchema,
   TaskSchemaType,
   TaskStatusListByDispOrder,
+  Task,
 } from '~/types/tasks'
 
 export interface TaskFormProps {
   task: Task | undefined
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
-  returnUrl?: string
-  children?: React.ReactNode
+  redirectUrl: string
 }
 
-export function TaskForm({
-  task,
-  onSubmit,
-  returnUrl = TODO_URL,
-  children,
-}: TaskFormProps) {
+export function TaskForm({ task, redirectUrl }: TaskFormProps) {
   const { t } = useTranslation()
+  const fetcher = useFetcher()
 
-  const action = task ? [TODO_URL, task.id].join('/') : TODO_URL
-  const formId = task ? `task-form-${task.id}` : 'task-form-new'
-  const defaultValue = task || {
-    title: '',
-    memo: '',
-    status: TaskStatus.NEW,
-    dueDate: null,
-    dueDateAllDay: false,
-  }
+  const action = task ? `${TODO_URL}/${task.todoId}` : `${TODO_URL}/task`
+  const formId = task ? `task-form-${task.todoId}` : 'task-form-new'
 
   const [form, fields] = useForm<TaskSchemaType>({
     id: formId,
-    defaultValue: defaultValue,
+    defaultValue: task || {
+      title: '',
+      memo: '',
+      status: TaskStatus.NEW,
+      dueDate: null,
+      dueDateAllDay: false,
+    },
     constraint: getZodConstraint(TaskSchema),
     onValidate: ({ formData }) => {
       return parseWithZod(formData, { schema: TaskSchema })
     },
     shouldRevalidate: 'onInput',
-    onSubmit: onSubmit,
   })
 
+  const viewTodo: ViewTodo | undefined = task
+    ? {
+        todoId: task.todoId,
+        createdAt: task.createdAt,
+        updatedAt: task.updatedAt,
+        accountId: task.accountId,
+        type: TodoType.TASK,
+        position: task.position,
+        title: task.title,
+        status: task.status,
+        memo: task.memo,
+        dueDate: task.dueDate,
+        dueDateAllDay: task.dueDateAllDay,
+        bgColor: null,
+        textColor: null,
+      }
+    : undefined
+
   return (
-    <Form
-      method="post"
-      className="space-y-8"
-      {...getFormProps(form)}
-      action={action}
-    >
-      <div className="max-h-[calc(100dvh_-_240px)] space-y-8 overflow-y-auto px-0.5">
+    <fetcher.Form method="post" {...getFormProps(form)} action={action}>
+      <div className="max-h-[calc(100svh-240px)] space-y-8 overflow-y-auto p-0.5">
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
             {t('task.model.title')}
@@ -115,13 +122,20 @@ export function TaskForm({
           </FormDescription>
           <FormMessage message={fields.status.errors} />
         </FormItem>
-        <input type="hidden" name="returnUrl" value={returnUrl} />
+        <input type="hidden" name="type" value={TodoType.TASK} />
+        <input type="hidden" name="redirectUrl" value={redirectUrl} />
+        <FormFooter className="sm:justify-between">
+          <div>
+            {task && (
+              <TodoDeleteButton viewTodo={viewTodo} redirectUrl={redirectUrl} />
+            )}
+          </div>
+          <Button type="submit" disabled={fetcher.state !== 'idle'}>
+            {t('common.message.save')}
+          </Button>
+        </FormFooter>
       </div>
-      <FormFooter className="sm:justify-between">
-        {children || <div>&nbsp;</div>}
-        <Button type="submit">{t('common.message.save')}</Button>
-      </FormFooter>
-    </Form>
+    </fetcher.Form>
   )
 }
 

@@ -1,16 +1,15 @@
-import { NavLink } from '@remix-run/react'
+import { useNavigate } from 'react-router'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import { RiArchiveLine } from 'react-icons/ri'
-import { CSS } from '@dnd-kit/utilities'
-import { useSortable } from '@dnd-kit/sortable'
+import { LuArchive } from 'react-icons/lu'
+import { useSortable } from '@dnd-kit/react/sortable'
 import { cn } from '~/lib/utils'
 import { useAgoFormat } from '~/lib/hooks'
 import { Memo, MemoStatus } from '~/types/memos'
 import { MEMO_URL } from '~/constants'
 
-function NavLinkClassName({
+function getListItemClassName({
   item,
   isSelected,
 }: {
@@ -19,15 +18,14 @@ function NavLinkClassName({
 }) {
   const selectedClassName = isSelected
     ? 'bg-muted'
-    : 'hover:bg-muted/50 bg-background'
+    : 'bg-background hover:bg-muted'
 
   const archiveClassName =
     item.status === MemoStatus.ARCHIVED ? 'text-muted-foreground' : ''
 
   return cn(
     'flex flex-col gap-2 rounded-md border p-3 text-sm group',
-    // 'outline-none focus:ring-2 focus:ring-inset focus:ring-ring',
-    'outline-none focus:ring-1 focus:ring-inset focus:ring-ring',
+    'focus:inset-ring-ring outline-hidden focus:inset-ring',
     'select-none',
     selectedClassName,
     archiveClassName,
@@ -37,6 +35,7 @@ function NavLinkClassName({
 // Item Component
 interface ListItemProps {
   item: Memo
+  index: number
   onFocus: () => void
   isSelected: boolean
   isPreview: boolean
@@ -44,72 +43,61 @@ interface ListItemProps {
 }
 
 export function ListItem(props: ListItemProps) {
-  const { item, onFocus, isSelected, isPreview, children } = props
+  const { item, index, onFocus, isSelected, isPreview, children } = props
 
   const { t } = useTranslation()
-  const {
-    transform,
-    transition,
-    setNodeRef,
-    isDragging,
-    attributes,
-    listeners,
-  } = useSortable({
+  const { ref, isDragging } = useSortable({
     id: item.id,
+    index,
   })
+  const navigate = useNavigate()
 
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition: transition,
-    opacity: isDragging ? 0.8 : 1,
-    zIndex: isDragging ? 1 : 0,
-    position: 'relative',
-    // isDraggingの場合はpointerEventsをnoneにする(アンカーに対してドラッグ時のクリックを無効にする)
-    // この処理をしないと、ドラッグ中にアンカーをクリックしてしまうため、リンク先に遷移してしまう
-    // この方法のデメリットはドラッグ中のマウスポインターが標準のカーソルになること
-    ...(isDragging && {
-      pointerEvents: 'none',
-    }),
-    WebkitTouchCallout: 'none', // iOSの長押し時のコンテキストメニューの表示を防ぐ
-  }
+  const style: React.CSSProperties = isDragging
+    ? {
+        boxShadow:
+          '-1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25)',
+      }
+    : {}
 
   // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
   const updatedAtDiff = useAgoFormat(item.updatedAt)
   const updatedAt = format(item.updatedAt, t('common.format.date_time_format'))
-  const to = [MEMO_URL, item.id].join('/')
+  const to = `${MEMO_URL}/${item.id}`
   const title = item.title || t('memo.message.un_titled')
+  const content = isPreview ? item.content.substring(0, 300) || '　' : ''
 
   return (
-    <NavLink
+    <div
       id={`memo-${item.id}`}
-      ref={setNodeRef}
-      to={to}
-      className={NavLinkClassName({ item, isSelected })}
+      ref={ref as React.Ref<HTMLDivElement>}
+      className={getListItemClassName({ item, isSelected })}
       style={style}
       onFocus={onFocus}
-      {...attributes}
-      {...listeners}
-      role="listitem"
+      role="button"
+      data-role="listitem"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.altKey) {
+          navigate(to)
+        }
+      }}
+      onClick={() => navigate(to)}
     >
       <div className="flex items-center">
         <div className="line-clamp-1">{title}</div>
         <div className="ml-auto">{children}</div>
       </div>
-      <div className="line-clamp-2 text-xs text-muted-foreground">
-        {isPreview && item.content.substring(0, 300)}
+      <div className="text-muted-foreground line-clamp-1 text-xs">
+        {content}
       </div>
       <div className="flex items-center justify-between space-x-2">
-        <div>
-          {item.status === MemoStatus.ARCHIVED && (
-            <RiArchiveLine className="mr-2 h-4 w-4" />
-          )}
-        </div>
-        <div className="ml-auto text-xs text-muted-foreground">
+        <div>{item.status === MemoStatus.ARCHIVED && <LuArchive />}</div>
+        <div className="text-muted-foreground ml-auto text-xs">
           <ClientOnly fallback={<span>&nbsp;</span>}>
             {() => <span title={updatedAt}>{updatedAtDiff}</span>}
           </ClientOnly>
         </div>
       </div>
-    </NavLink>
+    </div>
   )
 }

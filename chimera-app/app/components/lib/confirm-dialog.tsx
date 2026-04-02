@@ -9,25 +9,25 @@ import {
 } from '~/components/ui/alert-dialog'
 
 interface ConfirmDialogProps {
-  title: string
-  description: string
+  title: React.ReactNode | string
+  description: React.ReactNode | string
   isOpen?: boolean
-  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
-  torigger?: React.ReactNode
+  onOpenChange?: (open: boolean) => void
+  trigger?: React.ReactNode
   children?: React.ReactNode
 }
 
 export function ConfirmDialog({
   title,
-  torigger,
   description,
   isOpen,
-  setIsOpen,
+  onOpenChange,
+  trigger,
   children,
 }: ConfirmDialogProps) {
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogTrigger asChild>{torigger}</AlertDialogTrigger>
+    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
+      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>

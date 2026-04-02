@@ -1,9 +1,13 @@
-import {
-  MemoSettings,
-  UpdateMemoSettingsModel,
-  MemoSettingsModel2MemoSettings,
-} from '~/types/memo-settings'
+import { toDate } from 'date-fns'
+import type { Database } from '~/types/database'
+import { MemoSettings } from '~/types/memo-settings'
 import { supabase } from '~/lib/supabase-client.server'
+
+// DBのアカウントメモ設定テーブルの型
+export type MemoSettingsModel =
+  Database['public']['Tables']['memo_settings']['Row']
+export type UpdateMemoSettingsModel =
+  Database['public']['Tables']['memo_settings']['Update'] & { id: string } // idを必須で上書き
 
 // アカウントのメモ設定情報を取得
 export async function getMemoSettings(
@@ -16,18 +20,17 @@ export async function getMemoSettings(
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return MemoSettingsModel2MemoSettings(data)
+  return convertToMemoSettings(data)
 }
 
 // アカウントのメモ設定情報の取得、なければ追加
-export async function getOrInsertMemoSettings(
+export async function getOrAddMemoSettings(
   accountId: string,
 ): Promise<MemoSettings> {
   try {
     const memoSettings = await getMemoSettings(accountId)
     if (memoSettings) return memoSettings
   } catch (error) {
-    //accountIdが空以外は握りつぶす
     if (accountId === '') throw error
   }
 
@@ -38,7 +41,7 @@ export async function getOrInsertMemoSettings(
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return MemoSettingsModel2MemoSettings(data)
+  return convertToMemoSettings(data)
 }
 
 // アカウントのメモ設定情報の更新
@@ -56,7 +59,7 @@ export async function updateMemoSettings(
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return MemoSettingsModel2MemoSettings(data)
+  return convertToMemoSettings(data)
 }
 
 // アカウントのメモ設定情報の削除
@@ -66,4 +69,18 @@ export async function deleteMemoSettings(accountId: string): Promise<void> {
     .delete()
     .eq('account_id', accountId)
   if (error) throw error
+}
+
+export function convertToMemoSettings(
+  memoSettingsModel: MemoSettingsModel,
+): MemoSettings {
+  return {
+    id: memoSettingsModel.id,
+    createdAt: toDate(memoSettingsModel.created_at),
+    updatedAt: toDate(memoSettingsModel.updated_at),
+    accountId: memoSettingsModel.account_id,
+    listFilter: memoSettingsModel.list_filter as MemoSettings['listFilter'],
+    listDisplay: memoSettingsModel.list_display as MemoSettings['listDisplay'],
+    autoSave: memoSettingsModel.auto_save,
+  }
 }

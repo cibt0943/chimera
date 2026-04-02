@@ -1,4 +1,4 @@
-import { Form } from '@remix-run/react'
+import { Form } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
@@ -16,7 +16,7 @@ export function AccountPasswordTab({
   accountPassword,
 }: AccountPasswordTabProps) {
   const { t } = useTranslation()
-  const action = [ACCOUNT_URL, 'password'].join('/')
+  const action = `${ACCOUNT_URL}/password`
 
   return (
     <div className="space-y-6">

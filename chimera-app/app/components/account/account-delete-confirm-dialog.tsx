@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { Form } from '@remix-run/react'
+import { Form } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '~/components/ui/alert-dialog'
-import { buttonVariants } from '~/components/ui/button'
 import { ACCOUNT_URL } from '~/constants'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
 import type { AccountGeneral } from '~/types/accounts'
@@ -21,7 +20,7 @@ export function AccountDeleteConfirmDialog({
 }: DeleteAccountConfirmDialogProps) {
   const { t } = useTranslation()
 
-  const action = [ACCOUNT_URL, 'delete'].join('/')
+  const action = `${ACCOUNT_URL}/delete`
   const desc =
     '「' + accountGeneral.name + '」' + t('common.message.confirm_deletion')
 
@@ -29,12 +28,12 @@ export function AccountDeleteConfirmDialog({
     <ConfirmDialog
       title={t('account.message.account_deletion')}
       description={desc}
-      torigger={children}
+      trigger={children}
     >
       <AlertDialogCancel>{t('common.message.cancel')}</AlertDialogCancel>
       <AlertDialogAction
         type="submit"
-        className={buttonVariants({ variant: 'destructive' })}
+        variant="destructive"
         form="delete-account-form"
       >
         {t('common.message.delete')}

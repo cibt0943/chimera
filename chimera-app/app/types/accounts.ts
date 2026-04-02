@@ -1,7 +1,5 @@
-import { RiSunLine, RiMoonClearFill, RiMacLine } from 'react-icons/ri'
-import { toDate } from 'date-fns'
+import { LuSun, LuMoonStar, LuMonitor } from 'react-icons/lu'
 import * as zod from 'zod'
-import type { Database } from '~/types/schema'
 
 export const Language = {
   AUTO: 'auto',
@@ -29,24 +27,19 @@ export const ThemeList = [
   {
     value: Theme.SYSTEM,
     label: 'account.model.theme_list.system',
-    icon: RiMacLine,
+    icon: LuMonitor,
   },
   {
     value: Theme.LIGHT,
     label: 'account.model.theme_list.light',
-    icon: RiSunLine,
+    icon: LuSun,
   },
   {
     value: Theme.DARK,
     label: 'account.model.theme_list.dark',
-    icon: RiMoonClearFill,
+    icon: LuMoonStar,
   },
 ]
-
-// DBのアカウントテーブルの型
-export type AccountModel = Database['public']['Tables']['accounts']['Row']
-export type UpdateAccountModel =
-  Database['public']['Tables']['accounts']['Update'] & { id: string } // idを必須で上書き
 
 // アカウントの型
 export type Account = {
@@ -57,18 +50,6 @@ export type Account = {
   language: Language
   timezone: string
   theme: Theme
-}
-
-export function AccountModel2Account(accountModel: AccountModel): Account {
-  return {
-    id: accountModel.id,
-    createdAt: toDate(accountModel.created_at),
-    updatedAt: toDate(accountModel.updated_at),
-    sub: accountModel.sub,
-    language: accountModel.language as Language,
-    timezone: accountModel.timezone,
-    theme: accountModel.theme as Theme,
-  }
 }
 
 // Auth0ユーザーの型
@@ -82,7 +63,7 @@ export type Auth0User = {
 }
 
 // ログインセッションの型
-export type LoginSession = {
+export type LoginInfo = {
   auth0User: Auth0User
   account: Account
 }
@@ -107,12 +88,15 @@ export type AccountPassword = {
 
 export const AccountGeneralSchema = zod.object({
   name: zod
-    .string({ required_error: '必須項目です' })
+    .string({
+      error: (issue) =>
+        issue.input === undefined ? '必須項目です' : '入力値が不正です',
+    })
     .max(255, { message: '255文字以内で入力してください' }),
-  language: zod.nativeEnum(Language, {
+  language: zod.enum(Language, {
     message: '不正な値が選択されています。',
   }),
-  theme: zod.nativeEnum(Theme, {
+  theme: zod.enum(Theme, {
     message: '不正な値が選択されています。',
   }),
 })

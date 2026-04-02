@@ -1,6 +1,6 @@
-FROM node:20
+FROM node:24-slim
 
-ENV APP_ROOT /chimera-app
+ENV APP_ROOT=/chimera-app
 
 RUN apt -y update && \
     apt -y upgrade
@@ -9,7 +9,7 @@ RUN apt -y update && \
 RUN apt -y install locales && \
     echo "ja_JP.UTF-8 UTF-8" >> /etc/locale.gen && \
     locale-gen ja_JP.UTF-8
-ENV LANG ja_JP.UTF-8
+ENV LANG=ja_JP.UTF-8
 
 # 運用のために入れとく
 RUN \

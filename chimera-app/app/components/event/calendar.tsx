@@ -4,16 +4,17 @@ import {
   useFetcher,
   useSearchParams,
   useLocation,
-} from '@remix-run/react'
+} from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { format, startOfMonth } from 'date-fns'
 import {
-  RiCircleLine,
-  RiProgress4Line,
-  RiProgress8Line,
-  RiProhibited2Line,
-} from 'react-icons/ri'
-import { RxPencil2, RxCalendar } from 'react-icons/rx'
+  LuCircleDot,
+  LuCirclePlay,
+  LuCircleCheck,
+  LuCirclePause,
+  LuFilePen,
+  LuCalendarDays,
+} from 'react-icons/lu'
 import allLocales from '@fullcalendar/core/locales-all'
 import {
   DatesSetArg,
@@ -29,7 +30,7 @@ import interactionPlugin, {
   EventResizeDoneArg,
 } from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
-import { API_URL, TODO_URL, MEMO_URL, EVENT_URL } from '~/constants'
+import { API_URL, TODO_URL, TASK_URL, MEMO_URL, EVENT_URL } from '~/constants'
 import { useMedia } from '~/lib/hooks'
 import { Event, CalendarEvents, CalendarEventType } from '~/types/events'
 import { Task, TaskStatus } from '~/types/tasks'
@@ -45,28 +46,24 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const [actionEvent, setActionEvent] = React.useState<Event>() // イベント作成用
-  const [isOpenEventDialog, setIsOpenEventDialog] = React.useState(false)
+  const [isOpenAddDialog, setIsOpenAddDialog] = React.useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const location = useLocation()
   const isLaptop = useMedia('(min-width: 1024px)')
   const callenderRef = React.useRef<FullCalendar>(null)
+  const redirectUrl = EVENT_URL + location.search
 
   // 日付セット時の処理
   function handleDatesSet(arg: DatesSetArg) {
-    if (viewMode !== arg.view.type) {
-      setSearchParams((prev) => {
-        prev.set('view', arg.view.type)
-        return prev
-      })
-    }
-
     const startStr = format(arg.view.currentStart, 'yyyy-MM-dd')
-    if (startDate !== startStr) {
-      setSearchParams((prev) => {
-        prev.set('start', startStr)
-        return prev
-      })
-    }
+
+    if (viewMode === arg.view.type && startDate === startStr) return
+
+    setSearchParams((prev) => {
+      prev.set('view', arg.view.type)
+      prev.set('start', startStr)
+      return prev
+    })
   }
 
   // イベント編集
@@ -80,11 +77,11 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   function getEditUrl(type: CalendarEventType, id: string) {
     switch (type) {
       case CalendarEventType.EVENT:
-        return [EVENT_URL, id].join('/')
+        return `${EVENT_URL}/${id}`
       case CalendarEventType.TASK:
-        return [EVENT_URL, TODO_URL, '/' + id].join('')
+        return `${EVENT_URL}${TASK_URL}/${id}`
       case CalendarEventType.MEMO:
-        return [EVENT_URL, MEMO_URL, '/' + id].join('')
+        return `${EVENT_URL}${MEMO_URL}/${id}`
       default:
         return null
     }
@@ -94,7 +91,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   function handleSelect(arg: DateSelectArg) {
     const event = createNewEvent(arg.start, arg.end)
     setActionEvent(event)
-    setIsOpenEventDialog(true)
+    setIsOpenAddDialog(true)
   }
 
   // 新しいイベントを作成
@@ -144,6 +141,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
     fetcher.submit(request.data, {
       action: request.action,
       method: 'post',
+      encType: 'application/json',
     })
   }
 
@@ -173,8 +171,9 @@ export function Calendar({ defaultEvents }: CalendarProps) {
         ...(endDate && { endDate: endDate.toISOString() }),
       },
       {
-        action: [API_URL, EVENT_URL, '/' + srcObj.id].join(''),
+        action: `${API_URL}${EVENT_URL}/${srcObj.id}`,
         method: 'post',
+        encType: 'application/json',
       },
     )
   }
@@ -182,11 +181,11 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   const viewMode = isLaptop
     ? searchParams.get('view') || 'dayGridMonth'
     : 'listMonth'
-  const defaultStartDate = format(startOfMonth(new Date()), 'yyyy-MM-dd')
-  const startDate = searchParams.get('start') || defaultStartDate
   const headerToolbarRight = isLaptop
     ? 'dayGridMonth dayGridWeek listMonth'
     : ''
+  const defaultStartDate = format(startOfMonth(new Date()), 'yyyy-MM-dd')
+  const startDate = searchParams.get('start') || defaultStartDate
 
   React.useEffect(() => {
     // 以下のワーニングを回避するために非同期でviewModeを変更
@@ -200,7 +199,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   }, [viewMode])
 
   return (
-    <div className="h-[calc(100dvh_-_72px)] xl:h-[calc(100dvh_-_32px)]">
+    <div className="h-[calc(100svh-68px)] lg:h-[calc(100svh-32px)]">
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
         height={'100%'}
@@ -236,9 +235,14 @@ export function Calendar({ defaultEvents }: CalendarProps) {
       />
       <EventFormDialogMemo
         event={actionEvent}
-        isOpen={isOpenEventDialog}
-        setIsOpen={setIsOpenEventDialog}
-        returnUrl={EVENT_URL + location.search}
+        redirectUrl={redirectUrl}
+        isOpen={isOpenAddDialog}
+        onOpenChange={async (open) => {
+          setIsOpenAddDialog(open)
+          if (open) return
+          navigate(redirectUrl)
+        }}
+        onSubmit={() => setIsOpenAddDialog(false)} // 追加保存後にダイアログを閉じる
       />
     </div>
   )
@@ -264,7 +268,7 @@ function createEventDropRequest(
     allDay: srcObj.allDay ? 'on' : '',
     ...(endDate && { endDate }),
   }
-  request.action = [API_URL, EVENT_URL, '/' + srcObj.id].join('')
+  request.action = `${API_URL}${EVENT_URL}/${srcObj.id}`
   return request
 }
 
@@ -277,7 +281,7 @@ function createTaskDropRequest(startDate: Date, srcObj: Task) {
     dueDate: startDate,
     dueDateAllDay: srcObj.dueDateAllDay ? 'on' : '',
   }
-  request.action = [API_URL, TODO_URL, '/' + srcObj.id].join('')
+  request.action = `${API_URL}${TODO_URL}/${srcObj.todoId}`
   return request
 }
 
@@ -290,7 +294,7 @@ function createMemoDropRequest(startDate: Date, srcObj: Memo) {
     relatedDate: startDate,
     relatedDateAllDay: srcObj.relatedDateAllDay ? 'on' : '',
   }
-  request.action = [API_URL, MEMO_URL, '/' + srcObj.id].join('')
+  request.action = `${API_URL}${MEMO_URL}/${srcObj.id}`
   return request
 }
 
@@ -343,24 +347,24 @@ function EventTypeIcon({
 }) {
   switch (type) {
     case CalendarEventType.EVENT:
-      return RxCalendar
+      return LuCalendarDays
     case CalendarEventType.TASK:
       switch ((srcObj as Task).status) {
         case TaskStatus.NEW:
-          return RiCircleLine
+          return LuCircleDot
         case TaskStatus.DOING:
-          return RiProgress4Line
+          return LuCirclePlay
         case TaskStatus.DONE:
-          return RiProgress8Line
+          return LuCircleCheck
         case TaskStatus.PENDING:
-          return RiProhibited2Line
+          return LuCirclePause
         default:
-          return RiCircleLine
+          return LuCirclePlay
       }
     case CalendarEventType.MEMO:
-      return RxPencil2
+      return LuFilePen
     default:
-      return RxCalendar
+      return LuCalendarDays
   }
 }
 

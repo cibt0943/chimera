@@ -1,86 +1,81 @@
 import * as React from 'react'
-import { Form, useNavigate, useFetcher } from '@remix-run/react'
+import { Form, useNavigate, useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
-import { RiAddLine } from 'react-icons/ri'
+import { LuPlus } from 'react-icons/lu'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
-  DndContext,
-  MouseSensor,
-  TouchSensor,
-  closestCenter,
-  type DragEndEvent,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+  DragDropProvider,
+  type DragEndEvent as DragEndHandler,
+  PointerSensor,
+} from '@dnd-kit/react'
+import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
+import { toast } from 'sonner'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
 import { API_URL, MEMO_URL } from '~/constants'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
+import { arrayMove } from '~/lib/utils'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
 import { MemoSettings } from '~/types/memo-settings'
 import { ListItem } from './memo-list-item'
 import { MemoActionMenu } from './memo-action-menu'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
 import { MemoSettingsForm } from './memo-settings-form'
+import { useUserAgentAtom } from '~/lib/global-state'
+
+function getHotkeys(modifierKey: string) {
+  return {
+    UP: 'up',
+    DOWN: 'down',
+    MODIFIER_UP: `${modifierKey}+up`,
+    MODIFIER_DOWN: `${modifierKey}+down`,
+    MODIFIER_ENTER: `${modifierKey}+enter`,
+    MODIFIER_DELETE: `${modifierKey}+delete`,
+    MODIFIER_BACKSPACE: `${modifierKey}+backspace`,
+    MODIFIER_N: `${modifierKey}+n`,
+    MODIFIER_LEFT: `${modifierKey}+left`,
+  }
+}
 
 interface MemoListProps {
-  defaultMemos: Memos
-  showId: string
+  originalMemos: Memos
+  selectedMemo: Memo | undefined
   memoSettings: MemoSettings
 }
 
 export function MemoList({
-  defaultMemos,
-  showId,
+  originalMemos,
+  selectedMemo,
   memoSettings,
 }: MemoListProps) {
   const { t } = useTranslation()
+  const userAgent = useUserAgentAtom()
   const { enqueue: searchEnqueue } = useApiQueue()
   const { enqueue: moveMemoEnqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: { distance: 5 },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 1000,
-        tolerance: 10,
-      },
-    }),
-  )
 
   // メモ一覧データ
-  const [memos, setMemos] = React.useState(defaultMemos)
-
-  // 一覧で選択しているメモ
-  const [selectedMemo, setSelectedMemo] = React.useState<Memo>()
+  const [memos, setMemos] = React.useState(originalMemos)
 
   // 一覧でフォーカスしているメモ
-  const [focusedMemo, setFocusedMemo] = React.useState<Memo>()
+  const focusedMemoRef = React.useRef<Memo | undefined>(selectedMemo)
 
   // 検索文字列
   const [searchTerm, setSearchTerm] = React.useState('')
 
   // 編集・削除するメモ
-  const [actionMemo, setActionMemo] = React.useState<Memo>()
+  const [actionMemo, setActionMemo] = React.useState<Memo | undefined>()
 
   // 削除用ダイアログの表示・非表示
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = React.useState(false)
 
   // メモ一覧要素参照用
-  const useMemosRef = React.useRef<HTMLDivElement>(null)
+  const memosRef = React.useRef<HTMLDivElement>(null)
 
   // メモ追加ボタン参照用
-  const useAddButtonRef = React.useRef<HTMLButtonElement>(null)
+  const addButtonRef = React.useRef<HTMLButtonElement>(null)
 
   // フィルタリング後のメモ一覧データ
   const dispMemos = React.useMemo(() => {
@@ -90,19 +85,8 @@ export function MemoList({
 
   // フィルタリング前のメモ一覧データ更新
   React.useEffect(() => {
-    setMemos(defaultMemos)
-  }, [defaultMemos])
-
-  // F5でリロードされた場合に選択行のフォーカスを設定
-  const targetId = showId ? showId : selectedMemo?.id
-  React.useEffect(() => {
-    const selectMemo = memos.find((memo) => memo.id === targetId)
-    setSelectedMemo(selectMemo)
-    setFocusedMemo(selectMemo)
-    setListFocus(selectMemo)
-    // 以下のdisableを止める方法を検討したい。
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetId])
+    setMemos(originalMemos)
+  }, [originalMemos])
 
   // メモ一覧の検索
   async function searchMemos(searchTerm: string) {
@@ -117,12 +101,14 @@ export function MemoList({
   // フォーカスを1ステップ変更
   function changeFocusedMemoOneStep(isUp: boolean) {
     let targetIndex = 0
-    if (focusedMemo) {
-      const nowIndex = dispMemos.findIndex((memo) => memo.id === focusedMemo.id)
+    if (focusedMemoRef.current) {
+      const nowIndex = dispMemos.findIndex(
+        (memo) => memo.id === focusedMemoRef.current?.id,
+      )
       targetIndex = isUp ? nowIndex - 1 : nowIndex + 1
     }
+
     if (!dispMemos[targetIndex]) return
-    setFocusedMemo(dispMemos[targetIndex])
     setListFocus(dispMemos[targetIndex])
   }
 
@@ -141,7 +127,7 @@ export function MemoList({
   }
 
   // 選択行のステータスを変更
-  function updateSeletedMemoStatus() {
+  function updateSelectedMemoStatus() {
     if (!selectedMemo) return
     const status =
       selectedMemo.status === MemoStatus.NOMAL
@@ -152,13 +138,27 @@ export function MemoList({
 
   // メモのステータスを変更
   function updateMemoStatusApi(memo: Memo) {
-    fetcher.submit(
-      { status: memo.status },
-      {
-        action: [API_URL, MEMO_URL, '/' + memo.id].join(''),
-        method: 'post',
-      },
-    )
+    fetcher
+      .submit(
+        { status: memo.status },
+        {
+          action: `${API_URL}${MEMO_URL}/${memo.id}`,
+          method: 'post',
+          encType: 'application/json',
+        },
+      )
+      .then(() => {
+        const msg =
+          memo.status === MemoStatus.NOMAL
+            ? 'memo.message.un_archived'
+            : 'memo.message.archived'
+        toast.info(t(msg))
+      })
+  }
+
+  // 選択行のメモ削除ダイアログを開く
+  function openSelectedMemoDeleteDialog() {
+    selectedMemo && openDeleteMemoDialog(selectedMemo)
   }
 
   // メモ削除ダイアログを開く
@@ -168,15 +168,32 @@ export function MemoList({
   }
 
   // ドラッグ&ドロップによるメモの表示順変更
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
-    if (over && active.id !== over.id) {
-      // フィルタリング後のメモデータ(dispMemos)を元に表示順更新対象のメモを取得
-      const fromMemo = dispMemos.find((memo) => memo.id === active.id)
-      const toMemo = dispMemos.find((memo) => memo.id === over.id)
-      if (!fromMemo || !toMemo) return
-      moveMemo(fromMemo, toMemo)
-    }
+  const handleDragEnd: DragEndHandler = (event) => {
+    if (event.canceled) return
+
+    // @dnd-kit/react v0.3.0 では
+    // event.operation.source、event.operation.targetともに
+    // ドロップ元のid, indexを保持しているので、
+    // event.operation.sourceからドロップ元、先情報を取得する
+
+    const source = event.operation.source
+    if (!source) return
+
+    const fromId = String(source.id)
+
+    const toIndex = (source as { index?: unknown }).index
+    if (typeof toIndex !== 'number') return
+
+    const toMemo = dispMemos[toIndex]
+    if (!toMemo) return
+
+    if (toMemo.id === fromId) return
+
+    // フィルタリング後のメモデータ(dispMemos)を元に表示順更新対象のメモを取得
+    const fromMemo = dispMemos.find((memo) => memo.id === fromId)
+    if (!fromMemo) return
+
+    moveMemo(fromMemo, toMemo)
   }
 
   // メモの表示順を変更
@@ -200,16 +217,21 @@ export function MemoList({
 
   // メモの表示順変更API呼び出し
   async function moveMemoApi(fromMemo: Memo, toMemo: Memo) {
-    // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
-    const url = [MEMO_URL, fromMemo.id, 'position'].join('/')
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({ toMemoId: toMemo.id }),
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to update position api')
+    try {
+      // fetcher.submitを利用すると自動でメモデータを再取得してしまうのであえてfetchを利用
+      const url = `${API_URL}${MEMO_URL}/${fromMemo.id}/position`
+      const response = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({ toMemoId: toMemo.id }),
+      })
+
+      if (!response.ok) throw new Error('Failed to update position api')
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message)
+        navigate('.', { replace: true })
       }
-    })
+    }
   }
 
   // メモの表示順変更APIをdebounce
@@ -223,42 +245,45 @@ export function MemoList({
   }, 300)
 
   // 指定メモへフォーカスを設定
-  function setListFocus(memo: Memo | undefined, force = false) {
-    const targetMemo = memo ? memo : force ? dispMemos[0] : undefined
-    targetMemo &&
-      useMemosRef.current
-        ?.querySelector<HTMLElement>(`#memo-${targetMemo.id}`)
-        ?.focus()
+  function setListFocus(memo: Memo | undefined) {
+    const targetMemo = memo ? memo : dispMemos[0]
+    if (!targetMemo) return
+    memosRef.current
+      ?.querySelector<HTMLElement>(`#memo-${targetMemo.id}`)
+      ?.focus()
   }
 
-  // キーボード操作(スコープあり)
+  const HOTKEYS = getHotkeys(userAgent.modifierKey)
+
+  // キーボードショートカット(スコープあり)
   useHotkeys(
-    [
-      'up',
-      'down',
-      'alt+up',
-      'alt+down',
-      'alt+enter',
-      'alt+delete',
-      'alt+backspace',
-    ],
-    (_, handler) => {
-      switch (handler.keys?.join('')) {
-        // フォーカス上下or表示順上下の1ステップ移動
-        case 'up':
-        case 'down':
-          handler.alt
-            ? moveSelectedMemoOneStep(handler.keys.includes('up'))
-            : changeFocusedMemoOneStep(handler.keys.includes('up'))
+    Object.values(HOTKEYS),
+    (_, { hotkey }) => {
+      switch (hotkey) {
+        // フォーカス上移動
+        case HOTKEYS.UP:
+          changeFocusedMemoOneStep(true)
+          break
+        // フォーカス下移動
+        case HOTKEYS.DOWN:
+          changeFocusedMemoOneStep(false)
+          break
+        // メモの表示順を上へ移動
+        case HOTKEYS.MODIFIER_UP:
+          moveSelectedMemoOneStep(true)
+          break
+        // メモの表示順を下へ移動
+        case HOTKEYS.MODIFIER_DOWN:
+          moveSelectedMemoOneStep(false)
           break
         // メモのアーカイブ
-        case 'enter':
-          updateSeletedMemoStatus()
+        case HOTKEYS.MODIFIER_ENTER:
+          updateSelectedMemoStatus()
           break
         // メモ削除
-        case 'delete':
-        case 'backspace':
-          selectedMemo && openDeleteMemoDialog(selectedMemo)
+        case HOTKEYS.MODIFIER_DELETE:
+        case HOTKEYS.MODIFIER_BACKSPACE:
+          openSelectedMemoDeleteDialog()
           break
       }
     },
@@ -270,23 +295,23 @@ export function MemoList({
         const target = event.target as HTMLElement
         const tagName = target.tagName.toLowerCase()
         if (tagName === 'body') return false
-        return tagName !== 'a' || target.getAttribute('role') !== 'listitem'
+        return target.getAttribute('data-role') !== 'listitem'
       },
     },
   )
 
-  // キーボード操作(スコープなし)
+  // キーボードショートカット(スコープなし)
   useHotkeys(
-    ['alt+n', 'alt+left'],
-    (_, handler) => {
-      switch (handler.keys?.join('')) {
+    [HOTKEYS.MODIFIER_N, HOTKEYS.MODIFIER_LEFT],
+    (_, { hotkey }) => {
+      switch (hotkey) {
         // メモ追加
-        case 'n':
-          useAddButtonRef.current?.click()
+        case HOTKEYS.MODIFIER_N:
+          addButtonRef.current?.click()
           break
         // フォーカスを一覧へ移動
-        case 'left':
-          setListFocus(focusedMemo, true)
+        case HOTKEYS.MODIFIER_LEFT:
+          setListFocus(focusedMemoRef.current)
           break
       }
     },
@@ -298,20 +323,20 @@ export function MemoList({
   const isPrevew = !!memoSettings.listDisplay.content
 
   return (
-    <div className="space-y-4 px-1 lg:py-4">
-      <div className="flex items-center space-x-2 px-3">
+    <div className="space-y-4 px-1 md:py-4">
+      <div className="flex items-center gap-2 px-3">
         <Form action={MEMO_URL} method="post">
           <Button
             type="submit"
             variant="secondary"
             className="h-8 px-3"
-            ref={useAddButtonRef}
+            ref={addButtonRef}
           >
-            <RiAddLine className="mr-2" />
+            <LuPlus />
             {t('common.message.add')}
-            <p className="ml-2 text-xs text-muted-foreground">
-              <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-                <span>⌥</span>n
+            <p className="text-muted-foreground text-xs">
+              <kbd className="pointer-events-none inline-flex h-5 items-center gap-1 rounded border px-1.5 select-none">
+                <span>{userAgent.modifierKeyIcon}</span>n
               </kbd>
             </p>
           </Button>
@@ -325,47 +350,42 @@ export function MemoList({
         />
         <MemoSettingsForm />
       </div>
-      <ScrollArea className="h-[calc(100dvh_-_121px)] lg:h-[calc(100dvh_-_155px)] xl:h-[calc(100dvh_-_115px)]">
-        <DndContext
-          collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis]}
+      <ScrollArea className="h-[calc(100svh-115px)]">
+        <DragDropProvider
+          sensors={[PointerSensor]}
+          modifiers={(defaults) => [...defaults, RestrictToVerticalAxis]}
           onDragEnd={handleDragEnd}
-          sensors={sensors}
-          id="dnd-context-for-memos"
         >
-          <div className="space-y-3 px-3" id="memos" ref={useMemosRef}>
-            <SortableContext
-              items={dispMemos}
-              strategy={verticalListSortingStrategy}
-            >
-              {dispMemos.length ? (
-                dispMemos.map((item: Memo) => (
-                  <ListItem
-                    key={item.id}
-                    item={item}
-                    onFocus={() => setFocusedMemo(item)}
-                    isSelected={item.id === selectedMemo?.id}
-                    isPreview={isPrevew}
-                  >
-                    <MemoActionMenu
-                      memo={item}
-                      handleMoveMemo={moveMemoOneStep}
-                      handleUpdateMemoStatus={updateMemoStatusApi}
-                      handleDeleteMemo={openDeleteMemoDialog}
-                    />
-                  </ListItem>
-                ))
-              ) : (
-                <div className="text-sm">{t('common.message.no_data')}</div>
-              )}
-            </SortableContext>
+          <div className="flex flex-col gap-2 px-3" id="memos" ref={memosRef}>
+            {dispMemos.length ? (
+              dispMemos.map((item: Memo, index) => (
+                <ListItem
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  onFocus={() => (focusedMemoRef.current = item)}
+                  isSelected={item.id === selectedMemo?.id}
+                  isPreview={isPrevew}
+                >
+                  <MemoActionMenu
+                    memo={item}
+                    handleMoveMemo={moveMemoOneStep}
+                    handleUpdateMemoStatus={updateMemoStatusApi}
+                    handleDeleteMemo={openDeleteMemoDialog}
+                  />
+                </ListItem>
+              ))
+            ) : (
+              <div className="text-sm">{t('common.message.no_data')}</div>
+            )}
           </div>
-        </DndContext>
+        </DragDropProvider>
       </ScrollArea>
       <MemoDeleteConfirmDialog
         memo={actionMemo}
+        redirectUrl={MEMO_URL}
         isOpen={isOpenDeleteDialog}
-        setIsOpen={setIsOpenDeleteDialog}
+        onOpenChange={setIsOpenDeleteDialog}
       />
     </div>
   )

@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Form } from '@remix-run/react'
+import { Form } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useForm, getFormProps } from '@conform-to/react'
-import { parseWithZod, getZodConstraint } from '@conform-to/zod'
+import { parseWithZod, getZodConstraint } from '@conform-to/zod/v4'
 import { Button } from '~/components/ui/button'
 import { SelectItem } from '~/components/ui/select'
 import { ACCOUNT_URL } from '~/constants'
@@ -34,7 +34,7 @@ export function AccountGeneralForm({
 }: AccountFormProps) {
   const { t } = useTranslation()
 
-  const action = [ACCOUNT_URL, 'general'].join('/')
+  const action = `${ACCOUNT_URL}/general`
   const defaultValue = accountGeneral
 
   const [form, fields] = useForm<AccountGeneralSchemaType>({

@@ -1,14 +1,12 @@
-import * as React from 'react'
 import { useForm } from '@conform-to/react'
-import { parseWithZod, getZodConstraint } from '@conform-to/zod'
+import { parseWithZod, getZodConstraint } from '@conform-to/zod/v4'
 import { Memo, MemoSchema, MemoSchemaType } from '~/types/memos'
 
 export interface useMemoConformProps {
   memo: Memo | undefined
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
 }
 
-export function useMemoConform({ memo, onSubmit }: useMemoConformProps) {
+export function useMemoConform({ memo }: useMemoConformProps) {
   const formId = memo ? `memo-form-${memo.id}` : 'memo-form-new'
   const defaultValue = {
     content:
@@ -27,7 +25,6 @@ export function useMemoConform({ memo, onSubmit }: useMemoConformProps) {
       return parseWithZod(formData, { schema: MemoSchema })
     },
     shouldRevalidate: 'onInput',
-    onSubmit: onSubmit,
   })
 
   return { form, fields }

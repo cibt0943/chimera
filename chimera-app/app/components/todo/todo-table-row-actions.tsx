@@ -1,17 +1,17 @@
 import { useTranslation } from 'react-i18next'
 import {
-  RiMoreLine,
-  RiArrowUpLine,
-  RiArrowDownLine,
-  RiCircleLine,
-  RiProgress4Line,
-  RiProgress8Line,
-  RiProhibited2Line,
-  RiEdit2Line,
-  RiDeleteBinLine,
-  RiDeleteBack2Line,
-  RiCornerDownLeftLine,
-} from 'react-icons/ri'
+  LuEllipsis,
+  LuArrowUpFromLine,
+  LuArrowDownFromLine,
+  LuCircleDot,
+  LuCirclePlay,
+  LuCircleCheck,
+  LuCirclePause,
+  LuPencilLine,
+  LuTrash2,
+  LuDelete,
+  LuCornerDownLeft,
+} from 'react-icons/lu'
 import { Row, Table } from '@tanstack/react-table'
 import { Button } from '~/components/ui/button'
 import {
@@ -22,7 +22,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
-import { Task, TaskStatus } from '~/types/tasks'
+import { TaskStatus } from '~/types/tasks'
+import { TodoType } from '~/types/todos'
+import { ViewTodo } from '~/types/view-todos'
+import { useUserAgentAtom } from '~/lib/global-state'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
@@ -32,107 +35,128 @@ interface DataTableRowActionsProps<TData> {
 export function TodoTableRowActions({
   row,
   table,
-}: DataTableRowActionsProps<Task>) {
+}: DataTableRowActionsProps<ViewTodo>) {
   const { t } = useTranslation()
-  const task = row.original
+  const userAgent = useUserAgentAtom()
+
+  const viewTodo = row.original
+  const isTask = viewTodo.type === TodoType.TASK
+  const heightCss = isTask ? '' : 'h-6'
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-        >
-          <RiMoreLine className="h-4 w-4" />
+        <Button variant="ghost" size="icon" className={heightCss}>
+          <LuEllipsis />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
+      <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem
           onClick={() => {
-            table.options.meta?.moveTask(task, true)
+            table.options.meta?.moveTodo(viewTodo, true)
           }}
         >
-          <RiArrowUpLine className="mr-2 h-4 w-4" />
+          <LuArrowUpFromLine />
           {t('common.message.position_up')}
-          <DropdownMenuShortcut>⌥ ↑</DropdownMenuShortcut>
+          <DropdownMenuShortcut>
+            {userAgent.modifierKeyIcon + ' ↑'}
+          </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
-            table.options.meta?.moveTask(task, false)
+            table.options.meta?.moveTodo(viewTodo, false)
           }}
         >
-          <RiArrowDownLine className="mr-2 h-4 w-4" />
+          <LuArrowDownFromLine />
           {t('common.message.position_down')}
-          <DropdownMenuShortcut>⌥ ↓</DropdownMenuShortcut>
+          <DropdownMenuShortcut>
+            {userAgent.modifierKeyIcon + ' ↓'}
+          </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+
+        {isTask && (
+          <>
+            <DropdownMenuItem
+              disabled={viewTodo.status === TaskStatus.NEW}
+              onClick={() => {
+                const upateTask = { ...viewTodo, status: TaskStatus.NEW }
+                table.options.meta?.updateTodoStatus(upateTask)
+              }}
+            >
+              <LuCircleDot />
+              {t('task.message.to_new')}
+              <DropdownMenuShortcut>
+                {userAgent.modifierKeyIcon + ' 1'}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={viewTodo.status === TaskStatus.DOING}
+              onClick={() => {
+                const upateTask = { ...viewTodo, status: TaskStatus.DOING }
+                table.options.meta?.updateTodoStatus(upateTask)
+              }}
+            >
+              <LuCirclePlay />
+              {t('task.message.to_doing')}
+              <DropdownMenuShortcut>
+                {userAgent.modifierKeyIcon + ' 2'}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={viewTodo.status === TaskStatus.DONE}
+              onClick={() => {
+                const upateTask = { ...viewTodo, status: TaskStatus.DONE }
+                table.options.meta?.updateTodoStatus(upateTask)
+              }}
+            >
+              <LuCircleCheck />
+              {t('task.message.to_done')}
+              <DropdownMenuShortcut>
+                {userAgent.modifierKeyIcon + ' 3'}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={viewTodo.status === TaskStatus.PENDING}
+              onClick={() => {
+                const upateTask = { ...viewTodo, status: TaskStatus.PENDING }
+                table.options.meta?.updateTodoStatus(upateTask)
+              }}
+            >
+              <LuCirclePause />
+              {t('task.message.to_pending')}
+              <DropdownMenuShortcut>
+                {userAgent.modifierKeyIcon + ' 4'}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+
         <DropdownMenuItem
-          disabled={task.status === TaskStatus.NEW}
           onClick={() => {
-            const upateTask = { ...task, status: TaskStatus.NEW }
-            table.options.meta?.updateTaskStatus(upateTask)
+            table.options.meta?.editTodo(viewTodo)
           }}
         >
-          <RiCircleLine className="mr-2 h-4 w-4" />
-          {t('task.message.to_new')}
-          <DropdownMenuShortcut>⌥ 1</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          disabled={task.status === TaskStatus.DOING}
-          onClick={() => {
-            const upateTask = { ...task, status: TaskStatus.DOING }
-            table.options.meta?.updateTaskStatus(upateTask)
-          }}
-        >
-          <RiProgress4Line className="mr-2 h-4 w-4" />
-          {t('task.message.to_doing')}
-          <DropdownMenuShortcut>⌥ 2</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          disabled={task.status === TaskStatus.DONE}
-          onClick={() => {
-            const upateTask = { ...task, status: TaskStatus.DONE }
-            table.options.meta?.updateTaskStatus(upateTask)
-          }}
-        >
-          <RiProgress8Line className="mr-2 h-4 w-4" />
-          {t('task.message.to_done')}
-          <DropdownMenuShortcut>⌥ 3</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          disabled={task.status === TaskStatus.PENDING}
-          onClick={() => {
-            const upateTask = { ...task, status: TaskStatus.PENDING }
-            table.options.meta?.updateTaskStatus(upateTask)
-          }}
-        >
-          <RiProhibited2Line className="mr-2 h-4 w-4" />
-          {t('task.message.to_pending')}
-          <DropdownMenuShortcut>⌥ 4</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            table.options.meta?.editTask(task)
-          }}
-        >
-          <RiEdit2Line className="mr-2 h-4 w-4" />
+          <LuPencilLine />
           {t('common.message.edit')}
           <DropdownMenuShortcut>
-            <RiCornerDownLeftLine className="inline h-3 w-3" />
+            <LuCornerDownLeft className="inline" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => {
-            table.options.meta?.deleteTask(task)
-          }}
           className="text-red-600 focus:text-red-600"
+          onClick={() => {
+            table.options.meta?.deleteTodo(viewTodo)
+          }}
         >
-          <RiDeleteBinLine className="mr-2 h-4 w-4" />
+          <LuTrash2 />
           {t('common.message.delete')}
           <DropdownMenuShortcut>
-            ⌥ <RiDeleteBack2Line className="inline h-3 w-3" />
+            {userAgent.modifierKeyIcon + ' '}
+            <LuDelete className="inline" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>

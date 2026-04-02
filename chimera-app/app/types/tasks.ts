@@ -1,6 +1,5 @@
-import { toDate } from 'date-fns'
 import * as zod from 'zod'
-import type { Database } from '~/types/schema'
+import { Todo } from '~/types/todos'
 
 export const TaskStatus = {
   NEW: 0,
@@ -23,13 +22,13 @@ export const TaskStatusList = [
     label: 'task.model.status_list.done',
     dispOrder: 2,
     color: 'bg-violet-600',
-  }, //bg-orange-500
+  },
   {
     value: TaskStatus.DOING,
     label: 'task.model.status_list.doing',
     dispOrder: 1,
     color: 'bg-indigo-800',
-  }, //bg-violet-600
+  },
   {
     value: TaskStatus.PENDING,
     label: 'task.model.status_list.pending',
@@ -43,19 +42,9 @@ export const TaskStatusListByDispOrder = TaskStatusList.slice().sort(
   (a, b) => a.dispOrder - b.dispOrder,
 )
 
-// DBのタスクテーブルの型
-export type TaskModel = Database['public']['Tables']['tasks']['Row']
-export type InsertTaskModel = Database['public']['Tables']['tasks']['Insert']
-export type UpdateTaskModel =
-  Database['public']['Tables']['tasks']['Update'] & { id: string } // idを必須で上書き
-
-export type Task = {
-  id: string
-  createdAt: Date
-  updatedAt: Date
-  accountId: string
+export type Task = Todo & {
+  todoId: string
   status: TaskStatus
-  position: number
   title: string
   memo: string
   dueDate: Date | null
@@ -64,25 +53,13 @@ export type Task = {
 
 export type Tasks = Task[]
 
-export function TaskModel2Task(taskModel: TaskModel): Task {
-  return {
-    id: taskModel.id,
-    createdAt: toDate(taskModel.created_at),
-    updatedAt: toDate(taskModel.updated_at),
-    accountId: taskModel.account_id,
-    status: taskModel.status as TaskStatus,
-    position: taskModel.position,
-    title: taskModel.title,
-    memo: taskModel.memo,
-    dueDate: taskModel.due_date ? toDate(taskModel.due_date) : null,
-    dueDateAllDay: taskModel.due_date_all_day,
-  }
-}
-
 export const TaskSchema = zod.object({
-  status: zod.preprocess((v) => Number(v), zod.nativeEnum(TaskStatus)),
+  status: zod.preprocess((v) => Number(v), zod.enum(TaskStatus)),
   title: zod
-    .string({ required_error: '必須項目です' })
+    .string({
+      error: (issue) =>
+        issue.input === undefined ? '必須項目です' : '入力値が不正です',
+    })
     .max(255, { message: '255文字以内で入力してください' }),
   memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
   dueDate: zod.date().optional(),

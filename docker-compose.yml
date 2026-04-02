@@ -7,16 +7,13 @@ services:
       - ./chimera-app:/chimera-app
     ports:
       - 3000:3000
-      - 3001:3001 # for remix dev server websocket
+      - 24678:24678 # HMR(Hot Module Replacement)用のポートを追加
+      - 7777:7777 # eslint config-inspector用のポートを追加
     # env_file: ./chimera-app/.env
     tty: true
     stdin_open: true
-    # command: >
-    #   bash -c "
-    #     yarn
-    #     yarn dev"
-#     networks:
-#       - supabase_network_chimera
-# networks:
-#   supabase_network_chimera:
-#     external: true
+    networks:
+      - supabase_network_chimera
+networks:
+  supabase_network_chimera:
+    external: true

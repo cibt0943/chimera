@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form } from '@remix-run/react'
+import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { toDate } from 'date-fns'
 import {
@@ -8,7 +8,8 @@ import {
   FieldMetadata,
   useInputControl,
 } from '@conform-to/react'
-import { parseWithZod, getZodConstraint } from '@conform-to/zod'
+import { parseWithZod, getZodConstraint } from '@conform-to/zod/v4'
+import { Matcher } from 'react-day-picker'
 import { Button } from '~/components/ui/button'
 import { Checkbox } from '~/components/ui/checkbox'
 import { EVENT_URL } from '~/constants'
@@ -22,31 +23,20 @@ import { Required } from '~/components/lib/required'
 import { InputConform } from '~/components/lib/conform/input'
 import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePicker } from '~/components/lib/date-time-picker'
+import { EventDeleteButton } from './event-delete-button'
 import { Event, EventSchema, EventSchemaType } from '~/types/events'
-
-type useInputControlType = ReturnType<typeof useInputControl<string>>
 
 export interface EventFormProps {
   event: Event | undefined
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
-  returnUrl?: string
-  children?: React.ReactNode
+  redirectUrl: string
+  onSubmit?: () => void
 }
 
-export function EventForm({
-  event,
-  onSubmit,
-  returnUrl = EVENT_URL,
-  children,
-}: EventFormProps) {
+export function EventForm({ event, redirectUrl, onSubmit }: EventFormProps) {
   const { t } = useTranslation()
+  const fetcher = useFetcher()
 
-  // 新規作成時であってもeventに初期値を埋めて送られてくるため、idがあるかどうかで判定
-  function isNew(event: Event | undefined): event is undefined {
-    return !event?.id
-  }
-
-  const action = isNew(event) ? EVENT_URL : [EVENT_URL, event.id].join('/')
+  const action = isNew(event) ? EVENT_URL : `${EVENT_URL}/${event.id}`
   const formId = isNew(event) ? 'event-form-new' : `event-form-${event.id}`
   const defaultValue = event
 
@@ -90,14 +80,17 @@ export function EventForm({
     ],
   )
 
+  const startDate = startDateControl.value
+    ? new Date(startDateControl.value)
+    : undefined
+  const endDate = endDateControl.value
+    ? new Date(endDateControl.value)
+    : undefined
+  const endDateDisabled = startDate ? { before: startDate } : undefined
+
   return (
-    <Form
-      method="post"
-      className="space-y-8"
-      {...getFormProps(form)}
-      action={action}
-    >
-      <div className="max-h-[calc(100dvh_-_240px)] space-y-8 overflow-y-auto px-0.5">
+    <fetcher.Form method="post" {...getFormProps(form)} action={action}>
+      <div className="max-h-[calc(100svh_-_240px)] space-y-8 overflow-y-auto p-0.5">
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
             {t('event.model.title')}
@@ -113,8 +106,12 @@ export function EventForm({
                 label={t('event.model.start')}
                 qequired={true}
                 fieldMeta={fields.startDate}
-                control={startDateControl}
+                selectedDate={startDate}
+                defaultMonth={startDate}
                 allDay={fields.allDay.value === 'on'}
+                handleChangeDate={(date) => {
+                  startDateControl.change(date?.toISOString() || '')
+                }}
               />
             </div>
             <div className="basis-1/2">
@@ -122,8 +119,13 @@ export function EventForm({
                 label={t('event.model.end')}
                 qequired={false}
                 fieldMeta={fields.endDate}
-                control={endDateControl}
+                selectedDate={endDate}
+                defaultMonth={endDate || startDate || new Date()}
                 allDay={fields.allDay.value === 'on'}
+                handleChangeDate={(date) => {
+                  endDateControl.change(date?.toISOString() || '')
+                }}
+                disabled={endDateDisabled}
               />
             </div>
           </div>
@@ -158,13 +160,19 @@ export function EventForm({
           <InputConform meta={fields.location} type="text" />
           <FormMessage message={fields.location.errors} />
         </FormItem>
-        <input type="hidden" name="returnUrl" value={returnUrl} />
+        <input type="hidden" name="redirectUrl" value={redirectUrl} />
+        <FormFooter className="sm:justify-between">
+          <div>
+            {event?.id && (
+              <EventDeleteButton event={event} redirectUrl={redirectUrl} />
+            )}
+          </div>
+          <Button type="submit" disabled={fetcher.state !== 'idle'}>
+            {t('common.message.save')}
+          </Button>
+        </FormFooter>
       </div>
-      <FormFooter className="sm:justify-between">
-        {children || <div>&nbsp;</div>}
-        <Button type="submit">{t('common.message.save')}</Button>
-      </FormFooter>
-    </Form>
+    </fetcher.Form>
   )
 }
 
@@ -172,23 +180,23 @@ interface DateTimePickerFieldProps {
   label: string
   qequired: boolean
   fieldMeta: FieldMetadata<Date | undefined>
-  control: useInputControlType
+  selectedDate: Date | undefined
+  defaultMonth: Date | undefined
   allDay: boolean
+  handleChangeDate: (date: Date | undefined) => void
+  disabled?: Matcher
 }
 
 function DateTimePickerField({
   label,
   qequired,
   fieldMeta,
-  control,
+  selectedDate,
+  defaultMonth,
   allDay,
+  handleChangeDate,
+  disabled,
 }: DateTimePickerFieldProps) {
-  const date = fieldMeta.value ? toDate(fieldMeta.value) : undefined
-
-  function handleChangeDate(date: Date | undefined) {
-    control.change(date?.toISOString() || '')
-  }
-
   return (
     <FormItem>
       <FormLabel htmlFor={fieldMeta.id}>
@@ -196,14 +204,21 @@ function DateTimePickerField({
         {qequired && <Required />}
       </FormLabel>
       <DateTimePicker
-        date={date}
+        triggerId={fieldMeta.id}
+        selectedDate={selectedDate}
+        defaultMonth={defaultMonth}
         allDay={allDay}
         defaultAllDay={true}
         includeAllDayComponent={false}
         onChangeDate={handleChangeDate}
-        triggerId={fieldMeta.id}
+        disabled={disabled}
       />
       <FormMessage message={fieldMeta.errors} />
     </FormItem>
   )
+}
+
+// 新規作成時であってもeventに初期値を埋めて送られてくるため、idがあるかどうかで判定
+function isNew(event: Event | undefined): event is undefined {
+  return !event?.id
 }

@@ -1,22 +1,17 @@
 import * as React from 'react'
-import { useFetcher } from '@remix-run/react'
 import { useHotkeys } from 'react-hotkeys-hook'
-import { MEMO_URL } from '~/constants'
 import { Memo } from '~/types/memos'
 import { MemoForm } from './memo-form'
-import { MemoActionButton } from './memo-action-button'
-import { useAtomValue } from 'jotai'
-import { memoSettingsAtom } from '~/lib/state'
+import { useUserAgentAtom, useMemoSettingsAtom } from '~/lib/global-state'
 
 interface MemoFormViewProps {
   memo: Memo | undefined
-  returnUrl: string
 }
 
-export function MemoFormView({ memo, returnUrl }: MemoFormViewProps) {
+export function MemoFormView({ memo }: MemoFormViewProps) {
+  const userAgent = useUserAgentAtom()
   const formRef = React.useRef<HTMLDivElement>(null)
-  const memoFormFetcher = useFetcher()
-  const memoSettings = useAtomValue(memoSettingsAtom)
+  const memoSettings = useMemoSettingsAtom()
   const autoSave = memoSettings?.autoSave || false
 
   // テキストエリアにフォーカス
@@ -26,13 +21,9 @@ export function MemoFormView({ memo, returnUrl }: MemoFormViewProps) {
 
   // キーボード操作
   useHotkeys(
-    ['alt+right'],
-    (event, handler) => {
-      switch (handler.keys?.join('')) {
-        case 'right':
-          setTextAreaFocus()
-          break
-      }
+    [`${userAgent.modifierKey}+right`],
+    () => {
+      setTextAreaFocus()
     },
     {
       preventDefault: true, // テキストエリアにフォーカスがある時にalt+sを押すと変なドイツ語がテキストエリアに入力されるのを防ぐ
@@ -44,21 +35,12 @@ export function MemoFormView({ memo, returnUrl }: MemoFormViewProps) {
     <div className="p-4" ref={formRef}>
       <MemoForm
         memo={memo}
-        fetcher={memoFormFetcher}
         isAutoSave={autoSave}
-        returnUrl={returnUrl}
+        redirectUrl={''}
         textareaProps={{
-          className: 'h-[calc(100dvh_-_256px)] xl:h-[calc(100dvh_-_216px)]',
+          className: 'h-[calc(100svh_-_216px)]',
         }}
-      >
-        {memo && (
-          <MemoActionButton
-            memo={memo}
-            deleteReturnUrl={MEMO_URL}
-            onDeleteSubmit={(event) => event.stopPropagation()}
-          />
-        )}
-      </MemoForm>
+      />
     </div>
   )
 }

@@ -1,8 +1,9 @@
-import { useNavigation } from '@remix-run/react'
+import { useNavigation } from 'react-router'
 
 export function useIsLoading() {
   const navigation = useNavigation()
-  return ['loading', 'submitting'].includes(navigation.state)
+  return Boolean(navigation.location)
+  // return ['loading', 'submitting'].includes(navigation.state)
 }
 
 export function useIsLoadingEffect() {

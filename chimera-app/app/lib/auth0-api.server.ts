@@ -4,6 +4,7 @@ const apiDomain = `https://${process.env.AUTH0_DOMAIN}`
 const apiBaseUrl = `${apiDomain}/api/v2`
 const clientId = process.env.AUTH0_CLIENT_ID
 const clientSecret = process.env.AUTH0_CLIENT_SECRET
+const audience = process.env.AUTH0_MANAGEMENT_API_IDENTIFIER
 
 interface TokenResponse {
   access_token: string
@@ -25,9 +26,9 @@ export async function getAuth0Token(): Promise<TokenResponse> {
       method: 'POST',
       body: JSON.stringify({
         grant_type: 'client_credentials',
-        client_id: process.env.AUTH0_CLIENT_ID!,
-        client_secret: process.env.AUTH0_CLIENT_SECRET!,
-        audience: process.env.AUTH0_MANAGEMENT_API_IDENTIFIER,
+        client_id: clientId,
+        client_secret: clientSecret,
+        audience: audience,
       }),
       headers: {
         'Content-Type': 'application/json',

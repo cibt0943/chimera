@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useFetcher } from '@remix-run/react'
+import { useFetcher } from 'react-router'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from 'react-hotkeys-hook'
@@ -18,32 +18,30 @@ import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
 import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
 import { Memo } from '~/types/memos'
+import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
+import { useUserAgentAtom } from '~/lib/global-state'
 
 export interface MemoFormProps {
   memo: Memo | undefined
-  fetcher: ReturnType<typeof useFetcher>
   isAutoSave: boolean
-  returnUrl: string
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  redirectUrl: string
   textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>
-  children?: React.ReactNode
 }
 
 export function MemoForm({
   memo,
-  fetcher,
   isAutoSave,
-  returnUrl,
-  onSubmit,
+  redirectUrl,
   textareaProps = {},
-  children,
 }: MemoFormProps) {
   const { t } = useTranslation()
+  const userAgent = useUserAgentAtom()
   const formRef = React.useRef<HTMLFormElement>(null)
   const { enqueue } = useApiQueue()
   // memoの状態を変更して保存したかどうか
   const [isChangedMemo, setIsChangedMemo] = React.useState(false)
+  const fetcher = useFetcher()
 
   React.useEffect(() => {
     setIsChangedMemo(false)
@@ -70,7 +68,7 @@ export function MemoForm({
     enqueue(() => saveMemoApi())
   }, 1000)
 
-  // メモ情報が更新されていた保存する
+  // メモ情報が更新されていたら保存する
   function handleChangeMemo() {
     setIsChangedMemo(true)
     isAutoSave && saveMemoDebounce()
@@ -78,7 +76,7 @@ export function MemoForm({
 
   // キーボード操作
   useHotkeys(
-    ['alt+s'],
+    [`${userAgent.modifierKey}+s`],
     (event, handler) => {
       switch (handler.keys?.join('')) {
         case 's':
@@ -92,76 +90,75 @@ export function MemoForm({
     },
   )
 
-  const { form, fields } = useMemoConform({
-    memo,
-    onSubmit: (event) => {
-      setIsChangedMemo(false)
-      onSubmit && onSubmit(event)
-    },
-  })
+  const { form, fields } = useMemoConform({ memo })
 
-  const action = memo ? [MEMO_URL, memo.id].join('/') : MEMO_URL
+  const action = memo ? `${MEMO_URL}/${memo.id}` : MEMO_URL
 
   const { className, ...otherProps } = textareaProps
 
   return (
     <fetcher.Form
       method="post"
-      className="space-y-6"
       {...getFormProps(form)}
       action={action}
       onChange={handleChangeMemo}
       ref={formRef}
+      onSubmit={() => {
+        setIsChangedMemo(false)
+      }}
     >
-      <FormItem>
-        <FormDescription>
-          {t('memo.message.first_line_is_title')}
-        </FormDescription>
-        <TextareaConform
-          meta={fields.content}
-          key={fields.content.key}
-          className={cn(
-            'resize-none bg-[#303841] text-white focus-visible:ring-0',
-            className,
+      <div className="space-y-6">
+        <FormItem>
+          <FormDescription>
+            {t('memo.message.first_line_is_title')}
+          </FormDescription>
+          <TextareaConform
+            meta={fields.content}
+            key={fields.content.key}
+            className={cn('resize-none bg-[#303841] text-white', className)}
+            {...otherProps}
+          />
+          <FormMessage message={fields.content.errors} />
+        </FormItem>
+        <FormItem>
+          <ClientOnly
+            fallback={
+              <DummyDateTimePicker
+                placeholder={t('memo.model.related_date')}
+                className="w-56"
+              />
+            }
+          >
+            {() => (
+              <DateTimePickerConform
+                dateMeta={fields.relatedDate}
+                allDayMeta={fields.relatedDateAllDay}
+                defaultAllDay={true}
+                includeAllDayComponent={true}
+                onChangeData={handleChangeMemo}
+                onChangeAllDay={handleChangeMemo}
+                placeholder={t('memo.model.related_date')}
+                className="w-56"
+              />
+            )}
+          </ClientOnly>
+          <FormMessage message={fields.relatedDate.errors} />
+        </FormItem>
+        {/* 戻り先を切り替えるための値 */}
+        <input type="hidden" name="redirectUrl" value={redirectUrl} />
+        <FormFooter className="sm:justify-between">
+          {memo ? (
+            <MemoActionButton memo={memo} redirectUrl={redirectUrl} />
+          ) : (
+            <div>&nbsp;</div>
           )}
-          {...otherProps}
-        />
-        <FormMessage message={fields.content.errors} />
-      </FormItem>
-      <FormItem>
-        <ClientOnly
-          fallback={
-            <DummyDateTimePicker
-              placeholder={t('memo.model.related_date')}
-              className="w-52"
-            />
-          }
-        >
-          {() => (
-            <DateTimePickerConform
-              dateMeta={fields.relatedDate}
-              allDayMeta={fields.relatedDateAllDay}
-              defaultAllDay={true}
-              includeAllDayComponent={true}
-              onChangeData={handleChangeMemo}
-              onChangeAllDay={handleChangeMemo}
-              placeholder={t('memo.model.related_date')}
-              className="w-52"
-            />
-          )}
-        </ClientOnly>
-        <FormMessage message={fields.relatedDate.errors} />
-      </FormItem>
-      {/* 戻り先を切り替えるための値 */}
-      <input type="hidden" name="returnUrl" value={returnUrl} />
-      <FormFooter className="sm:justify-between">
-        {children || <div>&nbsp;</div>}
-        <SaveButton
-          isChangedMemo={isChangedMemo}
-          isSubmitting={fetcher.state === 'submitting'}
-          isAutoSave={isAutoSave}
-        />
-      </FormFooter>
+          <SaveButton
+            isChangedMemo={isChangedMemo}
+            isSubmitting={fetcher.state === 'submitting'}
+            isAutoSave={isAutoSave}
+          />
+        </FormFooter>
+      </div>
     </fetcher.Form>
   )
 }
@@ -198,10 +195,12 @@ export function SaveButton({
 }
 
 function SaveHotkeyIcon() {
+  const userAgent = useUserAgentAtom()
+
   return (
-    <p className="ml-2 text-xs">
-      <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border px-1.5">
-        <span>⌥</span>s
+    <p className="text-xs">
+      <kbd className="inline-flex h-5 items-center gap-1 rounded border px-1.5 select-none">
+        <span>{userAgent.modifierKeyIcon}</span>s
       </kbd>
     </p>
   )

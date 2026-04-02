@@ -1,26 +1,26 @@
-import { format } from 'date-fns'
-import {
-  Memos,
-  Memo,
-  MemoModel,
-  InsertMemoModel,
-  UpdateMemoModel,
-  MemoModel2Memo,
-  MemoStatus,
-} from '~/types/memos'
+import { format, toDate } from 'date-fns'
+import type { Database } from '~/types/database'
+import { Memos, Memo, MemoStatus } from '~/types/memos'
 import { supabase } from '~/lib/supabase-client.server'
 
-// メモ一覧を取得
+// DBのメモテーブルの型
+export type MemoModel = Database['public']['Tables']['memos']['Row']
+export type InsertMemoModel = Database['public']['Tables']['memos']['Insert']
+export type UpdateMemoModel =
+  Database['public']['Tables']['memos']['Update'] & { id: string } // idを必須で上書き
+
 interface GetMemosOptionParams {
   statuses?: MemoStatus[]
   relatedDateStart?: Date
   relatedDateEnd?: Date
 }
+
+// メモ一覧を取得
 export async function getMemos(
   accountId: string,
   options?: GetMemosOptionParams,
 ): Promise<Memos> {
-  const { statuses, relatedDateStart, relatedDateEnd } = options || {}
+  const { statuses, relatedDateStart, relatedDateEnd } = options ?? {}
 
   let query = supabase
     .from('memos')
@@ -44,11 +44,7 @@ export async function getMemos(
   const { data, error } = await query
   if (error) throw error
 
-  const memos = data.map((memo) => {
-    return MemoModel2Memo(memo)
-  })
-
-  return memos
+  return data.map(convertToMemo)
 }
 
 // メモを取得
@@ -60,29 +56,29 @@ export async function getMemo(memoId: string): Promise<Memo> {
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return MemoModel2Memo(data)
+  return convertToMemo(data)
 }
 
 // メモの追加
-export async function insertMemo(memo: InsertMemoModel): Promise<Memo> {
+export async function addMemo(memo: InsertMemoModel): Promise<Memo> {
   const { data: maxMemo, error: errorMaxMemo } = await supabase
     .from('memos')
-    .select()
+    .select('position')
     .eq('account_id', memo.account_id)
     .order('position', { ascending: false })
     .limit(1)
   if (errorMaxMemo) throw errorMaxMemo
 
-  const position = maxMemo.length > 0 ? maxMemo[0].position + 1 : 1
+  const position = (maxMemo?.[0]?.position ?? 0) + 1
 
   const { data: newMemo, error: errorNewMemo } = await supabase
     .from('memos')
     .insert({ ...memo, position })
-    .select()
+    .select('id')
     .single()
   if (errorNewMemo || !newMemo) throw errorNewMemo || new Error('erorr')
 
-  return MemoModel2Memo(newMemo)
+  return getMemo(newMemo.id)
 }
 
 // メモの更新
@@ -96,11 +92,11 @@ export async function updateMemo(
     .from('memos')
     .update(memo)
     .eq('id', memo.id)
-    .select()
+    .select('id')
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return MemoModel2Memo(data)
+  return getMemo(data.id)
 }
 
 // メモの削除
@@ -112,7 +108,7 @@ export async function deleteMemo(memoId: string): Promise<void> {
 // メモの位置を変更
 // memoIdにて指定されたメモの位置をpositionに変更します。
 // この変更による他のメモの位置の変更もあわせて行います。
-export async function updateMemoPosition(
+export async function setMemoPosition(
   memoId: string,
   position: number,
 ): Promise<Memo> {
@@ -131,8 +127,9 @@ export async function updateMemoPosition(
 
   // 間のメモの位置を変更
   await updateMemosPosition(memosToUpdate, isUp)
+
   // 移動するメモの位置を変更
-  return await updateMemo({
+  return updateMemo({
     id: fromMemo.id,
     position,
   })
@@ -148,4 +145,19 @@ async function updateMemosPosition(memosToUpdate: MemoModel[], isUp: boolean) {
     .from('memos')
     .upsert(updatedMemos, { onConflict: 'id' })
   if (error) throw error
+}
+
+export function convertToMemo(memoModel: MemoModel): Memo {
+  return {
+    id: memoModel.id,
+    createdAt: toDate(memoModel.created_at),
+    updatedAt: toDate(memoModel.updated_at),
+    accountId: memoModel.account_id,
+    status: memoModel.status as MemoStatus,
+    position: memoModel.position,
+    title: memoModel.title,
+    content: memoModel.content,
+    relatedDate: memoModel.related_date ? toDate(memoModel.related_date) : null,
+    relatedDateAllDay: memoModel.related_date_all_day,
+  }
 }

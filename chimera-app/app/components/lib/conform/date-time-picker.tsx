@@ -2,9 +2,9 @@ import * as React from 'react'
 import { toDate } from 'date-fns'
 import { FieldMetadata, useInputControl } from '@conform-to/react'
 import { DateTimePicker } from '~/components/lib/date-time-picker'
+import { Matcher } from 'react-day-picker'
 
-export interface DateTimePickerConformProps
-  extends React.ComponentProps<'div'> {
+export interface DateTimePickerConformProps extends React.ComponentProps<'div'> {
   dateMeta: FieldMetadata<Date | undefined>
   allDayMeta: FieldMetadata<boolean | undefined>
   defaultAllDay: boolean
@@ -12,6 +12,8 @@ export interface DateTimePickerConformProps
   onChangeData?: (date: Date | undefined) => void
   onChangeAllDay?: (isAllDay: boolean) => void
   placeholder?: string
+  disabled?: Matcher
+  captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
 }
 
 export function DateTimePickerConform(props: DateTimePickerConformProps) {
@@ -23,25 +25,37 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
     onChangeData,
     onChangeAllDay,
     placeholder,
+    disabled,
+    captionLayout,
     ...divProps
   } = props
 
-  const dateValue = dateMeta.value ? toDate(dateMeta.value) : undefined
+  const dateValue = React.useMemo(
+    () => (dateMeta.value ? toDate(dateMeta.value) : undefined),
+    [dateMeta.value],
+  )
   const allDayValue = allDayMeta.value === 'on'
 
   const dateControl = useInputControl(dateMeta)
   const allDayControl = useInputControl(allDayMeta)
 
-  // 選択された日時が変更されたときに呼ばれるコールバック
+  const [internalDate, setInternalDate] = React.useState<Date | undefined>(
+    dateValue,
+  )
+
+  React.useEffect(() => {
+    setInternalDate(dateValue)
+  }, [dateValue])
+
   const handleChangeDate = React.useCallback(
     (date: Date | undefined) => {
+      setInternalDate(date)
       dateControl.change(date?.toISOString() || '')
       onChangeData && onChangeData(date)
     },
     [dateControl, onChangeData],
   )
 
-  // 終日か否かが変更されたときに呼ばれるコールバック
   const handleChangeAllDay = React.useCallback(
     (isAllDay: boolean) => {
       allDayControl.change(isAllDay ? 'on' : '')
@@ -52,7 +66,8 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
 
   return (
     <DateTimePicker
-      date={dateValue}
+      selectedDate={internalDate}
+      defaultMonth={internalDate}
       allDay={allDayValue}
       defaultAllDay={defaultAllDay}
       includeAllDayComponent={includeAllDayComponent}
@@ -60,6 +75,8 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
       onChangeAllDay={handleChangeAllDay}
       triggerId={dateMeta.id}
       placeholder={placeholder}
+      disabled={disabled}
+      captionLayout={captionLayout}
       {...divProps}
     />
   )
