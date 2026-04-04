@@ -3,7 +3,10 @@ import type { Database } from '~/types/database'
 import { TaskStatus } from '~/types/tasks'
 import { TodoType } from '~/types/todos'
 import { ViewTodo, ViewTodos } from '~/types/view-todos'
-import { supabase } from '~/lib/supabase-client.server'
+import {
+  supabase,
+  createSupabaseClientForUser,
+} from '~/lib/supabase-client.server'
 
 // DBのViewTodoテーブルの型
 export type ViewTodoModel = Database['public']['Views']['view_todos']['Row']
@@ -20,8 +23,9 @@ export async function getViewTodos(
   options?: GetViewTodosOptionParams,
 ): Promise<ViewTodos> {
   const { dueDateStart, dueDateEnd, type } = options || {}
+  const client = createSupabaseClientForUser(accountId)
 
-  let query = supabase
+  let query = client
     .from('view_todos')
     .select()
     .eq('account_id', accountId)

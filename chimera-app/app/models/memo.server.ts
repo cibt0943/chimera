@@ -1,7 +1,10 @@
 import { format, toDate } from 'date-fns'
 import type { Database } from '~/types/database'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
-import { supabase } from '~/lib/supabase-client.server'
+import {
+  supabase,
+  createSupabaseClientForUser,
+} from '~/lib/supabase-client.server'
 
 // DBのメモテーブルの型
 export type MemoModel = Database['public']['Tables']['memos']['Row']
@@ -21,8 +24,9 @@ export async function getMemos(
   options?: GetMemosOptionParams,
 ): Promise<Memos> {
   const { statuses, relatedDateStart, relatedDateEnd } = options ?? {}
+  const client = createSupabaseClientForUser(accountId)
 
-  let query = supabase
+  let query = client
     .from('memos')
     .select()
     .eq('account_id', accountId)
@@ -61,7 +65,8 @@ export async function getMemo(memoId: string): Promise<Memo> {
 
 // メモの追加
 export async function addMemo(memo: InsertMemoModel): Promise<Memo> {
-  const { data: maxMemo, error: errorMaxMemo } = await supabase
+  const client = createSupabaseClientForUser(memo.account_id)
+  const { data: maxMemo, error: errorMaxMemo } = await client
     .from('memos')
     .select('position')
     .eq('account_id', memo.account_id)
@@ -71,7 +76,7 @@ export async function addMemo(memo: InsertMemoModel): Promise<Memo> {
 
   const position = (maxMemo?.[0]?.position ?? 0) + 1
 
-  const { data: newMemo, error: errorNewMemo } = await supabase
+  const { data: newMemo, error: errorNewMemo } = await client
     .from('memos')
     .insert({ ...memo, position })
     .select('id')

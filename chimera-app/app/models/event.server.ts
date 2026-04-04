@@ -1,7 +1,10 @@
 import { format, toDate } from 'date-fns'
 import type { Database } from '~/types/database'
 import { Events, Event } from '~/types/events'
-import { supabase } from '~/lib/supabase-client.server'
+import {
+  supabase,
+  createSupabaseClientForUser,
+} from '~/lib/supabase-client.server'
 
 // DBのイベントテーブルの型
 export type EventModel = Database['public']['Tables']['events']['Row']
@@ -20,8 +23,9 @@ export async function getEvents(
   options?: GetEventsOptionParams,
 ): Promise<Events> {
   const { startDateStart, startDateEnd } = options ?? {}
+  const client = createSupabaseClientForUser(accountId)
 
-  let query = supabase
+  let query = client
     .from('events')
     .select()
     .eq('account_id', accountId)
@@ -55,7 +59,8 @@ export async function getEvent(eventId: string): Promise<Event> {
 
 // イベントの追加
 export async function addEvent(event: InsertEventModel): Promise<Event> {
-  const { data: newEvent, error: errorNewEvent } = await supabase
+  const client = createSupabaseClientForUser(event.account_id)
+  const { data: newEvent, error: errorNewEvent } = await client
     .from('events')
     .insert(event)
     .select()
