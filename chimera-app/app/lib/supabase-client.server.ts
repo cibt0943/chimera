@@ -9,25 +9,24 @@ export const supabase = createClient<Database>(
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 )
 
+// Base64url-encode a Buffer or string (no padding, URL-safe chars).
+function base64url(data: string | Buffer): string {
+  const buf = Buffer.isBuffer(data) ? data : Buffer.from(data)
+  return buf
+    .toString('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+}
+
 // Sign a HS256 JWT using the Supabase JWT secret.
 function signJwt(payload: Record<string, unknown>, secret: string): string {
-  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
-    .toString('base64')
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-  const body = Buffer.from(JSON.stringify(payload))
-    .toString('base64')
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
+  const header = base64url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+  const body = base64url(JSON.stringify(payload))
   const signingInput = `${header}.${body}`
-  const sig = createHmac('sha256', secret)
-    .update(signingInput)
-    .digest('base64')
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
+  const sig = base64url(
+    createHmac('sha256', secret).update(signingInput).digest(),
+  )
   return `${signingInput}.${sig}`
 }
 
