@@ -1,7 +1,10 @@
 import { toDate } from 'date-fns'
 import type { Database } from '~/types/database'
 import { TodoType, Todo, Todos } from '~/types/todos'
-import { supabase } from '~/lib/supabase-client.server'
+import {
+  supabase,
+  createSupabaseClientForUser,
+} from '~/lib/supabase-client.server'
 
 // DBのTodoテーブルの型
 export type TodoModel = Database['public']['Tables']['todos']['Row']
@@ -14,7 +17,8 @@ export type UpdateTodoModel =
 
 // Todo一覧を取得
 export async function getTodos(accountId: string): Promise<Todos> {
-  const { data, error } = await supabase
+  const client = createSupabaseClientForUser(accountId)
+  const { data, error } = await client
     .from('todos')
     .select()
     .eq('account_id', accountId)
@@ -38,8 +42,9 @@ export async function getTodo(todoId: string): Promise<Todo> {
 
 // Todoの追加
 export async function addTodo(todo: InsertTodoModel): Promise<Todo> {
+  const client = createSupabaseClientForUser(todo.account_id)
   // 現在の最大表示位置を取得
-  const { data: maxTodo, error: errorMaxTodo } = await supabase
+  const { data: maxTodo, error: errorMaxTodo } = await client
     .from('todos')
     .select('position')
     .eq('account_id', todo.account_id)
@@ -51,7 +56,7 @@ export async function addTodo(todo: InsertTodoModel): Promise<Todo> {
   const newPosition = (maxTodo?.[0]?.position ?? 0) + 1
 
   // Todoを追加
-  const { data: newTodo, error: errorNewTodo } = await supabase
+  const { data: newTodo, error: errorNewTodo } = await client
     .from('todos')
     .insert({
       account_id: todo.account_id,

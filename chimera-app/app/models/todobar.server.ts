@@ -1,5 +1,8 @@
 import { toDate } from 'date-fns'
-import { supabase } from '~/lib/supabase-client.server'
+import {
+  supabase,
+  createSupabaseClientForUser,
+} from '~/lib/supabase-client.server'
 import { addTodo, deleteTodo, TodoModel } from '~/models/todo.server'
 import type { Database } from '~/types/database'
 import { TodoType } from '~/types/todos'
@@ -55,7 +58,8 @@ export async function addTodoBar(todoBar: AddTodoBarModel): Promise<TodoBar> {
   })
 
   // TodoBarを追加
-  const { data: newTodoBar, error: errorNewTodoBar } = await supabase
+  const client = createSupabaseClientForUser(todoBar.account_id)
+  const { data: newTodoBar, error: errorNewTodoBar } = await client
     .from('todo_bars')
     .insert({ ...todoBar, todo_id: newTodo.id })
     .select('id')

@@ -1,5 +1,8 @@
 import { format, toDate } from 'date-fns'
-import { supabase } from '~/lib/supabase-client.server'
+import {
+  supabase,
+  createSupabaseClientForUser,
+} from '~/lib/supabase-client.server'
 import { addTodo, deleteTodo, TodoModel } from '~/models/todo.server'
 import type { Database } from '~/types/database'
 import { TodoType } from '~/types/todos'
@@ -28,8 +31,9 @@ export async function getTasks(
   options?: GetTodosOptionParams,
 ): Promise<Task[]> {
   const { dueDateStart, dueDateEnd } = options ?? {}
+  const client = createSupabaseClientForUser(accountId)
 
-  let query = supabase
+  let query = client
     .from('tasks')
     .select(TASK_WITH_TODO_SELECT)
     .eq('account_id', accountId)
@@ -91,7 +95,8 @@ export async function addTask(task: AddTaskModel): Promise<Task> {
   })
 
   // タスクを追加
-  const { data: newTask, error: errorNewTask } = await supabase
+  const client = createSupabaseClientForUser(task.account_id)
+  const { data: newTask, error: errorNewTask } = await client
     .from('tasks')
     .insert({ ...task, todo_id: newTodo.id })
     .select('id')
