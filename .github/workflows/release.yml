@@ -58,7 +58,7 @@ jobs:
       - name: Verify Fly token is present
         run: |
           if [ -z "${FLY_API_TOKEN}" ]; then
-            echo "FLY_API_TOKEN が未設定です。GitHub Actions secret に追加してください。"
+            echo "FLY_API_TOKEN が未設定です。"
             exit 1
           fi
 
