@@ -18,3 +18,8 @@ alter table "public"."events" enable row level security;
 alter table "public"."todos" enable row level security;
 
 alter table "public"."todo_bars" enable row level security;
+
+-- view_todos はデフォルトで SECURITY DEFINER になるため、
+-- SECURITY INVOKER に変更して呼び出しユーザーの RLS ポリシーを適用する。
+alter view "public"."view_todos" set (security_invoker = true);
+

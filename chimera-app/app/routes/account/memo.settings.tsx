@@ -38,6 +38,7 @@ export async function action({ request }: Route.ActionArgs) {
 
   const updatedMemoSettings = await updateMemoSettings({
     id: memoSettings.id,
+    account_id: memoSettings.accountId,
     ...updateData,
   })
 

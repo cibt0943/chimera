@@ -1,10 +1,7 @@
 import { toDate } from 'date-fns'
 import type { Database } from '~/types/database'
 import { TodoType, Todo, Todos } from '~/types/todos'
-import {
-  supabase,
-  createSupabaseClientForUser,
-} from '~/lib/supabase-client.server'
+import { createSupabaseClientForUser } from '~/lib/supabase-client.server'
 
 // DBのTodoテーブルの型
 export type TodoModel = Database['public']['Tables']['todos']['Row']
@@ -13,7 +10,10 @@ export type InsertTodoModel = Omit<
   'id'
 > & { type: TodoType } // idを削除, typeを必須で上書き
 export type UpdateTodoModel =
-  Database['public']['Tables']['todos']['Update'] & { id: string } // idを必須で上書き
+  Database['public']['Tables']['todos']['Update'] & {
+    id: string
+    account_id: string
+  } // idとaccount_idを必須で上書き
 
 // Todo一覧を取得
 export async function getTodos(accountId: string): Promise<Todos> {
@@ -29,8 +29,12 @@ export async function getTodos(accountId: string): Promise<Todos> {
 }
 
 // Todoを取得
-export async function getTodo(todoId: string): Promise<Todo> {
-  const { data, error } = await supabase
+export async function getTodo(
+  accountId: string,
+  todoId: string,
+): Promise<Todo> {
+  const client = createSupabaseClientForUser(accountId)
+  const { data, error } = await client
     .from('todos')
     .select()
     .eq('id', todoId)
@@ -67,12 +71,13 @@ export async function addTodo(todo: InsertTodoModel): Promise<Todo> {
     .single()
   if (errorNewTodo || !newTodo) throw errorNewTodo || new Error('erorr')
 
-  return getTodo(newTodo.id)
+  return getTodo(todo.account_id, newTodo.id)
 }
 
 // Todoの更新
 export async function updateTodo(todo: UpdateTodoModel): Promise<Todo> {
-  const { data, error } = await supabase
+  const client = createSupabaseClientForUser(todo.account_id)
+  const { data, error } = await client
     .from('todos')
     .update(todo)
     .eq('id', todo.id)
@@ -80,40 +85,34 @@ export async function updateTodo(todo: UpdateTodoModel): Promise<Todo> {
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return getTodo(data.id)
+  return getTodo(todo.account_id, data.id)
 }
 
 // Todoの削除
-export async function deleteTodo(todoId: string): Promise<void> {
-  const { error } = await supabase.from('todos').delete().eq('id', todoId)
+export async function deleteTodo(
+  accountId: string,
+  todoId: string,
+): Promise<void> {
+  const client = createSupabaseClientForUser(accountId)
+  const { error } = await client.from('todos').delete().eq('id', todoId)
   if (error) throw error
-}
-
-// TodoモデルをTodo型に変換
-export function convertToTodo(todoModel: TodoModel): Todo {
-  return {
-    id: todoModel.id,
-    createdAt: toDate(todoModel.created_at),
-    updatedAt: toDate(todoModel.updated_at),
-    accountId: todoModel.account_id,
-    type: todoModel.type as TodoType,
-    position: todoModel.position,
-  }
 }
 
 // Todoの位置を変更
 // 指定されたTodoの位置をpositionに変更します。
 // この変更による他のTodoの位置の変更もあわせて行います。
 export async function setTodoPosition(
+  accountId: string,
   todoId: string,
   position: number,
 ): Promise<Todo> {
-  const fromTodo = await getTodo(todoId)
+  const fromTodo = await getTodo(accountId, todoId)
 
   const isUp = fromTodo.position < position
   const [fromOperator, toOperator] = isUp ? ['gt', 'lte'] : ['lt', 'gte']
 
-  const { data: todosToUpdate, error: errorTodosToUpdate } = await supabase
+  const client = createSupabaseClientForUser(accountId)
+  const { data: todosToUpdate, error: errorTodosToUpdate } = await client
     .from('todos')
     .select()
     .filter('position', fromOperator, fromTodo.position)
@@ -122,17 +121,19 @@ export async function setTodoPosition(
   if (errorTodosToUpdate) throw errorTodosToUpdate
 
   // 間のTodoの位置を変更
-  await updateTodosPosition(todosToUpdate, isUp)
+  await updateTodosPosition(accountId, todosToUpdate, isUp)
 
   // 移動するタスクの位置を変更
-  await updateTodoPosition(fromTodo.id, position)
-
-  // 変更後のTodoを返す
-  return getTodo(todoId)
+  return updateTodo({
+    id: fromTodo.id,
+    account_id: fromTodo.accountId,
+    position,
+  })
 }
 
 // 複数のTodoの位置を更新
 async function updateTodosPosition(
+  accountId: string,
   todosToUpdate: TodoModel[],
   isUp: boolean,
 ): Promise<void> {
@@ -141,20 +142,21 @@ async function updateTodosPosition(
     position: isUp ? todo.position - 1 : todo.position + 1,
   }))
 
-  const { error } = await supabase
+  const client = createSupabaseClientForUser(accountId)
+  const { error } = await client
     .from('todos')
     .upsert(updatedTodos, { onConflict: 'id' })
   if (error) throw error
 }
 
-// Todoの位置を変更
-async function updateTodoPosition(
-  todoId: string,
-  newPosition: number,
-): Promise<void> {
-  const { error } = await supabase
-    .from('todos')
-    .update({ position: newPosition })
-    .eq('id', todoId)
-  if (error) throw error
+// TodoモデルをTodo型に変換
+function convertToTodo(todoModel: TodoModel): Todo {
+  return {
+    id: todoModel.id,
+    createdAt: toDate(todoModel.created_at),
+    updatedAt: toDate(todoModel.updated_at),
+    accountId: todoModel.account_id,
+    type: todoModel.type as TodoType,
+    position: todoModel.position,
+  }
 }

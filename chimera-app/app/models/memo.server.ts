@@ -1,16 +1,16 @@
 import { format, toDate } from 'date-fns'
 import type { Database } from '~/types/database'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
-import {
-  supabase,
-  createSupabaseClientForUser,
-} from '~/lib/supabase-client.server'
+import { createSupabaseClientForUser } from '~/lib/supabase-client.server'
 
 // DBのメモテーブルの型
 export type MemoModel = Database['public']['Tables']['memos']['Row']
 export type InsertMemoModel = Database['public']['Tables']['memos']['Insert']
 export type UpdateMemoModel =
-  Database['public']['Tables']['memos']['Update'] & { id: string } // idを必須で上書き
+  Database['public']['Tables']['memos']['Update'] & {
+    id: string
+    account_id: string
+  } // idとaccount_idを必須で上書き
 
 interface GetMemosOptionParams {
   statuses?: MemoStatus[]
@@ -52,8 +52,12 @@ export async function getMemos(
 }
 
 // メモを取得
-export async function getMemo(memoId: string): Promise<Memo> {
-  const { data, error } = await supabase
+export async function getMemo(
+  accountId: string,
+  memoId: string,
+): Promise<Memo> {
+  const client = createSupabaseClientForUser(accountId)
+  const { data, error } = await client
     .from('memos')
     .select()
     .eq('id', memoId)
@@ -83,7 +87,7 @@ export async function addMemo(memo: InsertMemoModel): Promise<Memo> {
     .single()
   if (errorNewMemo || !newMemo) throw errorNewMemo || new Error('erorr')
 
-  return getMemo(newMemo.id)
+  return getMemo(memo.account_id, newMemo.id)
 }
 
 // メモの更新
@@ -93,7 +97,8 @@ export async function updateMemo(
 ): Promise<Memo> {
   if (!noUpdated) memo.updated_at = new Date().toISOString()
 
-  const { data, error } = await supabase
+  const client = createSupabaseClientForUser(memo.account_id)
+  const { data, error } = await client
     .from('memos')
     .update(memo)
     .eq('id', memo.id)
@@ -101,12 +106,16 @@ export async function updateMemo(
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return getMemo(data.id)
+  return getMemo(memo.account_id, data.id)
 }
 
 // メモの削除
-export async function deleteMemo(memoId: string): Promise<void> {
-  const { error } = await supabase.from('memos').delete().eq('id', memoId)
+export async function deleteMemo(
+  accountId: string,
+  memoId: string,
+): Promise<void> {
+  const client = createSupabaseClientForUser(accountId)
+  const { error } = await client.from('memos').delete().eq('id', memoId)
   if (error) throw error
 }
 
@@ -114,15 +123,17 @@ export async function deleteMemo(memoId: string): Promise<void> {
 // memoIdにて指定されたメモの位置をpositionに変更します。
 // この変更による他のメモの位置の変更もあわせて行います。
 export async function setMemoPosition(
+  accountId: string,
   memoId: string,
   position: number,
 ): Promise<Memo> {
-  const fromMemo = await getMemo(memoId)
+  const fromMemo = await getMemo(accountId, memoId)
 
   const isUp = fromMemo.position < position
   const [fromOperator, toOperator] = isUp ? ['gt', 'lte'] : ['lt', 'gte']
 
-  const { data: memosToUpdate, error: errorMemosToUpdate } = await supabase
+  const client = createSupabaseClientForUser(accountId)
+  const { data: memosToUpdate, error: errorMemosToUpdate } = await client
     .from('memos')
     .select()
     .filter('position', fromOperator, fromMemo.position)
@@ -131,28 +142,36 @@ export async function setMemoPosition(
   if (errorMemosToUpdate) throw errorMemosToUpdate
 
   // 間のメモの位置を変更
-  await updateMemosPosition(memosToUpdate, isUp)
+  await updateMemosPosition(accountId, memosToUpdate, isUp)
 
   // 移動するメモの位置を変更
   return updateMemo({
     id: fromMemo.id,
+    account_id: fromMemo.accountId,
     position,
   })
 }
 
-async function updateMemosPosition(memosToUpdate: MemoModel[], isUp: boolean) {
+// 複数のメモの位置を更新
+async function updateMemosPosition(
+  accountId: string,
+  memosToUpdate: MemoModel[],
+  isUp: boolean,
+) {
   const updatedMemos = memosToUpdate.map((memo) => ({
     ...memo,
     position: isUp ? memo.position - 1 : memo.position + 1,
   }))
 
-  const { error } = await supabase
+  const client = createSupabaseClientForUser(accountId)
+  const { error } = await client
     .from('memos')
     .upsert(updatedMemos, { onConflict: 'id' })
   if (error) throw error
 }
 
-export function convertToMemo(memoModel: MemoModel): Memo {
+// MemoモデルをMemo型に変換
+function convertToMemo(memoModel: MemoModel): Memo {
   return {
     id: memoModel.id,
     createdAt: toDate(memoModel.created_at),
