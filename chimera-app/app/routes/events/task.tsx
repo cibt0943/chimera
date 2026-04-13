@@ -12,7 +12,7 @@ export function meta({ params }: Route.MetaArgs) {
 
 async function requireAuthorizedTask(request: Request, taskId: string) {
   const loginInfo = await isAuthenticated(request)
-  const task = await getTask(taskId)
+  const task = await getTask(loginInfo.account.id, taskId)
   if (task.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }

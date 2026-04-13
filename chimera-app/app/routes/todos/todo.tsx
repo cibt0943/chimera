@@ -21,16 +21,19 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
 async function requireAuthorizedTodo(request: Request, todoId: string) {
   const loginInfo = await isAuthenticated(request)
-  const todo = await getTodo(todoId)
+  const todo = await getTodo(loginInfo.account.id, todoId)
   if (todo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  return { todo }
+  return { loginInfo, todo }
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
-  const { todo } = await requireAuthorizedTodo(request, params.todoId)
+  const { loginInfo, todo } = await requireAuthorizedTodo(
+    request,
+    params.todoId,
+  )
 
   const formData = await request.formData()
   switch (todo.type) {
@@ -42,10 +45,11 @@ export async function action({ params, request }: Route.ActionArgs) {
       }
 
       const data = submission.value
-      const task = await getTaskFromTodoId(todo.id)
+      const task = await getTaskFromTodoId(loginInfo.account.id, todo.id)
 
       await updateTask({
         id: task.id,
+        account_id: task.accountId,
         status: data.status,
         title: data.title,
         memo: data.memo || '',
@@ -62,10 +66,11 @@ export async function action({ params, request }: Route.ActionArgs) {
       }
 
       const data = submission.value
-      const todoBar = await getTodoBarFromTodoId(todo.id)
+      const todoBar = await getTodoBarFromTodoId(loginInfo.account.id, todo.id)
 
       await updateTodoBar({
         id: todoBar.id,
+        account_id: todoBar.accountId,
         title: data.title,
         bg_color: data.bgColor || '',
         text_color: data.textColor || '',
@@ -82,16 +87,19 @@ export async function action({ params, request }: Route.ActionArgs) {
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
-  const { todo } = await requireAuthorizedTodo(request, params.todoId)
+  const { todo, loginInfo } = await requireAuthorizedTodo(
+    request,
+    params.todoId,
+  )
 
   switch (todo.type) {
     case TodoType.TASK: {
-      const task = await getTaskFromTodoId(todo.id)
+      const task = await getTaskFromTodoId(loginInfo.account.id, todo.id)
       return { todoType: TodoType.TASK, todoId: todo.id, task }
     }
 
     case TodoType.BAR: {
-      const todoBar = await getTodoBarFromTodoId(todo.id)
+      const todoBar = await getTodoBarFromTodoId(loginInfo.account.id, todo.id)
       return { todoType: TodoType.BAR, todoId: todo.id, todoBar }
     }
 

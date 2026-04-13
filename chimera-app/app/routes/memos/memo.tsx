@@ -17,16 +17,19 @@ export function meta({ params }: Route.MetaArgs) {
 
 async function requireAuthorizedMemo(request: Request, memoId: string) {
   const loginInfo = await isAuthenticated(request)
-  const memo = await getMemo(memoId)
+  const memo = await getMemo(loginInfo.account.id, memoId)
   if (memo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  return { memo }
+  return { loginInfo, memo }
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
-  const { memo } = await requireAuthorizedMemo(request, params.memoId)
+  const { loginInfo, memo } = await requireAuthorizedMemo(
+    request,
+    params.memoId,
+  )
 
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: MemoSchema })
@@ -40,6 +43,7 @@ export async function action({ params, request }: Route.ActionArgs) {
   const [title, ...content] = (data.content ?? '').split('\n')
   const updatedMemo = await updateMemo({
     id: memo.id,
+    account_id: loginInfo.account.id,
     title,
     content: content.join('\n'),
     related_date: data.relatedDate?.toISOString() ?? null,

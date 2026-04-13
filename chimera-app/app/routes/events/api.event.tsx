@@ -17,17 +17,20 @@ const UpdateEventSchema = zod.object({
 
 async function requireAuthorizedEvent(request: Request, eventId: string) {
   const loginInfo = await isAuthenticated(request)
-  const event = await getEvent(eventId)
+  const event = await getEvent(loginInfo.account.id, eventId)
   if (event.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  return { event }
+  return { loginInfo, event }
 }
 
 // イベントの更新API（送られてきた値のみを更新）
 export async function action({ params, request }: Route.ActionArgs) {
-  const { event } = await requireAuthorizedEvent(request, params.eventId)
+  const { loginInfo, event } = await requireAuthorizedEvent(
+    request,
+    params.eventId,
+  )
 
   const jsonData = await request.json()
   const submission = UpdateEventSchema.safeParse(jsonData)
@@ -37,7 +40,10 @@ export async function action({ params, request }: Route.ActionArgs) {
     throw new Response('Invalid submission data.', { status: 400 })
   }
 
-  const values: UpdateEventModel = { id: event.id }
+  const values: UpdateEventModel = {
+    id: event.id,
+    account_id: loginInfo.account.id,
+  }
   const data = submission.data
 
   if (data.startDate !== undefined) {

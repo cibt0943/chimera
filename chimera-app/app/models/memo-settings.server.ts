@@ -1,19 +1,23 @@
 import { toDate } from 'date-fns'
 import type { Database } from '~/types/database'
 import { MemoSettings } from '~/types/memo-settings'
-import { supabase } from '~/lib/supabase-client.server'
+import { createSupabaseClientForUser } from '~/lib/supabase-client.server'
 
 // DBのアカウントメモ設定テーブルの型
 export type MemoSettingsModel =
   Database['public']['Tables']['memo_settings']['Row']
 export type UpdateMemoSettingsModel =
-  Database['public']['Tables']['memo_settings']['Update'] & { id: string } // idを必須で上書き
+  Database['public']['Tables']['memo_settings']['Update'] & {
+    id: string
+    account_id: string
+  } // idとaccount_idを必須で上書き
 
 // アカウントのメモ設定情報を取得
 export async function getMemoSettings(
   accountId: string,
 ): Promise<MemoSettings> {
-  const { data, error } = await supabase
+  const client = createSupabaseClientForUser(accountId)
+  const { data, error } = await client
     .from('memo_settings')
     .select()
     .eq('account_id', accountId)
@@ -34,7 +38,8 @@ export async function getOrAddMemoSettings(
     if (accountId === '') throw error
   }
 
-  const { data, error } = await supabase
+  const client = createSupabaseClientForUser(accountId)
+  const { data, error } = await client
     .from('memo_settings')
     .insert({ account_id: accountId })
     .select()
@@ -51,7 +56,8 @@ export async function updateMemoSettings(
 ): Promise<MemoSettings> {
   if (!noUpdated) memoSettings.updated_at = new Date().toISOString()
 
-  const { data, error } = await supabase
+  const client = createSupabaseClientForUser(memoSettings.account_id)
+  const { data, error } = await client
     .from('memo_settings')
     .update(memoSettings)
     .eq('id', memoSettings.id)
@@ -64,7 +70,8 @@ export async function updateMemoSettings(
 
 // アカウントのメモ設定情報の削除
 export async function deleteMemoSettings(accountId: string): Promise<void> {
-  const { error } = await supabase
+  const client = createSupabaseClientForUser(accountId)
+  const { error } = await client
     .from('memo_settings')
     .delete()
     .eq('account_id', accountId)

@@ -3,7 +3,7 @@ import type { Database } from '~/types/database'
 import { TaskStatus } from '~/types/tasks'
 import { TodoType } from '~/types/todos'
 import { ViewTodo, ViewTodos } from '~/types/view-todos'
-import { supabase } from '~/lib/supabase-client.server'
+import { createSupabaseClientForUser } from '~/lib/supabase-client.server'
 
 // DBのViewTodoテーブルの型
 export type ViewTodoModel = Database['public']['Views']['view_todos']['Row']
@@ -20,8 +20,9 @@ export async function getViewTodos(
   options?: GetViewTodosOptionParams,
 ): Promise<ViewTodos> {
   const { dueDateStart, dueDateEnd, type } = options || {}
+  const client = createSupabaseClientForUser(accountId)
 
-  let query = supabase
+  let query = client
     .from('view_todos')
     .select()
     .eq('account_id', accountId)
@@ -46,8 +47,12 @@ export async function getViewTodos(
 }
 
 // ViewTodoを取得
-export async function getViewTodo(todoId: string): Promise<ViewTodo> {
-  const { data, error } = await supabase
+export async function getViewTodo(
+  accountId: string,
+  todoId: string,
+): Promise<ViewTodo> {
+  const client = createSupabaseClientForUser(accountId)
+  const { data, error } = await client
     .from('view_todos')
     .select()
     .eq('todo_id', todoId)
@@ -58,7 +63,7 @@ export async function getViewTodo(todoId: string): Promise<ViewTodo> {
 }
 
 // ViewTodoModelをViewTodo型に変換
-export function convertToViewTodo(viewTodoModel: ViewTodoModel): ViewTodo {
+function convertToViewTodo(viewTodoModel: ViewTodoModel): ViewTodo {
   return {
     todoId: viewTodoModel.todo_id,
     createdAt: toDate(viewTodoModel.created_at),

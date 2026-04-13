@@ -14,7 +14,7 @@ export function meta({ params }: Route.MetaArgs) {
 
 export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
-  const event = await getEvent(params.eventId)
+  const event = await getEvent(loginInfo.account.id, params.eventId)
   if (event.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
@@ -35,6 +35,7 @@ export async function action({ params, request }: Route.ActionArgs) {
 
   await updateEvent({
     id: event.id,
+    account_id: loginInfo.account.id,
     title: data.title,
     start_datetime: data.startDate.toISOString(),
     end_datetime: endDate?.toISOString() ?? null,
@@ -54,7 +55,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     return { event: undefined }
   }
 
-  const event = await getEvent(params.eventId)
+  const event = await getEvent(loginInfo.account.id, params.eventId)
   if (event.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }

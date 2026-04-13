@@ -19,21 +19,24 @@ const updateTaskSchema = zod.object({
 
 async function requireAuthorizedTodo(request: Request, todoId: string) {
   const loginInfo = await isAuthenticated(request)
-  const todo = await getTodo(todoId)
+  const todo = await getTodo(loginInfo.account.id, todoId)
   if (todo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  return { todo }
+  return { loginInfo, todo }
 }
 
 // タスクの更新API（送られてきた値のみを更新）
 export async function action({ params, request }: Route.ActionArgs) {
-  const { todo } = await requireAuthorizedTodo(request, params.todoId)
+  const { loginInfo, todo } = await requireAuthorizedTodo(
+    request,
+    params.todoId,
+  )
 
   switch (todo.type) {
     case TodoType.TASK: {
-      const task = await getTaskFromTodoId(todo.id)
+      const task = await getTaskFromTodoId(loginInfo.account.id, todo.id)
       const jsonData = await request.json()
 
       const submission = updateTaskSchema.safeParse(jsonData)
@@ -41,7 +44,10 @@ export async function action({ params, request }: Route.ActionArgs) {
         throw new Response('Invalid submission data.', { status: 400 })
       }
 
-      const values: UpdateTaskModel = { id: task.id }
+      const values: UpdateTaskModel = {
+        id: task.id,
+        account_id: task.accountId,
+      }
       const data = submission.data
 
       if (data.status !== undefined) {
@@ -57,7 +63,9 @@ export async function action({ params, request }: Route.ActionArgs) {
     }
 
     case TodoType.BAR: {
-      return Response.json({ todoBar: await getTodoBarFromTodoId(todo.id) })
+      return Response.json({
+        todoBar: await getTodoBarFromTodoId(loginInfo.account.id, todo.id),
+      })
     }
 
     default:

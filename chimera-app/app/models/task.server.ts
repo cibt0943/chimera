@@ -1,5 +1,5 @@
 import { format, toDate } from 'date-fns'
-import { supabase } from '~/lib/supabase-client.server'
+import { createSupabaseClientForUser } from '~/lib/supabase-client.server'
 import { addTodo, deleteTodo, TodoModel } from '~/models/todo.server'
 import type { Database } from '~/types/database'
 import { TodoType } from '~/types/todos'
@@ -9,7 +9,10 @@ import { Task, TaskStatus } from '~/types/tasks'
 export type TaskModel = Database['public']['Tables']['tasks']['Row']
 export type InsertTaskModel = Database['public']['Tables']['tasks']['Insert']
 export type UpdateTaskModel =
-  Database['public']['Tables']['tasks']['Update'] & { id: string } // idを必須で上書き
+  Database['public']['Tables']['tasks']['Update'] & {
+    id: string
+    account_id: string
+  } // idとaccount_idを必須で上書き
 
 export type AddTaskModel = Omit<InsertTaskModel, 'todo_id'>
 
@@ -28,8 +31,9 @@ export async function getTasks(
   options?: GetTodosOptionParams,
 ): Promise<Task[]> {
   const { dueDateStart, dueDateEnd } = options ?? {}
+  const client = createSupabaseClientForUser(accountId)
 
-  let query = supabase
+  let query = client
     .from('tasks')
     .select(TASK_WITH_TODO_SELECT)
     .eq('account_id', accountId)
@@ -56,8 +60,12 @@ export async function getTasks(
 }
 
 // タスクの取得
-export async function getTask(taskId: string): Promise<Task> {
-  const { data: taskData, error: taskError } = await supabase
+export async function getTask(
+  accountId: string,
+  taskId: string,
+): Promise<Task> {
+  const client = createSupabaseClientForUser(accountId)
+  const { data: taskData, error: taskError } = await client
     .from('tasks')
     .select(TASK_WITH_TODO_SELECT)
     .eq('id', taskId)
@@ -71,15 +79,19 @@ export async function getTask(taskId: string): Promise<Task> {
 }
 
 // TodoIdからタスクを取得
-export async function getTaskFromTodoId(todoId: string): Promise<Task> {
-  const { data: taskData, error: taskError } = await supabase
+export async function getTaskFromTodoId(
+  accountId: string,
+  todoId: string,
+): Promise<Task> {
+  const client = createSupabaseClientForUser(accountId)
+  const { data: taskData, error: taskError } = await client
     .from('tasks')
     .select('id')
     .eq('todo_id', todoId)
     .single()
   if (taskError || !taskData) throw taskError || new Error('erorr')
 
-  return getTask(taskData.id)
+  return getTask(accountId, taskData.id)
 }
 
 // タスクの追加
@@ -91,14 +103,15 @@ export async function addTask(task: AddTaskModel): Promise<Task> {
   })
 
   // タスクを追加
-  const { data: newTask, error: errorNewTask } = await supabase
+  const client = createSupabaseClientForUser(task.account_id)
+  const { data: newTask, error: errorNewTask } = await client
     .from('tasks')
     .insert({ ...task, todo_id: newTodo.id })
     .select('id')
     .single()
   if (errorNewTask || !newTask) throw errorNewTask || new Error('erorr')
 
-  return getTask(newTask.id)
+  return getTask(task.account_id, newTask.id)
 }
 
 // タスクの更新
@@ -108,7 +121,8 @@ export async function updateTask(
 ): Promise<Task> {
   if (!noUpdated) task.updated_at = new Date().toISOString()
 
-  const { data, error } = await supabase
+  const client = createSupabaseClientForUser(task.account_id)
+  const { data, error } = await client
     .from('tasks')
     .update(task)
     .eq('id', task.id)
@@ -116,22 +130,29 @@ export async function updateTask(
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return getTask(task.id)
+  return getTask(task.account_id, task.id)
 }
 
 // タスクの削除
-export async function deleteTask(taskId: string): Promise<void> {
-  const task = await getTask(taskId)
-  await deleteTaskFromTodoId(task.todoId)
+export async function deleteTask(
+  accountId: string,
+  taskId: string,
+): Promise<void> {
+  const task = await getTask(accountId, taskId)
+  await deleteTaskFromTodoId(accountId, task.todoId)
 }
 
 // TodoIdからタスクの削除
-export async function deleteTaskFromTodoId(todoId: string): Promise<void> {
+export async function deleteTaskFromTodoId(
+  accountId: string,
+  todoId: string,
+): Promise<void> {
   // まずはTodoを削除
-  await deleteTodo(todoId)
+  await deleteTodo(accountId, todoId)
 
   // タスクをTodoIdにて削除
-  const { error } = await supabase.from('tasks').delete().eq('todo_id', todoId)
+  const client = createSupabaseClientForUser(accountId)
+  const { error } = await client.from('tasks').delete().eq('todo_id', todoId)
   if (error) throw error
 }
 

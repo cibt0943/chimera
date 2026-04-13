@@ -1,5 +1,5 @@
 import { toDate } from 'date-fns'
-import { supabase } from '~/lib/supabase-client.server'
+import { createSupabaseClientForUser } from '~/lib/supabase-client.server'
 import { addTodo, deleteTodo, TodoModel } from '~/models/todo.server'
 import type { Database } from '~/types/database'
 import { TodoType } from '~/types/todos'
@@ -10,7 +10,10 @@ export type TodoBarModel = Database['public']['Tables']['todo_bars']['Row']
 export type InsertTodoBarModel =
   Database['public']['Tables']['todo_bars']['Insert']
 export type UpdateTodoBarModel =
-  Database['public']['Tables']['todo_bars']['Update'] & { id: string } // idを必須で上書き
+  Database['public']['Tables']['todo_bars']['Update'] & {
+    id: string
+    account_id: string
+  } // idとaccount_idを必須で上書き
 
 export type AddTodoBarModel = Omit<InsertTodoBarModel, 'todo_id'>
 
@@ -19,8 +22,12 @@ type TodoBarJoinTodoModel = TodoBarModel & { todos: TodoModel | null }
 const TODOBAR_WITH_TODO_SELECT = '*, todos!todo_bars_todo_id_fkey(*)'
 
 // TodoBarを取得
-export async function getTodoBar(todoBarId: string): Promise<TodoBar> {
-  const { data: todoBarData, error: todoBarError } = await supabase
+export async function getTodoBar(
+  accountId: string,
+  todoBarId: string,
+): Promise<TodoBar> {
+  const client = createSupabaseClientForUser(accountId)
+  const { data: todoBarData, error: todoBarError } = await client
     .from('todo_bars')
     .select(TODOBAR_WITH_TODO_SELECT)
     .eq('id', todoBarId)
@@ -35,15 +42,19 @@ export async function getTodoBar(todoBarId: string): Promise<TodoBar> {
 }
 
 // TodoIdからTodoBarを取得
-export async function getTodoBarFromTodoId(todoId: string): Promise<TodoBar> {
-  const { data: todoBarData, error: todoBarError } = await supabase
+export async function getTodoBarFromTodoId(
+  accountId: string,
+  todoId: string,
+): Promise<TodoBar> {
+  const client = createSupabaseClientForUser(accountId)
+  const { data: todoBarData, error: todoBarError } = await client
     .from('todo_bars')
     .select('id')
     .eq('todo_id', todoId)
     .single()
   if (todoBarError || !todoBarData) throw todoBarError || new Error('erorr')
 
-  return getTodoBar(todoBarData.id)
+  return getTodoBar(accountId, todoBarData.id)
 }
 
 // TodoBarの追加
@@ -55,7 +66,8 @@ export async function addTodoBar(todoBar: AddTodoBarModel): Promise<TodoBar> {
   })
 
   // TodoBarを追加
-  const { data: newTodoBar, error: errorNewTodoBar } = await supabase
+  const client = createSupabaseClientForUser(todoBar.account_id)
+  const { data: newTodoBar, error: errorNewTodoBar } = await client
     .from('todo_bars')
     .insert({ ...todoBar, todo_id: newTodo.id })
     .select('id')
@@ -63,7 +75,7 @@ export async function addTodoBar(todoBar: AddTodoBarModel): Promise<TodoBar> {
   if (errorNewTodoBar || !newTodoBar)
     throw errorNewTodoBar || new Error('erorr')
 
-  return getTodoBar(newTodoBar.id)
+  return getTodoBar(todoBar.account_id, newTodoBar.id)
 }
 
 // TodoBarの更新
@@ -73,7 +85,8 @@ export async function updateTodoBar(
 ): Promise<TodoBar> {
   if (!noUpdated) todoBar.updated_at = new Date().toISOString()
 
-  const { data, error } = await supabase
+  const client = createSupabaseClientForUser(todoBar.account_id)
+  const { data, error } = await client
     .from('todo_bars')
     .update(todoBar)
     .eq('id', todoBar.id)
@@ -81,22 +94,29 @@ export async function updateTodoBar(
     .single()
   if (error || !data) throw error || new Error('erorr')
 
-  return getTodoBar(data.id)
+  return getTodoBar(todoBar.account_id, data.id)
 }
 
 // TodoBarの削除
-export async function deleteTodoBar(todoBarId: string): Promise<void> {
-  const todoBar = await getTodoBar(todoBarId)
-  await deleteTodoBarFromTodoId(todoBar.todoId)
+export async function deleteTodoBar(
+  accountId: string,
+  todoBarId: string,
+): Promise<void> {
+  const todoBar = await getTodoBar(accountId, todoBarId)
+  await deleteTodoBarFromTodoId(accountId, todoBar.todoId)
 }
 
 // TodoIdからTodoBarの削除
-export async function deleteTodoBarFromTodoId(todoId: string): Promise<void> {
+export async function deleteTodoBarFromTodoId(
+  accountId: string,
+  todoId: string,
+): Promise<void> {
   // まずはTodoを削除
-  await deleteTodo(todoId)
+  await deleteTodo(accountId, todoId)
 
   // TodoBarをTodoIdにて削除
-  const { error } = await supabase
+  const client = createSupabaseClientForUser(accountId)
+  const { error } = await client
     .from('todo_bars')
     .delete()
     .eq('todo_id', todoId)

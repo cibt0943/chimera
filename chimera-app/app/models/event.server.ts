@@ -1,13 +1,16 @@
 import { format, toDate } from 'date-fns'
 import type { Database } from '~/types/database'
 import { Events, Event } from '~/types/events'
-import { supabase } from '~/lib/supabase-client.server'
+import { createSupabaseClientForUser } from '~/lib/supabase-client.server'
 
 // DBのイベントテーブルの型
 export type EventModel = Database['public']['Tables']['events']['Row']
 export type InsertEventModel = Database['public']['Tables']['events']['Insert']
 export type UpdateEventModel =
-  Database['public']['Tables']['events']['Update'] & { id: string } // idを必須で上書き
+  Database['public']['Tables']['events']['Update'] & {
+    id: string
+    account_id: string
+  } // idとaccount_idを必須で上書き
 
 // イベント一覧を取得
 interface GetEventsOptionParams {
@@ -20,8 +23,9 @@ export async function getEvents(
   options?: GetEventsOptionParams,
 ): Promise<Events> {
   const { startDateStart, startDateEnd } = options ?? {}
+  const client = createSupabaseClientForUser(accountId)
 
-  let query = supabase
+  let query = client
     .from('events')
     .select()
     .eq('account_id', accountId)
@@ -42,8 +46,12 @@ export async function getEvents(
 }
 
 // イベントを取得
-export async function getEvent(eventId: string): Promise<Event> {
-  const { data, error } = await supabase
+export async function getEvent(
+  accountId: string,
+  eventId: string,
+): Promise<Event> {
+  const client = createSupabaseClientForUser(accountId)
+  const { data, error } = await client
     .from('events')
     .select()
     .eq('id', eventId)
@@ -55,7 +63,8 @@ export async function getEvent(eventId: string): Promise<Event> {
 
 // イベントの追加
 export async function addEvent(event: InsertEventModel): Promise<Event> {
-  const { data: newEvent, error: errorNewEvent } = await supabase
+  const client = createSupabaseClientForUser(event.account_id)
+  const { data: newEvent, error: errorNewEvent } = await client
     .from('events')
     .insert(event)
     .select()
@@ -72,7 +81,8 @@ export async function updateEvent(
 ): Promise<Event> {
   if (!noUpdated) event.updated_at = new Date().toISOString()
 
-  const { data, error } = await supabase
+  const client = createSupabaseClientForUser(event.account_id)
+  const { data, error } = await client
     .from('events')
     .update(event)
     .eq('id', event.id)
@@ -84,8 +94,12 @@ export async function updateEvent(
 }
 
 // イベントの削除
-export async function deleteEvent(eventId: string): Promise<void> {
-  const { error } = await supabase.from('events').delete().eq('id', eventId)
+export async function deleteEvent(
+  accountId: string,
+  eventId: string,
+): Promise<void> {
+  const client = createSupabaseClientForUser(accountId)
+  const { error } = await client.from('events').delete().eq('id', eventId)
   if (error) throw error
 }
 

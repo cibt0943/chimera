@@ -9,27 +9,30 @@ import type { Route } from './+types/todo.delete'
 
 async function requireAuthorizedTodo(request: Request, todoId: string) {
   const loginInfo = await isAuthenticated(request)
-  const todo = await getTodo(todoId)
+  const todo = await getTodo(loginInfo.account.id, todoId)
   if (todo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  return { todo }
+  return { loginInfo, todo }
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
-  const { todo } = await requireAuthorizedTodo(request, params.todoId)
+  const { loginInfo, todo } = await requireAuthorizedTodo(
+    request,
+    params.todoId,
+  )
 
   const formData = await request.formData()
   const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
 
   switch (todo.type) {
     case TodoType.TASK:
-      await deleteTaskFromTodoId(todo.id)
+      await deleteTaskFromTodoId(loginInfo.account.id, todo.id)
       return redirectWithInfo(redirectUrl, 'task.message.deleted')
 
     case TodoType.BAR:
-      await deleteTodoBarFromTodoId(todo.id)
+      await deleteTodoBarFromTodoId(loginInfo.account.id, todo.id)
       return redirectWithInfo(redirectUrl, 'todoBar.message.deleted')
 
     default:

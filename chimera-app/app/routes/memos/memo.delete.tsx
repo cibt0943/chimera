@@ -6,18 +6,21 @@ import type { Route } from './+types/memo.delete'
 
 async function requireAuthorizedMemo(request: Request, memoId: string) {
   const loginInfo = await isAuthenticated(request)
-  const memo = await getMemo(memoId)
+  const memo = await getMemo(loginInfo.account.id, memoId)
   if (memo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  return { memo }
+  return { loginInfo, memo }
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
-  const { memo } = await requireAuthorizedMemo(request, params.memoId)
+  const { loginInfo, memo } = await requireAuthorizedMemo(
+    request,
+    params.memoId,
+  )
 
-  await deleteMemo(memo.id)
+  await deleteMemo(loginInfo.account.id, memo.id)
 
   const formData = await request.formData()
   const redirectUrl = formData.get('redirectUrl')?.toString() || MEMO_URL
