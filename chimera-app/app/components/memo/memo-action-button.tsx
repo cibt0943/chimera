@@ -6,7 +6,6 @@ import { Button } from '~/components/ui/button'
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip'
 import { API_URL, MEMO_URL } from '~/constants'
@@ -28,48 +27,46 @@ export function MemoActionButton({ memo, redirectUrl }: MemoActionButtonProps) {
 
   return (
     <div className="mt-2 space-x-4 sm:mt-0">
-      <TooltipProvider delayDuration={0}>
-        <Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={(event) => {
+              event.preventDefault()
+              fetcher
+                .submit(
+                  { status: archiveMenu.toStatus },
+                  {
+                    action: `${API_URL}${MEMO_URL}/${memo.id}`,
+                    method: 'post',
+                    encType: 'application/json',
+                  },
+                )
+                .then(() => {
+                  const msg =
+                    archiveMenu.toStatus === MemoStatus.NOMAL
+                      ? 'memo.message.un_archived'
+                      : 'memo.message.archived'
+                  toast.info(t(msg))
+                })
+            }}
+          >
+            {archiveMenu.icon}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{archiveMenu.caption}</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <MemoDeleteConfirmDialog memo={memo} redirectUrl={redirectUrl}>
           <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={(event) => {
-                event.preventDefault()
-                fetcher
-                  .submit(
-                    { status: archiveMenu.toStatus },
-                    {
-                      action: `${API_URL}${MEMO_URL}/${memo.id}`,
-                      method: 'post',
-                      encType: 'application/json',
-                    },
-                  )
-                  .then(() => {
-                    const msg =
-                      archiveMenu.toStatus === MemoStatus.NOMAL
-                        ? 'memo.message.un_archived'
-                        : 'memo.message.archived'
-                    toast.info(t(msg))
-                  })
-              }}
-            >
-              {archiveMenu.icon}
+            <Button variant="outline" size="icon">
+              <LuTrash2 />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>{archiveMenu.caption}</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <MemoDeleteConfirmDialog memo={memo} redirectUrl={redirectUrl}>
-            <TooltipTrigger asChild>
-              <Button variant="outline" size="icon">
-                <LuTrash2 />
-              </Button>
-            </TooltipTrigger>
-          </MemoDeleteConfirmDialog>
-          <TooltipContent>{t('common.message.delete')}</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+        </MemoDeleteConfirmDialog>
+        <TooltipContent>{t('common.message.delete')}</TooltipContent>
+      </Tooltip>
     </div>
   )
 }
