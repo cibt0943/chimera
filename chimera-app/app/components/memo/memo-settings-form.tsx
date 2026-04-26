@@ -19,7 +19,7 @@ export function MemoSettingsForm() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="flex h-8 px-2">
+        <Button variant="outline" className="flex px-2">
           <LuSettings className="text-primary/80" />
           <span className="sr-only">{t('common.message.settings')}</span>
         </Button>
