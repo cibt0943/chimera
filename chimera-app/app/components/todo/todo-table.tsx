@@ -389,11 +389,11 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="default" size="icon-sm" className="rounded-full">
+            <Button variant="default" size="icon" className="rounded-full">
               <LuPlus />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent className="w-40">
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={openAddTaskDialog}>
                 {t('task.message.task_creation')}

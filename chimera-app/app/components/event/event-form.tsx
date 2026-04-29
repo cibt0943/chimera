@@ -14,6 +14,7 @@ import { Button } from '~/components/ui/button'
 import { Checkbox } from '~/components/ui/checkbox'
 import { EVENT_URL } from '~/constants'
 import {
+  FormItemGroup,
   FormItem,
   FormLabel,
   FormMessage,
@@ -90,7 +91,7 @@ export function EventForm({ event, redirectUrl, onSubmit }: EventFormProps) {
 
   return (
     <fetcher.Form method="post" {...getFormProps(form)} action={action}>
-      <div className="max-h-[calc(100svh_-_240px)] space-y-8 overflow-y-auto p-0.5">
+      <FormItemGroup>
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
             {t('event.model.title')}
@@ -171,7 +172,7 @@ export function EventForm({ event, redirectUrl, onSubmit }: EventFormProps) {
             {t('common.message.save')}
           </Button>
         </FormFooter>
-      </div>
+      </FormItemGroup>
     </fetcher.Form>
   )
 }
