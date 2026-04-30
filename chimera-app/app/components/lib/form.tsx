@@ -3,12 +3,11 @@ import { cn } from '~/lib/utils'
 import { Label } from '~/components/ui/label'
 import { FieldGroup, Field } from '~/components/ui/field'
 import { DialogFooter } from '~/components/ui/dialog'
-import e from 'express'
 
 export function FormItemGroup({
   children,
   className,
-}: React.ComponentProps<'div'>) {
+}: React.ComponentProps<typeof FieldGroup>) {
   return <FieldGroup className={className}>{children}</FieldGroup>
 }
 
@@ -16,7 +15,7 @@ export function FormItem({
   children,
   className,
   ...props
-}: React.ComponentProps<'div'>) {
+}: React.ComponentProps<typeof Field>) {
   return (
     <Field className={className} {...props}>
       {children}
@@ -78,6 +77,6 @@ export function FormDescription({
 export function FormFooter({
   children,
   ...props
-}: React.ComponentProps<'div'>) {
+}: React.ComponentProps<typeof DialogFooter>) {
   return <DialogFooter {...props}>{children}</DialogFooter>
 }

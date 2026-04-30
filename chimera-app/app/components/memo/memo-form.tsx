@@ -9,6 +9,7 @@ import { MEMO_URL } from '~/constants'
 import { cn } from '~/lib/utils'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
 import {
+  FormItemGroup,
   FormItem,
   FormMessage,
   FormDescription,
@@ -43,23 +44,9 @@ export function MemoForm({
   const [isChangedMemo, setIsChangedMemo] = React.useState(false)
   const fetcher = useFetcher()
 
-  React.useEffect(() => {
-    setIsChangedMemo(false)
-  }, [memo?.id])
-
-  React.useEffect(() => {
-    // メモが存在し、メモが変更されている場合、自動保存がOFF→ONの切り替え時に自動保存を実行する
-    if (memo && isChangedMemo && isAutoSave) {
-      saveMemoApi()
-    }
-    // 以下のdisableを止める方法を検討したい。
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAutoSave])
-
   // メモの保存API呼び出し
   async function saveMemoApi() {
     fetcher.submit(formRef.current)
-    // メモが保存されたら、メモが変更されていない状態にする
     setIsChangedMemo(false)
   }
 
@@ -68,10 +55,27 @@ export function MemoForm({
     enqueue(() => saveMemoApi())
   }, 1000)
 
+  // memo が切り替わったときに isChangedMemo をリセットする
+  const [prevMemoId, setPrevMemoId] = React.useState(memo?.id)
+  if (prevMemoId !== memo?.id) {
+    setPrevMemoId(memo?.id)
+    setIsChangedMemo(false)
+  }
+
+  React.useEffect(() => {
+    // isAutoSave が OFF→ON に切り替わった時点で未保存の変更があれば自動保存を実行する。
+    // memo / isChangedMemo は切り替わった瞬間の値を参照したいため、依存配列から意図的に除外している。
+    if (memo && isChangedMemo && isAutoSave) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      saveMemoApi()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAutoSave])
+
   // メモ情報が更新されていたら保存する
   function handleChangeMemo() {
     setIsChangedMemo(true)
-    isAutoSave && saveMemoDebounce()
+    if (isAutoSave) saveMemoDebounce()
   }
 
   // キーボード操作
@@ -107,7 +111,7 @@ export function MemoForm({
         setIsChangedMemo(false)
       }}
     >
-      <div className="space-y-6">
+      <FormItemGroup>
         <FormItem>
           <FormDescription>
             {t('memo.message.first_line_is_title')}
@@ -123,10 +127,7 @@ export function MemoForm({
         <FormItem>
           <ClientOnly
             fallback={
-              <DummyDateTimePicker
-                placeholder={t('memo.model.related_date')}
-                className="w-56"
-              />
+              <DummyDateTimePicker placeholder={t('memo.model.related_date')} />
             }
           >
             {() => (
@@ -138,7 +139,6 @@ export function MemoForm({
                 onChangeData={handleChangeMemo}
                 onChangeAllDay={handleChangeMemo}
                 placeholder={t('memo.model.related_date')}
-                className="w-56"
               />
             )}
           </ClientOnly>
@@ -158,7 +158,7 @@ export function MemoForm({
             isAutoSave={isAutoSave}
           />
         </FormFooter>
-      </div>
+      </FormItemGroup>
     </fetcher.Form>
   )
 }

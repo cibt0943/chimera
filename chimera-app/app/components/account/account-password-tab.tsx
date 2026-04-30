@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Separator } from '~/components/ui/separator'
 import { Button } from '~/components/ui/button'
 import { ACCOUNT_URL } from '~/constants'
-import { FormFooter } from '~/components/lib/form'
+import { FormItem } from '~/components/lib/form'
 import type { AccountPassword } from '~/types/accounts'
 
 interface AccountPasswordTabProps {
@@ -50,9 +50,9 @@ export function AccountPasswordTab({
         </CardContent>
       </Card>
       <Form action={action} method="post">
-        <FormFooter>
+        <FormItem orientation="horizontal" className="flex sm:justify-end">
           <Button type="submit">{t('account.message.change_password')}</Button>
-        </FormFooter>
+        </FormItem>
       </Form>
     </div>
   )
