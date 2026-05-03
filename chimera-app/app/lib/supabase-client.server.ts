@@ -6,7 +6,7 @@ import type { Database } from '~/types/database'
 // (e.g. looking up or creating accounts before a user session is established).
 export const supabase = createClient<Database>(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  process.env.SUPABASE_SECRET_KEY!,
 )
 
 // Base64url-encode a Buffer or string (no padding, URL-safe chars).
