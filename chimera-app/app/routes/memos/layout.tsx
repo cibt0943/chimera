@@ -56,7 +56,10 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="p-4">
-      <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
+      <ResizablePanelGroup
+        orientation="horizontal"
+        className="rounded-lg border"
+      >
         <ResizablePanel defaultSize={35}>{memoList}</ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={65}>

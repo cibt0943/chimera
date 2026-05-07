@@ -3,7 +3,6 @@ import { Theme } from '~/types/accounts'
 
 // テーマ設定
 export function useTheme(theme: Theme) {
-  const isomorphicLayoutEffect = useIsomorphicLayoutEffect()
   const prefersLightMQ = '(prefers-color-scheme: dark)'
 
   function updateClassName() {
@@ -20,7 +19,7 @@ export function useTheme(theme: Theme) {
   }
 
   // OSのモード変更に対するイベント付与
-  isomorphicLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     updateClassName()
     const mediaQuery = window.matchMedia(prefersLightMQ)
     const handleChange = () => updateClassName()

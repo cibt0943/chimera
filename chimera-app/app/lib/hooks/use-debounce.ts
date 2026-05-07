@@ -8,14 +8,14 @@ export function useDebounce(
   func: ReturnVoidFunctionType,
   delay: number,
 ): (...args: Parameters<ReturnVoidFunctionType>) => void {
-  const timerId = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const timerIdRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
   return React.useCallback(
     (...args: Parameters<ReturnVoidFunctionType>) => {
-      if (timerId.current) {
-        clearTimeout(timerId.current)
+      if (timerIdRef.current) {
+        clearTimeout(timerIdRef.current)
       }
-      timerId.current = setTimeout(() => {
+      timerIdRef.current = setTimeout(() => {
         func(...args)
       }, delay)
     },

@@ -66,7 +66,6 @@ export function MemoForm({
     // isAutoSave が OFF→ON に切り替わった時点で未保存の変更があれば自動保存を実行する。
     // memo / isChangedMemo は切り替わった瞬間の値を参照したいため、依存配列から意図的に除外している。
     if (memo && isChangedMemo && isAutoSave) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       saveMemoApi()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
