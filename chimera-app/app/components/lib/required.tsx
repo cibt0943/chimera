@@ -1,3 +1,3 @@
 export function Required() {
-  return <span className="text-red-500">*</span>
+  return <span className="text-destructive">*</span>
 }

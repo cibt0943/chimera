@@ -19,7 +19,7 @@ export function TodoDeleteButton({
 
   return (
     <TodoDeleteConfirmDialog viewTodo={viewTodo} redirectUrl={redirectUrl}>
-      <Button type="button" variant="link" className="text-destructive px-0">
+      <Button type="button" variant="destructive">
         <LuTrash2 />
         {t('common.message.delete')}
       </Button>

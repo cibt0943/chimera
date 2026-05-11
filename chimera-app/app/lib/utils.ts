@@ -46,7 +46,7 @@ export function getOS(): OS {
   return OS.UNKNOWN
 }
 
-// ユーザーのOSを判定するカスタムフック
+// ユーザーエージェント情報を取得する関数
 export interface UserAgent {
   OS: OS
   isWindows: boolean
@@ -55,7 +55,6 @@ export interface UserAgent {
   modifierKeyIcon: string
 }
 
-// ユーザーエージェント情報を取得する関数
 export function getUserAgent(): UserAgent {
   const userOS = getOS()
   return {

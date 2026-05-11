@@ -5,7 +5,7 @@ import { LuPlus } from 'react-icons/lu'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
   DragDropProvider,
-  type DragEndEvent as DragEndHandler,
+  type DragEndEvent,
   PointerSensor,
 } from '@dnd-kit/react'
 import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
@@ -168,7 +168,7 @@ export function MemoList({
   }
 
   // ドラッグ&ドロップによるメモの表示順変更
-  const handleDragEnd: DragEndHandler = (event) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     if (event.canceled) return
 
     // @dnd-kit/react v0.3.0 では

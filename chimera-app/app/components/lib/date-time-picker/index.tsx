@@ -78,21 +78,25 @@ export function DateTimePicker({
   const [localDate, setLocalDate] = React.useState<Date | undefined>(
     selectedDate,
   )
+  const [prevSelectedDateISO, setPrevSelectedDateISO] = React.useState(
+    selectedDate?.toISOString(),
+  )
 
-  React.useEffect(() => {
+  // selectedDate が外部から変更されたときに localDate を同期する（useEffect を避ける）
+  const selectedDateISO = selectedDate?.toISOString()
+  if (prevSelectedDateISO !== selectedDateISO) {
+    setPrevSelectedDateISO(selectedDateISO)
     setLocalDate(selectedDate)
-  }, [selectedDate])
+  }
 
-  const { className, ...otherDivProps } = divProps || {}
+  const { className, ...otherDivProps } = divProps
 
   const handleChangeDate = React.useCallback(
     (newDate: Date | undefined) => {
-      if (selectedDate !== newDate) {
-        setLocalDate(newDate)
-        onChangeDate(newDate)
-      }
+      setLocalDate(newDate)
+      onChangeDate(newDate)
     },
-    [selectedDate, onChangeDate],
+    [onChangeDate],
   )
 
   const handleChangeAllDay = React.useCallback(
@@ -191,10 +195,13 @@ function TimeControl({
 }: TimeControlProps) {
   if (!includeAllDayComponent && allDay) return null
 
-  const className = includeAllDayComponent ? 'justify-between' : 'justify-end'
-
   return (
-    <div className={cn('flex items-center justify-between p-3', className)}>
+    <div
+      className={cn(
+        'flex items-center p-3',
+        includeAllDayComponent ? 'justify-between' : 'justify-end',
+      )}
+    >
       {includeAllDayComponent && (
         <ToggleAllDay allDay={allDay} onChangeAllDay={onChangeAllDay} />
       )}
@@ -216,19 +223,20 @@ interface DispValueProps {
 function DispValue({ date, allDay = false, placeholder = '' }: DispValueProps) {
   const { t } = useTranslation()
 
-  const [formattedDate, className] = date
-    ? [
-        format(
-          date,
-          allDay
-            ? t('common.format.date_format')
-            : t('common.format.date_time_short_format'),
-        ),
-        'font-normal',
-      ]
-    : [placeholder, 'font-normal text-muted-foreground']
+  const formattedDate = date
+    ? format(
+        date,
+        allDay
+          ? t('common.format.date_format')
+          : t('common.format.date_time_short_format'),
+      )
+    : placeholder
 
-  return <span className={className}>{formattedDate}</span>
+  return (
+    <span className={cn('font-normal', !date && 'text-muted-foreground')}>
+      {formattedDate}
+    </span>
+  )
 }
 
 interface ToggleAllDayProps {

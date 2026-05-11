@@ -9,16 +9,16 @@ import {
 interface TimePickerProps {
   date: Date | undefined
   setDate: (date: Date | undefined) => void
-  minuteStep?: number
+  step?: number
 }
 
-export function TimePicker({ date, setDate }: TimePickerProps) {
+export function TimePicker({ date, setDate, step = 900 }: TimePickerProps) {
   return (
     <InputGroup>
       <InputGroupInput
         type="time"
-        step="900"
-        defaultValue={date?.toTimeString().substring(0, 5)}
+        step={step}
+        defaultValue={date?.toTimeString().slice(0, 5)}
         onChange={(e) => {
           if (e.target.value) {
             const [hours, minutes] = e.target.value.split(':').map(Number)
@@ -29,7 +29,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
             setDate(undefined)
           }
         }}
-        className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+        className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
       />
       <InputGroupAddon>
         <LuClock9 className="text-muted-foreground" />

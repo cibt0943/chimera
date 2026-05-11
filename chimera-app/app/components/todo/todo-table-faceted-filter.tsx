@@ -1,23 +1,15 @@
 import { useTranslation } from 'react-i18next'
-import { LuCheck, LuCirclePlus } from 'react-icons/lu'
+import { LuFilter, LuX } from 'react-icons/lu'
 import { Column } from '@tanstack/react-table'
-import { cn } from '~/lib/utils'
+import { Checkbox } from '~/components/ui/checkbox'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from '~/components/ui/command'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover'
+import { Field, FieldGroup, FieldLabel } from '~/components/ui/field'
 import { Separator } from '~/components/ui/separator'
 import { TaskStatus } from '~/types/tasks'
 
@@ -43,8 +35,8 @@ export function TodoTableFacetedFilter<TData, TValue>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
-          <LuCirclePlus />
+        <Button variant="outline" className="border-dashed">
+          <LuFilter />
           {title}
           {selectedValues?.size > 0 && (
             <>
@@ -81,65 +73,53 @@ export function TodoTableFacetedFilter<TData, TValue>({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[180px] p-0" align="start">
-        <Command>
-          <CommandInput placeholder={title} />
-          <CommandList>
-            <CommandEmpty>{t('common.message.no_result')}</CommandEmpty>
-            <CommandGroup>
+      {selectedValues.size > 0 && (
+        <Button
+          variant="ghost"
+          onClick={() => column?.setFilterValue(undefined)}
+        >
+          <LuX />
+          {t('common.message.clear')}
+        </Button>
+      )}
+      <PopoverContent className="w-40 p-0" align="start">
+        <div>
+          <div>
+            {options.length === 0 && <div>{t('common.message.no_result')}</div>}
+            <FieldGroup className="gap-3 p-2">
               {options.map((option) => {
                 const isSelected = selectedValues.has(option.value)
                 return (
-                  <CommandItem
-                    key={option.value}
-                    value={option.value.toString()}
-                    onSelect={() => {
-                      if (isSelected) {
-                        selectedValues.delete(option.value)
-                      } else {
-                        selectedValues.add(option.value)
-                      }
-                      const filterValues = Array.from(selectedValues)
-                      column?.setFilterValue(
-                        filterValues.length ? filterValues : undefined,
-                      )
-                    }}
-                  >
-                    <div
-                      className={cn(
-                        'flex size-4 items-center justify-center rounded-[4px] border',
-                        isSelected
-                          ? 'bg-primary border-primary text-primary-foreground'
-                          : 'border-input [&_svg]:invisible',
+                  <Field orientation="horizontal" key={option.value}>
+                    <Checkbox
+                      id={`status-${option.value}`}
+                      checked={isSelected}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          selectedValues.add(option.value)
+                        } else {
+                          selectedValues.delete(option.value)
+                        }
+                        const filterValues = Array.from(selectedValues)
+                        column?.setFilterValue(
+                          filterValues.length ? filterValues : undefined,
+                        )
+                      }}
+                    />
+                    <FieldLabel htmlFor={`status-${option.value}`}>
+                      <span>{t(option.label)}</span>
+                      {facets?.get(option.value) && (
+                        <span className="text-muted-foreground ml-auto flex size-4 items-center justify-center font-mono text-xs">
+                          {facets.get(option.value)}
+                        </span>
                       )}
-                    >
-                      <LuCheck className="text-primary-foreground" />
-                    </div>
-                    <span>{t(option.label)}</span>
-                    {facets?.get(option.value) && (
-                      <span className="text-muted-foreground ml-auto flex size-4 items-center justify-center font-mono text-xs">
-                        {facets.get(option.value)}
-                      </span>
-                    )}
-                  </CommandItem>
+                    </FieldLabel>
+                  </Field>
                 )
               })}
-            </CommandGroup>
-            {selectedValues.size > 0 && (
-              <>
-                <CommandSeparator />
-                <CommandGroup>
-                  <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
-                    className="justify-center text-center"
-                  >
-                    {t('common.message.clear_filters')}
-                  </CommandItem>
-                </CommandGroup>
-              </>
-            )}
-          </CommandList>
-        </Command>
+            </FieldGroup>
+          </div>
+        </div>
       </PopoverContent>
     </Popover>
   )

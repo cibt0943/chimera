@@ -105,6 +105,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
         <style data-fullcalendar />
         <Links />
         <script
+          // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml -- テーマ初期化スクリプトの注入のため意図的に使用
           dangerouslySetInnerHTML={{
             __html: `
             (function() {

@@ -39,19 +39,10 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
   const dateControl = useInputControl(dateMeta)
   const allDayControl = useInputControl(allDayMeta)
 
-  const [internalDate, setInternalDate] = React.useState<Date | undefined>(
-    dateValue,
-  )
-
-  React.useEffect(() => {
-    setInternalDate(dateValue)
-  }, [dateValue])
-
   const handleChangeDate = React.useCallback(
     (date: Date | undefined) => {
-      setInternalDate(date)
       dateControl.change(date?.toISOString() || '')
-      onChangeData && onChangeData(date)
+      onChangeData?.(date)
     },
     [dateControl, onChangeData],
   )
@@ -59,15 +50,15 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
   const handleChangeAllDay = React.useCallback(
     (isAllDay: boolean) => {
       allDayControl.change(isAllDay ? 'on' : '')
-      onChangeAllDay && onChangeAllDay(isAllDay)
+      onChangeAllDay?.(isAllDay)
     },
     [allDayControl, onChangeAllDay],
   )
 
   return (
     <DateTimePicker
-      selectedDate={internalDate}
-      defaultMonth={internalDate}
+      selectedDate={dateValue}
+      defaultMonth={dateValue}
       allDay={allDayValue}
       defaultAllDay={defaultAllDay}
       includeAllDayComponent={includeAllDayComponent}

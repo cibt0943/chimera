@@ -1,7 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { LuCircleX } from 'react-icons/lu'
 import { Table } from '@tanstack/react-table'
-import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { TaskStatusListByDispOrder } from '~/types/tasks'
 import { TodoTableViewOptions } from './todo-table-view-options'
@@ -25,7 +23,7 @@ export function TodoTableToolbar<TData>({
         onChange={(event) =>
           table.getColumn('title')?.setFilterValue(event.target.value)
         }
-        className="h-8 w-64"
+        className="w-64"
         id="tasks-title-search"
       />
       {table.getColumn('status') && (

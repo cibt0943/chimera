@@ -6,11 +6,8 @@ export interface TextareaConformProps extends ComponentProps<typeof Textarea> {
   meta: FieldMetadata<string>
 }
 
-export function TextareaConform({
-  meta,
-  ...textareaProps
-}: TextareaConformProps) {
-  const { key, ...otherProps } = textareaProps
-  // keyは別にしないとワーニングが出た
-  return <Textarea {...getTextareaProps(meta)} key={key} {...otherProps} />
+export function TextareaConform({ meta, key, ...props }: TextareaConformProps) {
+  const { key: _, ...conformProps } = getTextareaProps(meta)
+
+  return <Textarea key={key} {...conformProps} {...props} />
 }

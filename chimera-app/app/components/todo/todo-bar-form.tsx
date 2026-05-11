@@ -6,6 +6,7 @@ import { parseWithZod, getZodConstraint } from '@conform-to/zod/v4'
 import { Button } from '~/components/ui/button'
 import { TODO_URL } from '~/constants'
 import {
+  FormItemGroup,
   FormItem,
   FormLabel,
   FormMessage,
@@ -67,7 +68,7 @@ export function TodoBarForm({ todoBar, redirectUrl }: TodoBarFormProps) {
 
   return (
     <fetcher.Form method="post" {...getFormProps(form)} action={action}>
-      <div className="max-h-[calc(100svh-240px)] space-y-8 overflow-y-auto p-0.5">
+      <FormItemGroup>
         <FormItem>
           <FormLabel htmlFor={fields.title.id}>
             {t('todoBar.model.title')}
@@ -102,7 +103,7 @@ export function TodoBarForm({ todoBar, redirectUrl }: TodoBarFormProps) {
             {t('common.message.save')}
           </Button>
         </FormFooter>
-      </div>
+      </FormItemGroup>
     </fetcher.Form>
   )
 }
