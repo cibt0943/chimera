@@ -1,4 +1,4 @@
-FROM node:24-slim
+FROM node:26-slim
 
 ENV APP_ROOT=/chimera-app
 
@@ -13,5 +13,8 @@ RUN apt-get update && \
 RUN echo "ja_JP.UTF-8 UTF-8" >> /etc/locale.gen && \
     locale-gen ja_JP.UTF-8
 ENV LANG=ja_JP.UTF-8
+
+# Yarn Classic(v1) をインストール
+RUN npm install -g yarn@1
 
 WORKDIR $APP_ROOT
