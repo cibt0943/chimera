@@ -146,13 +146,18 @@ export function MemoForm({
                     handleChangeMemo()
                   }}
                   textareaProps={{
-                    id: fields.content.id,
-                    name: fields.content.name,
                     className: cn(
                       'resize-none bg-[#303841] text-white',
                       className,
                     ),
                   }}
+                />
+                <textarea
+                  className="hidden"
+                  id={fields.content.id}
+                  name={fields.content.name}
+                  value={memoContent}
+                  readOnly
                 />
               </div>
             )}
