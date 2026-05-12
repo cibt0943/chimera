@@ -98,14 +98,12 @@ export function MemoForm({
 
   const { form, fields } = useMemoConform({ memo })
   const [memoContent, setMemoContent] = React.useState(
-    (fields.content.initialValue as string | undefined) ?? '',
+    () => (fields.content.initialValue as string | undefined) ?? '',
   )
   React.useEffect(() => {
     const initialValue = (fields.content.initialValue as string | undefined) ?? ''
-    setMemoContent((currentValue) =>
-      currentValue === initialValue ? currentValue : initialValue,
-    )
-  }, [fields.content.key, fields.content.initialValue])
+    setMemoContent(initialValue)
+  }, [fields.content.initialValue])
 
   const action = memo ? `${MEMO_URL}/${memo.id}` : MEMO_URL
 
@@ -158,7 +156,6 @@ export function MemoForm({
                 <textarea
                   aria-hidden="true"
                   className="hidden"
-                  id={fields.content.id}
                   name={fields.content.name}
                   value={memoContent}
                   readOnly
