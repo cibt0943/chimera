@@ -4,7 +4,6 @@ import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { getFormProps } from '@conform-to/react'
-import MDEditor from '@uiw/react-md-editor'
 import { Button } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
 import { cn } from '~/lib/utils'
@@ -23,6 +22,8 @@ import { Memo } from '~/types/memos'
 import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
 import { useUserAgentAtom } from '~/lib/global-state'
+
+const LazyMDEditor = React.lazy(() => import('@uiw/react-md-editor'))
 
 export interface MemoFormProps {
   memo: Memo | undefined
@@ -107,6 +108,15 @@ export function MemoForm({
 
   const { className, ...otherProps } = textareaProps
 
+  const textareaFallback = (
+    <TextareaConform
+      meta={fields.content}
+      key={fields.content.key}
+      className={cn('resize-none bg-[#303841] text-white', className)}
+      {...otherProps}
+    />
+  )
+
   return (
     <fetcher.Form
       method="post"
@@ -123,41 +133,34 @@ export function MemoForm({
           <FormDescription>
             {t('memo.message.first_line_is_title')}
           </FormDescription>
-          <ClientOnly
-            fallback={
-              <TextareaConform
-                meta={fields.content}
-                key={fields.content.key}
-                className={cn('resize-none bg-[#303841] text-white', className)}
-                {...otherProps}
-              />
-            }
-          >
+          <ClientOnly fallback={textareaFallback}>
             {() => (
               <div data-color-mode="dark">
-                <MDEditor
-                  key={fields.content.key}
-                  value={memoContent}
-                  preview="edit"
-                  visibleDragbar={false}
-                  onChange={(value) => {
-                    setMemoContent(value ?? '')
-                    handleChangeMemo()
-                  }}
-                  textareaProps={{
-                    className: cn(
-                      'resize-none bg-[#303841] text-white',
-                      className,
-                    ),
-                  }}
-                />
-                <textarea
-                  aria-hidden="true"
-                  className="hidden"
-                  name={fields.content.name}
-                  value={memoContent}
-                  readOnly
-                />
+                <React.Suspense fallback={textareaFallback}>
+                  <LazyMDEditor
+                      key={fields.content.key}
+                      value={memoContent}
+                      preview="edit"
+                      visibleDragbar={false}
+                      onChange={(value) => {
+                        setMemoContent(value ?? '')
+                        handleChangeMemo()
+                      }}
+                      textareaProps={{
+                        className: cn(
+                          'resize-none bg-[#303841] text-white',
+                          className,
+                        ),
+                      }}
+                  />
+                  <textarea
+                    aria-hidden="true"
+                    className="hidden"
+                    name={fields.content.name}
+                    value={memoContent}
+                    readOnly
+                  />
+                </React.Suspense>
               </div>
             )}
           </ClientOnly>
