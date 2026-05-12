@@ -4,6 +4,7 @@ import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { getFormProps } from '@conform-to/react'
+import MDEditor from '@uiw/react-md-editor'
 import { Button } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
 import { cn } from '~/lib/utils'
@@ -22,6 +23,8 @@ import { Memo } from '~/types/memos'
 import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
 import { useUserAgentAtom } from '~/lib/global-state'
+import '@uiw/react-md-editor/markdown-editor.css'
+import '@uiw/react-markdown-preview/markdown.css'
 
 export interface MemoFormProps {
   memo: Memo | undefined
@@ -94,6 +97,12 @@ export function MemoForm({
   )
 
   const { form, fields } = useMemoConform({ memo })
+  const [memoContent, setMemoContent] = React.useState(
+    (fields.content.initialValue as string | undefined) ?? '',
+  )
+  React.useEffect(() => {
+    setMemoContent((fields.content.initialValue as string | undefined) ?? '')
+  }, [fields.content.key, fields.content.initialValue])
 
   const action = memo ? `${MEMO_URL}/${memo.id}` : MEMO_URL
 
@@ -115,12 +124,40 @@ export function MemoForm({
           <FormDescription>
             {t('memo.message.first_line_is_title')}
           </FormDescription>
-          <TextareaConform
-            meta={fields.content}
-            key={fields.content.key}
-            className={cn('resize-none bg-[#303841] text-white', className)}
-            {...otherProps}
-          />
+          <ClientOnly
+            fallback={
+              <TextareaConform
+                meta={fields.content}
+                key={fields.content.key}
+                className={cn('resize-none bg-[#303841] text-white', className)}
+                {...otherProps}
+              />
+            }
+          >
+            {() => (
+              <div data-color-mode="dark">
+                <MDEditor
+                  key={fields.content.key}
+                  value={memoContent}
+                  preview="edit"
+                  visibleDragbar={false}
+                  onChange={(value) => {
+                    setMemoContent(value ?? '')
+                    handleChangeMemo()
+                  }}
+                  textareaProps={{
+                    id: fields.content.id,
+                    name: fields.content.name,
+                    value: memoContent,
+                    className: cn(
+                      'resize-none bg-[#303841] text-white',
+                      className,
+                    ),
+                  }}
+                />
+              </div>
+            )}
+          </ClientOnly>
           <FormMessage message={fields.content.errors} />
         </FormItem>
         <FormItem>
