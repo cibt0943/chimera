@@ -23,6 +23,8 @@ import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
 import { useUserAgentAtom } from '~/lib/global-state'
 
+const LazyMDEditor = React.lazy(() => import('@uiw/react-md-editor'))
+
 export interface MemoFormProps {
   memo: Memo | undefined
   isAutoSave: boolean
@@ -94,10 +96,26 @@ export function MemoForm({
   )
 
   const { form, fields } = useMemoConform({ memo })
+  const [memoContent, setMemoContent] = React.useState(
+    () => (fields.content.initialValue as string | undefined) ?? '',
+  )
+  React.useEffect(() => {
+    const initialValue = (fields.content.initialValue as string | undefined) ?? ''
+    setMemoContent(initialValue)
+  }, [fields.content.initialValue])
 
   const action = memo ? `${MEMO_URL}/${memo.id}` : MEMO_URL
 
   const { className, ...otherProps } = textareaProps
+
+  const textareaFallback = (
+    <TextareaConform
+      meta={fields.content}
+      key={fields.content.key}
+      className={cn('resize-none bg-[#303841] text-white', className)}
+      {...otherProps}
+    />
+  )
 
   return (
     <fetcher.Form
@@ -115,12 +133,37 @@ export function MemoForm({
           <FormDescription>
             {t('memo.message.first_line_is_title')}
           </FormDescription>
-          <TextareaConform
-            meta={fields.content}
-            key={fields.content.key}
-            className={cn('resize-none bg-[#303841] text-white', className)}
-            {...otherProps}
-          />
+          <ClientOnly fallback={textareaFallback}>
+            {() => (
+              <div data-color-mode="dark">
+                <React.Suspense fallback={textareaFallback}>
+                  <LazyMDEditor
+                      key={fields.content.key}
+                      value={memoContent}
+                      preview="edit"
+                      visibleDragbar={false}
+                      onChange={(value) => {
+                        setMemoContent(value ?? '')
+                        handleChangeMemo()
+                      }}
+                      textareaProps={{
+                        className: cn(
+                          'resize-none bg-[#303841] text-white',
+                          className,
+                        ),
+                      }}
+                  />
+                  <textarea
+                    aria-hidden="true"
+                    className="hidden"
+                    name={fields.content.name}
+                    value={memoContent}
+                    readOnly
+                  />
+                </React.Suspense>
+              </div>
+            )}
+          </ClientOnly>
           <FormMessage message={fields.content.errors} />
         </FormItem>
         <FormItem>
