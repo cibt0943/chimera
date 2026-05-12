@@ -148,7 +148,6 @@ export function MemoForm({
                   textareaProps={{
                     id: fields.content.id,
                     name: fields.content.name,
-                    value: memoContent,
                     className: cn(
                       'resize-none bg-[#303841] text-white',
                       className,
