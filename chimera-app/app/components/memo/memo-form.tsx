@@ -23,8 +23,6 @@ import { Memo } from '~/types/memos'
 import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
 import { useUserAgentAtom } from '~/lib/global-state'
-import '@uiw/react-md-editor/markdown-editor.css'
-import '@uiw/react-markdown-preview/markdown.css'
 
 export interface MemoFormProps {
   memo: Memo | undefined
