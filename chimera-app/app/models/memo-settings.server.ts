@@ -87,7 +87,6 @@ export function convertToMemoSettings(
     updatedAt: toDate(memoSettingsModel.updated_at),
     accountId: memoSettingsModel.account_id,
     listFilter: memoSettingsModel.list_filter as MemoSettings['listFilter'],
-    listDisplay: memoSettingsModel.list_display as MemoSettings['listDisplay'],
     autoSave: memoSettingsModel.auto_save,
   }
 }

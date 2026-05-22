@@ -3,38 +3,38 @@ import { useFetcher } from 'react-router'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from 'react-hotkeys-hook'
-import { getFormProps } from '@conform-to/react'
+import { getFormProps, useInputControl } from '@conform-to/react'
 import { Button } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
-import { cn } from '~/lib/utils'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
 import {
   FormItemGroup,
   FormItem,
   FormMessage,
-  FormDescription,
   FormFooter,
 } from '~/components/lib/form'
-import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
+import { InputConform } from '~/components/lib/conform/input'
 import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
 import { Memo } from '~/types/memos'
 import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
 import { useUserAgentAtom } from '~/lib/global-state'
+import { LexicalMdEditor } from '~/components/lib/lexical-md-editor'
+import { cn } from '~/lib/utils'
 
 export interface MemoFormProps {
   memo: Memo | undefined
   isAutoSave: boolean
   redirectUrl: string
-  textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>
+  editorClassName?: string
 }
 
 export function MemoForm({
   memo,
   isAutoSave,
   redirectUrl,
-  textareaProps = {},
+  editorClassName,
 }: MemoFormProps) {
   const { t } = useTranslation()
   const userAgent = useUserAgentAtom()
@@ -90,14 +90,14 @@ export function MemoForm({
     {
       preventDefault: true, // テキストエリアにフォーカスがある時にalt+sを押すと変なドイツ語がテキストエリアに入力されるのを防ぐ
       enableOnFormTags: true, // テキストエリアにフォーカスがあっても保存できるようにする
+      enableOnContentEditable: true, // Lexicalエディタにフォーカスがあっても保存できるようにする
     },
   )
 
   const { form, fields } = useMemoConform({ memo })
+  const contentControl = useInputControl(fields.content)
 
   const action = memo ? `${MEMO_URL}/${memo.id}` : MEMO_URL
-
-  const { className, ...otherProps } = textareaProps
 
   return (
     <fetcher.Form
@@ -112,15 +112,32 @@ export function MemoForm({
     >
       <FormItemGroup>
         <FormItem>
-          <FormDescription>
-            {t('memo.message.first_line_is_title')}
-          </FormDescription>
-          <TextareaConform
-            meta={fields.content}
-            key={fields.content.key}
-            className={cn('resize-none bg-[#303841] text-white', className)}
-            {...otherProps}
-          />
+          <ClientOnly fallback={null}>
+            {() => (
+              <div className="flex flex-col gap-2">
+                <InputConform
+                  key={fields.title.key}
+                  meta={fields.title}
+                  type="text"
+                  placeholder={t('memo.message.un_titled')}
+                  className="hover:border-input h-9 border-transparent text-lg! font-bold"
+                />
+                <LexicalMdEditor
+                  key={fields.content.key}
+                  value={fields.content.defaultValue ?? ''}
+                  onChange={(value) => {
+                    contentControl.change(value)
+                    handleChangeMemo()
+                  }}
+                  onBlur={contentControl.blur}
+                  className={cn(
+                    'hover:border-input placeholder:text-muted-foreground focus-within:border-ring focus-within:ring-ring/50 border-transparent transition-colors focus-within:ring-3',
+                    editorClassName,
+                  )}
+                />
+              </div>
+            )}
+          </ClientOnly>
           <FormMessage message={fields.content.errors} />
         </FormItem>
         <FormItem>

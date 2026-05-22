@@ -40,6 +40,7 @@ export type Memos = Memo[]
 
 export const MemoSchema = zod.object({
   status: zod.preprocess((v) => Number(v), zod.enum(MemoStatus)).optional(),
+  title: zod.string().max(255, '255文字以内で入力してください').optional(),
   content: zod
     .string()
     .max(60000, '60000文字以内で入力してください')

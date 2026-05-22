@@ -40,12 +40,11 @@ export async function action({ params, request }: Route.ActionArgs) {
 
   const data = submission.value
 
-  const [title, ...content] = (data.content ?? '').split('\n')
   const updatedMemo = await updateMemo({
     id: memo.id,
     account_id: loginInfo.account.id,
-    title,
-    content: content.join('\n'),
+    title: data.title ?? '',
+    content: data.content ?? '',
     related_date: data.relatedDate?.toISOString() ?? null,
     related_date_all_day: Boolean(data.relatedDateAllDay),
   })

@@ -122,7 +122,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="text-red-600 focus:text-red-600"
+            variant="destructive"
             onClick={(event) => {
               event.stopPropagation() // 親エレメントのアンカータグのクリックイベントをキャンセル
               handleDeleteMemo(memo)

@@ -147,7 +147,7 @@ export function TodoTableRowActions({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="text-red-600 focus:text-red-600"
+          variant="destructive"
           onClick={() => {
             table.options.meta?.deleteTodo(viewTodo)
           }}

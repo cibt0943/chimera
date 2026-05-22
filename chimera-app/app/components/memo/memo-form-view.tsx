@@ -14,20 +14,38 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
   const memoSettings = useMemoSettingsAtom()
   const autoSave = memoSettings?.autoSave || false
 
-  // テキストエリアにフォーカス
-  function setTextAreaFocus() {
-    formRef.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus()
+  // フォームの指定エレメントへフォーカス
+  function setFocusFormElement(selector: string) {
+    formRef.current?.querySelector<HTMLElement>(selector)?.focus()
   }
 
   // キーボード操作
+  const modifierKey = userAgent.modifierKey
+  const HOTKEYS = {
+    MODIFIER_UP: `${modifierKey}+up`,
+    MODIFIER_RIGHT: `${modifierKey}+right`,
+    MODIFIER_DOWN: `${modifierKey}+down`,
+  }
+
   useHotkeys(
-    [`${userAgent.modifierKey}+right`],
-    () => {
-      setTextAreaFocus()
+    Object.values(HOTKEYS),
+    (_, { hotkey }) => {
+      switch (hotkey) {
+        case HOTKEYS.MODIFIER_UP:
+          setFocusFormElement('input[name="title"]')
+          break
+        case HOTKEYS.MODIFIER_RIGHT:
+          setFocusFormElement('input[name="title"]')
+          break
+        case HOTKEYS.MODIFIER_DOWN:
+          setFocusFormElement('[contenteditable="true"]')
+          break
+      }
     },
     {
       preventDefault: true, // テキストエリアにフォーカスがある時にalt+sを押すと変なドイツ語がテキストエリアに入力されるのを防ぐ
       enableOnFormTags: true, // テキストエリアにフォーカスがあっても保存できるようにする
+      enableOnContentEditable: true, // Lexicalエディタにフォーカスがあっても操作できるようにする
     },
   )
 
@@ -37,9 +55,7 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
         memo={memo}
         isAutoSave={autoSave}
         redirectUrl={''}
-        textareaProps={{
-          className: 'h-[calc(100svh_-_216px)]',
-        }}
+        editorClassName="h-[calc(100svh-216px)]"
       />
     </div>
   )

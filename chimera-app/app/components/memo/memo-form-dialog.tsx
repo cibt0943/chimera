@@ -46,7 +46,7 @@ export function MemoFormDialog({
           memo={memo}
           isAutoSave={autoSave}
           redirectUrl={memoFormSubmitRedirectUrl}
-          textareaProps={{ className: 'h-[calc(100svh_-_360px)]' }}
+          editorClassName="h-[calc(100svh_-_360px)]"
         />
       </DialogContent>
     </Dialog>
