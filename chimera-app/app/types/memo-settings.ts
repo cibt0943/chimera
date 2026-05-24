@@ -9,15 +9,11 @@ export type MemoSettings = {
   listFilter: {
     statuses: MemoStatus[]
   }
-  listDisplay: {
-    content: boolean
-  }
   autoSave: boolean
 }
 
 export type UpdateParams = {
   list_filter?: MemoSettings['listFilter']
-  list_display?: MemoSettings['listDisplay']
   auto_save?: boolean
 }
 
@@ -29,15 +25,8 @@ const ListFilterSchema = zod.object({
   ),
 })
 
-const ListDisplaySchema = zod.object({
-  content: zod.boolean({
-    message: '不正な値が選択されています。',
-  }),
-})
-
 export const MemoSettingsSchema = zod.object({
   listFilter: ListFilterSchema.optional(),
-  listDisplay: ListDisplaySchema.optional(),
   autoSave: zod.boolean().optional(),
 })
 

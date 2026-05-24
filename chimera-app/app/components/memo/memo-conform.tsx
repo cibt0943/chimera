@@ -9,10 +9,8 @@ export interface useMemoConformProps {
 export function useMemoConform({ memo }: useMemoConformProps) {
   const formId = memo ? `memo-form-${memo.id}` : 'memo-form-new'
   const defaultValue = {
-    content:
-      memo && memo.title + memo.content !== ''
-        ? memo.title.concat('\n', memo.content)
-        : '',
+    title: memo?.title ?? '',
+    content: memo?.content ?? '',
     relatedDate: memo ? memo.relatedDate : null,
     relatedDateAllDay: memo ? memo.relatedDateAllDay : true,
   }

@@ -23,27 +23,18 @@ export async function loader({ request }: Route.LoaderArgs) {
     statuses: memoSettings.listFilter.statuses,
   })
 
-  return {
-    memos,
-    memoSettings,
-  }
+  return { memos }
 }
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
-  const { memos, memoSettings } = loaderData
+  const { memos } = loaderData
   const isLaptop = useMedia('(min-width: 1024px)', true)
 
   const { memoId } = useParams()
 
   const memo = memos.find((m) => m.id === memoId)
 
-  const memoList = (
-    <MemoList
-      originalMemos={memos}
-      selectedMemo={memo}
-      memoSettings={memoSettings}
-    />
-  )
+  const memoList = <MemoList originalMemos={memos} selectedMemo={memo} />
 
   if (!isLaptop) {
     return (

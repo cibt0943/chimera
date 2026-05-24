@@ -27,7 +27,6 @@ export function MemoSettingsForm() {
       <PopoverContent className="w-[400px] space-y-4">
         <h4 className="font-medium">{t('common.message.settings')}</h4>
         <ShowArchivedSwith />
-        <ShowContentSwith />
         <AutoSaveSwith />
       </PopoverContent>
     </Popover>
@@ -78,51 +77,6 @@ function ShowArchivedSwith() {
               ? [MemoStatus.NOMAL, MemoStatus.ARCHIVED]
               : [MemoStatus.NOMAL]
             updateMemoSettingStatusFilter(statuses)
-          }}
-        />
-      </div>
-    </div>
-  )
-}
-
-function ShowContentSwith() {
-  const { t } = useTranslation()
-  const fetcher = useFetcher()
-  const memoSettings = useMemoSettingsAtom()
-  if (!memoSettings) return null
-
-  // 表示するメモのフィルタ
-  function updateMemoSettingDisplayContent(isShow: boolean) {
-    const url = `${ACCOUNT_URL}/memo/settings`
-
-    fetcher.submit(
-      {
-        listDisplay: {
-          content: isShow,
-        },
-      },
-      {
-        action: url,
-        method: 'post',
-        encType: 'application/json',
-      },
-    )
-  }
-
-  return (
-    <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-xs">
-      <div>
-        <Label htmlFor="show-content">
-          {t('memo_settings.message.list_show_content')}
-        </Label>
-      </div>
-      <div>
-        <Switch
-          id="show-content"
-          name="show-content"
-          defaultChecked={memoSettings.listDisplay.content}
-          onCheckedChange={(isChecked) => {
-            updateMemoSettingDisplayContent(isChecked)
           }}
         />
       </div>
