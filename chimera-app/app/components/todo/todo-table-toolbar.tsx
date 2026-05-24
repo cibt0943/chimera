@@ -15,24 +15,26 @@ export function TodoTableToolbar<TData>({
   const { t } = useTranslation()
 
   return (
-    <div className="flex flex-1 items-center justify-between gap-2">
-      <Input
-        type="search"
-        placeholder={t('task.message.title_search')}
-        value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
-        onChange={(event) =>
-          table.getColumn('title')?.setFilterValue(event.target.value)
-        }
-        className="w-64"
-        id="tasks-title-search"
-      />
-      {table.getColumn('status') && (
-        <TodoTableFacetedFilter
-          column={table.getColumn('status')}
-          title={t('task.message.status_filter')}
-          options={TaskStatusListByDispOrder}
+    <div className="flex flex-1 justify-between">
+      <div className="flex items-center gap-2">
+        <Input
+          type="search"
+          placeholder={t('task.message.title_search')}
+          value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
+          onChange={(event) =>
+            table.getColumn('title')?.setFilterValue(event.target.value)
+          }
+          className="w-48 sm:w-64"
+          id="tasks-title-search"
         />
-      )}
+        {table.getColumn('status') && (
+          <TodoTableFacetedFilter
+            column={table.getColumn('status')}
+            title={t('task.message.status_filter')}
+            options={TaskStatusListByDispOrder}
+          />
+        )}
+      </div>
       <TodoTableViewOptions table={table} />
     </div>
   )

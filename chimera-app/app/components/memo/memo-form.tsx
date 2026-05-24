@@ -45,22 +45,20 @@ export function MemoForm({
   const fetcher = useFetcher()
 
   // メモの保存API呼び出し
-  async function saveMemoApi() {
+  function saveMemoApi() {
     fetcher.submit(formRef.current)
     setIsChangedMemo(false)
   }
 
   // メモの保存APIをdebounce
   const saveMemoDebounce = useDebounce(() => {
-    enqueue(() => saveMemoApi())
+    enqueue(async () => saveMemoApi())
   }, 1000)
 
   // memo が切り替わったときに isChangedMemo をリセットする
-  const [prevMemoId, setPrevMemoId] = React.useState(memo?.id)
-  if (prevMemoId !== memo?.id) {
-    setPrevMemoId(memo?.id)
+  React.useEffect(() => {
     setIsChangedMemo(false)
-  }
+  }, [memo?.id])
 
   React.useEffect(() => {
     // isAutoSave が OFF→ON に切り替わった時点で未保存の変更があれば自動保存を実行する。
@@ -166,7 +164,7 @@ export function MemoForm({
           {memo ? (
             <MemoActionButton memo={memo} redirectUrl={redirectUrl} />
           ) : (
-            <div>&nbsp;</div>
+            <div></div>
           )}
           <SaveButton
             isChangedMemo={isChangedMemo}
@@ -192,13 +190,16 @@ export function SaveButton({
 }: SaveButtonProps) {
   const { t } = useTranslation()
 
-  const caption = isSubmitting
-    ? t('common.message.state_saving')
-    : !isChangedMemo
-      ? t('common.message.state_saved')
-      : isAutoSave
-        ? t('common.message.state_save_wait')
-        : t('common.message.save')
+  let caption: string
+  if (isSubmitting) {
+    caption = t('common.message.state_saving')
+  } else if (!isChangedMemo) {
+    caption = t('common.message.state_saved')
+  } else if (isAutoSave) {
+    caption = t('common.message.state_save_wait')
+  } else {
+    caption = t('common.message.save')
+  }
 
   const isDisabled = isAutoSave || !isChangedMemo
 
