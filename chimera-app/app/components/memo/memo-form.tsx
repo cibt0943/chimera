@@ -16,11 +16,11 @@ import {
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
 import { InputConform } from '~/components/lib/conform/input'
 import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
+import { LexicalMdEditor } from '~/components/lib/lexical-editor/editor'
 import { Memo } from '~/types/memos'
 import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
 import { useUserAgentAtom } from '~/lib/global-state'
-import { LexicalMdEditor } from '~/components/lib/lexical-md-editor'
 import { cn } from '~/lib/utils'
 
 export interface MemoFormProps {

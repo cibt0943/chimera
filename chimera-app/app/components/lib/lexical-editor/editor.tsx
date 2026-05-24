@@ -6,6 +6,7 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
@@ -17,36 +18,9 @@ import { CodeNode, CodeHighlightNode } from '@lexical/code'
 import { LinkNode } from '@lexical/link'
 import type { EditorState } from 'lexical'
 import { cn } from '~/lib/utils'
-
-const EDITOR_THEME = {
-  heading: {
-    h1: 'text-3xl font-bold',
-    h2: 'text-2xl font-bold',
-    h3: 'text-xl font-bold',
-    h4: 'text-lg font-bold',
-    h5: 'text-base font-bold',
-    h6: 'text-sm font-bold',
-  },
-  list: {
-    ul: 'list-disc pl-6',
-    ol: 'list-decimal pl-6',
-    listitem: 'mb-0.5',
-    nested: {
-      listitem: 'list-none',
-    },
-  },
-  quote: 'border-l-4 border-muted-foreground pl-4 italic text-muted-foreground',
-  code: 'block font-mono bg-muted rounded p-2 text-sm my-1',
-  text: {
-    bold: 'font-bold',
-    italic: 'italic',
-    underline: 'underline',
-    strikethrough: 'line-through',
-    underlineStrikethrough: 'underline line-through',
-    code: 'font-mono bg-muted rounded px-1 text-sm',
-  },
-  link: 'text-primary underline',
-}
+// import { ToolbarPlugin } from './toolbar-plugin'
+import { EditorTheme } from './theme'
+// import './editor.css'
 
 interface LexicalMdEditorProps {
   value: string
@@ -73,7 +47,7 @@ export function LexicalMdEditor({
 }: LexicalMdEditorProps) {
   const initialConfig = {
     namespace: 'MemoEditor',
-    theme: EDITOR_THEME,
+    theme: EditorTheme,
     nodes: EDITOR_NODES,
     editorState: () => {
       $convertFromMarkdownString(value, TRANSFORMERS)
@@ -95,6 +69,7 @@ export function LexicalMdEditor({
       <div
         className={cn('relative overflow-auto rounded-md border', className)}
       >
+        {/* <ToolbarPlugin /> */}
         <RichTextPlugin
           contentEditable={
             <ContentEditable
@@ -106,6 +81,7 @@ export function LexicalMdEditor({
         />
         <HistoryPlugin />
         <ListPlugin />
+        <LinkPlugin />
         <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
         <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
       </div>
