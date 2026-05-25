@@ -16,7 +16,7 @@ export function meta() {
 export async function action({ request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
   const formData = await request.formData()
-  const redirectUrl = formData.get('redirectUrl')?.toString() || TODO_URL
+  const redirectUrl = formData.get('redirectUrl')?.toString() ?? TODO_URL
 
   const submission = parseWithZod(formData, { schema: TaskSchema })
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す

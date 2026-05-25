@@ -43,7 +43,7 @@ export function TaskForm({ task, redirectUrl }: TaskFormProps) {
 
   const [form, fields] = useForm<TaskSchemaType>({
     id: formId,
-    defaultValue: task || {
+    defaultValue: task ?? {
       title: '',
       memo: '',
       status: TaskStatus.NEW,

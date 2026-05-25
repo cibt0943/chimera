@@ -94,7 +94,7 @@ export async function action({ params, request }: Route.ActionArgs) {
       throw new Response('Not Found', { status: 404 })
   }
 
-  const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
+  const redirectUrl = formData.get('redirectUrl')?.toString() ?? TODO_URL
   return redirect(redirectUrl)
 }
 

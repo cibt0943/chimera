@@ -10,14 +10,17 @@ function isHexColor(value: string) {
   return /^#[0-9a-fA-F]{6}$/.test(value)
 }
 
-export function CompactColorPickerConform(props: {
+export function CompactColorPickerConform({
+  meta,
+  disabled,
+  allowClear,
+  className,
+}: {
   meta: FieldMetadata<string>
   disabled?: boolean
   allowClear?: boolean
   className?: string
 }) {
-  const { meta, disabled, allowClear, className } = props
-
   const inputProps = getInputProps(meta, { type: 'text', ariaAttributes: true })
   const inputRef = React.useRef<HTMLInputElement>(null)
 

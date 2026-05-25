@@ -37,7 +37,7 @@ export async function getAuth0Token(): Promise<TokenResponse> {
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.message || 'Failed to fetch access token')
+      throw new Error(errorData.message ?? 'Failed to fetch access token')
     }
 
     return await response.json()
@@ -65,7 +65,7 @@ export async function getAuth0User(sub: string) {
     if (!response.ok) {
       const errorData = await response.json()
       console.error('Error response from Auth0:', errorData)
-      throw new Error(errorData.message || 'Failed to retrieve Auth0User')
+      throw new Error(errorData.message ?? 'Failed to retrieve Auth0User')
     }
     console.log('Auth0User retrieved successfully')
 
@@ -98,7 +98,7 @@ export async function updateAuth0User(
     if (!response.ok) {
       const errorData = await response.json()
       console.error('Error response from Auth0:', errorData)
-      throw new Error(errorData.message || 'Failed to update Auth0User')
+      throw new Error(errorData.message ?? 'Failed to update Auth0User')
     }
     console.log('Auth0User updated successfully')
 
@@ -134,7 +134,7 @@ export async function deleteAuth0User(userId: string) {
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.message || 'Failed to delete Auth0User')
+      throw new Error(errorData.message ?? 'Failed to delete Auth0User')
     }
 
     console.log('Auth0User deleted successfully')
@@ -147,15 +147,11 @@ export async function deleteAuth0User(userId: string) {
 // Auth0ユーザーのパスワードを変更
 export async function changePasswordAuth0User(email: string) {
   try {
-    // アクセストークンを取得
-    // const tokenData = await getAuth0Token()
-
     // パスワードリセットリクエストを送信
     const response = await fetch(`${apiDomain}/dbconnections/change_password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Authorization: `Bearer ${tokenData.access_token}`,
       },
       body: JSON.stringify({
         client_id: clientId,
@@ -167,7 +163,7 @@ export async function changePasswordAuth0User(email: string) {
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.message || 'Failed to change password')
+      throw new Error(errorData.message ?? 'Failed to change password')
     }
 
     console.log('Password changed successfully')

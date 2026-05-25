@@ -36,7 +36,7 @@ export function TodoBarForm({ todoBar, redirectUrl }: TodoBarFormProps) {
 
   const [form, fields] = useForm<TodoBarSchemaType>({
     id: formId,
-    defaultValue: todoBar || {
+    defaultValue: todoBar ?? {
       title: '',
       bgColor: '',
       textColor: '',

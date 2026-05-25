@@ -21,7 +21,7 @@ export function SelectConform<T>({
   return (
     <Select
       {...getSelectProps(meta)}
-      defaultValue={(meta.initialValue as string) || ''}
+      defaultValue={(meta.initialValue as string) ?? ''}
       {...selectProps}
     >
       <SelectTrigger id={meta.id}>
