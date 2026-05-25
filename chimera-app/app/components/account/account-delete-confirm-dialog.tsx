@@ -20,9 +20,7 @@ export function AccountDeleteConfirmDialog({
 }: DeleteAccountConfirmDialogProps) {
   const { t } = useTranslation()
 
-  const action = `${ACCOUNT_URL}/delete`
-  const desc =
-    '「' + accountGeneral.name + '」' + t('common.message.confirm_deletion')
+  const desc = `「${accountGeneral.name}」${t('common.message.confirm_deletion')}`
 
   return (
     <ConfirmDialog
@@ -38,7 +36,11 @@ export function AccountDeleteConfirmDialog({
       >
         {t('common.message.delete')}
       </AlertDialogAction>
-      <Form id="delete-account-form" action={action} method="delete" />
+      <Form
+        id="delete-account-form"
+        action={`${ACCOUNT_URL}/delete`}
+        method="delete"
+      />
     </ConfirmDialog>
   )
 }
