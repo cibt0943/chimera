@@ -54,7 +54,7 @@ export async function action({ params, request }: Route.ActionArgs) {
         : data.endDate
 
     values.start_datetime = data.startDate.toISOString()
-    values.end_datetime = endDate?.toISOString() || null
+    values.end_datetime = endDate?.toISOString() ?? null
     values.all_day = !!data.allDay
   }
 

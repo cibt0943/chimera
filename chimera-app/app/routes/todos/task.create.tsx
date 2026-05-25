@@ -16,8 +16,9 @@ export function meta() {
 export async function action({ request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
   const formData = await request.formData()
-  const submission = parseWithZod(formData, { schema: TaskSchema })
+  const redirectUrl = formData.get('redirectUrl')?.toString() || TODO_URL
 
+  const submission = parseWithZod(formData, { schema: TaskSchema })
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
   if (submission.status !== 'success') {
     throw new Response(JSON.stringify(submission.error), {
@@ -26,18 +27,17 @@ export async function action({ request }: Route.ActionArgs) {
     })
   }
 
-  const data = submission.value
+  const { status, title, memo, dueDate, dueDateAllDay } = submission.value
 
   await addTask({
     account_id: loginInfo.account.id,
-    status: data.status,
-    title: data.title,
-    memo: data.memo || '',
-    due_date: data.dueDate?.toISOString() || null,
-    due_date_all_day: !!data.dueDateAllDay,
+    status,
+    title,
+    memo: memo ?? '',
+    due_date: dueDate?.toISOString() ?? null,
+    due_date_all_day: !!dueDateAllDay,
   })
 
-  const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
   return redirect(redirectUrl)
 }
 
