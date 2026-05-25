@@ -23,7 +23,7 @@ export function MemoActionButton({ memo, redirectUrl }: MemoActionButtonProps) {
 
   if (!memo) return null
 
-  const archiveMenu = ArchiveMenu(memo.status)
+  const archiveMenu = getArchiveMenu(memo.status, t)
 
   return (
     <div className="mt-2 space-x-4 sm:mt-0">
@@ -71,9 +71,7 @@ export function MemoActionButton({ memo, redirectUrl }: MemoActionButtonProps) {
   )
 }
 
-function ArchiveMenu(status: MemoStatus) {
-  const { t } = useTranslation()
-
+function getArchiveMenu(status: MemoStatus, t: (key: string) => string) {
   return status === MemoStatus.NOMAL
     ? {
         toStatus: MemoStatus.ARCHIVED,

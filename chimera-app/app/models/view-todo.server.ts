@@ -19,7 +19,7 @@ export async function getViewTodos(
   accountId: string,
   options?: GetViewTodosOptionParams,
 ): Promise<ViewTodos> {
-  const { dueDateStart, dueDateEnd, type } = options || {}
+  const { dueDateStart, dueDateEnd, type } = options ?? {}
   const client = createSupabaseClientForUser(accountId)
 
   let query = client
@@ -57,7 +57,7 @@ export async function getViewTodo(
     .select()
     .eq('todo_id', todoId)
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('error')
 
   return convertToViewTodo(data)
 }

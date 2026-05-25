@@ -29,7 +29,7 @@ export function EventDeleteConfirmDialog({
 
   if (!event) return null
 
-  const desc = '「' + event.title + '」' + t('common.message.confirm_deletion')
+  const desc = `「${event.title}」${t('common.message.confirm_deletion')}`
   const action = `${EVENT_URL}/${event.id}/delete`
 
   return (

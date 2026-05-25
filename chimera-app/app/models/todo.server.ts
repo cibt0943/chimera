@@ -39,7 +39,7 @@ export async function getTodo(
     .select()
     .eq('id', todoId)
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('error')
 
   return convertToTodo(data)
 }
@@ -69,7 +69,7 @@ export async function addTodo(todo: InsertTodoModel): Promise<Todo> {
     })
     .select()
     .single()
-  if (errorNewTodo || !newTodo) throw errorNewTodo || new Error('erorr')
+  if (errorNewTodo || !newTodo) throw errorNewTodo || new Error('error')
 
   return getTodo(todo.account_id, newTodo.id)
 }
@@ -83,7 +83,7 @@ export async function updateTodo(todo: UpdateTodoModel): Promise<Todo> {
     .eq('id', todo.id)
     .select()
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('error')
 
   return getTodo(todo.account_id, data.id)
 }

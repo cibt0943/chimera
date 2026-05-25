@@ -22,7 +22,7 @@ export async function getMemoSettings(
     .select()
     .eq('account_id', accountId)
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('error')
 
   return convertToMemoSettings(data)
 }
@@ -44,7 +44,7 @@ export async function getOrAddMemoSettings(
     .insert({ account_id: accountId })
     .select()
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('error')
 
   return convertToMemoSettings(data)
 }
@@ -63,7 +63,7 @@ export async function updateMemoSettings(
     .eq('id', memoSettings.id)
     .select()
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('error')
 
   return convertToMemoSettings(data)
 }

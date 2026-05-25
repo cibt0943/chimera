@@ -62,7 +62,7 @@ export async function getMemo(
     .select()
     .eq('id', memoId)
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('error')
 
   return convertToMemo(data)
 }
@@ -85,7 +85,7 @@ export async function addMemo(memo: InsertMemoModel): Promise<Memo> {
     .insert({ ...memo, position })
     .select('id')
     .single()
-  if (errorNewMemo || !newMemo) throw errorNewMemo || new Error('erorr')
+  if (errorNewMemo || !newMemo) throw errorNewMemo || new Error('error')
 
   return getMemo(memo.account_id, newMemo.id)
 }
@@ -104,7 +104,7 @@ export async function updateMemo(
     .eq('id', memo.id)
     .select('id')
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('error')
 
   return getMemo(memo.account_id, data.id)
 }

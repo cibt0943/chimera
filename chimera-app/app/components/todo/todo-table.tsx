@@ -190,7 +190,7 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
   // 並び順を変更できるか否か
   function canMoveTodo() {
     // ソート中は並び順を変更できない
-    return sorting.length == 0
+    return sorting.length === 0
   }
 
   // 並び順を変更できないか否か

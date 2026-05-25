@@ -31,11 +31,7 @@ export function MemoDeleteConfirmDialog({
   if (!memo) return null
 
   const action = `${MEMO_URL}/${memo.id}/delete`
-  const desc =
-    '「' +
-    (memo.title || t('memo.message.un_titled')) +
-    '」' +
-    t('common.message.confirm_deletion')
+  const desc = `「${memo.title || t('memo.message.un_titled')}」${t('common.message.confirm_deletion')}`
 
   return (
     <ConfirmDialog

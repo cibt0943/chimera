@@ -37,8 +37,9 @@ export function EventForm({ event, redirectUrl, onSubmit }: EventFormProps) {
   const { t } = useTranslation()
   const fetcher = useFetcher()
 
-  const action = isNew(event) ? EVENT_URL : `${EVENT_URL}/${event.id}`
-  const formId = isNew(event) ? 'event-form-new' : `event-form-${event.id}`
+  const isNewEvent = isNew(event)
+  const action = isNewEvent ? EVENT_URL : `${EVENT_URL}/${event.id}`
+  const formId = isNewEvent ? 'event-form-new' : `event-form-${event.id}`
   const defaultValue = event
 
   const [form, fields] = useForm<EventSchemaType>({
@@ -105,7 +106,7 @@ export function EventForm({ event, redirectUrl, onSubmit }: EventFormProps) {
             <div className="basis-1/2">
               <DateTimePickerField
                 label={t('event.model.start')}
-                qequired={true}
+                required={true}
                 fieldMeta={fields.startDate}
                 selectedDate={startDate}
                 defaultMonth={startDate}
@@ -118,7 +119,7 @@ export function EventForm({ event, redirectUrl, onSubmit }: EventFormProps) {
             <div className="basis-1/2">
               <DateTimePickerField
                 label={t('event.model.end')}
-                qequired={false}
+                required={false}
                 fieldMeta={fields.endDate}
                 selectedDate={endDate}
                 defaultMonth={endDate || startDate || new Date()}
@@ -179,7 +180,7 @@ export function EventForm({ event, redirectUrl, onSubmit }: EventFormProps) {
 
 interface DateTimePickerFieldProps {
   label: string
-  qequired: boolean
+  required: boolean
   fieldMeta: FieldMetadata<Date | undefined>
   selectedDate: Date | undefined
   defaultMonth: Date | undefined
@@ -190,7 +191,7 @@ interface DateTimePickerFieldProps {
 
 function DateTimePickerField({
   label,
-  qequired,
+  required,
   fieldMeta,
   selectedDate,
   defaultMonth,
@@ -202,7 +203,7 @@ function DateTimePickerField({
     <FormItem>
       <FormLabel htmlFor={fieldMeta.id}>
         {label}
-        {qequired && <Required />}
+        {required && <Required />}
       </FormLabel>
       <DateTimePicker
         triggerId={fieldMeta.id}

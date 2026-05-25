@@ -32,7 +32,7 @@ export async function getTodoBar(
     .select(TODOBAR_WITH_TODO_SELECT)
     .eq('id', todoBarId)
     .single()
-  if (todoBarError || !todoBarData) throw todoBarError || new Error('erorr')
+  if (todoBarError || !todoBarData) throw todoBarError || new Error('error')
 
   const { todos: todoModel, ...todoBarModel } =
     todoBarData as TodoBarJoinTodoModel
@@ -52,7 +52,7 @@ export async function getTodoBarFromTodoId(
     .select('id')
     .eq('todo_id', todoId)
     .single()
-  if (todoBarError || !todoBarData) throw todoBarError || new Error('erorr')
+  if (todoBarError || !todoBarData) throw todoBarError || new Error('error')
 
   return getTodoBar(accountId, todoBarData.id)
 }
@@ -73,7 +73,7 @@ export async function addTodoBar(todoBar: AddTodoBarModel): Promise<TodoBar> {
     .select('id')
     .single()
   if (errorNewTodoBar || !newTodoBar)
-    throw errorNewTodoBar || new Error('erorr')
+    throw errorNewTodoBar || new Error('error')
 
   return getTodoBar(todoBar.account_id, newTodoBar.id)
 }
@@ -92,7 +92,7 @@ export async function updateTodoBar(
     .eq('id', todoBar.id)
     .select('id')
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('error')
 
   return getTodoBar(todoBar.account_id, data.id)
 }
