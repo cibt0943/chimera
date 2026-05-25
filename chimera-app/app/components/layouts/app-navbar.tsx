@@ -28,7 +28,9 @@ export function AppNavbar() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbPage>{Title()}</BreadcrumbPage>
+            <BreadcrumbPage>
+              <Title />
+            </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

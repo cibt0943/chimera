@@ -343,7 +343,6 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
     tBodyRef.current
       ?.querySelector<HTMLElement>(`#row-${viewTodo.todoId}`)
       ?.focus()
-    // tBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
   }
 
   // テーブルにフォーカスを設定
@@ -451,16 +450,17 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
             </TableHeader>
             <TableBody ref={tBodyRef}>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row, index) => (
-                  <DraggableRow
-                    key={row.id}
-                    row={row}
-                    index={index}
-                    // disabled={cannotMoveTodo()}
-                    disabled={false}
-                    isSelected={row.getIsSelected()}
-                  />
-                ))
+                table
+                  .getRowModel()
+                  .rows.map((row, index) => (
+                    <DraggableRow
+                      key={row.id}
+                      row={row}
+                      index={index}
+                      disabled={false}
+                      isSelected={row.getIsSelected()}
+                    />
+                  ))
               ) : (
                 <TableRow>
                   <TableCell

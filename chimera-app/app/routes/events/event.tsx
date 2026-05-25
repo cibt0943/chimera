@@ -44,7 +44,7 @@ export async function action({ params, request }: Route.ActionArgs) {
     location: data.location ?? '',
   })
 
-  const redirectUrl = formData.get('redirectUrl')?.toString() || EVENT_URL
+  const redirectUrl = formData.get('redirectUrl')?.toString() ?? EVENT_URL
   return redirect(redirectUrl)
 }
 
