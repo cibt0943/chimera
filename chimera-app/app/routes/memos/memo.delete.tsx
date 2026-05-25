@@ -20,9 +20,9 @@ export async function action({ params, request }: Route.ActionArgs) {
     params.memoId,
   )
 
-  await deleteMemo(loginInfo.account.id, memo.id)
-
   const formData = await request.formData()
-  const redirectUrl = formData.get('redirectUrl')?.toString() || MEMO_URL
+  const redirectUrl = formData.get('redirectUrl')?.toString() ?? MEMO_URL
+
+  await deleteMemo(loginInfo.account.id, memo.id)
   return redirectWithInfo(redirectUrl, 'memo.message.deleted')
 }

@@ -11,7 +11,7 @@ export function useMemoConform({ memo }: useMemoConformProps) {
   const defaultValue = {
     title: memo?.title ?? '',
     content: memo?.content ?? '',
-    relatedDate: memo ? memo.relatedDate : null,
+    relatedDate: memo?.relatedDate ?? null,
     relatedDateAllDay: memo ? memo.relatedDateAllDay : true,
   }
 

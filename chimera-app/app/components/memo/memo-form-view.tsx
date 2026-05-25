@@ -12,7 +12,7 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
   const userAgent = useUserAgentAtom()
   const formRef = React.useRef<HTMLDivElement>(null)
   const memoSettings = useMemoSettingsAtom()
-  const autoSave = memoSettings?.autoSave || false
+  const autoSave = memoSettings?.autoSave ?? false
 
   // フォームの指定エレメントへフォーカス
   function setFocusFormElement(selector: string) {

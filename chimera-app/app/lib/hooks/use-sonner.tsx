@@ -19,7 +19,7 @@ export function useSonner(toastMsg: ToastMessage | undefined) {
           toast.success(t(toastMsg.message), options)
           break
         case 'error':
-          toast.error(t(toastMsg.message, options))
+          toast.error(t(toastMsg.message), options)
           break
         case 'info':
           toast.info(t(toastMsg.message), options)
