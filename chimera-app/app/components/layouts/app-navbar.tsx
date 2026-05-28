@@ -23,8 +23,8 @@ function Title() {
 export function AppNavbar() {
   return (
     <header className="bg-background sticky top-0 z-10 flex h-12 items-center gap-2 px-4 md:hidden">
-      <SidebarTrigger className="-ml-1" />
-      <Separator orientation="vertical" className="mr-2 h-4!" />
+      <SidebarTrigger />
+      <Separator orientation="vertical" className="h-0!" />
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
