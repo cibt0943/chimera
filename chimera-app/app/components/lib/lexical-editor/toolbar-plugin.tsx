@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { $setBlocksType, $patchStyleText } from '@lexical/selection'
 import {
   $getSelection,
   $isRangeSelection,
+  $createParagraphNode,
   CAN_UNDO_COMMAND,
   CAN_REDO_COMMAND,
   UNDO_COMMAND,
@@ -21,15 +22,11 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
-  Type,
   Bold,
   Italic,
   Underline,
   Code,
-  Link,
   ChevronDown,
-  Plus,
-  Palette,
 } from 'lucide-react'
 
 const COMMAND_PRIORITY_CRITICAL = 4
@@ -100,7 +97,7 @@ export function ToolbarPlugin() {
   // --- アクション関数群 ---
 
   // ブロックタイプ (H1/標準テキストなど) の変更
-  const formatBlock = (type) => {
+  const formatBlock = (type: string) => {
     if (blockType !== type) {
       editor.update(() => {
         const selection = $getSelection()
@@ -120,7 +117,7 @@ export function ToolbarPlugin() {
   }
 
   // フォントファミリーの変更
-  const formatFontFamily = (family) => {
+  const formatFontFamily = (family: string) => {
     setFontFamily(family)
     setShowFontDropdown(false)
     editor.update(() => {
@@ -132,7 +129,7 @@ export function ToolbarPlugin() {
   }
 
   // フォントサイズの変更
-  const updateFontSize = (newSize) => {
+  const updateFontSize = (newSize: number) => {
     const validSize = Math.max(8, newSize)
     setFontSize(validSize)
     editor.update(() => {

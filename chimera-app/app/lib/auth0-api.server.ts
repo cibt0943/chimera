@@ -1,10 +1,27 @@
 import { Auth0User } from '~/types/accounts'
 
-const apiDomain = `https://${process.env.AUTH0_DOMAIN}`
+const AUTH0_DOMAIN = process.env.AUTH0_DOMAIN
+const AUTH0_CLIENT_ID = process.env.AUTH0_CLIENT_ID
+const AUTH0_CLIENT_SECRET = process.env.AUTH0_CLIENT_SECRET
+const AUTH0_MANAGEMENT_API_IDENTIFIER =
+  process.env.AUTH0_MANAGEMENT_API_IDENTIFIER
+
+if (
+  !AUTH0_DOMAIN ||
+  !AUTH0_CLIENT_ID ||
+  !AUTH0_CLIENT_SECRET ||
+  !AUTH0_MANAGEMENT_API_IDENTIFIER
+) {
+  throw new Error(
+    'Missing required Auth0 environment variables: AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_MANAGEMENT_API_IDENTIFIER',
+  )
+}
+
+const apiDomain = `https://${AUTH0_DOMAIN}`
 const apiBaseUrl = `${apiDomain}/api/v2`
-const clientId = process.env.AUTH0_CLIENT_ID
-const clientSecret = process.env.AUTH0_CLIENT_SECRET
-const audience = process.env.AUTH0_MANAGEMENT_API_IDENTIFIER
+const clientId = AUTH0_CLIENT_ID
+const clientSecret = AUTH0_CLIENT_SECRET
+const audience = AUTH0_MANAGEMENT_API_IDENTIFIER
 
 interface TokenResponse {
   access_token: string

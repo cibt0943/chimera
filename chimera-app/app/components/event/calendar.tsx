@@ -264,9 +264,9 @@ function createEventDropRequest(
   return {
     data: {
       id: srcObj.id,
-      startDate: startDate,
+      startDate: startDate.toISOString(),
       allDay: srcObj.allDay ? 'on' : '',
-      ...(endDate && { endDate }),
+      ...(endDate && { endDate: endDate.toISOString() }),
     },
     action: `${API_URL}${EVENT_URL}/${srcObj.id}`,
   }
@@ -278,7 +278,7 @@ function createTaskDropRequest(startDate: Date, srcObj: Task) {
   return {
     data: {
       id: srcObj.id,
-      dueDate: startDate,
+      dueDate: startDate.toISOString(),
       dueDateAllDay: srcObj.dueDateAllDay ? 'on' : '',
     },
     action: `${API_URL}${TODO_URL}/${srcObj.todoId}`,
@@ -291,7 +291,7 @@ function createMemoDropRequest(startDate: Date, srcObj: Memo) {
   return {
     data: {
       id: srcObj.id,
-      relatedDate: startDate,
+      relatedDate: startDate.toISOString(),
       relatedDateAllDay: srcObj.relatedDateAllDay ? 'on' : '',
     },
     action: `${API_URL}${MEMO_URL}/${srcObj.id}`,

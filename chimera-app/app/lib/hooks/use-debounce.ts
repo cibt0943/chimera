@@ -1,17 +1,14 @@
 import * as React from 'react'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ReturnVoidFunctionType = (...args: any[]) => void
-
 // 関数を指定した時間が経過するまでは、同じ関数の実行を抑制するフック
-export function useDebounce(
-  func: ReturnVoidFunctionType,
+export function useDebounce<T extends unknown[]>(
+  func: (...args: T) => void,
   delay: number,
-): (...args: Parameters<ReturnVoidFunctionType>) => void {
+): (...args: T) => void {
   const timerIdRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
   return React.useCallback(
-    (...args: Parameters<ReturnVoidFunctionType>) => {
+    (...args: T) => {
       if (timerIdRef.current) {
         clearTimeout(timerIdRef.current)
       }

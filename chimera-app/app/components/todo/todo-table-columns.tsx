@@ -87,7 +87,7 @@ export const TodoTableColumns: ColumnDef<ViewTodo>[] = [
       return ColumnHeader({ column, title: 'task.model.status' })
     },
     cell: StatusCell,
-    filterFn: (row, id, value) => {
+    filterFn: (row, _id, value) => {
       if (row.original.type === TodoType.BAR) return true
       return value.includes(row.original.status) //id="status"
     },

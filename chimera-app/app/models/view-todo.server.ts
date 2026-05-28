@@ -57,7 +57,7 @@ export async function getViewTodo(
     .select()
     .eq('todo_id', todoId)
     .single()
-  if (error || !data) throw error || new Error('error')
+  if (error || !data) throw error || new Error('ViewTodo not found')
 
   return convertToViewTodo(data)
 }

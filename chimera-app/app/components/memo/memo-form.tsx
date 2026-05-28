@@ -78,7 +78,7 @@ export function MemoForm({
   // キーボード操作
   useHotkeys(
     [`${userAgent.modifierKey}+s`],
-    (event, handler) => {
+    (_event, handler) => {
       switch (handler.keys?.join('')) {
         case 's':
           saveMemoApi()

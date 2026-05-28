@@ -198,7 +198,7 @@ export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
       moveMemoApiDebounce(fromMemo, toMemo)
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error'
-      alert(msg)
+      toast.error(msg)
       navigate('.', { replace: true })
     }
   }
@@ -216,17 +216,17 @@ export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
       if (!response.ok) throw new Error('Failed to update position api')
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message)
+        toast.error(error.message)
         navigate('.', { replace: true })
       }
     }
   }
 
   // メモの表示順変更APIをdebounce
-  const moveMemoApiDebounce = useDebounce((fromMemo, toMemo) => {
+  const moveMemoApiDebounce = useDebounce((fromMemo: Memo, toMemo: Memo) => {
     moveMemoEnqueue(() =>
       moveMemoApi(fromMemo, toMemo).catch((error) => {
-        alert(error.message)
+        toast.error(error.message)
         navigate('.', { replace: true })
       }),
     )

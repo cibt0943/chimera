@@ -263,16 +263,19 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
       if (!response.ok) throw new Error('Failed to update position api')
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message)
+        toast.error(error.message)
         navigate('.', { replace: true })
       }
     }
   }
 
   // タスクの表示順変更APIをdebounce
-  const moveTodoApiDebounce = useDebounce((fromViewTodo, toViewTodo) => {
-    enqueue(() => moveTodoApi(fromViewTodo, toViewTodo))
-  }, 300)
+  const moveTodoApiDebounce = useDebounce(
+    (fromViewTodo: ViewTodo, toViewTodo: ViewTodo) => {
+      enqueue(() => moveTodoApi(fromViewTodo, toViewTodo))
+    },
+    300,
+  )
 
   // タスクの表示順を1ステップ変更
   function moveTodoOneStep(targetViewTodo: ViewTodo, isUp: boolean) {

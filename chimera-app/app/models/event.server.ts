@@ -56,7 +56,7 @@ export async function getEvent(
     .select()
     .eq('id', eventId)
     .single()
-  if (error || !data) throw error || new Error('error')
+  if (error || !data) throw error || new Error('Event not found')
 
   return convertToEvent(data)
 }
@@ -69,7 +69,8 @@ export async function addEvent(event: InsertEventModel): Promise<Event> {
     .insert(event)
     .select()
     .single()
-  if (errorNewEvent || !newEvent) throw errorNewEvent || new Error('error')
+  if (errorNewEvent || !newEvent)
+    throw errorNewEvent || new Error('Failed to insert event')
 
   return convertToEvent(newEvent)
 }
@@ -88,7 +89,7 @@ export async function updateEvent(
     .eq('id', event.id)
     .select()
     .single()
-  if (error || !data) throw error || new Error('error')
+  if (error || !data) throw error || new Error('Failed to update event')
 
   return convertToEvent(data)
 }

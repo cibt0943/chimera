@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useForm, getFormProps } from '@conform-to/react'
