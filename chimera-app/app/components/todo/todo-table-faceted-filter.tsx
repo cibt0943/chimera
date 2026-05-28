@@ -76,6 +76,7 @@ export function TodoTableFacetedFilter<TData, TValue>({
       {selectedValues.size > 0 && (
         <Button
           variant="ghost"
+          className="hidden sm:flex"
           onClick={() => column?.setFilterValue(undefined)}
         >
           <LuX />

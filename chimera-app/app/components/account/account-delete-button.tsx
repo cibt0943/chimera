@@ -7,7 +7,7 @@ interface AccountGeneralTabProps {
   accountGeneral: AccountGeneral
 }
 
-export function AccounyDeleteButton({
+export function AccountDeleteButton({
   accountGeneral,
 }: AccountGeneralTabProps) {
   const { t } = useTranslation()

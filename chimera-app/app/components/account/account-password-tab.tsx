@@ -16,8 +16,6 @@ export function AccountPasswordTab({
   accountPassword,
 }: AccountPasswordTabProps) {
   const { t } = useTranslation()
-  const action = `${ACCOUNT_URL}/password`
-
   return (
     <div className="space-y-6">
       <Separator />
@@ -49,7 +47,7 @@ export function AccountPasswordTab({
           </p>
         </CardContent>
       </Card>
-      <Form action={action} method="post">
+      <Form action={`${ACCOUNT_URL}/password`} method="post">
         <FormItem orientation="horizontal" className="flex sm:justify-end">
           <Button type="submit">{t('account.message.change_password')}</Button>
         </FormItem>

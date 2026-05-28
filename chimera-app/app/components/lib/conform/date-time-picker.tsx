@@ -41,7 +41,7 @@ export function DateTimePickerConform(props: DateTimePickerConformProps) {
 
   const handleChangeDate = React.useCallback(
     (date: Date | undefined) => {
-      dateControl.change(date?.toISOString() || '')
+      dateControl.change(date?.toISOString() ?? '')
       onChangeData?.(date)
     },
     [dateControl, onChangeData],

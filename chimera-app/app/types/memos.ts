@@ -16,7 +16,7 @@ export const MemoStatusList = [
   },
   {
     value: MemoStatus.ARCHIVED,
-    label: 'task.model.status_list.archive',
+    label: 'memo.model.status_list.archive',
     dispOrder: 2,
     color: 'bg-violet-600',
   },

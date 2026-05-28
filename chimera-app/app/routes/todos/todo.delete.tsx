@@ -24,7 +24,7 @@ export async function action({ params, request }: Route.ActionArgs) {
   )
 
   const formData = await request.formData()
-  const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
+  const redirectUrl = formData.get('redirectUrl')?.toString() ?? TODO_URL
 
   switch (todo.type) {
     case TodoType.TASK:

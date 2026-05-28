@@ -190,7 +190,7 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
   // 並び順を変更できるか否か
   function canMoveTodo() {
     // ソート中は並び順を変更できない
-    return sorting.length == 0
+    return sorting.length === 0
   }
 
   // 並び順を変更できないか否か
@@ -263,16 +263,19 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
       if (!response.ok) throw new Error('Failed to update position api')
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message)
+        toast.error(error.message)
         navigate('.', { replace: true })
       }
     }
   }
 
   // タスクの表示順変更APIをdebounce
-  const moveTodoApiDebounce = useDebounce((fromViewTodo, toViewTodo) => {
-    enqueue(() => moveTodoApi(fromViewTodo, toViewTodo))
-  }, 300)
+  const moveTodoApiDebounce = useDebounce(
+    (fromViewTodo: ViewTodo, toViewTodo: ViewTodo) => {
+      enqueue(() => moveTodoApi(fromViewTodo, toViewTodo))
+    },
+    300,
+  )
 
   // タスクの表示順を1ステップ変更
   function moveTodoOneStep(targetViewTodo: ViewTodo, isUp: boolean) {
@@ -343,7 +346,6 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
     tBodyRef.current
       ?.querySelector<HTMLElement>(`#row-${viewTodo.todoId}`)
       ?.focus()
-    // tBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
   }
 
   // テーブルにフォーカスを設定
@@ -451,16 +453,17 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
             </TableHeader>
             <TableBody ref={tBodyRef}>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row, index) => (
-                  <DraggableRow
-                    key={row.id}
-                    row={row}
-                    index={index}
-                    // disabled={cannotMoveTodo()}
-                    disabled={false}
-                    isSelected={row.getIsSelected()}
-                  />
-                ))
+                table
+                  .getRowModel()
+                  .rows.map((row, index) => (
+                    <DraggableRow
+                      key={row.id}
+                      row={row}
+                      index={index}
+                      disabled={false}
+                      isSelected={row.getIsSelected()}
+                    />
+                  ))
               ) : (
                 <TableRow>
                   <TableCell

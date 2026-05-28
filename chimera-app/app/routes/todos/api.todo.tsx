@@ -55,7 +55,7 @@ export async function action({ params, request }: Route.ActionArgs) {
       }
 
       if (data.dueDate !== undefined) {
-        values.due_date = data.dueDate?.toISOString() || null
+        values.due_date = data.dueDate?.toISOString() ?? null
         values.due_date_all_day = !!data.dueDateAllDay
       }
 

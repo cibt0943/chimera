@@ -70,7 +70,7 @@ export async function getTask(
     .select(TASK_WITH_TODO_SELECT)
     .eq('id', taskId)
     .single()
-  if (taskError || !taskData) throw taskError || new Error('erorr')
+  if (taskError || !taskData) throw taskError || new Error('Task not found')
 
   const { todos: todoModel, ...taskModel } = taskData as TaskJoinTodoModel
   if (!todoModel) throw new Error('todo not found')
@@ -89,7 +89,8 @@ export async function getTaskFromTodoId(
     .select('id')
     .eq('todo_id', todoId)
     .single()
-  if (taskError || !taskData) throw taskError || new Error('erorr')
+  if (taskError || !taskData)
+    throw taskError || new Error('Task not found by todo id')
 
   return getTask(accountId, taskData.id)
 }
@@ -109,7 +110,8 @@ export async function addTask(task: AddTaskModel): Promise<Task> {
     .insert({ ...task, todo_id: newTodo.id })
     .select('id')
     .single()
-  if (errorNewTask || !newTask) throw errorNewTask || new Error('erorr')
+  if (errorNewTask || !newTask)
+    throw errorNewTask || new Error('Failed to insert task')
 
   return getTask(task.account_id, newTask.id)
 }
@@ -128,7 +130,7 @@ export async function updateTask(
     .eq('id', task.id)
     .select('id')
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('Failed to update task')
 
   return getTask(task.account_id, task.id)
 }

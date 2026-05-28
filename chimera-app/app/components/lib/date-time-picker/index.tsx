@@ -142,8 +142,8 @@ export function DateTimePicker({
               if (date) {
                 // 日付が変更されても時分は維持（デフォルトは9:00）
                 date.setHours(
-                  selectedDate?.getHours() || 9,
-                  selectedDate?.getMinutes() || 0,
+                  selectedDate?.getHours() ?? 9,
+                  selectedDate?.getMinutes() ?? 0,
                 )
               }
               handleChangeDate(date)

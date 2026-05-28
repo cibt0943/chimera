@@ -25,7 +25,7 @@ export function MemoFormDialog({
 }: MemoFormDialogProps) {
   const { t } = useTranslation()
   const memoSettings = useMemoSettingsAtom()
-  const autoSave = memoSettings?.autoSave || false
+  const autoSave = memoSettings?.autoSave ?? false
 
   //autosaveの場合はsubmitしても画面遷移しないので、redirectUrlは空文字
   const memoFormSubmitRedirectUrl = autoSave ? '' : redirectUrl

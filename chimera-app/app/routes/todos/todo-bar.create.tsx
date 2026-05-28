@@ -16,8 +16,9 @@ export function meta() {
 export async function action({ request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
   const formData = await request.formData()
-  const submission = parseWithZod(formData, { schema: TodoBarSchema })
+  const redirectUrl = formData.get('redirectUrl')?.toString() ?? TODO_URL
 
+  const submission = parseWithZod(formData, { schema: TodoBarSchema })
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
   if (submission.status !== 'success') {
     throw new Response(JSON.stringify(submission.error), {
@@ -26,16 +27,15 @@ export async function action({ request }: Route.ActionArgs) {
     })
   }
 
-  const data = submission.value
+  const { title, bgColor, textColor } = submission.value
 
   await addTodoBar({
     account_id: loginInfo.account.id,
-    title: data.title,
-    bg_color: data.bgColor || '',
-    text_color: data.textColor || '',
+    title,
+    bg_color: bgColor ?? '',
+    text_color: textColor ?? '',
   })
 
-  const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
   return redirect(redirectUrl)
 }
 

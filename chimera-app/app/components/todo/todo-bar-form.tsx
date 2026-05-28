@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useForm, getFormProps } from '@conform-to/react'
@@ -36,7 +35,7 @@ export function TodoBarForm({ todoBar, redirectUrl }: TodoBarFormProps) {
 
   const [form, fields] = useForm<TodoBarSchemaType>({
     id: formId,
-    defaultValue: todoBar || {
+    defaultValue: todoBar ?? {
       title: '',
       bgColor: '',
       textColor: '',

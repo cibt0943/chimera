@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { LuClock9 } from 'react-icons/lu'
 import {
   InputGroup,

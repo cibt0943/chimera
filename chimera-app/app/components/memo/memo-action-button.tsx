@@ -23,15 +23,15 @@ export function MemoActionButton({ memo, redirectUrl }: MemoActionButtonProps) {
 
   if (!memo) return null
 
-  const archiveMenu = ArchiveMenu(memo.status)
+  const archiveMenu = getArchiveMenu(memo.status, t)
 
   return (
     <div className="mt-2 space-x-4 sm:mt-0">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant="outline"
             size="icon"
+            variant="outline"
             onClick={(event) => {
               event.preventDefault()
               fetcher
@@ -60,7 +60,7 @@ export function MemoActionButton({ memo, redirectUrl }: MemoActionButtonProps) {
       <Tooltip>
         <MemoDeleteConfirmDialog memo={memo} redirectUrl={redirectUrl}>
           <TooltipTrigger asChild>
-            <Button variant="outline" size="icon">
+            <Button variant="destructive" size="icon">
               <LuTrash2 />
             </Button>
           </TooltipTrigger>
@@ -71,9 +71,7 @@ export function MemoActionButton({ memo, redirectUrl }: MemoActionButtonProps) {
   )
 }
 
-function ArchiveMenu(status: MemoStatus) {
-  const { t } = useTranslation()
-
+function getArchiveMenu(status: MemoStatus, t: (key: string) => string) {
   return status === MemoStatus.NOMAL
     ? {
         toStatus: MemoStatus.ARCHIVED,

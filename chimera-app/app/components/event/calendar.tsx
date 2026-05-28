@@ -179,13 +179,13 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   }
 
   const viewMode = isLaptop
-    ? searchParams.get('view') || 'dayGridMonth'
+    ? (searchParams.get('view') ?? 'dayGridMonth')
     : 'listMonth'
   const headerToolbarRight = isLaptop
     ? 'dayGridMonth dayGridWeek listMonth'
     : ''
   const defaultStartDate = format(startOfMonth(new Date()), 'yyyy-MM-dd')
-  const startDate = searchParams.get('start') || defaultStartDate
+  const startDate = searchParams.get('start') ?? defaultStartDate
 
   React.useEffect(() => {
     // 以下のワーニングを回避するために非同期でviewModeを変更
@@ -253,7 +253,6 @@ function createEventDropRequest(
   endDate: Date | null,
   srcObj: Event,
 ) {
-  const request = { data: {}, action: '' }
   copyTime(srcObj.startDate, startDate)
 
   // fullcalendarは終日の場合、終了日の値が1日後の日付になるので1日前に変更
@@ -262,40 +261,41 @@ function createEventDropRequest(
     copyTime(srcObj.endDate, endDate)
   }
 
-  request.data = {
-    id: srcObj.id,
-    startDate: startDate,
-    allDay: srcObj.allDay ? 'on' : '',
-    ...(endDate && { endDate }),
+  return {
+    data: {
+      id: srcObj.id,
+      startDate: startDate.toISOString(),
+      allDay: srcObj.allDay ? 'on' : '',
+      ...(endDate && { endDate: endDate.toISOString() }),
+    },
+    action: `${API_URL}${EVENT_URL}/${srcObj.id}`,
   }
-  request.action = `${API_URL}${EVENT_URL}/${srcObj.id}`
-  return request
 }
 
 function createTaskDropRequest(startDate: Date, srcObj: Task) {
-  const request = { data: {}, action: '' }
   copyTime(srcObj.dueDate, startDate)
 
-  request.data = {
-    id: srcObj.id,
-    dueDate: startDate,
-    dueDateAllDay: srcObj.dueDateAllDay ? 'on' : '',
+  return {
+    data: {
+      id: srcObj.id,
+      dueDate: startDate.toISOString(),
+      dueDateAllDay: srcObj.dueDateAllDay ? 'on' : '',
+    },
+    action: `${API_URL}${TODO_URL}/${srcObj.todoId}`,
   }
-  request.action = `${API_URL}${TODO_URL}/${srcObj.todoId}`
-  return request
 }
 
 function createMemoDropRequest(startDate: Date, srcObj: Memo) {
-  const request = { data: {}, action: '' }
   copyTime(srcObj.relatedDate, startDate)
 
-  request.data = {
-    id: srcObj.id,
-    relatedDate: startDate,
-    relatedDateAllDay: srcObj.relatedDateAllDay ? 'on' : '',
+  return {
+    data: {
+      id: srcObj.id,
+      relatedDate: startDate.toISOString(),
+      relatedDateAllDay: srcObj.relatedDateAllDay ? 'on' : '',
+    },
+    action: `${API_URL}${MEMO_URL}/${srcObj.id}`,
   }
-  request.action = `${API_URL}${MEMO_URL}/${srcObj.id}`
-  return request
 }
 
 // Date型の時刻部分をコピー

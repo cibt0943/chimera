@@ -41,9 +41,13 @@ interface ListItemProps {
   actionMenu: React.ReactNode
 }
 
-export function ListItem(props: ListItemProps) {
-  const { item, index, onFocus, isSelected, actionMenu } = props
-
+export function ListItem({
+  item,
+  index,
+  onFocus,
+  isSelected,
+  actionMenu,
+}: ListItemProps) {
   const { t } = useTranslation()
   const { ref, isDragging } = useSortable({
     id: item.id,
@@ -58,7 +62,6 @@ export function ListItem(props: ListItemProps) {
       }
     : {}
 
-  // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
   const updatedAtDiff = useAgoFormat(item.updatedAt)
   const updatedAt = format(item.updatedAt, t('common.format.date_time_format'))
   const to = `${MEMO_URL}/${item.id}`

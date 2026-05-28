@@ -19,7 +19,7 @@ export async function getAccount(accountId: string): Promise<Account> {
     .select()
     .eq('id', accountId)
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('Account not found')
 
   return convertToAccount(data)
 }
@@ -45,7 +45,7 @@ export async function getOrInsertAccount(sub: string): Promise<Account> {
     .insert({ sub })
     .select()
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('Failed to insert account')
 
   return convertToAccount(data)
 }
@@ -64,7 +64,7 @@ export async function updateAccount(
     .eq('id', account.id)
     .select()
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('Failed to update account')
 
   return convertToAccount(data)
 }

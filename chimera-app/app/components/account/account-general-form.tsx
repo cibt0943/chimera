@@ -34,12 +34,9 @@ export function AccountGeneralForm({
 }: AccountFormProps) {
   const { t } = useTranslation()
 
-  const action = `${ACCOUNT_URL}/general`
-  const defaultValue = accountGeneral
-
   const [form, fields] = useForm<AccountGeneralSchemaType>({
     id: 'account-general-form',
-    defaultValue: defaultValue,
+    defaultValue: accountGeneral,
     constraint: getZodConstraint(AccountGeneralSchema),
     onValidate: ({ formData }) => {
       return parseWithZod(formData, { schema: AccountGeneralSchema })
@@ -52,7 +49,7 @@ export function AccountGeneralForm({
       method="post"
       {...getFormProps(form)}
       className="space-y-6"
-      action={action}
+      action={`${ACCOUNT_URL}/general`}
       state={{ isLoadEffect: true }}
     >
       <FormItemGroup>

@@ -12,7 +12,7 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
   const userAgent = useUserAgentAtom()
   const formRef = React.useRef<HTMLDivElement>(null)
   const memoSettings = useMemoSettingsAtom()
-  const autoSave = memoSettings?.autoSave || false
+  const autoSave = memoSettings?.autoSave ?? false
 
   // フォームの指定エレメントへフォーカス
   function setFocusFormElement(selector: string) {
@@ -55,7 +55,7 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
         memo={memo}
         isAutoSave={autoSave}
         redirectUrl={''}
-        editorClassName="h-[calc(100svh-216px)]"
+        editorClassName="h-[calc(100svh-233px)]"
       />
     </div>
   )

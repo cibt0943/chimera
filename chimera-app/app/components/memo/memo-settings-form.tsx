@@ -41,16 +41,10 @@ function ShowArchivedSwith() {
 
   // 表示するメモのフィルタ
   function updateMemoSettingStatusFilter(statuses: MemoStatus[]) {
-    const url = `${ACCOUNT_URL}/memo/settings`
-
     fetcher.submit(
+      { listFilter: { statuses } },
       {
-        listFilter: {
-          statuses,
-        },
-      },
-      {
-        action: url,
+        action: `${ACCOUNT_URL}/memo/settings`,
         method: 'post',
         encType: 'application/json',
       },
@@ -71,7 +65,6 @@ function ShowArchivedSwith() {
           defaultChecked={memoSettings.listFilter.statuses.includes(
             MemoStatus.ARCHIVED,
           )}
-          // checked={memoSettings?.list_filter.statuses.includes(MemoStatus.ARCHIVED)}
           onCheckedChange={(isChecked) => {
             const statuses = isChecked
               ? [MemoStatus.NOMAL, MemoStatus.ARCHIVED]
@@ -92,14 +85,10 @@ function AutoSaveSwith() {
 
   // 表示するメモのフィルタ
   function updateMemoSettingAutoSave(isAutoSave: boolean) {
-    const url = `${ACCOUNT_URL}/memo/settings`
-
     fetcher.submit(
+      { autoSave: isAutoSave },
       {
-        autoSave: isAutoSave,
-      },
-      {
-        action: url,
+        action: `${ACCOUNT_URL}/memo/settings`,
         method: 'post',
         encType: 'application/json',
       },
