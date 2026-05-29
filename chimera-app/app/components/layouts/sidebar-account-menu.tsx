@@ -28,14 +28,12 @@ export function SidebarAccountMenu() {
   const loginInfo = useLoginInfoAtom()
   if (!loginInfo) return null
 
-  function handleUerSettingsClick() {
-    const url = `${ACCOUNT_URL}/settings`
-    navigate(url)
+  function handleUserSettingsClick() {
+    navigate(`${ACCOUNT_URL}/settings`)
   }
 
   function handleLogoutClick() {
-    const url = `${AUTH_URL}/logout`
-    fetcher.submit(null, { method: 'post', action: url })
+    fetcher.submit(null, { method: 'post', action: `${AUTH_URL}/logout` })
   }
 
   return (
@@ -58,7 +56,7 @@ export function SidebarAccountMenu() {
             <DropdownMenuLabel>{loginInfo.auth0User.name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={handleUerSettingsClick}>
+              <DropdownMenuItem onSelect={handleUserSettingsClick}>
                 <LuUserRoundCog />
                 {t('common.message.settings')}
               </DropdownMenuItem>

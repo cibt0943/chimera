@@ -1,17 +1,25 @@
 import * as React from 'react'
 import { cn } from '~/lib/utils'
 import { Label } from '~/components/ui/label'
+import { FieldGroup, Field } from '~/components/ui/field'
 import { DialogFooter } from '~/components/ui/dialog'
+
+export function FormItemGroup({
+  children,
+  className,
+}: React.ComponentProps<typeof FieldGroup>) {
+  return <FieldGroup className={className}>{children}</FieldGroup>
+}
 
 export function FormItem({
   children,
   className,
   ...props
-}: React.ComponentProps<'div'>) {
+}: React.ComponentProps<typeof Field>) {
   return (
-    <div className={cn('space-y-2', className)} {...props}>
+    <Field className={className} {...props}>
       {children}
-    </div>
+    </Field>
   )
 }
 
@@ -45,10 +53,7 @@ export function FormMessage({
   const messages = typeof message === 'string' ? [message] : message
 
   return (
-    <p
-      className={cn('text-destructive text-[0.8rem] font-medium', className)}
-      {...props}
-    >
+    <p className={cn('text-destructive text-[0.8rem]', className)} {...props}>
       {messages}
     </p>
   )
@@ -72,6 +77,6 @@ export function FormDescription({
 export function FormFooter({
   children,
   ...props
-}: React.ComponentProps<'div'>) {
+}: React.ComponentProps<typeof DialogFooter>) {
   return <DialogFooter {...props}>{children}</DialogFooter>
 }

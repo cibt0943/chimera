@@ -42,13 +42,13 @@ function getLanguageFromHeader(request: Request) {
   // リクエストヘッダから言語を取得
   const cookieHeader = request.headers.get('Cookie')
   const acceptLanguage = request.headers.get('Accept-Language')
-  if (cookieHeader?.includes('i18next=ja')) {
+  if (
+    cookieHeader?.includes('i18next=ja') ||
+    acceptLanguage?.startsWith('ja')
+  ) {
     return Language.JA
-  } else if (acceptLanguage?.startsWith('ja')) {
-    return Language.JA
-  } else {
-    return Language.EN
   }
+  return Language.EN
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -57,8 +57,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   const loginInfo = session.get('loginInfo')
 
   // 言語を設定
-  let language = loginInfo?.account.language || 'auto'
-  language = language === 'auto' ? getLanguageFromHeader(request) : language
+  const rawLanguage = loginInfo?.account.language ?? 'auto'
+  const language =
+    rawLanguage === 'auto' ? getLanguageFromHeader(request) : rawLanguage
   i18n.changeLanguage(language)
 
   // メモ設定を取得
@@ -73,7 +74,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function App({ loaderData }: Route.ComponentProps) {
   const { loginInfo, language, memoSettings, toast } = loaderData
-  const theme = loginInfo?.account.theme || Theme.SYSTEM
+  const theme = loginInfo?.account.theme ?? Theme.SYSTEM
 
   // useEffectにてOSのテーマ設定に合わせてテーマを変更
   useTheme(theme)
@@ -105,6 +106,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
         <style data-fullcalendar />
         <Links />
         <script
+          // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml -- テーマ初期化スクリプトの注入のため意図的に使用
           dangerouslySetInnerHTML={{
             __html: `
             (function() {

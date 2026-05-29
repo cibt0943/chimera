@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Separator } from '~/components/ui/separator'
 import { Button } from '~/components/ui/button'
 import { ACCOUNT_URL } from '~/constants'
-import { FormFooter } from '~/components/lib/form'
+import { FormItem } from '~/components/lib/form'
 import type { AccountPassword } from '~/types/accounts'
 
 interface AccountPasswordTabProps {
@@ -16,8 +16,6 @@ export function AccountPasswordTab({
   accountPassword,
 }: AccountPasswordTabProps) {
   const { t } = useTranslation()
-  const action = `${ACCOUNT_URL}/password`
-
   return (
     <div className="space-y-6">
       <Separator />
@@ -49,10 +47,10 @@ export function AccountPasswordTab({
           </p>
         </CardContent>
       </Card>
-      <Form action={action} method="post">
-        <FormFooter>
+      <Form action={`${ACCOUNT_URL}/password`} method="post">
+        <FormItem orientation="horizontal" className="flex sm:justify-end">
           <Button type="submit">{t('account.message.change_password')}</Button>
-        </FormFooter>
+        </FormItem>
       </Form>
     </div>
   )

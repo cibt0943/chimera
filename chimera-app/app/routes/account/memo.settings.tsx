@@ -26,18 +26,13 @@ export async function action({ request }: Route.ActionArgs) {
       statuses: data.listFilter.statuses,
     }
   }
-  if (data.listDisplay !== undefined) {
-    updateData.list_display = {
-      ...memoSettings.listDisplay,
-      content: data.listDisplay.content,
-    }
-  }
   if (data.autoSave !== undefined) {
     updateData.auto_save = data.autoSave
   }
 
   const updatedMemoSettings = await updateMemoSettings({
     id: memoSettings.id,
+    account_id: memoSettings.accountId,
     ...updateData,
   })
 

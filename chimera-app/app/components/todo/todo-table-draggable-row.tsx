@@ -40,7 +40,7 @@ function TaskRow({ row, ref, style, handleRef, isSelected }: RowProps) {
       id={`row-${row.id}`}
       ref={ref}
       tabIndex={0}
-      className="bg-white outline-hidden"
+      className="bg-background outline-hidden"
       style={style}
       onFocus={() => row.toggleSelected(true)}
       data-state={isSelected && 'selected'}
@@ -75,7 +75,7 @@ function BarRow({ row, ref, style, handleRef, isSelected }: RowProps) {
       id={`row-${row.id}`}
       ref={ref}
       tabIndex={0}
-      className="bg-white outline-hidden"
+      className="bg-background outline-hidden"
       style={{ ...style, ...colorStyle }}
       onFocus={() => row.toggleSelected(true)}
       data-state={isSelected && 'selected'}

@@ -1,7 +1,10 @@
 import { toDate } from 'date-fns'
 import type { Database } from '~/types/database'
 import { Account, Language, Theme } from '~/types/accounts'
-import { supabase } from '~/lib/supabase-client.server'
+import {
+  supabase,
+  createSupabaseClientForUser,
+} from '~/lib/supabase-client.server'
 
 // DBのアカウントテーブルの型
 export type AccountModel = Database['public']['Tables']['accounts']['Row']
@@ -10,12 +13,13 @@ export type UpdateAccountModel =
 
 // idからアカウント情報を取得
 export async function getAccount(accountId: string): Promise<Account> {
-  const { data, error } = await supabase
+  const client = createSupabaseClientForUser(accountId)
+  const { data, error } = await client
     .from('accounts')
     .select()
     .eq('id', accountId)
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('Account not found')
 
   return convertToAccount(data)
 }
@@ -41,7 +45,7 @@ export async function getOrInsertAccount(sub: string): Promise<Account> {
     .insert({ sub })
     .select()
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('Failed to insert account')
 
   return convertToAccount(data)
 }
@@ -53,20 +57,22 @@ export async function updateAccount(
 ): Promise<Account> {
   if (!noUpdated) account.updated_at = new Date().toISOString()
 
-  const { data, error } = await supabase
+  const client = createSupabaseClientForUser(account.id)
+  const { data, error } = await client
     .from('accounts')
     .update(account)
     .eq('id', account.id)
     .select()
     .single()
-  if (error || !data) throw error || new Error('erorr')
+  if (error || !data) throw error || new Error('Failed to update account')
 
   return convertToAccount(data)
 }
 
 // アカウント情報の削除
 export async function deleteAccount(accountId: string): Promise<void> {
-  const { error } = await supabase.from('accounts').delete().eq('id', accountId)
+  const client = createSupabaseClientForUser(accountId)
+  const { error } = await client.from('accounts').delete().eq('id', accountId)
   if (error) throw error
 }
 

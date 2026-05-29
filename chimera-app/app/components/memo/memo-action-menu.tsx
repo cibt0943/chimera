@@ -33,10 +33,12 @@ interface MemoActionMenuProps {
   handleDeleteMemo: (memo: Memo) => void
 }
 
-export function MemoActionMenu(props: MemoActionMenuProps) {
-  const { memo, handleMoveMemo, handleUpdateMemoStatus, handleDeleteMemo } =
-    props
-
+export function MemoActionMenu({
+  memo,
+  handleMoveMemo,
+  handleUpdateMemoStatus,
+  handleDeleteMemo,
+}: MemoActionMenuProps) {
   const userAgent = useUserAgentAtom()
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -122,7 +124,7 @@ export function MemoActionMenu(props: MemoActionMenuProps) {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="text-red-600 focus:text-red-600"
+            variant="destructive"
             onClick={(event) => {
               event.stopPropagation() // 親エレメントのアンカータグのクリックイベントをキャンセル
               handleDeleteMemo(memo)

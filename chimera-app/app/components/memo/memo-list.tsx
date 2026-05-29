@@ -5,7 +5,7 @@ import { LuPlus } from 'react-icons/lu'
 import { useHotkeys } from 'react-hotkeys-hook'
 import {
   DragDropProvider,
-  type DragEndEvent as DragEndHandler,
+  type DragEndEvent,
   PointerSensor,
 } from '@dnd-kit/react'
 import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
@@ -17,7 +17,6 @@ import { API_URL, MEMO_URL } from '~/constants'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
 import { arrayMove } from '~/lib/utils'
 import { Memos, Memo, MemoStatus } from '~/types/memos'
-import { MemoSettings } from '~/types/memo-settings'
 import { ListItem } from './memo-list-item'
 import { MemoActionMenu } from './memo-action-menu'
 import { MemoDeleteConfirmDialog } from './memo-delete-confirm-dialog'
@@ -41,17 +40,11 @@ function getHotkeys(modifierKey: string) {
 interface MemoListProps {
   originalMemos: Memos
   selectedMemo: Memo | undefined
-  memoSettings: MemoSettings
 }
 
-export function MemoList({
-  originalMemos,
-  selectedMemo,
-  memoSettings,
-}: MemoListProps) {
+export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
   const { t } = useTranslation()
   const userAgent = useUserAgentAtom()
-  const { enqueue: searchEnqueue } = useApiQueue()
   const { enqueue: moveMemoEnqueue } = useApiQueue()
   const navigate = useNavigate()
   const fetcher = useFetcher()
@@ -88,14 +81,9 @@ export function MemoList({
     setMemos(originalMemos)
   }, [originalMemos])
 
-  // メモ一覧の検索
-  async function searchMemos(searchTerm: string) {
-    setSearchTerm(searchTerm.toLowerCase())
-  }
-
   // メモ一覧の検索をdebounce
-  const searchMemosDebounce = useDebounce((searchTerm) => {
-    searchEnqueue(() => searchMemos(searchTerm))
+  const searchMemosDebounce = useDebounce((searchTerm: string) => {
+    setSearchTerm(searchTerm.toLowerCase())
   }, 300)
 
   // フォーカスを1ステップ変更
@@ -168,7 +156,7 @@ export function MemoList({
   }
 
   // ドラッグ&ドロップによるメモの表示順変更
-  const handleDragEnd: DragEndHandler = (event) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     if (event.canceled) return
 
     // @dnd-kit/react v0.3.0 では
@@ -210,7 +198,7 @@ export function MemoList({
       moveMemoApiDebounce(fromMemo, toMemo)
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error'
-      alert(msg)
+      toast.error(msg)
       navigate('.', { replace: true })
     }
   }
@@ -228,17 +216,17 @@ export function MemoList({
       if (!response.ok) throw new Error('Failed to update position api')
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message)
+        toast.error(error.message)
         navigate('.', { replace: true })
       }
     }
   }
 
   // メモの表示順変更APIをdebounce
-  const moveMemoApiDebounce = useDebounce((fromMemo, toMemo) => {
+  const moveMemoApiDebounce = useDebounce((fromMemo: Memo, toMemo: Memo) => {
     moveMemoEnqueue(() =>
       moveMemoApi(fromMemo, toMemo).catch((error) => {
-        alert(error.message)
+        toast.error(error.message)
         navigate('.', { replace: true })
       }),
     )
@@ -317,10 +305,9 @@ export function MemoList({
     },
     {
       enableOnFormTags: true, // テキストエリアにフォーカスがあってもフォーカス移動できるようにする
+      enableOnContentEditable: true, // Lexicalエディタにフォーカスがあっても操作できるようにする
     },
   )
-
-  const isPrevew = !!memoSettings.listDisplay.content
 
   return (
     <div className="space-y-4 px-1 md:py-4">
@@ -350,7 +337,7 @@ export function MemoList({
         />
         <MemoSettingsForm />
       </div>
-      <ScrollArea className="h-[calc(100svh-115px)]">
+      <ScrollArea className="h-[calc(100svh-114px)]">
         <DragDropProvider
           sensors={[PointerSensor]}
           modifiers={(defaults) => [...defaults, RestrictToVerticalAxis]}
@@ -365,15 +352,15 @@ export function MemoList({
                   index={index}
                   onFocus={() => (focusedMemoRef.current = item)}
                   isSelected={item.id === selectedMemo?.id}
-                  isPreview={isPrevew}
-                >
-                  <MemoActionMenu
-                    memo={item}
-                    handleMoveMemo={moveMemoOneStep}
-                    handleUpdateMemoStatus={updateMemoStatusApi}
-                    handleDeleteMemo={openDeleteMemoDialog}
-                  />
-                </ListItem>
+                  actionMenu={
+                    <MemoActionMenu
+                      memo={item}
+                      handleMoveMemo={moveMemoOneStep}
+                      handleUpdateMemoStatus={updateMemoStatusApi}
+                      handleDeleteMemo={openDeleteMemoDialog}
+                    />
+                  }
+                />
               ))
             ) : (
               <div className="text-sm">{t('common.message.no_data')}</div>

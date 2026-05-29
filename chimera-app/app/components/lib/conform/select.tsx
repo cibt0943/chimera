@@ -21,21 +21,13 @@ export function SelectConform<T>({
   return (
     <Select
       {...getSelectProps(meta)}
-      defaultValue={(meta.initialValue as string) || ''}
+      defaultValue={(meta.initialValue as string) ?? ''}
       {...selectProps}
     >
       <SelectTrigger id={meta.id}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent
-        ref={(ref) => {
-          // radix-ui/react-selectの2.1.2で修正される予定
-          // temporary workaround from https://github.com/shadcn-ui/ui/issues/1220
-          ref?.addEventListener('touchend', (e) => e.preventDefault())
-        }}
-      >
-        {children}
-      </SelectContent>
+      <SelectContent>{children}</SelectContent>
     </Select>
   )
 }

@@ -13,7 +13,7 @@ export function meta({ params }: Route.MetaArgs) {
 export async function loader({ params, request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
 
-  const memo = await getMemo(params.memoId || '')
+  const memo = await getMemo(loginInfo.account.id, params.memoId || '')
   if (memo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }

@@ -19,17 +19,20 @@ const UpdateMemoSchema = zod.object({
 
 async function requireAuthorizedMemo(request: Request, memoId: string) {
   const loginInfo = await isAuthenticated(request)
-  const memo = await getMemo(memoId)
+  const memo = await getMemo(loginInfo.account.id, memoId)
   if (memo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  return { memo }
+  return { loginInfo, memo }
 }
 
 // メモの更新API（送られてきた値のみを更新）
 export async function action({ params, request }: Route.ActionArgs) {
-  const { memo } = await requireAuthorizedMemo(request, params.memoId)
+  const { loginInfo, memo } = await requireAuthorizedMemo(
+    request,
+    params.memoId,
+  )
 
   const jsonData = await request.json()
   const submission = UpdateMemoSchema.safeParse(jsonData)
@@ -39,7 +42,10 @@ export async function action({ params, request }: Route.ActionArgs) {
     throw new Response('Invalid submission data.', { status: 400 })
   }
 
-  const values: UpdateMemoModel = { id: memo.id }
+  const values: UpdateMemoModel = {
+    id: memo.id,
+    account_id: loginInfo.account.id,
+  }
   const data = submission.data
 
   if (data.status !== undefined) {

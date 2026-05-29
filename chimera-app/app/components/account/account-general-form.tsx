@@ -7,10 +7,10 @@ import { Button } from '~/components/ui/button'
 import { SelectItem } from '~/components/ui/select'
 import { ACCOUNT_URL } from '~/constants'
 import {
+  FormItemGroup,
   FormItem,
   FormLabel,
   FormMessage,
-  FormFooter,
 } from '~/components/lib/form'
 import { Required } from '~/components/lib/required'
 import { InputConform } from '~/components/lib/conform/input'
@@ -34,12 +34,9 @@ export function AccountGeneralForm({
 }: AccountFormProps) {
   const { t } = useTranslation()
 
-  const action = `${ACCOUNT_URL}/general`
-  const defaultValue = accountGeneral
-
   const [form, fields] = useForm<AccountGeneralSchemaType>({
     id: 'account-general-form',
-    defaultValue: defaultValue,
+    defaultValue: accountGeneral,
     constraint: getZodConstraint(AccountGeneralSchema),
     onValidate: ({ formData }) => {
       return parseWithZod(formData, { schema: AccountGeneralSchema })
@@ -52,47 +49,49 @@ export function AccountGeneralForm({
       method="post"
       {...getFormProps(form)}
       className="space-y-6"
-      action={action}
+      action={`${ACCOUNT_URL}/general`}
       state={{ isLoadEffect: true }}
     >
-      <FormItem>
-        <FormLabel htmlFor={fields.name.id}>
-          {t('account.model.name')}
-          <Required />
-        </FormLabel>
-        <InputConform meta={fields.name} type="text" autoComplete="on" />
-        <FormMessage message={fields.name.errors} />
-      </FormItem>
-      <FormItem>
-        <FormLabel htmlFor={fields.language.id}>
-          {t('account.model.language')}
-          <Required />
-        </FormLabel>
-        <SelectConform
-          meta={fields.language}
-          placeholder="Select a language to display"
-        >
-          <SelectLanguageItems />
-        </SelectConform>
-        <FormMessage message={fields.language.errors} />
-      </FormItem>
-      <FormItem>
-        <FormLabel htmlFor={fields.theme.id}>
-          {t('account.model.theme')}
-          <Required />
-        </FormLabel>
-        <SelectConform
-          meta={fields.theme}
-          placeholder="Select a theme to display"
-        >
-          <SelectThemeItems />
-        </SelectConform>
-        <FormMessage message={fields.theme.errors} />
-      </FormItem>
-      <FormFooter className="flex sm:justify-between">
-        {children || <div>&nbsp;</div>}
-        <Button type="submit">{t('common.message.save')}</Button>
-      </FormFooter>
+      <FormItemGroup>
+        <FormItem>
+          <FormLabel htmlFor={fields.name.id}>
+            {t('account.model.name')}
+            <Required />
+          </FormLabel>
+          <InputConform meta={fields.name} type="text" autoComplete="on" />
+          <FormMessage message={fields.name.errors} />
+        </FormItem>
+        <FormItem>
+          <FormLabel htmlFor={fields.language.id}>
+            {t('account.model.language')}
+            <Required />
+          </FormLabel>
+          <SelectConform
+            meta={fields.language}
+            placeholder="Select a language to display"
+          >
+            <SelectLanguageItems />
+          </SelectConform>
+          <FormMessage message={fields.language.errors} />
+        </FormItem>
+        <FormItem>
+          <FormLabel htmlFor={fields.theme.id}>
+            {t('account.model.theme')}
+            <Required />
+          </FormLabel>
+          <SelectConform
+            meta={fields.theme}
+            placeholder="Select a theme to display"
+          >
+            <SelectThemeItems />
+          </SelectConform>
+          <FormMessage message={fields.theme.errors} />
+        </FormItem>
+        <FormItem orientation="horizontal" className="flex sm:justify-between">
+          {children || <div>&nbsp;</div>}
+          <Button type="submit">{t('common.message.save')}</Button>
+        </FormItem>
+      </FormItemGroup>
     </Form>
   )
 }

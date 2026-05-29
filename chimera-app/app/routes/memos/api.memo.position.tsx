@@ -4,7 +4,7 @@ import type { Route } from './+types/api.memo.position'
 
 async function requireAuthorizedMemo(request: Request, memoId: string) {
   const loginInfo = await isAuthenticated(request)
-  const memo = await getMemo(memoId)
+  const memo = await getMemo(loginInfo.account.id, memoId)
   if (memo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
@@ -23,12 +23,16 @@ export async function action({ params, request }: Route.ActionArgs) {
     throw new Response('Bad Request.', { status: 400 })
   }
 
-  const toMemo = await getMemo(toMemoId)
+  const toMemo = await getMemo(loginInfo.account.id, toMemoId)
   if (toMemo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  const updatedMemo = await setMemoPosition(fromMemo.id, toMemo.position)
+  const updatedMemo = await setMemoPosition(
+    loginInfo.account.id,
+    fromMemo.id,
+    toMemo.position,
+  )
 
   return Response.json({ memo: updatedMemo })
 }

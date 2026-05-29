@@ -37,11 +37,7 @@ export function TodoTableColumnHeader<TData, TValue>({
     <div className={cn('flex items-center', className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="data-[state=open]:bg-accent -ml-3"
-          >
+          <Button variant="ghost" className="data-[state=open]:bg-accent -ml-3">
             <span>{title}</span>
             {column.getIsSorted() === 'desc' ? (
               <LuArrowDownWideNarrow />

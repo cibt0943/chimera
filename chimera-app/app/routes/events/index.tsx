@@ -31,25 +31,26 @@ export async function action({ request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const formData = await request.formData()
+  const redirectUrl = formData.get('redirectUrl')?.toString() || EVENT_URL
+
   const submission = parseWithZod(formData, { schema: EventSchema })
   // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
   if (submission.status !== 'success') {
     throw new Response('Invalid submission data.', { status: 400 })
   }
 
-  const data = submission.value
+  const { startDate, endDate, allDay, title, memo, location } = submission.value
 
   await addEvent({
     account_id: loginInfo.account.id,
-    start_datetime: data.startDate.toISOString(),
-    end_datetime: data.endDate?.toISOString() || null,
-    all_day: !!data.allDay,
-    title: data.title,
-    memo: data.memo || '',
-    location: data.location || '',
+    start_datetime: startDate.toISOString(),
+    end_datetime: endDate?.toISOString() ?? null,
+    all_day: !!allDay,
+    title,
+    memo: memo ?? '',
+    location: location ?? '',
   })
 
-  const redirectUrl = (formData.get('redirectUrl') as string) || EVENT_URL
   return redirect(redirectUrl)
 }
 
@@ -84,22 +85,13 @@ export async function loader({ request }: Route.LoaderArgs) {
     relatedDateEnd: getEnd,
   })
 
-  const calendarEvents: CalendarEvents = []
-
-  // Events → CalendarEvents
-  events.forEach((event) => {
-    calendarEvents.push(Event2Calendar(event))
-  })
-
-  // Tasks → CalendarEvents
-  tasks.forEach((task) => {
-    calendarEvents.push(Task2Calendar(task as TaskWithNonNullableDueDate))
-  })
-
-  // Memos → CalendarEvents
-  memos.forEach((memo) => {
-    calendarEvents.push(Memo2Calendar(memo as MemoWithNonNullableRelatedDate))
-  })
+  const calendarEvents: CalendarEvents = [
+    ...events.map(Event2Calendar),
+    ...tasks.map((task) => Task2Calendar(task as TaskWithNonNullableDueDate)),
+    ...memos.map((memo) =>
+      Memo2Calendar(memo as MemoWithNonNullableRelatedDate),
+    ),
+  ]
 
   return { calendarEvents }
 }

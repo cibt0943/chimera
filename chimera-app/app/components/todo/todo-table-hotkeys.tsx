@@ -1,7 +1,15 @@
 import { useHotkeys } from 'react-hotkeys-hook'
 import { TaskStatus } from '~/types/tasks'
 
-export function useTodoTableScopedHotkeys(params: {
+export function useTodoTableScopedHotkeys({
+  modifierKey,
+  enabled,
+  showSelectedTodoEdit,
+  changeSelectedTodoOneStep,
+  moveSelectedTodoOneStep,
+  updateSelectedTodoStatus,
+  deleteSelectedTodo,
+}: {
   modifierKey: string
   enabled: boolean
   showSelectedTodoEdit: () => void
@@ -10,16 +18,6 @@ export function useTodoTableScopedHotkeys(params: {
   updateSelectedTodoStatus: (status: TaskStatus) => void
   deleteSelectedTodo: () => void
 }) {
-  const {
-    modifierKey,
-    enabled,
-    showSelectedTodoEdit,
-    changeSelectedTodoOneStep,
-    moveSelectedTodoOneStep,
-    updateSelectedTodoStatus,
-    deleteSelectedTodo,
-  } = params
-
   const HOTKEYS = {
     ENTER: 'enter',
     UP: 'up',
@@ -82,15 +80,17 @@ export function useTodoTableScopedHotkeys(params: {
   )
 }
 
-export function useTodoTableGlobalHotkeys(params: {
+export function useTodoTableGlobalHotkeys({
+  modifierKey,
+  enabled,
+  openAddTaskDialog,
+  changeSelectedTodoOneStep,
+}: {
   modifierKey: string
   enabled: boolean
   openAddTaskDialog: () => void
   changeSelectedTodoOneStep: (isUp: boolean) => void
 }) {
-  const { modifierKey, enabled, openAddTaskDialog, changeSelectedTodoOneStep } =
-    params
-
   useHotkeys(
     [`${modifierKey}+n`, `${modifierKey}+left`, `${modifierKey}+right`],
     (_, handler) => {

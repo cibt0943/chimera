@@ -31,8 +31,7 @@ export function TodoDeleteConfirmDialog({
 
   if (!viewTodo) return null
 
-  const desc =
-    '「' + viewTodo.title + '」' + t('common.message.confirm_deletion')
+  const desc = `「${viewTodo.title}」${t('common.message.confirm_deletion')}`
   const action = `${TODO_URL}/${viewTodo.todoId}/delete`
 
   const title =

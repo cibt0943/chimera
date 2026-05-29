@@ -7,18 +7,14 @@ interface AccountGeneralTabProps {
   accountGeneral: AccountGeneral
 }
 
-export function AccounyDeleteButton({
+export function AccountDeleteButton({
   accountGeneral,
 }: AccountGeneralTabProps) {
   const { t } = useTranslation()
 
   return (
     <AccountDeleteConfirmDialog accountGeneral={accountGeneral}>
-      <Button
-        type="button"
-        variant="link"
-        className="border-destructive/50 text-destructive mt-2 px-0 sm:mt-0"
-      >
+      <Button type="button" variant="destructive">
         {t('account.message.do_delete')}
       </Button>
     </AccountDeleteConfirmDialog>

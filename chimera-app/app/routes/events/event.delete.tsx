@@ -6,20 +6,24 @@ import type { Route } from './+types/event.delete'
 
 async function requireAuthorizedEvent(request: Request, eventId: string) {
   const loginInfo = await isAuthenticated(request)
-  const event = await getEvent(eventId)
+  const event = await getEvent(loginInfo.account.id, eventId)
   if (event.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  return { event }
+  return { loginInfo, event }
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
-  const { event } = await requireAuthorizedEvent(request, params.eventId)
-
-  await deleteEvent(event.id)
+  const { loginInfo, event } = await requireAuthorizedEvent(
+    request,
+    params.eventId,
+  )
 
   const formData = await request.formData()
   const redirectUrl = formData.get('redirectUrl')?.toString() || EVENT_URL
+
+  await deleteEvent(loginInfo.account.id, event.id)
+
   return redirectWithInfo(redirectUrl, 'event.message.deleted')
 }

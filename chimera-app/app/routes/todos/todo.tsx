@@ -21,80 +21,98 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
 async function requireAuthorizedTodo(request: Request, todoId: string) {
   const loginInfo = await isAuthenticated(request)
-  const todo = await getTodo(todoId)
+  const todo = await getTodo(loginInfo.account.id, todoId)
   if (todo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
+  return { loginInfo, todo }
+}
 
-  return { todo }
+// クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
+async function handleTaskAction(
+  accountId: string,
+  todoId: string,
+  formData: FormData,
+) {
+  const submission = parseWithZod(formData, { schema: TaskSchema })
+  if (submission.status !== 'success') {
+    throw new Response('Invalid submission data.', { status: 400 })
+  }
+
+  const { status, title, memo, dueDate, dueDateAllDay } = submission.value
+  const task = await getTaskFromTodoId(accountId, todoId)
+
+  await updateTask({
+    id: task.id,
+    account_id: task.accountId,
+    status,
+    title,
+    memo: memo ?? '',
+    due_date: dueDate?.toISOString() ?? null,
+    due_date_all_day: !!dueDateAllDay,
+  })
+}
+
+async function handleTodoBarAction(
+  accountId: string,
+  todoId: string,
+  formData: FormData,
+) {
+  const submission = parseWithZod(formData, { schema: TodoBarSchema })
+  if (submission.status !== 'success') {
+    throw new Response('Invalid submission data.', { status: 400 })
+  }
+
+  const { title, bgColor, textColor } = submission.value
+  const todoBar = await getTodoBarFromTodoId(accountId, todoId)
+
+  await updateTodoBar({
+    id: todoBar.id,
+    account_id: todoBar.accountId,
+    title,
+    bg_color: bgColor ?? '',
+    text_color: textColor ?? '',
+  })
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
-  const { todo } = await requireAuthorizedTodo(request, params.todoId)
+  const { loginInfo, todo } = await requireAuthorizedTodo(
+    request,
+    params.todoId,
+  )
 
   const formData = await request.formData()
+
   switch (todo.type) {
-    case TodoType.TASK: {
-      const submission = parseWithZod(formData, { schema: TaskSchema })
-      // クライアントバリデーションを行なってるのでここでsubmissionが成功しなかった場合はエラーを返す
-      if (submission.status !== 'success') {
-        throw new Response('Invalid submission data.', { status: 400 })
-      }
-
-      const data = submission.value
-      const task = await getTaskFromTodoId(todo.id)
-
-      await updateTask({
-        id: task.id,
-        status: data.status,
-        title: data.title,
-        memo: data.memo || '',
-        due_date: data.dueDate?.toISOString() || null,
-        due_date_all_day: !!data.dueDateAllDay,
-      })
+    case TodoType.TASK:
+      await handleTaskAction(loginInfo.account.id, todo.id, formData)
       break
-    }
-
-    case TodoType.BAR: {
-      const submission = parseWithZod(formData, { schema: TodoBarSchema })
-      if (submission.status !== 'success') {
-        throw new Response('Invalid submission data.', { status: 400 })
-      }
-
-      const data = submission.value
-      const todoBar = await getTodoBarFromTodoId(todo.id)
-
-      await updateTodoBar({
-        id: todoBar.id,
-        title: data.title,
-        bg_color: data.bgColor || '',
-        text_color: data.textColor || '',
-      })
+    case TodoType.BAR:
+      await handleTodoBarAction(loginInfo.account.id, todo.id, formData)
       break
-    }
-
     default:
       throw new Response('Not Found', { status: 404 })
   }
 
-  const redirectUrl = (formData.get('redirectUrl') as string) || TODO_URL
+  const redirectUrl = formData.get('redirectUrl')?.toString() ?? TODO_URL
   return redirect(redirectUrl)
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
-  const { todo } = await requireAuthorizedTodo(request, params.todoId)
+  const { todo, loginInfo } = await requireAuthorizedTodo(
+    request,
+    params.todoId,
+  )
 
   switch (todo.type) {
     case TodoType.TASK: {
-      const task = await getTaskFromTodoId(todo.id)
+      const task = await getTaskFromTodoId(loginInfo.account.id, todo.id)
       return { todoType: TodoType.TASK, todoId: todo.id, task }
     }
-
     case TodoType.BAR: {
-      const todoBar = await getTodoBarFromTodoId(todo.id)
+      const todoBar = await getTodoBarFromTodoId(loginInfo.account.id, todo.id)
       return { todoType: TodoType.BAR, todoId: todo.id, todoBar }
     }
-
     default:
       throw new Response('Not Found', { status: 404 })
   }
@@ -122,7 +140,6 @@ export default function Todo({ loaderData }: Route.ComponentProps) {
           redirectUrl={redirectUrl}
         />
       )
-
     case TodoType.TASK:
       return (
         <TaskFormDialog
@@ -132,7 +149,6 @@ export default function Todo({ loaderData }: Route.ComponentProps) {
           redirectUrl={redirectUrl}
         />
       )
-
     default:
       return null
   }

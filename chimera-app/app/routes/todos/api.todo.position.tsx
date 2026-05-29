@@ -4,7 +4,7 @@ import type { Route } from './+types/api.todo.position'
 
 async function requireAuthorizedTodo(request: Request, todoId: string) {
   const loginInfo = await isAuthenticated(request)
-  const todo = await getTodo(todoId)
+  const todo = await getTodo(loginInfo.account.id, todoId)
   if (todo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
@@ -23,12 +23,16 @@ export async function action({ params, request }: Route.ActionArgs) {
     throw new Response('Bad Request.', { status: 400 })
   }
 
-  const toTodo = await getTodo(toTodoId)
+  const toTodo = await getTodo(loginInfo.account.id, toTodoId)
   if (toTodo.accountId !== loginInfo.account.id) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  const updatedTodo = await setTodoPosition(fromTodo.id, toTodo.position)
+  const updatedTodo = await setTodoPosition(
+    loginInfo.account.id,
+    fromTodo.id,
+    toTodo.position,
+  )
 
   return Response.json({ todo: updatedTodo })
 }

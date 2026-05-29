@@ -19,7 +19,7 @@ import {
 } from '@tanstack/react-table'
 import {
   DragDropProvider,
-  type DragEndEvent as DragEndHandler,
+  type DragEndEvent,
   PointerSensor,
 } from '@dnd-kit/react'
 import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
@@ -190,7 +190,7 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
   // 並び順を変更できるか否か
   function canMoveTodo() {
     // ソート中は並び順を変更できない
-    return sorting.length == 0
+    return sorting.length === 0
   }
 
   // 並び順を変更できないか否か
@@ -199,7 +199,7 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
   }
 
   // ドラッグ&ドロップによるタスクの表示順変更
-  const handleDragEnd: DragEndHandler = (event) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     if (event.canceled) return
 
     // @dnd-kit/react v0.3.0 では
@@ -263,16 +263,19 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
       if (!response.ok) throw new Error('Failed to update position api')
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message)
+        toast.error(error.message)
         navigate('.', { replace: true })
       }
     }
   }
 
   // タスクの表示順変更APIをdebounce
-  const moveTodoApiDebounce = useDebounce((fromViewTodo, toViewTodo) => {
-    enqueue(() => moveTodoApi(fromViewTodo, toViewTodo))
-  }, 300)
+  const moveTodoApiDebounce = useDebounce(
+    (fromViewTodo: ViewTodo, toViewTodo: ViewTodo) => {
+      enqueue(() => moveTodoApi(fromViewTodo, toViewTodo))
+    },
+    300,
+  )
 
   // タスクの表示順を1ステップ変更
   function moveTodoOneStep(targetViewTodo: ViewTodo, isUp: boolean) {
@@ -343,7 +346,6 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
     tBodyRef.current
       ?.querySelector<HTMLElement>(`#row-${viewTodo.todoId}`)
       ?.focus()
-    // tBodyRef.current?.querySelector(`#row-${nowSelectedRow.id}`)?.focus({ preventScroll: true })
   }
 
   // テーブルにフォーカスを設定
@@ -389,11 +391,11 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="default" size="icon-sm" className="rounded-full">
+            <Button variant="default" size="icon" className="rounded-full">
               <LuPlus />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent className="w-40">
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={openAddTaskDialog}>
                 {t('task.message.task_creation')}
@@ -451,16 +453,17 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
             </TableHeader>
             <TableBody ref={tBodyRef}>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row, index) => (
-                  <DraggableRow
-                    key={row.id}
-                    row={row}
-                    index={index}
-                    // disabled={cannotMoveTodo()}
-                    disabled={false}
-                    isSelected={row.getIsSelected()}
-                  />
-                ))
+                table
+                  .getRowModel()
+                  .rows.map((row, index) => (
+                    <DraggableRow
+                      key={row.id}
+                      row={row}
+                      index={index}
+                      disabled={false}
+                      isSelected={row.getIsSelected()}
+                    />
+                  ))
               ) : (
                 <TableRow>
                   <TableCell
@@ -478,7 +481,6 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
       <div className="flex items-center justify-end gap-2">
         <Button
           variant="outline"
-          size="sm"
           onClick={table.previousPage}
           disabled={!table.getCanPreviousPage()}
         >
@@ -486,7 +488,6 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
         </Button>
         <Button
           variant="outline"
-          size="sm"
           onClick={table.nextPage}
           disabled={!table.getCanNextPage()}
         >

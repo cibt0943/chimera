@@ -38,13 +38,16 @@ interface ListItemProps {
   index: number
   onFocus: () => void
   isSelected: boolean
-  isPreview: boolean
-  children: React.ReactNode
+  actionMenu: React.ReactNode
 }
 
-export function ListItem(props: ListItemProps) {
-  const { item, index, onFocus, isSelected, isPreview, children } = props
-
+export function ListItem({
+  item,
+  index,
+  onFocus,
+  isSelected,
+  actionMenu,
+}: ListItemProps) {
   const { t } = useTranslation()
   const { ref, isDragging } = useSortable({
     id: item.id,
@@ -59,12 +62,10 @@ export function ListItem(props: ListItemProps) {
       }
     : {}
 
-  // const updatedAtDiff = useDateDiffFormat(item.updatedAt)
   const updatedAtDiff = useAgoFormat(item.updatedAt)
   const updatedAt = format(item.updatedAt, t('common.format.date_time_format'))
   const to = `${MEMO_URL}/${item.id}`
   const title = item.title || t('memo.message.un_titled')
-  const content = isPreview ? item.content.substring(0, 300) || '　' : ''
 
   return (
     <div
@@ -85,10 +86,7 @@ export function ListItem(props: ListItemProps) {
     >
       <div className="flex items-center">
         <div className="line-clamp-1">{title}</div>
-        <div className="ml-auto">{children}</div>
-      </div>
-      <div className="text-muted-foreground line-clamp-1 text-xs">
-        {content}
+        <div className="ml-auto">{actionMenu}</div>
       </div>
       <div className="flex items-center justify-between space-x-2">
         <div>{item.status === MemoStatus.ARCHIVED && <LuArchive />}</div>

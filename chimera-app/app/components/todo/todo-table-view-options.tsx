@@ -22,13 +22,8 @@ export function TodoTableViewOptions<TData>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="ml-auto hidden h-8 sm:inline-flex"
-        >
-          <LuSettings2 />
-          {t('task.message.view_settings')}
+        <Button variant="outline" className="">
+          <LuSettings2 /> {t('task.message.view_settings')}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[150px]">

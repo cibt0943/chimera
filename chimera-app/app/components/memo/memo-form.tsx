@@ -3,37 +3,38 @@ import { useFetcher } from 'react-router'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from 'react-hotkeys-hook'
-import { getFormProps } from '@conform-to/react'
+import { getFormProps, useInputControl } from '@conform-to/react'
 import { Button } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
-import { cn } from '~/lib/utils'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
 import {
+  FormItemGroup,
   FormItem,
   FormMessage,
-  FormDescription,
   FormFooter,
 } from '~/components/lib/form'
-import { TextareaConform } from '~/components/lib/conform/textarea'
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
+import { InputConform } from '~/components/lib/conform/input'
 import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
+import { LexicalMdEditor } from '~/components/lib/lexical-editor/editor'
 import { Memo } from '~/types/memos'
 import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
 import { useUserAgentAtom } from '~/lib/global-state'
+import { cn } from '~/lib/utils'
 
 export interface MemoFormProps {
   memo: Memo | undefined
   isAutoSave: boolean
   redirectUrl: string
-  textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>
+  editorClassName?: string
 }
 
 export function MemoForm({
   memo,
   isAutoSave,
   redirectUrl,
-  textareaProps = {},
+  editorClassName,
 }: MemoFormProps) {
   const { t } = useTranslation()
   const userAgent = useUserAgentAtom()
@@ -43,41 +44,41 @@ export function MemoForm({
   const [isChangedMemo, setIsChangedMemo] = React.useState(false)
   const fetcher = useFetcher()
 
-  React.useEffect(() => {
-    setIsChangedMemo(false)
-  }, [memo?.id])
-
-  React.useEffect(() => {
-    // メモが存在し、メモが変更されている場合、自動保存がOFF→ONの切り替え時に自動保存を実行する
-    if (memo && isChangedMemo && isAutoSave) {
-      saveMemoApi()
-    }
-    // 以下のdisableを止める方法を検討したい。
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAutoSave])
-
   // メモの保存API呼び出し
-  async function saveMemoApi() {
+  function saveMemoApi() {
     fetcher.submit(formRef.current)
-    // メモが保存されたら、メモが変更されていない状態にする
     setIsChangedMemo(false)
   }
 
   // メモの保存APIをdebounce
   const saveMemoDebounce = useDebounce(() => {
-    enqueue(() => saveMemoApi())
+    enqueue(async () => saveMemoApi())
   }, 1000)
+
+  // memo が切り替わったときに isChangedMemo をリセットする
+  React.useEffect(() => {
+    setIsChangedMemo(false)
+  }, [memo?.id])
+
+  React.useEffect(() => {
+    // isAutoSave が OFF→ON に切り替わった時点で未保存の変更があれば自動保存を実行する。
+    // memo / isChangedMemo は切り替わった瞬間の値を参照したいため、依存配列から意図的に除外している。
+    if (memo && isChangedMemo && isAutoSave) {
+      saveMemoApi()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAutoSave])
 
   // メモ情報が更新されていたら保存する
   function handleChangeMemo() {
     setIsChangedMemo(true)
-    isAutoSave && saveMemoDebounce()
+    if (isAutoSave) saveMemoDebounce()
   }
 
   // キーボード操作
   useHotkeys(
     [`${userAgent.modifierKey}+s`],
-    (event, handler) => {
+    (_event, handler) => {
       switch (handler.keys?.join('')) {
         case 's':
           saveMemoApi()
@@ -87,14 +88,14 @@ export function MemoForm({
     {
       preventDefault: true, // テキストエリアにフォーカスがある時にalt+sを押すと変なドイツ語がテキストエリアに入力されるのを防ぐ
       enableOnFormTags: true, // テキストエリアにフォーカスがあっても保存できるようにする
+      enableOnContentEditable: true, // Lexicalエディタにフォーカスがあっても保存できるようにする
     },
   )
 
   const { form, fields } = useMemoConform({ memo })
+  const contentControl = useInputControl(fields.content)
 
   const action = memo ? `${MEMO_URL}/${memo.id}` : MEMO_URL
-
-  const { className, ...otherProps } = textareaProps
 
   return (
     <fetcher.Form
@@ -107,26 +108,40 @@ export function MemoForm({
         setIsChangedMemo(false)
       }}
     >
-      <div className="space-y-6">
+      <FormItemGroup>
         <FormItem>
-          <FormDescription>
-            {t('memo.message.first_line_is_title')}
-          </FormDescription>
-          <TextareaConform
-            meta={fields.content}
-            key={fields.content.key}
-            className={cn('resize-none bg-[#303841] text-white', className)}
-            {...otherProps}
-          />
+          <ClientOnly fallback={null}>
+            {() => (
+              <div className="flex flex-col gap-2">
+                <InputConform
+                  key={fields.title.key}
+                  meta={fields.title}
+                  type="text"
+                  placeholder={t('memo.message.un_titled')}
+                  className="hover:border-input h-9 border-transparent text-lg! font-bold"
+                />
+                <LexicalMdEditor
+                  key={fields.content.key}
+                  value={fields.content.defaultValue ?? ''}
+                  onChange={(value) => {
+                    contentControl.change(value)
+                    handleChangeMemo()
+                  }}
+                  onBlur={contentControl.blur}
+                  className={cn(
+                    'hover:border-input placeholder:text-muted-foreground focus-within:border-ring focus-within:ring-ring/50 border-transparent transition-colors focus-within:ring-3',
+                    editorClassName,
+                  )}
+                />
+              </div>
+            )}
+          </ClientOnly>
           <FormMessage message={fields.content.errors} />
         </FormItem>
         <FormItem>
           <ClientOnly
             fallback={
-              <DummyDateTimePicker
-                placeholder={t('memo.model.related_date')}
-                className="w-56"
-              />
+              <DummyDateTimePicker placeholder={t('memo.model.related_date')} />
             }
           >
             {() => (
@@ -138,7 +153,6 @@ export function MemoForm({
                 onChangeData={handleChangeMemo}
                 onChangeAllDay={handleChangeMemo}
                 placeholder={t('memo.model.related_date')}
-                className="w-56"
               />
             )}
           </ClientOnly>
@@ -150,7 +164,7 @@ export function MemoForm({
           {memo ? (
             <MemoActionButton memo={memo} redirectUrl={redirectUrl} />
           ) : (
-            <div>&nbsp;</div>
+            <div></div>
           )}
           <SaveButton
             isChangedMemo={isChangedMemo}
@@ -158,7 +172,7 @@ export function MemoForm({
             isAutoSave={isAutoSave}
           />
         </FormFooter>
-      </div>
+      </FormItemGroup>
     </fetcher.Form>
   )
 }
@@ -176,13 +190,16 @@ export function SaveButton({
 }: SaveButtonProps) {
   const { t } = useTranslation()
 
-  const caption = isSubmitting
-    ? t('common.message.state_saving')
-    : !isChangedMemo
-      ? t('common.message.state_saved')
-      : isAutoSave
-        ? t('common.message.state_save_wait')
-        : t('common.message.save')
+  let caption: string
+  if (isSubmitting) {
+    caption = t('common.message.state_saving')
+  } else if (!isChangedMemo) {
+    caption = t('common.message.state_saved')
+  } else if (isAutoSave) {
+    caption = t('common.message.state_save_wait')
+  } else {
+    caption = t('common.message.save')
+  }
 
   const isDisabled = isAutoSave || !isChangedMemo
 

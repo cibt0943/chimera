@@ -25,7 +25,7 @@ export function MemoFormDialog({
 }: MemoFormDialogProps) {
   const { t } = useTranslation()
   const memoSettings = useMemoSettingsAtom()
-  const autoSave = memoSettings?.autoSave || false
+  const autoSave = memoSettings?.autoSave ?? false
 
   //autosaveの場合はsubmitしても画面遷移しないので、redirectUrlは空文字
   const memoFormSubmitRedirectUrl = autoSave ? '' : redirectUrl
@@ -46,7 +46,7 @@ export function MemoFormDialog({
           memo={memo}
           isAutoSave={autoSave}
           redirectUrl={memoFormSubmitRedirectUrl}
-          textareaProps={{ className: 'h-[calc(100svh_-_360px)]' }}
+          editorClassName="h-[calc(100svh_-_360px)]"
         />
       </DialogContent>
     </Dialog>

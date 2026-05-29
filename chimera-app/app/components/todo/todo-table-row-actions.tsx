@@ -60,7 +60,7 @@ export function TodoTableRowActions({
           <LuArrowUpFromLine />
           {t('common.message.position_up')}
           <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' ↑'}
+            {`${userAgent.modifierKeyIcon} ↑`}
           </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -71,7 +71,7 @@ export function TodoTableRowActions({
           <LuArrowDownFromLine />
           {t('common.message.position_down')}
           <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' ↓'}
+            {`${userAgent.modifierKeyIcon} ↓`}
           </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -81,53 +81,61 @@ export function TodoTableRowActions({
             <DropdownMenuItem
               disabled={viewTodo.status === TaskStatus.NEW}
               onClick={() => {
-                const upateTask = { ...viewTodo, status: TaskStatus.NEW }
-                table.options.meta?.updateTodoStatus(upateTask)
+                table.options.meta?.updateTodoStatus({
+                  ...viewTodo,
+                  status: TaskStatus.NEW,
+                })
               }}
             >
               <LuCircleDot />
               {t('task.message.to_new')}
               <DropdownMenuShortcut>
-                {userAgent.modifierKeyIcon + ' 1'}
+                {`${userAgent.modifierKeyIcon} 1`}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem
               disabled={viewTodo.status === TaskStatus.DOING}
               onClick={() => {
-                const upateTask = { ...viewTodo, status: TaskStatus.DOING }
-                table.options.meta?.updateTodoStatus(upateTask)
+                table.options.meta?.updateTodoStatus({
+                  ...viewTodo,
+                  status: TaskStatus.DOING,
+                })
               }}
             >
               <LuCirclePlay />
               {t('task.message.to_doing')}
               <DropdownMenuShortcut>
-                {userAgent.modifierKeyIcon + ' 2'}
+                {`${userAgent.modifierKeyIcon} 2`}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem
               disabled={viewTodo.status === TaskStatus.DONE}
               onClick={() => {
-                const upateTask = { ...viewTodo, status: TaskStatus.DONE }
-                table.options.meta?.updateTodoStatus(upateTask)
+                table.options.meta?.updateTodoStatus({
+                  ...viewTodo,
+                  status: TaskStatus.DONE,
+                })
               }}
             >
               <LuCircleCheck />
               {t('task.message.to_done')}
               <DropdownMenuShortcut>
-                {userAgent.modifierKeyIcon + ' 3'}
+                {`${userAgent.modifierKeyIcon} 3`}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem
               disabled={viewTodo.status === TaskStatus.PENDING}
               onClick={() => {
-                const upateTask = { ...viewTodo, status: TaskStatus.PENDING }
-                table.options.meta?.updateTodoStatus(upateTask)
+                table.options.meta?.updateTodoStatus({
+                  ...viewTodo,
+                  status: TaskStatus.PENDING,
+                })
               }}
             >
               <LuCirclePause />
               {t('task.message.to_pending')}
               <DropdownMenuShortcut>
-                {userAgent.modifierKeyIcon + ' 4'}
+                {`${userAgent.modifierKeyIcon} 4`}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -147,7 +155,7 @@ export function TodoTableRowActions({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="text-red-600 focus:text-red-600"
+          variant="destructive"
           onClick={() => {
             table.options.meta?.deleteTodo(viewTodo)
           }}
@@ -155,7 +163,7 @@ export function TodoTableRowActions({
           <LuTrash2 />
           {t('common.message.delete')}
           <DropdownMenuShortcut>
-            {userAgent.modifierKeyIcon + ' '}
+            {`${userAgent.modifierKeyIcon} `}
             <LuDelete className="inline" />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
