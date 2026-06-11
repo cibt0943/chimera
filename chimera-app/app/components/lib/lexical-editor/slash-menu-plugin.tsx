@@ -17,6 +17,7 @@ import { $setBlocksType } from '@lexical/selection'
 import {
   INSERT_UNORDERED_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
+  INSERT_CHECK_LIST_COMMAND,
 } from '@lexical/list'
 import {
   Heading1,
@@ -25,11 +26,20 @@ import {
   Quote,
   List,
   ListOrdered,
+  ListTodo,
   Type,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 
-type SlashCommandType = 'paragraph' | 'h1' | 'h2' | 'h3' | 'quote' | 'ul' | 'ol'
+type SlashCommandType =
+  | 'paragraph'
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'quote'
+  | 'ul'
+  | 'ol'
+  | 'check'
 
 class SlashMenuOption extends MenuOption {
   label: string
@@ -93,6 +103,12 @@ const ALL_COMMANDS: SlashMenuOption[] = [
     <ListOrdered className="h-4 w-4" />,
     '番号付きリスト',
     'ol',
+  ),
+  new SlashMenuOption(
+    'Todoリスト',
+    <ListTodo className="h-4 w-4" />,
+    'チェックボックス付きリスト',
+    'check',
   ),
 ]
 
@@ -161,17 +177,19 @@ export function SlashMenuPlugin() {
     ) => {
       if (
         selectedOption.commandType === 'ul' ||
-        selectedOption.commandType === 'ol'
+        selectedOption.commandType === 'ol' ||
+        selectedOption.commandType === 'check'
       ) {
         editor.update(() => {
           nodeToRemove?.remove()
         })
-        editor.dispatchCommand(
+        const command =
           selectedOption.commandType === 'ul'
             ? INSERT_UNORDERED_LIST_COMMAND
-            : INSERT_ORDERED_LIST_COMMAND,
-          undefined,
-        )
+            : selectedOption.commandType === 'ol'
+              ? INSERT_ORDERED_LIST_COMMAND
+              : INSERT_CHECK_LIST_COMMAND
+        editor.dispatchCommand(command, undefined)
       } else {
         editor.update(() => {
           nodeToRemove?.remove()

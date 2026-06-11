@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/rich-text'
+import {
+  $createHeadingNode,
+  $createQuoteNode,
+  $isHeadingNode,
+} from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
 import {
   INSERT_UNORDERED_LIST_COMMAND,
@@ -17,7 +21,9 @@ import {
   UNDO_COMMAND,
   REDO_COMMAND,
   FORMAT_TEXT_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
 } from 'lexical'
+import { mergeRegister } from '@lexical/utils'
 import {
   Heading1,
   Heading2,
@@ -34,8 +40,6 @@ import {
 } from 'lucide-react'
 import { Toggle } from '~/components/ui/toggle'
 import { Separator } from '~/components/ui/separator'
-
-const COMMAND_PRIORITY_CRITICAL = 4
 
 type BlockType = 'paragraph' | 'h1' | 'h2' | 'h3' | 'quote' | 'ul' | 'ol'
 
@@ -73,26 +77,28 @@ export function ToolbarPlugin() {
   }, [])
 
   useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => updateToolbar())
-    })
+    return mergeRegister(
+      editor.registerUpdateListener(({ editorState }) => {
+        editorState.read(() => updateToolbar())
+      }),
+      editor.registerCommand(
+        CAN_UNDO_COMMAND,
+        (payload) => {
+          setCanUndo(payload)
+          return false
+        },
+        COMMAND_PRIORITY_CRITICAL,
+      ),
+      editor.registerCommand(
+        CAN_REDO_COMMAND,
+        (payload) => {
+          setCanRedo(payload)
+          return false
+        },
+        COMMAND_PRIORITY_CRITICAL,
+      ),
+    )
   }, [editor, updateToolbar])
-
-  useEffect(() => {
-    return editor.registerCommand(
-      CAN_UNDO_COMMAND,
-      (payload) => { setCanUndo(payload); return false },
-      COMMAND_PRIORITY_CRITICAL,
-    )
-  }, [editor])
-
-  useEffect(() => {
-    return editor.registerCommand(
-      CAN_REDO_COMMAND,
-      (payload) => { setCanRedo(payload); return false },
-      COMMAND_PRIORITY_CRITICAL,
-    )
-  }, [editor])
 
   const formatHeading = (tag: 'h1' | 'h2' | 'h3') => {
     editor.update(() => {
@@ -121,12 +127,15 @@ export function ToolbarPlugin() {
   }
 
   const formatList = (listType: 'bullet' | 'number') => {
-    const isActive = listType === 'bullet' ? blockType === 'ul' : blockType === 'ol'
+    const isActive =
+      listType === 'bullet' ? blockType === 'ul' : blockType === 'ol'
     if (isActive) {
       editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined)
     } else {
       editor.dispatchCommand(
-        listType === 'bullet' ? INSERT_UNORDERED_LIST_COMMAND : INSERT_ORDERED_LIST_COMMAND,
+        listType === 'bullet'
+          ? INSERT_UNORDERED_LIST_COMMAND
+          : INSERT_ORDERED_LIST_COMMAND,
         undefined,
       )
     }
@@ -188,7 +197,9 @@ export function ToolbarPlugin() {
       <Toggle
         size="sm"
         pressed={isBold}
-        onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
+        onPressedChange={() =>
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')
+        }
         title="太字"
       >
         <Bold />
@@ -196,7 +207,9 @@ export function ToolbarPlugin() {
       <Toggle
         size="sm"
         pressed={isItalic}
-        onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
+        onPressedChange={() =>
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')
+        }
         title="斜体"
       >
         <Italic />
@@ -204,7 +217,9 @@ export function ToolbarPlugin() {
       <Toggle
         size="sm"
         pressed={isStrikethrough}
-        onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}
+        onPressedChange={() =>
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')
+        }
         title="取り消し線"
       >
         <Strikethrough />
@@ -212,7 +227,9 @@ export function ToolbarPlugin() {
       <Toggle
         size="sm"
         pressed={isCode}
-        onPressedChange={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}
+        onPressedChange={() =>
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')
+        }
         title="インラインコード"
       >
         <Code />

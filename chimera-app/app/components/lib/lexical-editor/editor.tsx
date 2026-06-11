@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
@@ -7,13 +7,14 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
-// 行のD&Dを実装するために必要なプラグイン
 // import { DraggableBlockPlugin_EXPERIMENTAL } from '@lexical/react/LexicalDraggableBlockPlugin'
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
   TRANSFORMERS,
+  CHECK_LIST,
 } from '@lexical/markdown'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { ListNode, ListItemNode } from '@lexical/list'
@@ -21,11 +22,13 @@ import { CodeNode, CodeHighlightNode } from '@lexical/code'
 import { LinkNode } from '@lexical/link'
 import type { EditorState } from 'lexical'
 import { cn } from '~/lib/utils'
-// import { ToolbarPlugin } from './toolbar-plugin'
 import { EditorTheme } from './theme'
+import './editor.css'
 import { SlashMenuPlugin } from './slash-menu-plugin'
 import { FloatingToolbarPlugin } from './floating-toolbar-plugin'
-// import './editor.css'
+import { ListCancelPlugin } from './list-cancel-plugin'
+
+const ALL_TRANSFORMERS = [CHECK_LIST, ...TRANSFORMERS]
 
 interface LexicalEditorProps {
   value: string
@@ -55,7 +58,7 @@ export function LexicalEditor({
     theme: EditorTheme,
     nodes: EDITOR_NODES,
     editorState: () => {
-      $convertFromMarkdownString(value, TRANSFORMERS)
+      $convertFromMarkdownString(value, ALL_TRANSFORMERS)
     },
     onError: (error: Error) => {
       console.error(error)
@@ -66,16 +69,14 @@ export function LexicalEditor({
   // const menuRef = React.useRef<HTMLDivElement>(null)
   // const targetLineRef = React.useRef<HTMLDivElement>(null)
   const [floatingAnchorElem, setFloatingAnchorElem] =
-    React.useState<HTMLDivElement | null>(null)
-  const onRef = (_floatingAnchorElem: HTMLDivElement) => {
-    if (_floatingAnchorElem !== null) {
-      setFloatingAnchorElem(_floatingAnchorElem)
-    }
+    useState<HTMLDivElement | null>(null)
+  const onRef = (elem: HTMLDivElement) => {
+    if (elem !== null) setFloatingAnchorElem(elem)
   }
 
   function handleChange(editorState: EditorState) {
     editorState.read(() => {
-      const markdown = $convertToMarkdownString(TRANSFORMERS)
+      const markdown = $convertToMarkdownString(ALL_TRANSFORMERS)
       onChange?.(markdown)
     })
   }
@@ -97,10 +98,12 @@ export function LexicalEditor({
         />
         <HistoryPlugin />
         <ListPlugin />
+        <CheckListPlugin />
         <LinkPlugin />
-        <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+        <MarkdownShortcutPlugin transformers={ALL_TRANSFORMERS} />
         <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
         <SlashMenuPlugin />
+        <ListCancelPlugin />
         {floatingAnchorElem && (
           <FloatingToolbarPlugin anchorElem={floatingAnchorElem} />
         )}

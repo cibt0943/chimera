@@ -13,9 +13,11 @@ export const EditorTheme: EditorThemeClasses = {
   list: {
     ul: 'list-disc pl-6',
     ol: 'list-decimal pl-6',
+    checklist: 'lexical-checklist list-none pl-0',
     listitem: 'mb-0.5',
-    listitemChecked: 'line-through text-muted-foreground',
-    listitemUnchecked: '',
+    listitemChecked:
+      'lexical-listitem-checked relative pl-6 line-through text-muted-foreground',
+    listitemUnchecked: 'lexical-listitem-unchecked relative pl-6',
     nested: {
       listitem: 'list-none',
     },
