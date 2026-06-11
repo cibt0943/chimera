@@ -16,7 +16,7 @@ import {
 import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker'
 import { InputConform } from '~/components/lib/conform/input'
 import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
-import { LexicalMdEditor } from '~/components/lib/lexical-editor/editor'
+import { LexicalEditor } from '~/components/lib/lexical-editor/editor'
 import { Memo } from '~/types/memos'
 import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
@@ -112,28 +112,33 @@ export function MemoForm({
         <FormItem>
           <ClientOnly fallback={null}>
             {() => (
-              <div className="flex flex-col gap-2">
-                <InputConform
-                  key={fields.title.key}
-                  meta={fields.title}
-                  type="text"
-                  placeholder={t('memo.message.un_titled')}
-                  className="hover:border-input h-9 border-transparent text-lg! font-bold"
-                />
-                <LexicalMdEditor
-                  key={fields.content.key}
-                  value={fields.content.defaultValue ?? ''}
-                  onChange={(value) => {
-                    contentControl.change(value)
-                    handleChangeMemo()
-                  }}
-                  onBlur={contentControl.blur}
-                  className={cn(
-                    'hover:border-input placeholder:text-muted-foreground focus-within:border-ring focus-within:ring-ring/50 border-transparent transition-colors focus-within:ring-3',
-                    editorClassName,
-                  )}
-                />
-              </div>
+              <InputConform
+                key={fields.title.key}
+                meta={fields.title}
+                type="text"
+                placeholder={t('memo.message.un_titled')}
+                className="hover:border-input h-9 border-transparent text-lg! font-bold"
+              />
+            )}
+          </ClientOnly>
+          <FormMessage message={fields.title.errors} />
+        </FormItem>
+        <FormItem>
+          <ClientOnly fallback={null}>
+            {() => (
+              <LexicalEditor
+                key={fields.content.key}
+                value={fields.content.defaultValue ?? ''}
+                onChange={(value) => {
+                  contentControl.change(value)
+                  handleChangeMemo()
+                }}
+                onBlur={contentControl.blur}
+                className={cn(
+                  'hover:border-input border-transparent',
+                  editorClassName,
+                )}
+              />
             )}
           </ClientOnly>
           <FormMessage message={fields.content.errors} />
