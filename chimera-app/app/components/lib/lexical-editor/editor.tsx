@@ -15,12 +15,18 @@ import {
   $convertToMarkdownString,
   TRANSFORMERS,
   CHECK_LIST,
+  type ElementTransformer,
 } from '@lexical/markdown'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { ListNode, ListItemNode } from '@lexical/list'
 import { CodeNode, CodeHighlightNode } from '@lexical/code'
 import { LinkNode } from '@lexical/link'
-import type { EditorState } from 'lexical'
+import {
+  $isParagraphNode,
+  $isTextNode,
+  ParagraphNode,
+  type EditorState,
+} from 'lexical'
 import { cn } from '~/lib/utils'
 import { EditorTheme } from './theme'
 import './editor.css'
@@ -28,7 +34,39 @@ import { SlashMenuPlugin } from './slash-menu-plugin'
 import { FloatingToolbarPlugin } from './floating-toolbar-plugin'
 import { ListCancelPlugin } from './list-cancel-plugin'
 
-const ALL_TRANSFORMERS = [CHECK_LIST, ...TRANSFORMERS]
+// 空の段落を &nbsp; としてMarkdownに保存・復元するトランスフォーマー
+// インポート時は \u200B（ゼロ幅スペース）を挿入して Lexical の空段落クリーンアップを回避する
+const EMPTY_LINE_TRANSFORMER: ElementTransformer = {
+  dependencies: [ParagraphNode],
+  export: (node) => {
+    if (!$isParagraphNode(node)) return null
+    const size = node.getChildrenSize()
+    // 完全に空の段落
+    if (size === 0) return '\n&nbsp;\n'
+    // \u200B のみを含む段落（Markdown からインポートされた空行）
+    if (size === 1) {
+      const child = node.getFirstChild()
+      if ($isTextNode(child) && child.getTextContent() === '\u200B') {
+        return '\n&nbsp;\n'
+      }
+    }
+    return null
+  },
+  regExp: /^&nbsp;$/,
+  replace: (parentNode, children, _match, isImport) => {
+    if (isImport) {
+      // 空段落を作ると Lexical のクリーンアップで削除されるため、
+      // \u200B（ゼロ幅スペース）を挿入して isEmptyParagraph 判定を回避する
+      const textNode = children[0]
+      if (textNode && $isTextNode(textNode)) {
+        textNode.setTextContent('\u200B')
+      }
+    }
+  },
+  type: 'element',
+}
+
+const ALL_TRANSFORMERS = [EMPTY_LINE_TRANSFORMER, CHECK_LIST, ...TRANSFORMERS]
 
 interface LexicalEditorProps {
   value: string
@@ -77,7 +115,8 @@ export function LexicalEditor({
   function handleChange(editorState: EditorState) {
     editorState.read(() => {
       const markdown = $convertToMarkdownString(ALL_TRANSFORMERS)
-      onChange?.(markdown)
+      // \u200B が非空行に混入した場合（ユーザーが空行に文字を入力した場合）は除去する
+      onChange?.(markdown.replace(/\u200B/g, ''))
     })
   }
 
