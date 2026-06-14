@@ -1,108 +1,35 @@
-.editor-shell {
-  overflow: hidden;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 12px;
+/* ============================================================
+   Check list (Todo list)
+   ============================================================ */
+.lexical-checklist {
+  padding-left: 0;
 }
 
-.editor-toolbar {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  background: #fafafa;
-  border-bottom: 1px solid #eee;
-}
-
-.editor-toolbar button {
-  padding: 6px 10px;
-  cursor: pointer;
-  background: white;
-  border: none;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-.editor-container {
-  position: relative;
-}
-
-.editor-input {
-  min-height: 300px;
-  padding: 16px;
-  font-size: 16px;
-  line-height: 1.7;
+.lexical-listitem-unchecked,
+.lexical-listitem-checked {
   outline: none;
+  list-style-type: none;
 }
 
-.editor-placeholder {
+.lexical-listitem-unchecked::before,
+.lexical-listitem-checked::before {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  color: #999;
-  pointer-events: none;
+  top: 3px;
+  left: 0;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  content: '';
+  border: 1.5px solid var(--border);
+  border-radius: 3px;
 }
 
-.editor-h1 {
-  margin: 24px 0 12px;
-  font-size: 32px;
-  font-weight: bold;
-}
-
-.editor-h2 {
-  margin: 20px 0 10px;
-  font-size: 26px;
-  font-weight: bold;
-}
-
-.editor-h3 {
-  margin: 18px 0 8px;
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.editor-text-bold {
-  font-weight: bold;
-}
-
-.editor-text-italic {
-  font-style: italic;
-}
-
-.editor-text-underline {
-  text-decoration: underline;
-}
-
-.editor-text-code {
-  padding: 2px 4px;
-  font-family: monospace;
-  background: #f4f4f4;
-  border-radius: 4px;
-}
-
-.editor-ul {
-  padding-left: 24px;
-}
-
-.editor-ol {
-  padding-left: 24px;
-}
-
-.editor-quote {
-  padding-left: 16px;
-  margin-left: 0;
-  color: #666;
-  border-left: 4px solid #ddd;
-}
-
-.editor-link {
-  color: #2563eb;
-  text-decoration: underline;
-}
-
-.editor-code {
-  padding: 16px;
-  font-family: monospace;
-  color: white;
-  background: #111;
-  border-radius: 8px;
+.lexical-listitem-checked::before {
+  background-color: var(--primary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M2 6l3 3 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 10px 10px;
+  border-color: var(--primary);
 }

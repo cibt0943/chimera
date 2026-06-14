@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
@@ -6,11 +7,14 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
+// import { DraggableBlockPlugin_EXPERIMENTAL } from '@lexical/react/LexicalDraggableBlockPlugin'
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
   TRANSFORMERS,
+  CHECK_LIST,
 } from '@lexical/markdown'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { ListNode, ListItemNode } from '@lexical/list'
@@ -18,11 +22,15 @@ import { CodeNode, CodeHighlightNode } from '@lexical/code'
 import { LinkNode } from '@lexical/link'
 import type { EditorState } from 'lexical'
 import { cn } from '~/lib/utils'
-// import { ToolbarPlugin } from './toolbar-plugin'
 import { EditorTheme } from './theme'
-// import './editor.css'
+import './editor.css'
+import { SlashMenuPlugin } from './slash-menu-plugin'
+import { FloatingToolbarPlugin } from './floating-toolbar-plugin'
+import { ListCancelPlugin } from './list-cancel-plugin'
 
-interface LexicalMdEditorProps {
+const ALL_TRANSFORMERS = [CHECK_LIST, ...TRANSFORMERS]
+
+interface LexicalEditorProps {
   value: string
   onChange?: (value: string) => void
   onBlur?: () => void
@@ -39,41 +47,50 @@ const EDITOR_NODES = [
   LinkNode,
 ]
 
-export function LexicalMdEditor({
+export function LexicalEditor({
   value,
   onChange,
   onBlur,
   className,
-}: LexicalMdEditorProps) {
+}: LexicalEditorProps) {
   const initialConfig = {
     namespace: 'MemoEditor',
     theme: EditorTheme,
     nodes: EDITOR_NODES,
     editorState: () => {
-      $convertFromMarkdownString(value, TRANSFORMERS)
+      $convertFromMarkdownString(value, ALL_TRANSFORMERS)
     },
     onError: (error: Error) => {
       console.error(error)
     },
   }
 
+  // 行のD&Dを実装するための状態とref
+  // const menuRef = React.useRef<HTMLDivElement>(null)
+  // const targetLineRef = React.useRef<HTMLDivElement>(null)
+  const [floatingAnchorElem, setFloatingAnchorElem] =
+    useState<HTMLDivElement | null>(null)
+  const onRef = (elem: HTMLDivElement) => {
+    if (elem !== null) setFloatingAnchorElem(elem)
+  }
+
   function handleChange(editorState: EditorState) {
     editorState.read(() => {
-      const markdown = $convertToMarkdownString(TRANSFORMERS)
+      const markdown = $convertToMarkdownString(ALL_TRANSFORMERS)
       onChange?.(markdown)
     })
   }
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <div
-        className={cn('relative overflow-auto rounded-md border', className)}
-      >
-        {/* <ToolbarPlugin /> */}
+      <div ref={onRef} className="relative">
         <RichTextPlugin
           contentEditable={
             <ContentEditable
-              className="h-full min-h-40 px-2.5 py-1 outline-none"
+              className={cn(
+                'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 w-full min-w-0 rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:ring-3',
+                className,
+              )}
               onBlur={onBlur}
             />
           }
@@ -81,9 +98,39 @@ export function LexicalMdEditor({
         />
         <HistoryPlugin />
         <ListPlugin />
+        <CheckListPlugin />
         <LinkPlugin />
-        <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+        <MarkdownShortcutPlugin transformers={ALL_TRANSFORMERS} />
         <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
+        <SlashMenuPlugin />
+        <ListCancelPlugin />
+        {floatingAnchorElem && (
+          <FloatingToolbarPlugin anchorElem={floatingAnchorElem} />
+        )}
+        {/*
+          // 行のD&D
+          floatingAnchorElem && (
+          <DraggableBlockPlugin_EXPERIMENTAL
+            anchorElem={floatingAnchorElem}
+            menuRef={menuRef}
+            targetLineRef={targetLineRef}
+            menuComponent={
+              <div
+                ref={menuRef}
+                className="hover:bg-accent text-muted-foreground absolute top-0 left-0 cursor-grab rounded px-1 opacity-0"
+              >
+                ⠿
+              </div>
+            }
+            targetLineComponent={
+              <div
+                ref={targetLineRef}
+                className="bg-primary pointer-events-none absolute top-0 left-0 h-1 rounded opacity-0"
+              />
+            }
+            isOnMenu={(el) => menuRef.current?.contains(el) ?? false}
+          />
+        ) */}
       </div>
     </LexicalComposer>
   )
