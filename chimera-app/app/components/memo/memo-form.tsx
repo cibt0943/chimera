@@ -117,7 +117,7 @@ export function MemoForm({
                 meta={fields.title}
                 type="text"
                 placeholder={t('memo.message.un_titled')}
-                className="hover:border-input h-9 border-transparent text-lg! font-bold"
+                className="hover:border-input h-12 border-transparent text-3xl! font-bold"
               />
             )}
           </ClientOnly>
