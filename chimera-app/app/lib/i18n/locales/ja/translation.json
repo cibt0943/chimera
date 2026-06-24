@@ -62,6 +62,12 @@
       "state_saved": "保存済み",
       "state_saving": "保存中...",
       "set_time": "時間を設定"
+    },
+    "validation": {
+      "required": "必須項目です",
+      "invalid": "入力値が不正です",
+      "max_length_255": "255文字以内で入力してください",
+      "max_length_10000": "10000文字以内で入力してください"
     }
   },
   "account": {

@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { cn } from '~/lib/utils'
-import { Label } from '~/components/ui/label'
-import { FieldGroup, Field } from '~/components/ui/field'
+import { FieldGroup, Field, FieldLabel } from '~/components/ui/field'
 import { DialogFooter } from '~/components/ui/dialog'
 
 export function FormItemGroup({
@@ -34,9 +33,12 @@ export function FormLabel({
   ...props
 }: FormLabelProps) {
   return (
-    <Label className={cn(error && 'text-destructive', className)} {...props}>
+    <FieldLabel
+      className={cn(error && 'text-destructive', className)}
+      {...props}
+    >
       {children}
-    </Label>
+    </FieldLabel>
   )
 }
 export interface FormMessageProps extends React.ComponentProps<'p'> {

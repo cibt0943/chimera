@@ -84,7 +84,7 @@ export function TaskForm({ task, redirectUrl }: TaskFormProps) {
             <Required />
           </FormLabel>
           <InputConform meta={fields.title} type="text" />
-          <FormMessage message={fields.title.errors} />
+          <FormMessage message={t(fields.title.errors)} />
         </FormItem>
         <FormItem>
           <FormLabel htmlFor={fields.memo.id}>{t('task.model.memo')}</FormLabel>
@@ -93,7 +93,7 @@ export function TaskForm({ task, redirectUrl }: TaskFormProps) {
             className="resize-none"
             rows={4}
           />
-          <FormMessage message={fields.memo.errors} />
+          <FormMessage message={t(fields.memo.errors)} />
         </FormItem>
         <FormItem>
           <FormLabel htmlFor={fields.dueDate.id}>
@@ -105,7 +105,7 @@ export function TaskForm({ task, redirectUrl }: TaskFormProps) {
             defaultAllDay={false}
             includeAllDayComponent={true}
           />
-          <FormMessage message={fields.dueDate.errors} />
+          <FormMessage message={t(fields.dueDate.errors)} />
         </FormItem>
         <FormItem>
           <FormLabel htmlFor={fields.status.id}>
@@ -121,21 +121,21 @@ export function TaskForm({ task, redirectUrl }: TaskFormProps) {
           <FormDescription>
             {t('task.message.select_task_status')}
           </FormDescription>
-          <FormMessage message={fields.status.errors} />
+          <FormMessage message={t(fields.status.errors)} />
         </FormItem>
         <input type="hidden" name="type" value={TodoType.TASK} />
         <input type="hidden" name="redirectUrl" value={redirectUrl} />
-        <FormFooter className="sm:justify-between">
-          <div>
-            {task && (
-              <TodoDeleteButton viewTodo={viewTodo} redirectUrl={redirectUrl} />
-            )}
-          </div>
-          <Button type="submit" disabled={fetcher.state !== 'idle'}>
-            {t('common.message.save')}
-          </Button>
-        </FormFooter>
       </FormItemGroup>
+      <FormFooter className="sm:justify-between">
+        <div>
+          {task && (
+            <TodoDeleteButton viewTodo={viewTodo} redirectUrl={redirectUrl} />
+          )}
+        </div>
+        <Button type="submit" disabled={fetcher.state !== 'idle'}>
+          {t('common.message.save')}
+        </Button>
+      </FormFooter>
     </fetcher.Form>
   )
 }
