@@ -7,6 +7,9 @@ import { getFormProps, useInputControl } from '@conform-to/react'
 import { Button } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
+import { cn } from '~/lib/utils'
+import { useUserAgentAtom } from '~/lib/global-state'
+import { Memo } from '~/types/memos'
 import {
   FormItemGroup,
   FormItem,
@@ -17,11 +20,8 @@ import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker
 import { InputConform } from '~/components/lib/conform/input'
 import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
 import { LexicalEditor } from '~/components/lib/lexical-editor/editor'
-import { Memo } from '~/types/memos'
 import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
-import { useUserAgentAtom } from '~/lib/global-state'
-import { cn } from '~/lib/utils'
 
 export interface MemoFormProps {
   memo: Memo | undefined
@@ -121,7 +121,7 @@ export function MemoForm({
               />
             )}
           </ClientOnly>
-          <FormMessage message={fields.title.errors} />
+          <FormMessage message={t(fields.title.errors)} />
         </FormItem>
         <FormItem>
           <ClientOnly fallback={null}>
@@ -141,7 +141,7 @@ export function MemoForm({
               />
             )}
           </ClientOnly>
-          <FormMessage message={fields.content.errors} />
+          <FormMessage message={t(fields.content.errors)} />
         </FormItem>
         <FormItem>
           <ClientOnly
@@ -161,11 +161,11 @@ export function MemoForm({
               />
             )}
           </ClientOnly>
-          <FormMessage message={fields.relatedDate.errors} />
+          <FormMessage message={t(fields.relatedDate.errors)} />
         </FormItem>
         {/* 戻り先を切り替えるための値 */}
         <input type="hidden" name="redirectUrl" value={redirectUrl} />
-        <FormFooter className="sm:justify-between">
+        <FormFooter className="rounded-bl-none sm:justify-between">
           {memo ? (
             <MemoActionButton memo={memo} redirectUrl={redirectUrl} />
           ) : (

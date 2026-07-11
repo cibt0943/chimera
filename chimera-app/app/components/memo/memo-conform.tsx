@@ -8,16 +8,15 @@ export interface useMemoConformProps {
 
 export function useMemoConform({ memo }: useMemoConformProps) {
   const formId = memo ? `memo-form-${memo.id}` : 'memo-form-new'
-  const defaultValue = {
-    title: memo?.title ?? '',
-    content: memo?.content ?? '',
-    relatedDate: memo?.relatedDate ?? null,
-    relatedDateAllDay: memo ? memo.relatedDateAllDay : true,
-  }
 
   const [form, fields] = useForm<MemoSchemaType>({
     id: formId,
-    defaultValue: defaultValue,
+    defaultValue: memo ?? {
+      title: '',
+      content: '',
+      relatedDate: null,
+      relatedDateAllDay: true,
+    },
     constraint: getZodConstraint(MemoSchema),
     onValidate: ({ formData }) => {
       return parseWithZod(formData, { schema: MemoSchema })

@@ -55,7 +55,7 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
         memo={memo}
         isAutoSave={autoSave}
         redirectUrl={''}
-        editorClassName="h-[calc(100svh-233px)]"
+        editorClassName="h-[calc(100svh-257px)]"
       />
     </div>
   )

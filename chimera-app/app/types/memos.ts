@@ -39,11 +39,14 @@ export type Memo = {
 export type Memos = Memo[]
 
 export const MemoSchema = zod.object({
-  status: zod.preprocess((v) => Number(v), zod.enum(MemoStatus)).optional(),
-  title: zod.string().max(255, '255文字以内で入力してください').optional(),
+  status: zod.coerce
+    .number()
+    .pipe(zod.enum(MemoStatus, 'common.validation.invalid'))
+    .optional(),
+  title: zod.string().max(255, 'common.validation.max_length_255').optional(),
   content: zod
     .string()
-    .max(60000, '60000文字以内で入力してください')
+    .max(60000, 'common.validation.max_length_60000')
     .optional(),
   relatedDate: zod.date().optional(),
   relatedDateAllDay: zod.boolean().optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要

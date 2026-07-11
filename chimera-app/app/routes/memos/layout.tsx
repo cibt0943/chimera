@@ -46,14 +46,14 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <div className="p-4">
+    <div className="h-svh overflow-hidden p-4">
       <ResizablePanelGroup
         orientation="horizontal"
         className="rounded-lg border"
       >
-        <ResizablePanel defaultSize={35}>{memoList}</ResizablePanel>
+        <ResizablePanel defaultSize="35%">{memoList}</ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={65}>
+        <ResizablePanel defaultSize="65%">
           <Outlet />
         </ResizablePanel>
       </ResizablePanelGroup>

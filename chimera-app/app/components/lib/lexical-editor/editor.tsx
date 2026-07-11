@@ -127,7 +127,7 @@ export function LexicalEditor({
           contentEditable={
             <ContentEditable
               className={cn(
-                'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 w-full min-w-0 overflow-auto rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:ring-3',
+                'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 w-full min-w-0 overflow-auto rounded-lg border bg-transparent px-2.5 py-2 text-base transition-colors outline-none focus-visible:ring-3',
                 className,
               )}
               onBlur={onBlur}

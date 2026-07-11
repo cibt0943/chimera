@@ -310,7 +310,7 @@ export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
   )
 
   return (
-    <div className="space-y-4 px-1 md:py-4">
+    <div className="flex flex-col gap-4 overflow-hidden px-1 md:py-4">
       <div className="flex items-center gap-2 px-3">
         <Form action={MEMO_URL} method="post">
           <Button
