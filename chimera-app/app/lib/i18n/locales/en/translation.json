@@ -66,8 +66,10 @@
     "validation": {
       "required": "This field is required",
       "invalid": "Invalid value",
+      "max_length_10": "Must be 10 characters or fewer",
       "max_length_255": "Must be 255 characters or fewer",
-      "max_length_10000": "Must be 10000 characters or fewer"
+      "max_length_10000": "Must be 10000 characters or fewer",
+      "max_length_60000": "Must be 60000 characters or fewer"
     }
   },
   "account": {

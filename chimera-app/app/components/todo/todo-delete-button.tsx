@@ -1,24 +1,21 @@
 import { useTranslation } from 'react-i18next'
 import { LuTrash2 } from 'react-icons/lu'
 import { Button } from '~/components/ui/button'
-import { ViewTodo } from '~/types/view-todos'
+import { DeleteTodo } from '~/types/view-todos'
 import { TodoDeleteConfirmDialog } from './todo-delete-confirm-dialog'
 
 export interface TodoDeleteButtonProps {
-  viewTodo: ViewTodo | undefined
   redirectUrl: string
+  todo?: DeleteTodo
 }
 
-export function TodoDeleteButton({
-  viewTodo,
-  redirectUrl,
-}: TodoDeleteButtonProps) {
+export function TodoDeleteButton({ todo, redirectUrl }: TodoDeleteButtonProps) {
   const { t } = useTranslation()
 
-  if (!viewTodo) return null
+  if (!todo) return null
 
   return (
-    <TodoDeleteConfirmDialog viewTodo={viewTodo} redirectUrl={redirectUrl}>
+    <TodoDeleteConfirmDialog todo={todo} redirectUrl={redirectUrl}>
       <Button type="button" variant="destructive">
         <LuTrash2 />
         {t('common.message.delete')}

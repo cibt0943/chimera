@@ -22,10 +22,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
+import { useUserAgentAtom } from '~/lib/global-state'
 import { TaskStatus } from '~/types/tasks'
 import { TodoType } from '~/types/todos'
 import { ViewTodo } from '~/types/view-todos'
-import { useUserAgentAtom } from '~/lib/global-state'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>

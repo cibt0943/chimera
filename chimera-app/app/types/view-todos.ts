@@ -18,3 +18,9 @@ export type ViewTodo = {
 }
 
 export type ViewTodos = ViewTodo[]
+
+export type DeleteTodo = {
+  todoId: string
+  title: string
+  type: TodoType
+}

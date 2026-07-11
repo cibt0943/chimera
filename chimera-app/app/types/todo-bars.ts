@@ -14,11 +14,13 @@ export const TodoBarSchema = zod.object({
   title: zod
     .string({
       error: (issue) =>
-        issue.input === undefined ? '必須項目です' : '入力値が不正です',
+        issue.input === undefined
+          ? 'common.validation.required'
+          : 'common.validation.invalid',
     })
-    .max(255, { message: '255文字以内で入力してください' }),
-  bgColor: zod.string().max(10, '10文字以内で入力してください').optional(),
-  textColor: zod.string().max(10, '10文字以内で入力してください').optional(),
+    .max(255, 'common.validation.max_length_255'),
+  bgColor: zod.string().max(10, 'common.validation.max_length_10').optional(),
+  textColor: zod.string().max(10, 'common.validation.max_length_10').optional(),
 })
 
 export type TodoBarSchemaType = zod.infer<typeof TodoBarSchema>

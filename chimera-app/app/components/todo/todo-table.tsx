@@ -43,6 +43,8 @@ import {
 } from '~//components/ui/dropdown-menu'
 import { API_URL, TODO_URL } from '~/constants'
 import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
+import { useUserAgentAtom } from '~/lib/global-state'
+import { arrayMove } from '~/lib/utils'
 import { TaskStatus } from '~/types/tasks'
 import { ViewTodo, ViewTodos } from '~/types/view-todos'
 import { TodoTableToolbar } from './todo-table-toolbar'
@@ -51,8 +53,6 @@ import {
   TodoDeleteConfirmDialog,
   TodoDeleteConfirmDialogProps,
 } from './todo-delete-confirm-dialog'
-import { useUserAgentAtom } from '~/lib/global-state'
-import { arrayMove } from '~/lib/utils'
 import {
   useTodoTableScopedHotkeys,
   useTodoTableGlobalHotkeys,
@@ -495,7 +495,7 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
         </Button>
       </div>
       <TodoDeleteConfirmDialogMemo
-        viewTodo={actionViewTodo}
+        todo={actionViewTodo}
         redirectUrl={TODO_URL}
         isOpen={isOpenDeleteDialog}
         onOpenChange={setIsOpenDeleteDialog}
