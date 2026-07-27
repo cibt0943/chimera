@@ -85,7 +85,7 @@ export function ListItem({
       onClick={() => navigate(to)}
     >
       <div className="flex items-center">
-        <div className="line-clamp-1">{title}</div>
+        <div className="line-clamp-1 truncate">{title}</div>
         <div className="ml-auto">{actionMenu}</div>
       </div>
       <div className="flex items-center justify-between space-x-2">
