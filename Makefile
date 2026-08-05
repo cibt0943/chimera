@@ -5,6 +5,10 @@ local:
 	supabase start
 	docker compose up -d
 
+dev:
+
+	docker compose up -d
+
 stop:
 
 	docker compose down
