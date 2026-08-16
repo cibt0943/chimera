@@ -129,7 +129,7 @@ export function MemoForm({
               />
             )}
           </ClientOnly>
-          <FormMessage message={t(fields.title.errors)} />
+          <FormMessage message={fields.title.errors} />
         </FormItem>
         <FormItem>
           <ClientOnly fallback={null}>
@@ -149,7 +149,7 @@ export function MemoForm({
               />
             )}
           </ClientOnly>
-          <FormMessage message={t(fields.content.errors)} />
+          <FormMessage message={fields.content.errors} />
         </FormItem>
         <FormItem>
           <ClientOnly
@@ -169,7 +169,7 @@ export function MemoForm({
               />
             )}
           </ClientOnly>
-          <FormMessage message={t(fields.relatedDate.errors)} />
+          <FormMessage message={fields.relatedDate.errors} />
         </FormItem>
         {/* 戻り先を切り替えるための値 */}
         <input type="hidden" name="redirectUrl" value={redirectUrl} />

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '~/lib/utils'
 import { FieldGroup, Field, FieldLabel } from '~/components/ui/field'
 import { DialogFooter } from '~/components/ui/dialog'
@@ -50,13 +51,20 @@ export function FormMessage({
   className,
   ...props
 }: FormMessageProps) {
+  const { t } = useTranslation()
+
   if (!message) return null
 
   const messages = typeof message === 'string' ? [message] : message
 
   return (
     <p className={cn('text-destructive text-[0.8rem]', className)} {...props}>
-      {messages}
+      {messages.map((value, index) => (
+        <React.Fragment key={`${value}-${index}`}>
+          {index > 0 && <br />}
+          {t(value)}
+        </React.Fragment>
+      ))}
     </p>
   )
 }

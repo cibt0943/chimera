@@ -54,21 +54,21 @@ export function TodoBarForm({
             <Required />
           </FormLabel>
           <InputConform meta={fields.title} type="text" />
-          <FormMessage message={t(fields.title.errors)} />
+          <FormMessage message={fields.title.errors} />
         </FormItem>
         <FormItem>
           <FormLabel htmlFor={fields.bgColor.id}>
             {t('todoBar.model.bgColor')}
           </FormLabel>
           <CompactColorPickerConform meta={fields.bgColor} allowClear />
-          <FormMessage message={t(fields.bgColor.errors)} />
+          <FormMessage message={fields.bgColor.errors} />
         </FormItem>
         <FormItem>
           <FormLabel htmlFor={fields.textColor.id}>
             {t('todoBar.model.textColor')}
           </FormLabel>
           <CompactColorPickerConform meta={fields.textColor} allowClear />
-          <FormMessage message={t(fields.textColor.errors)} />
+          <FormMessage message={fields.textColor.errors} />
         </FormItem>
         <input type="hidden" name="type" value={TodoType.BAR} />
         <input type="hidden" name="redirectUrl" value={redirectUrl} />

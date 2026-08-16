@@ -62,7 +62,7 @@ export function TaskForm({ task, formId, redirectUrl }: TaskFormProps) {
             <Required />
           </FormLabel>
           <InputConform meta={fields.title} type="text" />
-          <FormMessage message={t(fields.title.errors)} />
+          <FormMessage message={fields.title.errors} />
         </FormItem>
         <FormItem>
           <FormLabel htmlFor={fields.memo.id}>{t('task.model.memo')}</FormLabel>
@@ -71,7 +71,7 @@ export function TaskForm({ task, formId, redirectUrl }: TaskFormProps) {
             className="resize-none"
             rows={4}
           />
-          <FormMessage message={t(fields.memo.errors)} />
+          <FormMessage message={fields.memo.errors} />
         </FormItem>
         <FormItem>
           <FormLabel htmlFor={fields.dueDate.id}>
@@ -83,7 +83,7 @@ export function TaskForm({ task, formId, redirectUrl }: TaskFormProps) {
             defaultAllDay={false}
             includeAllDayComponent={true}
           />
-          <FormMessage message={t(fields.dueDate.errors)} />
+          <FormMessage message={fields.dueDate.errors} />
         </FormItem>
         <FormItem>
           <FormLabel htmlFor={fields.status.id}>
@@ -99,7 +99,7 @@ export function TaskForm({ task, formId, redirectUrl }: TaskFormProps) {
           <FormDescription>
             {t('task.message.select_task_status')}
           </FormDescription>
-          <FormMessage message={t(fields.status.errors)} />
+          <FormMessage message={fields.status.errors} />
         </FormItem>
         <input type="hidden" name="type" value={TodoType.TASK} />
         <input type="hidden" name="redirectUrl" value={redirectUrl} />
