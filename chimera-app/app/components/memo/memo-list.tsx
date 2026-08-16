@@ -337,7 +337,7 @@ export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
         />
         <MemoSettingsForm />
       </div>
-      <ScrollArea className="max-lg:h-[calc(100svh-80px)] max-md:h-[calc(100svh-110px)] lg:min-h-0 lg:flex-1">
+      <ScrollArea className="max-lg:h-[calc(100svh-80px)] max-md:h-[calc(100svh-110px)] lg:min-h-0 lg:flex-1 [&>[data-slot=scroll-area-viewport]>div]:!block">
         <DragDropProvider
           sensors={[PointerSensor]}
           modifiers={(defaults) => [...defaults, RestrictToVerticalAxis]}

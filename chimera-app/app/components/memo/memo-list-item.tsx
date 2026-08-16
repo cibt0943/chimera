@@ -84,9 +84,9 @@ export function ListItem({
       }}
       onClick={() => navigate(to)}
     >
-      <div className="flex items-center">
-        <div className="line-clamp-1 truncate">{title}</div>
-        <div className="ml-auto">{actionMenu}</div>
+      <div className="flex min-w-0 items-center gap-2">
+        <div className="min-w-0 flex-1 truncate">{title}</div>
+        <div className="ml-auto shrink-0">{actionMenu}</div>
       </div>
       <div className="flex items-center justify-between space-x-2">
         <div>{item.status === MemoStatus.ARCHIVED && <LuArchive />}</div>
