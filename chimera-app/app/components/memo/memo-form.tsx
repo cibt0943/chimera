@@ -6,7 +6,10 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import { getFormProps, useInputControl } from '@conform-to/react'
 import { Button } from '~/components/ui/button'
 import { MEMO_URL } from '~/constants'
-import { useDebounce, useApiQueue } from '~/lib/hooks'
+import { useDebounce } from '~/lib/hooks'
+import { cn } from '~/lib/utils'
+import { useUserAgentAtom } from '~/lib/global-state'
+import { Memo } from '~/types/memos'
 import {
   FormItemGroup,
   FormItem,
@@ -17,11 +20,8 @@ import { DateTimePickerConform } from '~/components/lib/conform/date-time-picker
 import { InputConform } from '~/components/lib/conform/input'
 import { DummyDateTimePicker } from '~/components/lib/date-time-picker'
 import { LexicalEditor } from '~/components/lib/lexical-editor/editor'
-import { Memo } from '~/types/memos'
 import { MemoActionButton } from './memo-action-button'
 import { useMemoConform } from './memo-conform'
-import { useUserAgentAtom } from '~/lib/global-state'
-import { cn } from '~/lib/utils'
 
 export interface MemoFormProps {
   memo: Memo | undefined
@@ -39,20 +39,26 @@ export function MemoForm({
   const { t } = useTranslation()
   const userAgent = useUserAgentAtom()
   const formRef = React.useRef<HTMLFormElement>(null)
-  const { enqueue } = useApiQueue()
   // memoの状態を変更して保存したかどうか
   const [isChangedMemo, setIsChangedMemo] = React.useState(false)
   const fetcher = useFetcher()
+  const isSubmitting = fetcher.state === 'submitting'
 
   // メモの保存API呼び出し
-  function saveMemoApi() {
-    fetcher.submit(formRef.current)
-    setIsChangedMemo(false)
-  }
+  const saveMemoApi = React.useCallback(() => {
+    if (isSubmitting) return
+    formRef.current?.requestSubmit()
+  }, [isSubmitting])
+
+  const handleAutoSaveToggle = React.useEffectEvent(() => {
+    // 自動保存のON/OFFを切り替えた瞬間に、未保存の変更を即時保存する
+    if (!memo || !isChangedMemo || !isAutoSave) return
+    saveMemoApi()
+  })
 
   // メモの保存APIをdebounce
   const saveMemoDebounce = useDebounce(() => {
-    enqueue(async () => saveMemoApi())
+    saveMemoApi()
   }, 1000)
 
   // memo が切り替わったときに isChangedMemo をリセットする
@@ -61,18 +67,15 @@ export function MemoForm({
   }, [memo?.id])
 
   React.useEffect(() => {
-    // isAutoSave が OFF→ON に切り替わった時点で未保存の変更があれば自動保存を実行する。
-    // memo / isChangedMemo は切り替わった瞬間の値を参照したいため、依存配列から意図的に除外している。
-    if (memo && isChangedMemo && isAutoSave) {
-      saveMemoApi()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    handleAutoSaveToggle()
   }, [isAutoSave])
 
   // メモ情報が更新されていたら保存する
   function handleChangeMemo() {
     setIsChangedMemo(true)
-    if (isAutoSave) saveMemoDebounce()
+    if (isAutoSave) {
+      saveMemoDebounce()
+    }
   }
 
   // キーボード操作
@@ -94,17 +97,22 @@ export function MemoForm({
 
   const { form, fields } = useMemoConform({ memo })
   const contentControl = useInputControl(fields.content)
+  const formProps = getFormProps(form)
 
   const action = memo ? `${MEMO_URL}/${memo.id}` : MEMO_URL
 
   return (
     <fetcher.Form
       method="post"
-      {...getFormProps(form)}
+      {...formProps}
       action={action}
       onChange={handleChangeMemo}
       ref={formRef}
-      onSubmit={() => {
+      onSubmit={(event) => {
+        formProps.onSubmit(event)
+        if (event.defaultPrevented) {
+          return
+        }
         setIsChangedMemo(false)
       }}
     >
@@ -117,7 +125,7 @@ export function MemoForm({
                 meta={fields.title}
                 type="text"
                 placeholder={t('memo.message.un_titled')}
-                className="hover:border-input h-9 border-transparent text-lg! font-bold"
+                className="hover:border-input h-12 border-transparent text-3xl! font-bold"
               />
             )}
           </ClientOnly>
@@ -165,7 +173,7 @@ export function MemoForm({
         </FormItem>
         {/* 戻り先を切り替えるための値 */}
         <input type="hidden" name="redirectUrl" value={redirectUrl} />
-        <FormFooter className="sm:justify-between">
+        <FormFooter className="rounded-bl-none sm:justify-between">
           {memo ? (
             <MemoActionButton memo={memo} redirectUrl={redirectUrl} />
           ) : (
@@ -173,7 +181,7 @@ export function MemoForm({
           )}
           <SaveButton
             isChangedMemo={isChangedMemo}
-            isSubmitting={fetcher.state === 'submitting'}
+            isSubmitting={isSubmitting}
             isAutoSave={isAutoSave}
           />
         </FormFooter>

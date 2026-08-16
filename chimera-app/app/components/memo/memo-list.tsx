@@ -310,7 +310,7 @@ export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
   )
 
   return (
-    <div className="space-y-4 px-1 md:py-4">
+    <div className="flex flex-col gap-4 overflow-hidden px-1 md:py-4 lg:h-full lg:min-h-0">
       <div className="flex items-center gap-2 px-3">
         <Form action={MEMO_URL} method="post">
           <Button
@@ -337,7 +337,7 @@ export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
         />
         <MemoSettingsForm />
       </div>
-      <ScrollArea className="h-[calc(100svh-114px)]">
+      <ScrollArea className="max-lg:h-[calc(100svh-80px)] max-md:h-[calc(100svh-110px)] lg:min-h-0 lg:flex-1 [&>[data-slot=scroll-area-viewport]>div]:!block">
         <DragDropProvider
           sensors={[PointerSensor]}
           modifiers={(defaults) => [...defaults, RestrictToVerticalAxis]}

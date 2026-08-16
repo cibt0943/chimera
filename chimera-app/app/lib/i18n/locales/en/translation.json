@@ -62,6 +62,15 @@
       "state_saved": "Saved",
       "state_saving": "Saving...",
       "set_time": "Set Time"
+    },
+    "validation": {
+      "required": "This field is required",
+      "invalid": "Invalid value",
+      "max_length_10": "Must be 10 characters or fewer",
+      "max_length_255": "Must be 255 characters or fewer",
+      "max_length_10000": "Must be 10000 characters or fewer",
+      "max_length_60000": "Must be 60000 characters or fewer",
+      "end_date_before_start_date": "Please specify a date and time after the start"
     }
   },
   "account": {

@@ -22,20 +22,27 @@ export const EventSchema = zod
   .object({
     startDate: zod.date({
       error: (issue) =>
-        issue.input === undefined ? '必須項目です' : '入力値が不正です',
+        issue.input === undefined
+          ? 'common.validation.required'
+          : 'common.validation.invalid',
     }),
     endDate: zod.date().optional(),
     allDay: zod.boolean().optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
     title: zod
       .string({
         error: (issue) =>
-          issue.input === undefined ? '必須項目です' : '入力値が不正です',
+          issue.input === undefined
+            ? 'common.validation.required'
+            : 'common.validation.invalid',
       })
-      .max(255, { message: '255文字以内で入力してください' }),
-    memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
+      .max(255, { message: 'common.validation.max_length_255' }),
+    memo: zod
+      .string()
+      .max(10000, 'common.validation.max_length_10000')
+      .optional(),
     location: zod
       .string()
-      .max(10000, '10000文字以内で入力してください')
+      .max(10000, 'common.validation.max_length_10000')
       .optional(),
   })
   .refine(
@@ -44,7 +51,7 @@ export const EventSchema = zod
       return startDate <= endDate // 終了日が開始日より未来かどうか
     },
     {
-      message: '開始より後の日時を指定してください',
+      message: 'common.validation.end_date_before_start_date',
       path: ['endDate'],
     },
   )

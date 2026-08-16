@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '~/lib/utils'
-import { Label } from '~/components/ui/label'
-import { FieldGroup, Field } from '~/components/ui/field'
+import { FieldGroup, Field, FieldLabel } from '~/components/ui/field'
 import { DialogFooter } from '~/components/ui/dialog'
 
 export function FormItemGroup({
@@ -34,9 +34,12 @@ export function FormLabel({
   ...props
 }: FormLabelProps) {
   return (
-    <Label className={cn(error && 'text-destructive', className)} {...props}>
+    <FieldLabel
+      className={cn(error && 'text-destructive', className)}
+      {...props}
+    >
       {children}
-    </Label>
+    </FieldLabel>
   )
 }
 export interface FormMessageProps extends React.ComponentProps<'p'> {
@@ -48,13 +51,20 @@ export function FormMessage({
   className,
   ...props
 }: FormMessageProps) {
+  const { t } = useTranslation()
+
   if (!message) return null
 
   const messages = typeof message === 'string' ? [message] : message
 
   return (
     <p className={cn('text-destructive text-[0.8rem]', className)} {...props}>
-      {messages}
+      {messages.map((value, index) => (
+        <React.Fragment key={`${value}-${index}`}>
+          {index > 0 && <br />}
+          {t(value)}
+        </React.Fragment>
+      ))}
     </p>
   )
 }
