@@ -3,7 +3,7 @@ import { LuCalendar, LuX } from 'react-icons/lu'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { Matcher } from 'react-day-picker'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import { Calendar } from '~/components/ui/calendar'
 import {
   Popover,

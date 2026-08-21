@@ -2,7 +2,7 @@ import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { LuTrash2, LuArchive, LuArchiveRestore } from 'react-icons/lu'
 import { toast } from 'sonner'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import {
   Tooltip,
   TooltipContent,

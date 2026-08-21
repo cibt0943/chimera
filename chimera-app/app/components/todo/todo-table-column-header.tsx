@@ -5,7 +5,7 @@ import {
   LuArrowDownWideNarrow,
 } from 'react-icons/lu'
 import { Column } from '@tanstack/react-table'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import {
   DropdownMenu,
   DropdownMenuContent,

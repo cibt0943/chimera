@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import type { AccountGeneral } from '~/types/accounts'
 import { AccountDeleteConfirmDialog } from './account-delete-confirm-dialog'
 

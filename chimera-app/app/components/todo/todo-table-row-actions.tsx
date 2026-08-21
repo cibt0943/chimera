@@ -13,7 +13,7 @@ import {
   LuCornerDownLeft,
 } from 'react-icons/lu'
 import { Row, Table } from '@tanstack/react-table'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import {
   DropdownMenu,
   DropdownMenuContent,

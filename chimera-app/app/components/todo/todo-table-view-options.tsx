@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { LuSettings2 } from 'react-icons/lu'
 import { Table } from '@tanstack/react-table'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,

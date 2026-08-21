@@ -1,5 +1,5 @@
 import { Form } from 'react-router'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import { LuLogIn } from 'react-icons/lu'
 import { useTranslation } from 'react-i18next'
 

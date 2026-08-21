@@ -1,7 +1,7 @@
 import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { LuSettings } from 'react-icons/lu'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import { Label } from '~/components/ui/label'
 import { Switch } from '~/components/ui/switch'
 import {

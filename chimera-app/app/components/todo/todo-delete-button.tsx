@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { LuTrash2 } from 'react-icons/lu'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import { DeleteTodo } from '~/types/view-todos'
 import { TodoDeleteConfirmDialog } from './todo-delete-confirm-dialog'
 

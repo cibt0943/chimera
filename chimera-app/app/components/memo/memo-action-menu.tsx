@@ -11,7 +11,7 @@ import {
   LuDelete,
   LuCornerDownLeft,
 } from 'react-icons/lu'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import {
   DropdownMenu,
   DropdownMenuContent,
