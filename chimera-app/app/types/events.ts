@@ -1,6 +1,6 @@
 import * as zod from 'zod'
-import { Task } from '~/types/tasks'
-import { Memo } from '~/types/memos'
+import type { Task } from '~/types/tasks'
+import type { Memo } from '~/types/memos'
 
 // イベントの型
 export type Event = {
