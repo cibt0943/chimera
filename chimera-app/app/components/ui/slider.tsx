@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Slider as SliderPrimitive } from "radix-ui"
+import { Slider as SliderPrimitive } from "@base-ui/react/slider"
 
 import { cn } from "~/lib/utils"
 
@@ -36,15 +36,20 @@ function Slider({
       )}
       {...props}
     >
-      <SliderPrimitive.Track
-        data-slot="slider-track"
-        className="relative grow overflow-hidden rounded-full bg-muted data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1"
+      <SliderPrimitive.Control
+        data-slot="slider-control"
+        className="relative flex grow items-center"
       >
-        <SliderPrimitive.Range
-          data-slot="slider-range"
-          className="absolute bg-primary select-none data-horizontal:h-full data-vertical:w-full"
-        />
-      </SliderPrimitive.Track>
+        <SliderPrimitive.Track
+          data-slot="slider-track"
+          className="relative grow overflow-hidden rounded-full bg-muted data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1"
+        >
+          <SliderPrimitive.Indicator
+            data-slot="slider-range"
+            className="absolute bg-primary select-none data-horizontal:h-full data-vertical:w-full"
+          />
+        </SliderPrimitive.Track>
+      </SliderPrimitive.Control>
       {Array.from({ length: _values.length }, (_, index) => (
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"

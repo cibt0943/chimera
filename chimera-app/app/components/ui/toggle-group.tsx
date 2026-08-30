@@ -1,6 +1,6 @@
 import * as React from "react"
 import { type VariantProps } from "class-variance-authority"
-import { ToggleGroup as ToggleGroupPrimitive } from "radix-ui"
+import { Toggle } from "@base-ui/react/toggle"
 
 import { cn } from "~/lib/utils"
 import { toggleVariants } from "~/components/ui/toggle"
@@ -9,12 +9,16 @@ const ToggleGroupContext = React.createContext<
   VariantProps<typeof toggleVariants> & {
     spacing?: number
     orientation?: "horizontal" | "vertical"
+    value: readonly string[]
+    setValue?: (value: string, pressed: boolean) => void
   }
 >({
   size: "default",
   variant: "default",
   spacing: 2,
   orientation: "horizontal",
+  value: [],
+  setValue: undefined,
 })
 
 function ToggleGroup({
@@ -24,14 +28,39 @@ function ToggleGroup({
   spacing = 2,
   orientation = "horizontal",
   children,
+  value: valueProp,
+  defaultValue = [],
+  onValueChange,
+  multiple = false,
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
+}: React.ComponentProps<"div"> & {
+  value?: readonly string[]
+  defaultValue?: readonly string[]
+  onValueChange?: (value: string[]) => void
+  multiple?: boolean
+  disabled?: boolean
+} &
   VariantProps<typeof toggleVariants> & {
     spacing?: number
     orientation?: "horizontal" | "vertical"
   }) {
+  const [valueState, setValueState] = React.useState<readonly string[]>(defaultValue)
+  const value = valueProp ?? valueState
+
+  const setValue = (itemValue: string, pressed: boolean) => {
+    const nextValue = multiple
+      ? pressed
+        ? [...value, itemValue].filter((item, index, items) => items.indexOf(item) === index)
+        : value.filter((item) => item !== itemValue)
+      : pressed
+        ? [itemValue]
+        : []
+    if (valueProp === undefined) setValueState(nextValue)
+    onValueChange?.(nextValue)
+  }
+
   return (
-    <ToggleGroupPrimitive.Root
+    <div
       data-slot="toggle-group"
       data-variant={variant}
       data-size={size}
@@ -45,11 +74,11 @@ function ToggleGroup({
       {...props}
     >
       <ToggleGroupContext.Provider
-        value={{ variant, size, spacing, orientation }}
+        value={{ variant, size, spacing, orientation, value, setValue }}
       >
         {children}
       </ToggleGroupContext.Provider>
-    </ToggleGroupPrimitive.Root>
+    </div>
   )
 }
 
@@ -59,12 +88,14 @@ function ToggleGroupItem({
   variant = "default",
   size = "default",
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Item> &
-  VariantProps<typeof toggleVariants>) {
+}: React.ComponentProps<typeof Toggle> &
+  VariantProps<typeof toggleVariants> & {
+    value?: string
+  }) {
   const context = React.useContext(ToggleGroupContext)
 
   return (
-    <ToggleGroupPrimitive.Item
+    <Toggle
       data-slot="toggle-group-item"
       data-variant={context.variant || variant}
       data-size={context.size || size}
@@ -77,10 +108,14 @@ function ToggleGroupItem({
         }),
         className
       )}
+      pressed={context.value?.includes(props.value ?? "")}
+      onPressedChange={(pressed) => {
+        if (props.value) context.setValue?.(props.value, pressed)
+      }}
       {...props}
     >
       {children}
-    </ToggleGroupPrimitive.Item>
+    </Toggle>
   )
 }
 

@@ -1,22 +1,19 @@
 "use client"
 
 import * as React from "react"
-import { Direction } from "radix-ui"
+import {
+  DirectionProvider as BaseDirectionProvider,
+  useDirection,
+} from "@base-ui/react/direction-provider"
 
 function DirectionProvider({
   dir,
   direction,
   children,
-}: React.ComponentProps<typeof Direction.DirectionProvider> & {
-  direction?: React.ComponentProps<typeof Direction.DirectionProvider>["dir"]
+}: React.ComponentProps<typeof BaseDirectionProvider> & {
+  dir?: "ltr" | "rtl"
 }) {
-  return (
-    <Direction.DirectionProvider dir={direction ?? dir}>
-      {children}
-    </Direction.DirectionProvider>
-  )
+  return <BaseDirectionProvider direction={direction ?? dir}>{children}</BaseDirectionProvider>
 }
-
-const useDirection = Direction.useDirection
 
 export { DirectionProvider, useDirection }
