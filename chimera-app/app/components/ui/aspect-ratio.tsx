@@ -1,22 +1,22 @@
-"use client"
+import { cn } from "~/lib/utils"
 
-import * as React from "react"
-
-type AspectRatioProps = React.ComponentPropsWithoutRef<"div"> & {
-  ratio?: number
-}
-
-const AspectRatio = React.forwardRef<HTMLDivElement, AspectRatioProps>(
-  ({ ratio = 1, style, ...props }, ref) => (
+function AspectRatio({
+  ratio,
+  className,
+  ...props
+}: React.ComponentProps<"div"> & { ratio: number }) {
+  return (
     <div
-      ref={ref}
       data-slot="aspect-ratio"
-      style={{ aspectRatio: ratio, ...style }}
+      style={
+        {
+          "--ratio": ratio,
+        } as React.CSSProperties
+      }
+      className={cn("relative aspect-(--ratio)", className)}
       {...props}
     />
   )
-)
-
-AspectRatio.displayName = "AspectRatio"
+}
 
 export { AspectRatio }

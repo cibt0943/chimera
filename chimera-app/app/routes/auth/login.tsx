@@ -1,5 +1,5 @@
 import { Form } from 'react-router'
-import { Button } from '~/components/ui/button-base'
+import { Button } from '~/components/ui/button'
 import { LuLogIn } from 'react-icons/lu'
 import { useTranslation } from 'react-i18next'
 
@@ -11,7 +11,7 @@ export default function Login() {
       <div>{t('account.message.need_login')}</div>
       <div className="mt-4">
         <Form action="/auth/auth0" method="post">
-          <Button>
+          <Button type="submit">
             <LuLogIn />
             {t('account.message.login')}
           </Button>
