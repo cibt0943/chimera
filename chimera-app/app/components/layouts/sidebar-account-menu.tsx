@@ -40,29 +40,27 @@ export function SidebarAccountMenu() {
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton size="lg">
-              <Avatar className="h-8 w-8">
-                <AvatarImage
-                  src={loginInfo.auth0User.picture}
-                  alt={loginInfo.auth0User.name}
-                />
-                <AvatarFallback>{loginInfo.auth0User.name}</AvatarFallback>
-              </Avatar>
-              <span>{loginInfo.auth0User.name}</span>
-            </SidebarMenuButton>
+          <DropdownMenuTrigger render={<SidebarMenuButton size="lg" />}>
+            <Avatar className="h-8 w-8">
+              <AvatarImage
+                src={loginInfo.auth0User.picture}
+                alt={loginInfo.auth0User.name}
+              />
+              <AvatarFallback>{loginInfo.auth0User.name}</AvatarFallback>
+            </Avatar>
+            <span>{loginInfo.auth0User.name}</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuLabel>{loginInfo.auth0User.name}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={handleUserSettingsClick}>
-                <LuUserRoundCog />
-                {t('common.message.settings')}
-              </DropdownMenuItem>
+              <DropdownMenuLabel>{loginInfo.auth0User.name}</DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={handleLogoutClick}>
+            <DropdownMenuItem onClick={handleUserSettingsClick}>
+              <LuUserRoundCog />
+              {t('common.message.settings')}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogoutClick}>
               <LuLogOut />
               {t('account.message.logout')}
             </DropdownMenuItem>

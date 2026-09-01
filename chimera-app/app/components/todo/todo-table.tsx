@@ -390,10 +390,12 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="default" size="icon" className="rounded-full">
-              <LuPlus />
-            </Button>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="default" size="icon" className="rounded-full" />
+            }
+          >
+            <LuPlus />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40">
             <DropdownMenuGroup>

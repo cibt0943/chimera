@@ -121,15 +121,21 @@ export function DateTimePicker({
       {...otherDivProps}
     >
       <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="ghost" id={triggerId} className="grow justify-start">
-            <LuCalendar className="text-muted-foreground" />
-            <DispValue
-              date={localDate}
-              allDay={allDay}
-              placeholder={placeholder}
+        <PopoverTrigger
+          render={
+            <Button
+              variant="ghost"
+              id={triggerId}
+              className="grow justify-start"
             />
-          </Button>
+          }
+        >
+          <LuCalendar className="text-muted-foreground" />
+          <DispValue
+            date={localDate}
+            allDay={allDay}
+            placeholder={placeholder}
+          />
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
