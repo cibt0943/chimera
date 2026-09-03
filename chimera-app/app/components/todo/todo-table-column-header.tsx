@@ -38,7 +38,7 @@ export function TodoTableColumnHeader<TData, TValue>({
     <div className={cn('flex items-center', className)}>
       <DropdownMenu>
         <DropdownMenuTrigger
-          render={<div className="flex cursor-pointer items-center gap-1" />}
+          render={<button className="flex items-center gap-1" />}
         >
           <span>{title}</span>
           {sortDirection === 'desc' ? (
