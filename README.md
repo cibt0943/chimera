@@ -42,19 +42,15 @@ You can access the service here: [IMA](https://ima.fly.dev)
 - [x] カレンダーから Todo の参照、編集、削除が行える
 - [x] カレンダーから Memo の参照、編集、削除が行える
 
+#### Network Diagram
+
+複数人で同時編集可能なネットワーク図機能
+
 #### Daily Note
 
 普通の日記帳
 左にカレンダー右にメモ内容を配置して
 カレンダーには情報があるかどうかを表示
-
-#### File
-
-Linux コマンド操作を主としたファイラー機能の予定
-
-#### Reminder
-
-モバイル端末で Todo や Event のリマインダ通知を受信できるようにする予定
 
 #### Account
 

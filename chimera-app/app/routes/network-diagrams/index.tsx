@@ -2,7 +2,7 @@ import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import type { Route } from './+types/index'
 
 export function meta() {
-  return [{ title: 'Reminders | IMA' }]
+  return [{ title: 'Network Diagram | IMA' }]
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -17,7 +17,7 @@ export default function Index() {
       <div className="text-l mb-8 font-bold">
         This feature is under development. Please check back later.
       </div>
-      モバイル端末でTodoやEventのリマインダ通知を受信できるようにする予定
+      aaaaa
     </div>
   )
 }

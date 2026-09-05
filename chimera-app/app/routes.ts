@@ -46,15 +46,15 @@ export default [
       route('memos/:memoId', './routes/events/memo.tsx'),
     ]),
 
-    ...prefix('daily-notes', [
-      layout('./routes/daily-notes/layout.tsx', [
-        index('./routes/daily-notes/index.tsx'),
+    ...prefix('network-diagrams', [
+      layout('./routes/network-diagrams/layout.tsx', [
+        index('./routes/network-diagrams/index.tsx'),
       ]),
     ]),
 
-    ...prefix('reminders', [
-      layout('./routes/reminders/layout.tsx', [
-        index('./routes/reminders/index.tsx'),
+    ...prefix('daily-notes', [
+      layout('./routes/daily-notes/layout.tsx', [
+        index('./routes/daily-notes/index.tsx'),
       ]),
     ]),
 

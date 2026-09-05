@@ -7,7 +7,7 @@ export const MEMO_URL = '/memos'
 export const EVENT_URL = '/events'
 export const DAILY_NOTE_URL = '/daily-notes'
 export const FILE_URL = '/files'
-export const REMINDER_URL = '/reminders'
+export const NETWORK_DIAGRAM_URL = '/network-diagrams'
 
 export const OS = {
   WIN: 'Windows',

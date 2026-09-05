@@ -19,7 +19,7 @@ import {
   MEMO_URL,
   EVENT_URL,
   DAILY_NOTE_URL,
-  REMINDER_URL,
+  NETWORK_DIAGRAM_URL,
 } from '~/constants'
 
 export const FuncMenuList = [
@@ -27,14 +27,14 @@ export const FuncMenuList = [
   { title: 'memo.menu_label', url: MEMO_URL, icon: LuFilePen },
   { title: 'event.menu_label', url: EVENT_URL, icon: LuCalendarDays },
   {
+    title: 'network_diagram.menu_label',
+    url: NETWORK_DIAGRAM_URL,
+    icon: LuAlarmClockCheck,
+  },
+  {
     title: 'daily_note.menu_label',
     url: DAILY_NOTE_URL,
     icon: LuBook,
-  },
-  {
-    title: 'reminder.menu_label',
-    url: REMINDER_URL,
-    icon: LuAlarmClockCheck,
   },
 ]
 

@@ -234,12 +234,8 @@
     "menu_label": "Daily Note",
     "page_title": "Daily Note"
   },
-  "file": {
-    "menu_label": "File",
-    "page_title": "File"
-  },
-  "reminder": {
-    "menu_label": "Reminder",
-    "page_title": "Reminder"
+  "network_diagram": {
+    "menu_label": "Network Diagram",
+    "page_title": "Network Diagram"
   }
 }
