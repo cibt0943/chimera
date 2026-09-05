@@ -1,5 +1,5 @@
 import * as zod from 'zod'
-import { Todo } from '~/types/todos'
+import type { Todo } from '~/types/todos'
 
 export const TaskStatus = {
   NEW: 0,
@@ -54,14 +54,21 @@ export type Task = Todo & {
 export type Tasks = Task[]
 
 export const TaskSchema = zod.object({
-  status: zod.preprocess((v) => Number(v), zod.enum(TaskStatus)),
+  status: zod.coerce
+    .number()
+    .pipe(zod.enum(TaskStatus, 'common.validation.invalid')),
   title: zod
     .string({
       error: (issue) =>
-        issue.input === undefined ? '必須項目です' : '入力値が不正です',
+        issue.input === undefined
+          ? 'common.validation.required'
+          : 'common.validation.invalid',
     })
-    .max(255, { message: '255文字以内で入力してください' }),
-  memo: zod.string().max(10000, '10000文字以内で入力してください').optional(),
+    .max(255, 'common.validation.max_length_255'),
+  memo: zod
+    .string()
+    .max(10000, 'common.validation.max_length_10000')
+    .optional(),
   dueDate: zod.date().optional(),
   dueDateAllDay: zod.boolean().optional(), // boolean型の場合はfalseの時に値が送信されないためoptionalが必要
 })

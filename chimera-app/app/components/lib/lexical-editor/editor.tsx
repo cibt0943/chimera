@@ -29,10 +29,10 @@ import {
 } from 'lexical'
 import { cn } from '~/lib/utils'
 import { EditorTheme } from './theme'
-import './editor.css'
 import { SlashMenuPlugin } from './slash-menu-plugin'
 import { FloatingToolbarPlugin } from './floating-toolbar-plugin'
 import { ListCancelPlugin } from './list-cancel-plugin'
+import './editor.css'
 
 // 空の段落を &nbsp; としてMarkdownに保存・復元するトランスフォーマー
 // インポート時は \u200B（ゼロ幅スペース）を挿入して Lexical の空段落クリーンアップを回避する
@@ -92,7 +92,7 @@ export function LexicalEditor({
   className,
 }: LexicalEditorProps) {
   const initialConfig = {
-    namespace: 'MemoEditor',
+    namespace: 'lexical-editor',
     theme: EditorTheme,
     nodes: EDITOR_NODES,
     editorState: () => {
@@ -127,7 +127,7 @@ export function LexicalEditor({
           contentEditable={
             <ContentEditable
               className={cn(
-                'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 w-full min-w-0 overflow-auto rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:ring-3',
+                'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 w-full min-w-0 overflow-auto rounded-lg border bg-transparent px-2.5 py-2 text-base transition-colors outline-none focus-visible:ring-3',
                 className,
               )}
               onBlur={onBlur}

@@ -8,19 +8,19 @@ import {
 import { TODO_URL } from '~/constants'
 import { sleep } from '~/lib/utils'
 import { ConfirmDialog } from '~/components/lib/confirm-dialog'
-import { ViewTodo } from '~/types/view-todos'
 import { TodoType } from '~/types/todos'
+import { DeleteTodo } from '~/types/view-todos'
 
 export interface TodoDeleteConfirmDialogProps {
-  viewTodo: ViewTodo | undefined
   redirectUrl: string
+  todo?: DeleteTodo
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void
   children?: React.ReactNode
 }
 
 export function TodoDeleteConfirmDialog({
-  viewTodo,
+  todo,
   redirectUrl,
   isOpen,
   onOpenChange,
@@ -29,13 +29,13 @@ export function TodoDeleteConfirmDialog({
   const { t } = useTranslation()
   const fetcher = useFetcher()
 
-  if (!viewTodo) return null
+  if (!todo) return null
 
-  const desc = `「${viewTodo.title}」${t('common.message.confirm_deletion')}`
-  const action = `${TODO_URL}/${viewTodo.todoId}/delete`
+  const desc = `「${todo.title}」${t('common.message.confirm_deletion')}`
+  const action = `${TODO_URL}/${todo.todoId}/delete`
 
   const title =
-    viewTodo.type === TodoType.BAR
+    todo.type === TodoType.BAR
       ? t('todoBar.message.todo_bar_deletion')
       : t('task.message.task_deletion')
 

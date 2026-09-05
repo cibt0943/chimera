@@ -2,7 +2,7 @@ import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { LuTrash2, LuArchive, LuArchiveRestore } from 'react-icons/lu'
 import { toast } from 'sonner'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import {
   Tooltip,
   TooltipContent,
@@ -28,41 +28,36 @@ export function MemoActionButton({ memo, redirectUrl }: MemoActionButtonProps) {
   return (
     <div className="mt-2 space-x-4 sm:mt-0">
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={(event) => {
-              event.preventDefault()
-              fetcher
-                .submit(
-                  { status: archiveMenu.toStatus },
-                  {
-                    action: `${API_URL}${MEMO_URL}/${memo.id}`,
-                    method: 'post',
-                    encType: 'application/json',
-                  },
-                )
-                .then(() => {
-                  const msg =
-                    archiveMenu.toStatus === MemoStatus.NOMAL
-                      ? 'memo.message.un_archived'
-                      : 'memo.message.archived'
-                  toast.info(t(msg))
-                })
-            }}
-          >
-            {archiveMenu.icon}
-          </Button>
+        <TooltipTrigger
+          render={<Button size="icon" variant="outline" />}
+          onClick={(event) => {
+            event.preventDefault()
+            fetcher
+              .submit(
+                { status: archiveMenu.toStatus },
+                {
+                  action: `${API_URL}${MEMO_URL}/${memo.id}`,
+                  method: 'post',
+                  encType: 'application/json',
+                },
+              )
+              .then(() => {
+                const msg =
+                  archiveMenu.toStatus === MemoStatus.NOMAL
+                    ? 'memo.message.un_archived'
+                    : 'memo.message.archived'
+                toast.info(t(msg))
+              })
+          }}
+        >
+          {archiveMenu.icon}
         </TooltipTrigger>
         <TooltipContent>{archiveMenu.caption}</TooltipContent>
       </Tooltip>
       <Tooltip>
         <MemoDeleteConfirmDialog memo={memo} redirectUrl={redirectUrl}>
-          <TooltipTrigger asChild>
-            <Button variant="destructive" size="icon">
-              <LuTrash2 />
-            </Button>
+          <TooltipTrigger render={<Button variant="destructive" size="icon" />}>
+            <LuTrash2 />
           </TooltipTrigger>
         </MemoDeleteConfirmDialog>
         <TooltipContent>{t('common.message.delete')}</TooltipContent>

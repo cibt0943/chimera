@@ -19,7 +19,7 @@ export default function Layout() {
         }
       >
         <AppSidebar />
-        <SidebarInset>
+        <SidebarInset className="min-w-0">
           <AppNavbar />
           <LoadingEffect>
             <Outlet />

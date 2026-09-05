@@ -11,7 +11,7 @@ import {
   LuDelete,
   LuCornerDownLeft,
 } from 'react-icons/lu'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,11 +64,11 @@ export function MemoActionMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className={buttonClassName}>
-          <LuEllipsis />
-          <span className="sr-only">Open menu</span>
-        </Button>
+      <DropdownMenuTrigger
+        render={<Button variant="ghost" className={buttonClassName} />}
+      >
+        <LuEllipsis />
+        <span className="sr-only">Open menu</span>
       </DropdownMenuTrigger>
       <DropdownMenuPortal>
         <DropdownMenuContent align="end" className="w-60">

@@ -3,7 +3,11 @@ import Compact from '@uiw/react-color-compact'
 import { FieldMetadata, getInputProps } from '@conform-to/react'
 import { LuX } from 'react-icons/lu'
 import { Input } from '~/components/ui/input'
-import { Popover, PopoverAnchor, PopoverContent } from '~/components/ui/popover'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '~/components/ui/popover'
 import { cn } from '~/lib/utils'
 
 function isHexColor(value: string) {
@@ -57,54 +61,49 @@ export function CompactColorPickerConform({
     inputRef.current.dispatchEvent(new Event('change', { bubbles: true }))
   }
 
-  function openPicker() {
-    if (disabled) return
-    setOpen(true)
-    inputRef.current?.focus()
-  }
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverAnchor asChild>
-        <div className="relative">
-          <div
-            className={cn(
-              'pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 rounded border',
-              disabled && 'opacity-50',
-            )}
-            style={{ backgroundColor: swatchColor }}
-          />
-          {allowClear && value && !disabled && (
-            <button
-              type="button"
-              aria-label="Clear color"
-              title="Clear"
-              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setOpen(false)
-                setColor('')
-              }}
-            >
-              <LuX className="size-4" />
-            </button>
+      <div className="relative">
+        <div
+          className={cn(
+            'pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 rounded border',
+            disabled && 'opacity-50',
           )}
-          <Input
-            {...inputProps}
-            ref={inputRef}
-            readOnly
-            disabled={disabled}
-            placeholder="#RRGGBB"
-            className={cn(
-              'cursor-pointer pl-10',
-              allowClear && !disabled ? 'pr-10' : undefined,
-              className,
-            )}
-            onClick={openPicker}
-          />
-        </div>
-      </PopoverAnchor>
+          style={{ backgroundColor: swatchColor }}
+        />
+        {allowClear && value && !disabled && (
+          <button
+            type="button"
+            aria-label="Clear color"
+            title="Clear"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setOpen(false)
+              setColor('')
+            }}
+          >
+            <LuX className="size-4" />
+          </button>
+        )}
+        <PopoverTrigger
+          render={
+            <Input
+              {...inputProps}
+              ref={inputRef}
+              readOnly
+              disabled={disabled}
+              placeholder="#RRGGBB"
+              className={cn(
+                'cursor-pointer pl-10',
+                allowClear && !disabled ? 'pr-10' : undefined,
+                className,
+              )}
+            />
+          }
+        />
+      </div>
       <PopoverContent className="w-auto" align="start">
         <Compact
           color={swatchColor}

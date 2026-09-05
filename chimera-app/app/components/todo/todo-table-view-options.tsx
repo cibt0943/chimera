@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { LuSettings2 } from 'react-icons/lu'
 import { Table } from '@tanstack/react-table'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -21,15 +22,15 @@ export function TodoTableViewOptions<TData>({
   const { t } = useTranslation()
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="">
-          <LuSettings2 /> {t('task.message.view_settings')}
-        </Button>
+      <DropdownMenuTrigger render={<Button variant="outline" />}>
+        <LuSettings2 /> {t('task.message.view_settings')}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[150px]">
-        <DropdownMenuLabel>
-          {t('task.message.select_columns')}
-        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>
+            {t('task.message.select_columns')}
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         {table
           .getAllColumns()

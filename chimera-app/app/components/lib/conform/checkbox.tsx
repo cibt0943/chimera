@@ -17,9 +17,9 @@ export function CheckboxConform({
   const checked = meta.value === 'on'
 
   const handleCheckedChange = React.useCallback(
-    (checked: boolean | 'indeterminate') => {
+    (checked: boolean) => {
       control.change(checked ? 'on' : '')
-      onCheckedChange?.(!!checked)
+      onCheckedChange?.(checked)
     },
     [control, onCheckedChange],
   )

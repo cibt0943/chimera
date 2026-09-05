@@ -5,6 +5,8 @@ ENV APP_ROOT=/chimera-app
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git \
     locales \
     vim && \
     rm -rf /var/lib/apt/lists/*

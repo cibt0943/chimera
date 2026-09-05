@@ -90,14 +90,16 @@ export const AccountGeneralSchema = zod.object({
   name: zod
     .string({
       error: (issue) =>
-        issue.input === undefined ? '必須項目です' : '入力値が不正です',
+        issue.input === undefined
+          ? 'common.validation.required'
+          : 'common.validation.invalid',
     })
-    .max(255, { message: '255文字以内で入力してください' }),
+    .max(255, { message: 'common.validation.max_length_255' }),
   language: zod.enum(Language, {
-    message: '不正な値が選択されています。',
+    message: 'common.validation.invalid',
   }),
   theme: zod.enum(Theme, {
-    message: '不正な値が選択されています。',
+    message: 'common.validation.invalid',
   }),
 })
 

@@ -1,5 +1,5 @@
 import { TodoType } from '~/types/todos'
-import { TaskStatus } from '~/types/tasks'
+import type { TaskStatus } from '~/types/tasks'
 
 export type ViewTodo = {
   todoId: string
@@ -18,3 +18,9 @@ export type ViewTodo = {
 }
 
 export type ViewTodos = ViewTodo[]
+
+export type DeleteTodo = {
+  todoId: string
+  title: string
+  type: TodoType
+}

@@ -3,7 +3,7 @@ import { LuCalendar, LuX } from 'react-icons/lu'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { Matcher } from 'react-day-picker'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import { Calendar } from '~/components/ui/calendar'
 import {
   Popover,
@@ -121,15 +121,21 @@ export function DateTimePicker({
       {...otherDivProps}
     >
       <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="ghost" id={triggerId} className="grow justify-start">
-            <LuCalendar className="text-muted-foreground" />
-            <DispValue
-              date={localDate}
-              allDay={allDay}
-              placeholder={placeholder}
+        <PopoverTrigger
+          render={
+            <Button
+              variant="ghost"
+              id={triggerId}
+              className="grow justify-start"
             />
-          </Button>
+          }
+        >
+          <LuCalendar className="text-muted-foreground" />
+          <DispValue
+            date={localDate}
+            allDay={allDay}
+            placeholder={placeholder}
+          />
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar

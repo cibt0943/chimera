@@ -32,7 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +43,8 @@ import {
 } from '~//components/ui/dropdown-menu'
 import { API_URL, TODO_URL } from '~/constants'
 import { useDebounce, useApiQueue, useIsLoading } from '~/lib/hooks'
+import { useUserAgentAtom } from '~/lib/global-state'
+import { arrayMove } from '~/lib/utils'
 import { TaskStatus } from '~/types/tasks'
 import { ViewTodo, ViewTodos } from '~/types/view-todos'
 import { TodoTableToolbar } from './todo-table-toolbar'
@@ -51,8 +53,6 @@ import {
   TodoDeleteConfirmDialog,
   TodoDeleteConfirmDialogProps,
 } from './todo-delete-confirm-dialog'
-import { useUserAgentAtom } from '~/lib/global-state'
-import { arrayMove } from '~/lib/utils'
 import {
   useTodoTableScopedHotkeys,
   useTodoTableGlobalHotkeys,
@@ -390,10 +390,12 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="default" size="icon" className="rounded-full">
-              <LuPlus />
-            </Button>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="default" size="icon" className="rounded-full" />
+            }
+          >
+            <LuPlus />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40">
             <DropdownMenuGroup>
@@ -495,7 +497,7 @@ export function TodoTable({ todos, showId }: TodoTableProps) {
         </Button>
       </div>
       <TodoDeleteConfirmDialogMemo
-        viewTodo={actionViewTodo}
+        todo={actionViewTodo}
         redirectUrl={TODO_URL}
         isOpen={isOpenDeleteDialog}
         onOpenChange={setIsOpenDeleteDialog}

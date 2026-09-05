@@ -31,14 +31,8 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
     Object.values(HOTKEYS),
     (_, { hotkey }) => {
       switch (hotkey) {
-        case HOTKEYS.MODIFIER_UP:
-          setFocusFormElement('input[name="title"]')
-          break
         case HOTKEYS.MODIFIER_RIGHT:
           setFocusFormElement('input[name="title"]')
-          break
-        case HOTKEYS.MODIFIER_DOWN:
-          setFocusFormElement('[contenteditable="true"]')
           break
       }
     },
@@ -55,7 +49,7 @@ export function MemoFormView({ memo }: MemoFormViewProps) {
         memo={memo}
         isAutoSave={autoSave}
         redirectUrl={''}
-        editorClassName="h-[calc(100svh-233px)]"
+        editorClassName="h-[calc(100svh-257px)]"
       />
     </div>
   )
