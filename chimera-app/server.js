@@ -12,6 +12,8 @@ const app = express()
 app.use(compression())
 app.disable('x-powered-by')
 
+app.set('trust proxy', true)
+
 // Chrome DevTools（または React DevTools）による自動アクセスが原因で
 // 以下のようなエラーが発生するので、.well-known へのアクセスを204で応答して無視する。
 // Error: No route matches URL "/.well-known/appspecific/com.chrome.devtools.json"。
