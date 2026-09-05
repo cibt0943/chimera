@@ -1,5 +1,5 @@
 import { TodoType } from '~/types/todos'
-import { TaskStatus } from '~/types/tasks'
+import type { TaskStatus } from '~/types/tasks'
 
 export type ViewTodo = {
   todoId: string

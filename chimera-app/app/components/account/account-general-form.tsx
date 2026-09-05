@@ -3,7 +3,7 @@ import { Form } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod/v4'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import { SelectItem } from '~/components/ui/select'
 import { ACCOUNT_URL } from '~/constants'
 import {

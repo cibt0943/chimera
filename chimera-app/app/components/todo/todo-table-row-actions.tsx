@@ -13,7 +13,7 @@ import {
   LuCornerDownLeft,
 } from 'react-icons/lu'
 import { Row, Table } from '@tanstack/react-table'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,11 +45,11 @@ export function TodoTableRowActions({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className={heightCss}>
-          <LuEllipsis />
-          <span className="sr-only">Open menu</span>
-        </Button>
+      <DropdownMenuTrigger
+        render={<Button variant="ghost" size="icon" className={heightCss} />}
+      >
+        <LuEllipsis />
+        <span className="sr-only">Open menu</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem

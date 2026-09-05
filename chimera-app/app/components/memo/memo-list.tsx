@@ -12,7 +12,7 @@ import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
 import { toast } from 'sonner'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Input } from '~/components/ui/input'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import { API_URL, MEMO_URL } from '~/constants'
 import { useDebounce, useApiQueue } from '~/lib/hooks'
 import { arrayMove } from '~/lib/utils'
@@ -310,70 +310,72 @@ export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
   )
 
   return (
-    <div className="flex flex-col gap-4 overflow-hidden px-1 md:py-4 lg:h-full lg:min-h-0">
-      <div className="flex items-center gap-2 px-3">
-        <Form action={MEMO_URL} method="post">
-          <Button
-            type="submit"
-            variant="secondary"
-            className="h-8 px-3"
-            ref={addButtonRef}
+    <>
+      <div>
+        <div className="bg-background sticky top-0 z-10 flex items-center gap-2 border-b p-4">
+          <Form action={MEMO_URL} method="post">
+            <Button
+              type="submit"
+              variant="secondary"
+              className="h-8 px-3"
+              ref={addButtonRef}
+            >
+              <LuPlus />
+              {t('common.message.add')}
+              <p className="text-muted-foreground text-xs">
+                <kbd className="pointer-events-none inline-flex h-5 items-center gap-1 rounded border px-1.5 select-none">
+                  <span>{userAgent.modifierKeyIcon}</span>n
+                </kbd>
+              </p>
+            </Button>
+          </Form>
+          <Input
+            type="search"
+            placeholder={t('memo.message.title_search')}
+            onChange={(event) => searchMemosDebounce(event.target.value)}
+            className="h-8"
+            id="memos-title-search"
+          />
+          <MemoSettingsForm />
+        </div>
+        <ScrollArea className="p-4">
+          <DragDropProvider
+            sensors={[PointerSensor]}
+            modifiers={(defaults) => [...defaults, RestrictToVerticalAxis]}
+            onDragEnd={handleDragEnd}
           >
-            <LuPlus />
-            {t('common.message.add')}
-            <p className="text-muted-foreground text-xs">
-              <kbd className="pointer-events-none inline-flex h-5 items-center gap-1 rounded border px-1.5 select-none">
-                <span>{userAgent.modifierKeyIcon}</span>n
-              </kbd>
-            </p>
-          </Button>
-        </Form>
-        <Input
-          type="search"
-          placeholder={t('memo.message.title_search')}
-          onChange={(event) => searchMemosDebounce(event.target.value)}
-          className="h-8"
-          id="memos-title-search"
-        />
-        <MemoSettingsForm />
+            <div className="flex flex-col gap-2" id="memos" ref={memosRef}>
+              {dispMemos.length ? (
+                dispMemos.map((item: Memo, index) => (
+                  <ListItem
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    onFocus={() => (focusedMemoRef.current = item)}
+                    isSelected={item.id === selectedMemo?.id}
+                    actionMenu={
+                      <MemoActionMenu
+                        memo={item}
+                        handleMoveMemo={moveMemoOneStep}
+                        handleUpdateMemoStatus={updateMemoStatusApi}
+                        handleDeleteMemo={openDeleteMemoDialog}
+                      />
+                    }
+                  />
+                ))
+              ) : (
+                <div className="text-sm">{t('common.message.no_data')}</div>
+              )}
+            </div>
+          </DragDropProvider>
+        </ScrollArea>
       </div>
-      <ScrollArea className="max-lg:h-[calc(100svh-80px)] max-md:h-[calc(100svh-110px)] lg:min-h-0 lg:flex-1 [&>[data-slot=scroll-area-viewport]>div]:!block">
-        <DragDropProvider
-          sensors={[PointerSensor]}
-          modifiers={(defaults) => [...defaults, RestrictToVerticalAxis]}
-          onDragEnd={handleDragEnd}
-        >
-          <div className="flex flex-col gap-2 px-3" id="memos" ref={memosRef}>
-            {dispMemos.length ? (
-              dispMemos.map((item: Memo, index) => (
-                <ListItem
-                  key={item.id}
-                  item={item}
-                  index={index}
-                  onFocus={() => (focusedMemoRef.current = item)}
-                  isSelected={item.id === selectedMemo?.id}
-                  actionMenu={
-                    <MemoActionMenu
-                      memo={item}
-                      handleMoveMemo={moveMemoOneStep}
-                      handleUpdateMemoStatus={updateMemoStatusApi}
-                      handleDeleteMemo={openDeleteMemoDialog}
-                    />
-                  }
-                />
-              ))
-            ) : (
-              <div className="text-sm">{t('common.message.no_data')}</div>
-            )}
-          </div>
-        </DragDropProvider>
-      </ScrollArea>
       <MemoDeleteConfirmDialog
         memo={actionMemo}
         redirectUrl={MEMO_URL}
         isOpen={isOpenDeleteDialog}
         onOpenChange={setIsOpenDeleteDialog}
       />
-    </div>
+    </>
   )
 }

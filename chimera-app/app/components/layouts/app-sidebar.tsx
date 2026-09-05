@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router'
-import { LuBird, LuFlower2, LuFlameKindling } from 'react-icons/lu'
+import { LuFlameKindling } from 'react-icons/lu'
 import {
   Sidebar,
   SidebarHeader,
@@ -21,15 +21,11 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center">
             <SidebarMenuButton
-              asChild
               className={'group-data-[collapsible=icon]:p-0!'}
+              render={<NavLink to="/" className="font-bold text-yellow-500!" />}
             >
-              <NavLink to="/" className="font-bold text-yellow-500!">
-                <LuBird />
-                <LuFlower2 />
-                <LuFlameKindling />
-                <span>IMA</span>
-              </NavLink>
+              <LuFlameKindling />
+              <span>IMA</span>
             </SidebarMenuButton>
             <SidebarTrigger className="p-4" />
           </SidebarMenuItem>

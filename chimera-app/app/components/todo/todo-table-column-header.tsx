@@ -5,7 +5,6 @@ import {
   LuArrowDownWideNarrow,
 } from 'react-icons/lu'
 import { Column } from '@tanstack/react-table'
-import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +28,7 @@ export function TodoTableColumnHeader<TData, TValue>({
   className,
 }: TodoTableColumnHeaderProps<TData, TValue>) {
   const { t } = useTranslation()
+  const sortDirection = column.getIsSorted()
 
   if (!column.getCanSort()) {
     return <div className={cn(className)}>{title}</div>
@@ -37,32 +37,32 @@ export function TodoTableColumnHeader<TData, TValue>({
   return (
     <div className={cn('flex items-center', className)}>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="data-[state=open]:bg-accent -ml-3">
-            <span>{title}</span>
-            {column.getIsSorted() === 'desc' ? (
-              <LuArrowDownWideNarrow />
-            ) : column.getIsSorted() === 'asc' ? (
-              <LuArrowUpNarrowWide />
-            ) : (
-              <LuChevronsUpDown className="h-3.5! w-3.5!" />
-            )}
-          </Button>
+        <DropdownMenuTrigger
+          render={<button className="flex items-center gap-1" />}
+        >
+          <span>{title}</span>
+          {sortDirection === 'desc' ? (
+            <LuArrowDownWideNarrow />
+          ) : sortDirection === 'asc' ? (
+            <LuArrowUpNarrowWide />
+          ) : (
+            <LuChevronsUpDown />
+          )}
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          {(column.getIsSorted() === 'desc' || !column.getIsSorted()) && (
+          {(sortDirection === 'desc' || !sortDirection) && (
             <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
               <LuArrowUpNarrowWide className="text-muted-foreground/70" />
               {t('common.message.sort_asc')}
             </DropdownMenuItem>
           )}
-          {(column.getIsSorted() === 'asc' || !column.getIsSorted()) && (
+          {(sortDirection === 'asc' || !sortDirection) && (
             <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
               <LuArrowDownWideNarrow className="text-muted-foreground/70" />
               {t('common.message.sort_desc')}
             </DropdownMenuItem>
           )}
-          {column.getIsSorted() && (
+          {sortDirection && (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => column.clearSorting()}>

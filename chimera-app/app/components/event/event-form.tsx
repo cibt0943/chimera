@@ -10,7 +10,7 @@ import {
 } from '@conform-to/react'
 import { parseWithZod, getZodConstraint } from '@conform-to/zod/v4'
 import { Matcher } from 'react-day-picker'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import { Checkbox } from '~/components/ui/checkbox'
 import { EVENT_URL } from '~/constants'
 import {

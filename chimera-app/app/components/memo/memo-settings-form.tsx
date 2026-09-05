@@ -1,7 +1,7 @@
 import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { LuSettings } from 'react-icons/lu'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/ui/button-base'
 import { Label } from '~/components/ui/label'
 import { Switch } from '~/components/ui/switch'
 import {
@@ -18,11 +18,9 @@ export function MemoSettingsForm() {
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline" className="flex px-2">
-          <LuSettings className="text-primary/80" />
-          <span className="sr-only">{t('common.message.settings')}</span>
-        </Button>
+      <PopoverTrigger render={<Button variant="outline" size="icon" />}>
+        <LuSettings />
+        <span className="sr-only">{t('common.message.settings')}</span>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] space-y-4">
         <h4 className="font-medium">{t('common.message.settings')}</h4>

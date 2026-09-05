@@ -11,7 +11,7 @@ export default function Login() {
       <div>{t('account.message.need_login')}</div>
       <div className="mt-4">
         <Form action="/auth/auth0" method="post">
-          <Button>
+          <Button type="submit">
             <LuLogIn />
             {t('account.message.login')}
           </Button>

@@ -54,14 +54,14 @@ export function SidebarFuncMenu() {
           {FuncMenuList.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
-                asChild
                 isActive={isActive(item.url)}
                 tooltip={t(item.title)}
+                render={
+                  <NavLink to={item.url} state={{ isLoadEffect: true }} />
+                }
               >
-                <NavLink to={item.url} state={{ isLoadEffect: true }}>
-                  <item.icon />
-                  <span>{t(item.title)}</span>
-                </NavLink>
+                <item.icon />
+                <span>{t(item.title)}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

@@ -1,5 +1,5 @@
 import * as zod from 'zod'
-import { Todo } from '~/types/todos'
+import type { Todo } from '~/types/todos'
 
 export const TaskStatus = {
   NEW: 0,
