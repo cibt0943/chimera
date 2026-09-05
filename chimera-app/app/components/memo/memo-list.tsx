@@ -312,7 +312,7 @@ export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
   return (
     <>
       <div>
-        <div className="bg-background sticky top-0 z-10 flex items-center gap-2 p-4">
+        <div className="bg-background sticky top-0 z-10 flex items-center gap-2 border-b p-4">
           <Form action={MEMO_URL} method="post">
             <Button
               type="submit"
@@ -338,7 +338,7 @@ export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
           />
           <MemoSettingsForm />
         </div>
-        <ScrollArea className="px-4 pb-4">
+        <ScrollArea className="p-4">
           <DragDropProvider
             sensors={[PointerSensor]}
             modifiers={(defaults) => [...defaults, RestrictToVerticalAxis]}
