@@ -36,6 +36,10 @@ export function TaskForm({ task, formId, redirectUrl }: TaskFormProps) {
   const fetcher = useFetcher()
 
   const action = task ? `${TODO_URL}/${task.todoId}` : `${TODO_URL}/task`
+  const statusItems = TaskStatusListByDispOrder.map((status) => ({
+    value: String(status.value),
+    label: t(status.label),
+  }))
 
   const [form, fields] = useForm<TaskSchemaType>({
     id: formId,
@@ -93,8 +97,9 @@ export function TaskForm({ task, formId, redirectUrl }: TaskFormProps) {
           <SelectConform
             meta={fields.status}
             placeholder="Select a task status"
+            items={statusItems}
           >
-            <SelectItems />
+            <SelectItems items={statusItems} />
           </SelectConform>
           <FormDescription>
             {t('task.message.select_task_status')}
@@ -108,14 +113,16 @@ export function TaskForm({ task, formId, redirectUrl }: TaskFormProps) {
   )
 }
 
-function SelectItems() {
-  const { t } = useTranslation()
-
+function SelectItems({
+  items,
+}: {
+  items: Array<{ value: string; label: string }>
+}) {
   return (
     <SelectGroup>
-      {TaskStatusListByDispOrder.map((status) => (
-        <SelectItem key={status.value} value={status.value.toString()}>
-          {t(status.label)}
+      {items.map((item) => (
+        <SelectItem key={item.value} value={item.value}>
+          {item.label}
         </SelectItem>
       ))}
     </SelectGroup>
