@@ -100,10 +100,6 @@ export default function App({ loaderData }: Route.ComponentProps) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
-        {/* FullCalendarにてエラーが出ないようにする対応 */}
-        {/* https://fullcalendar.io/docs/react */}
-        {/* https://github.com/fullcalendar/fullcalendar-examples/tree/main/remix */}
-        <style data-fullcalendar />
         <Links />
         <script
           // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml -- テーマ初期化スクリプトの注入のため意図的に使用

@@ -15,21 +15,23 @@ import {
   LuFilePen,
   LuCalendarDays,
 } from 'react-icons/lu'
-import allLocales from '@fullcalendar/core/locales-all'
+import allLocales from '@fullcalendar/react/locales-all'
 import {
-  DatesSetArg,
-  DateSelectArg,
-  EventContentArg,
-  EventClickArg,
+  useCalendarController,
+  DatesSetInfo,
+  DateSelectInfo,
+  EventDisplayInfo,
+  EventClickInfo,
+  EventDropInfo,
+  EventResizeDoneInfo,
   EventInput,
-  EventDropArg,
-} from '@fullcalendar/core'
-import FullCalendar from '@fullcalendar/react'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin, {
-  EventResizeDoneArg,
-} from '@fullcalendar/interaction'
-import listPlugin from '@fullcalendar/list'
+} from '@fullcalendar/react'
+import dayGridPlugin from '@fullcalendar/react/daygrid'
+import interactionPlugin from '@fullcalendar/react/interaction'
+import listPlugin from '@fullcalendar/react/list'
+import { EventCalendarViews } from '~/components/ui/event-calendar-views'
+import { EventCalendarToolbar } from '~/components/event/event-calendar-toolbar'
+import { EventCalendarCloseIcon } from '~/components/event/event-calendar-icons'
 import { API_URL, TODO_URL, TASK_URL, MEMO_URL, EVENT_URL } from '~/constants'
 import { useMedia } from '~/lib/hooks'
 import { Event, CalendarEvents, CalendarEventType } from '~/types/events'
@@ -50,11 +52,11 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   const [searchParams, setSearchParams] = useSearchParams()
   const location = useLocation()
   const isLaptop = useMedia('(min-width: 1024px)')
-  const callenderRef = React.useRef<FullCalendar>(null)
+  const controller = useCalendarController()
   const redirectUrl = EVENT_URL + location.search
 
   // 日付セット時の処理
-  function handleDatesSet(arg: DatesSetArg) {
+  function handleDatesSet(arg: DatesSetInfo) {
     const startStr = format(arg.view.currentStart, 'yyyy-MM-dd')
 
     if (viewMode === arg.view.type && startDate === startStr) return
@@ -67,7 +69,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   }
 
   // イベント編集
-  function handleEventClick(arg: EventClickArg) {
+  function handleEventClick(arg: EventClickInfo) {
     const { type, srcObj } = arg.event.extendedProps
     const url = getEditUrl(type, srcObj.id)
     url && navigate(url + location.search)
@@ -88,7 +90,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   }
 
   // イベント追加
-  function handleSelect(arg: DateSelectArg) {
+  function handleSelect(arg: DateSelectInfo) {
     const event = createNewEvent(arg.start, arg.end)
     setActionEvent(event)
     setIsOpenAddDialog(true)
@@ -116,7 +118,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   }
 
   // イベントDrop
-  function handleEventDrop(arg: EventDropArg) {
+  function handleEventDrop(arg: EventDropInfo) {
     const { type, srcObj } = arg.event.extendedProps
 
     const startDate = arg.event.start
@@ -146,7 +148,7 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   }
 
   // イベントResize
-  function handleEventResize(arg: EventResizeDoneArg) {
+  function handleEventResize(arg: EventResizeDoneInfo) {
     const { type, srcObj } = arg.event.extendedProps
 
     if (type !== CalendarEventType.EVENT) return
@@ -181,9 +183,9 @@ export function Calendar({ defaultEvents }: CalendarProps) {
   const viewMode = isLaptop
     ? (searchParams.get('view') ?? 'dayGridMonth')
     : 'listMonth'
-  const headerToolbarRight = isLaptop
-    ? 'dayGridMonth dayGridWeek listMonth'
-    : ''
+  const availableViews = isLaptop
+    ? ['dayGridMonth', 'dayGridWeek', 'listMonth']
+    : ['listMonth']
   const defaultStartDate = format(startOfMonth(new Date()), 'yyyy-MM-dd')
   const startDate = searchParams.get('start') ?? defaultStartDate
 
@@ -193,46 +195,45 @@ export function Calendar({ defaultEvents }: CalendarProps) {
     // React cannot flush when React is already rendering.
     // Consider moving this call to a scheduler task or micro task.
     Promise.resolve().then(() => {
-      if (!callenderRef.current) return
-      callenderRef.current.getApi().changeView(viewMode)
+      controller.changeView(viewMode)
     })
-  }, [viewMode])
+  }, [viewMode, controller])
 
   return (
-    <div className="h-[calc(100svh-68px)] lg:h-[calc(100svh-32px)]">
-      <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
-        height={'100%'}
-        locales={allLocales}
-        locale={i18n.language}
-        headerToolbar={{
-          left: 'prev today next',
-          center: 'title',
-          right: headerToolbarRight,
-        }}
-        datesSet={handleDatesSet}
-        initialView={viewMode}
-        initialDate={startDate}
-        viewClassNames={['text-sm']}
-        editable={true}
-        selectable={true}
-        select={handleSelect}
-        dayHeaderClassNames={['font-normal']}
-        dayCellContent={(arg) => arg.dayNumberText.replace('日', '')}
-        listDayFormat={{ day: 'numeric', weekday: 'short' }}
-        listDaySideFormat={() => ''}
-        events={defaultEvents}
-        eventContent={renderEventContent}
-        eventTimeFormat={{ hour: 'numeric', minute: '2-digit' }}
-        displayEventEnd={true}
-        eventInteractive={true}
-        eventTextColor="black"
-        eventClick={handleEventClick}
-        eventDataTransform={transformEventData}
-        eventDrop={handleEventDrop}
-        eventResize={handleEventResize}
-        ref={callenderRef}
+    <div className="flex h-[calc(100svh-68px)] flex-col gap-5 lg:h-[calc(100svh-32px)]">
+      <EventCalendarToolbar
+        controller={controller}
+        availableViews={availableViews}
       />
+      <div className="min-h-0 grow">
+        <EventCalendarViews
+          plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
+          height={'100%'}
+          locales={allLocales}
+          locale={i18n.language}
+          headerToolbar={false}
+          datesSet={handleDatesSet}
+          initialView={viewMode}
+          initialDate={startDate}
+          editable={true}
+          selectable={true}
+          select={handleSelect}
+          dayCellTopContent={(arg) => arg.dayNumberText.replace('日', '')}
+          listDayFormat={{ day: 'numeric', weekday: 'short' }}
+          listDayAltFormat={() => ''}
+          popoverCloseContent={() => <EventCalendarCloseIcon />}
+          events={defaultEvents}
+          eventContent={renderEventContent}
+          eventTimeFormat={{ hour: 'numeric', minute: '2-digit' }}
+          displayEventEnd={true}
+          eventInteractive={true}
+          eventClick={handleEventClick}
+          eventDataTransform={transformEventData}
+          eventDrop={handleEventDrop}
+          eventResize={handleEventResize}
+          controller={controller}
+        />
+      </div>
       <EventFormDialogMemo
         event={actionEvent}
         redirectUrl={redirectUrl}
@@ -320,7 +321,7 @@ function transformEventData(eventData: EventInput) {
 }
 
 // イベント表示用コンポーネント
-function renderEventContent(eventContent: EventContentArg) {
+function renderEventContent(eventContent: EventDisplayInfo) {
   const { timeText } = eventContent
   const { title } = eventContent.event
   const { type, srcObj } = eventContent.event.extendedProps
