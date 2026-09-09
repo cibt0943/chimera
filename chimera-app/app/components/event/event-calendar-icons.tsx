@@ -4,7 +4,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from 'lucide-react'
-import { cn } from '~/lib/utils'
+import { cn } from 'cn'
 
 export function EventCalendarPrevIcon() {
   return <ChevronLeftIcon className="[[dir=rtl]_&]:rotate-180" />

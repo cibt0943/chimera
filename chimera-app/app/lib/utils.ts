@@ -1,12 +1,8 @@
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
 import { Locale } from 'date-fns'
 import * as locales from 'date-fns/locale'
 import { OS } from '~/constants'
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+export { cn } from "cn";
 
 export function sleep(waitMsec: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, waitMsec))

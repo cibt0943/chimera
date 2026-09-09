@@ -7,7 +7,7 @@ import { getFormProps, useInputControl } from '@conform-to/react'
 import { Button } from '~/components/ui/button-base'
 import { MEMO_URL } from '~/constants'
 import { useDebounce } from '~/lib/hooks'
-import { cn } from '~/lib/utils'
+import { cn } from 'cn'
 import { useUserAgentAtom } from '~/lib/global-state'
 import { Memo } from '~/types/memos'
 import {

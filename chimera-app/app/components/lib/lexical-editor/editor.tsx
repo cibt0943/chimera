@@ -27,7 +27,7 @@ import {
   ParagraphNode,
   type EditorState,
 } from 'lexical'
-import { cn } from '~/lib/utils'
+import { cn } from 'cn'
 import { EditorTheme } from './theme'
 import { SlashMenuPlugin } from './slash-menu-plugin'
 import { FloatingToolbarPlugin } from './floating-toolbar-plugin'

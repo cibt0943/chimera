@@ -29,17 +29,10 @@ import {
   ListTodo,
   Type,
 } from 'lucide-react'
-import { cn } from '~/lib/utils'
+import { cn } from 'cn'
 
 type SlashCommandType =
-  | 'paragraph'
-  | 'h1'
-  | 'h2'
-  | 'h3'
-  | 'quote'
-  | 'ul'
-  | 'ol'
-  | 'check'
+  'paragraph' | 'h1' | 'h2' | 'h3' | 'quote' | 'ul' | 'ol' | 'check'
 
 class SlashMenuOption extends MenuOption {
   label: string

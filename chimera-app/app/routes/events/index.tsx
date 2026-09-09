@@ -7,7 +7,6 @@ import { getEvents, addEvent } from '~/models/event.server'
 import { getTasks } from '~/models/task.server'
 import { getMemos } from '~/models/memo.server'
 import { Calendar } from '~/components/event/calendar'
-import styles from '~/styles/events.css?url'
 import type { Route } from './+types/index'
 import {
   CalendarEvents,
@@ -18,10 +17,6 @@ import {
   TaskWithNonNullableDueDate,
   MemoWithNonNullableRelatedDate,
 } from '~/types/events'
-
-export function links() {
-  return [{ rel: 'stylesheet', href: styles }]
-}
 
 export function meta() {
   return [{ title: 'Events | IMA' }]

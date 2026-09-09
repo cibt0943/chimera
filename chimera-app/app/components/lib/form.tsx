@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { cn } from '~/lib/utils'
+import { cn } from 'cn'
 import { FieldGroup, Field, FieldLabel } from '~/components/ui/field'
 import { DialogFooter } from '~/components/ui/dialog'
 

@@ -5,7 +5,7 @@ import {
 } from '~/components/event/event-calendar-icons'
 import { Button } from '~/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs'
-import { cn } from '~/lib/utils'
+import { cn } from 'cn'
 
 export interface EventCalendarToolbarProps {
   className?: string

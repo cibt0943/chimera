@@ -8,7 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover'
-import { cn } from '~/lib/utils'
+import { cn } from 'cn'
 
 function isHexColor(value: string) {
   return /^#[0-9a-fA-F]{6}$/.test(value)

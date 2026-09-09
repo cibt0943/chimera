@@ -22,7 +22,7 @@ import {
   DropdownMenuShortcut,
 } from '~/components/ui/dropdown-menu'
 import { MEMO_URL } from '~/constants'
-import { cn } from '~/lib/utils'
+import { cn } from 'cn'
 import { Memo, MemoStatus } from '~/types/memos'
 import { useUserAgentAtom } from '~/lib/global-state'
 
