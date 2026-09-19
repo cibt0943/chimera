@@ -68,6 +68,7 @@ export default [
         route(':memoId/position', './routes/memos/api.memo.position.tsx'),
       ]),
       ...prefix('events', [route(':eventId', './routes/events/api.event.tsx')]),
+      route('collab-token', './routes/network-diagrams/api.collab-token.tsx'),
     ]),
   ]),
 ] satisfies RouteConfig
