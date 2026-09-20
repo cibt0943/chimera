@@ -1,23 +1,27 @@
+// app/routes/network-diagrams/index.tsx
+import { useLoaderData } from 'react-router'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
-import type { Route } from './+types/index'
+import CollaborativeFlow from '~/components/network-diagrams/CollaborativeFlow'
 
-export function meta() {
-  return [{ title: 'Network Diagram | IMA' }]
-}
-
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader({ request }: { request: Request }) {
   const loginInfo = await isAuthenticated(request)
 
-  return { loginInfo }
+  // TODO: 複数の工程表を扱うようになったら、URLパラメータ (:diagramId) から
+  // roomId を組み立てるようにする。今は動作確認用に固定値にしている。
+  const roomId = 'diagram:1234'
+
+  return {
+    roomId,
+    user: loginInfo.auth0User,
+  }
 }
 
-export default function Index() {
+export default function NetworkDiagramsIndexRoute() {
+  const { roomId, user } = useLoaderData<typeof loader>()
+
   return (
-    <div>
-      <div className="text-l mb-8 font-bold">
-        This feature is under development. Please check back later.
-      </div>
-      aaaaa
+    <div style={{ width: '100%', height: 'calc(100vh - 64px)' }}>
+      <CollaborativeFlow roomId={roomId} user={user} />
     </div>
   )
 }
