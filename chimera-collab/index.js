@@ -12,9 +12,12 @@
 
 const http = require("http");
 const { WebSocketServer } = require("ws");
-const { setupWSConnection } = require("y-websocket/bin/utils");
+const { setupWSConnection, setPersistence } = require("y-websocket/bin/utils");
 const jwt = require("jsonwebtoken");
 const { URL } = require("url");
+const persistence = require("./persistence");
+
+setPersistence(persistence);
 
 const PORT = process.env.PORT || 1234;
 const COLLAB_JWT_SECRET = process.env.COLLAB_JWT_SECRET;
