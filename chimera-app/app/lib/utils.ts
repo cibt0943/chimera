@@ -2,7 +2,7 @@ import { Locale } from 'date-fns'
 import * as locales from 'date-fns/locale'
 import { OS } from '~/constants'
 
-export { cn } from "cn";
+export { cn } from 'cn'
 
 export function sleep(waitMsec: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, waitMsec))
