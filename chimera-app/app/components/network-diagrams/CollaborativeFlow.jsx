@@ -75,6 +75,9 @@ export default function CollaborativeFlow({ roomId, user }) {
 
     async function connect() {
       const token = await fetchCollabToken(roomId)
+      // このawaitの間にStrictModeの二重実行でクリーンアップが先に走っている
+      // 可能性があるため、ここでも必ずチェックする。
+      if (disposed) return
 
       const ydoc = new Y.Doc()
       const yNodesMap = ydoc.getMap('nodes') // id -> node
@@ -83,6 +86,15 @@ export default function CollaborativeFlow({ roomId, user }) {
       const provider = new WebsocketProvider(COLLAB_SERVER_URL, roomId, ydoc, {
         params: { token },
       })
+
+      // WebsocketProviderの生成自体は同期処理だが、念のためここでも
+      // 破棄済みでないか確認してからrefに反映する。破棄済みなら、せっかく
+      // 作ったこの接続は使わず、後始末だけして終わる。
+      if (disposed) {
+        provider.destroy()
+        ydoc.destroy()
+        return
+      }
 
       ydocRef.current = ydoc
       providerRef.current = provider
