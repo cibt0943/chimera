@@ -1,17 +1,13 @@
-// client-src/CollaborativeFlow.jsx
+// app/components/network-diagrams/CollaborativeFlow.tsx
 //
-// Collaborative network-diagram (工程表) editor built on React Flow + Yjs.
-// - Durable data (nodes, edges) is stored in a shared Y.Doc and synced via
-//   the y-websocket WebsocketProvider, authenticated with an Auth0 access token.
-// - Ephemeral data (other users' cursors) is synced via Yjs Awareness.
-//
-// Install (client):
-//   npm install @xyflow/react yjs y-websocket @auth0/auth0-react
-//
-// Usage: wrap your app in <Auth0Provider> (see App.jsx below) and render
-//   <CollaborativeFlow roomId="diagram:123" />
+// React Flow + Yjs によるリアルタイム共同編集のネットワーク図(工程表)エディタ。
+// - Durable なデータ(nodes / edges)は共有 Y.Doc に保存し、y-websocket の
+//   WebsocketProvider 経由で同期する。接続時の認証には Remix の
+//   /api/collab-token が発行する短命JWTを使う。
+// - Ephemeral なデータ(他ユーザーのカーソル)は Yjs Awareness で同期する。
 
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import type { MouseEvent } from 'react'
 import {
   ReactFlow,
   Background,
@@ -20,54 +16,81 @@ import {
   applyNodeChanges,
   applyEdgeChanges,
   addEdge,
+  type Node,
+  type Edge,
+  type OnNodesChange,
+  type OnEdgesChange,
+  type OnConnect,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import * as Y from 'yjs'
 import { WebsocketProvider } from 'y-websocket'
+import { Button } from '~/components/ui/button-base'
+import type { Auth0User } from '~/types/accounts'
+
 const COLLAB_SERVER_URL =
   import.meta.env.VITE_COLLAB_WS_URL || 'ws://localhost:1234'
 
-// Fetches a short-lived collab token from the Remix app. The browser never
-// sees a raw Auth0 token — the session cookie authenticates this request,
-// and Remix mints a token scoped to this room. See:
-//   app/routes/api.collab-token.ts
-async function fetchCollabToken(roomId) {
+// Remix の /api/collab-token から、このroom用の短命トークンを取得する。
+// ブラウザはAuth0の生トークンを持たず、セッションCookieで認証される。
+async function fetchCollabToken(roomId: string): Promise<string> {
   const res = await fetch(
     `/api/collab-token?room=${encodeURIComponent(roomId)}`,
-    {
-      credentials: 'include',
-    },
+    { credentials: 'include' },
   )
   if (!res.ok) throw new Error('Failed to fetch collab token')
-  const { token } = await res.json()
+  const { token } = (await res.json()) as { token: string }
   return token
 }
 
-// Fields we persist per node/edge (see React Flow's Durable/Ephemeral guidance).
-// dragging/resizing/selected/measured are intentionally left out of the shared doc.
-function toDurableNode(node) {
+// 共有ドキュメントに保存するフィールド(React Flow公式のDurable/Ephemeral指針に準拠)。
+// dragging / resizing / selected / measured は意図的に含めない。
+type DurableNode = Pick<
+  Node,
+  'id' | 'type' | 'data' | 'position' | 'width' | 'height'
+>
+type DurableEdge = Pick<
+  Edge,
+  'id' | 'type' | 'data' | 'source' | 'target' | 'sourceHandle' | 'targetHandle'
+>
+
+function toDurableNode(node: Node): DurableNode {
   const { id, type, data, position, width, height } = node
   return { id, type, data, position, width, height }
 }
-function toDurableEdge(edge) {
+
+function toDurableEdge(edge: Edge): DurableEdge {
   const { id, type, data, source, target, sourceHandle, targetHandle } = edge
   return { id, type, data, source, target, sourceHandle, targetHandle }
 }
 
+interface CursorInfo {
+  x: number
+  y: number
+  name: string
+  color: string
+}
+
 const randomColor = () => `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`
 
-export default function CollaborativeFlow({ roomId, user }) {
-  // `user` is passed down from the Remix route's loader data (loginInfo.auth0User),
-  // since the browser has no direct Auth0 hook/session in this app.
-  const [ready, setReady] = useState(false)
-  const [nodes, setNodes] = useState([])
-  const [edges, setEdges] = useState([])
-  const [cursors, setCursors] = useState({})
+export interface CollaborativeFlowProps {
+  roomId: string
+  user: Pick<Auth0User, 'name'> | undefined
+}
 
-  const ydocRef = useRef(null)
-  const providerRef = useRef(null)
-  const yNodesRef = useRef(null)
-  const yEdgesRef = useRef(null)
+export default function CollaborativeFlow({
+  roomId,
+  user,
+}: CollaborativeFlowProps) {
+  const [ready, setReady] = useState(false)
+  const [nodes, setNodes] = useState<Node[]>([])
+  const [edges, setEdges] = useState<Edge[]>([])
+  const [cursors, setCursors] = useState<Record<number, CursorInfo>>({})
+
+  const ydocRef = useRef<Y.Doc | null>(null)
+  const providerRef = useRef<WebsocketProvider | null>(null)
+  const yNodesRef = useRef<Y.Map<DurableNode> | null>(null)
+  const yEdgesRef = useRef<Y.Map<DurableEdge> | null>(null)
   const applyingRemoteRef = useRef(false)
 
   useEffect(() => {
@@ -80,16 +103,14 @@ export default function CollaborativeFlow({ roomId, user }) {
       if (disposed) return
 
       const ydoc = new Y.Doc()
-      const yNodesMap = ydoc.getMap('nodes') // id -> node
-      const yEdgesMap = ydoc.getMap('edges') // id -> edge
+      const yNodesMap = ydoc.getMap<DurableNode>('nodes') // id -> node
+      const yEdgesMap = ydoc.getMap<DurableEdge>('edges') // id -> edge
 
       const provider = new WebsocketProvider(COLLAB_SERVER_URL, roomId, ydoc, {
         params: { token },
       })
 
-      // WebsocketProviderの生成自体は同期処理だが、念のためここでも
-      // 破棄済みでないか確認してからrefに反映する。破棄済みなら、せっかく
-      // 作ったこの接続は使わず、後始末だけして終わる。
+      // 破棄済みなら、作った接続は使わず後始末だけして終わる。
       if (disposed) {
         provider.destroy()
         ydoc.destroy()
@@ -101,8 +122,7 @@ export default function CollaborativeFlow({ roomId, user }) {
       yNodesRef.current = yNodesMap
       yEdgesRef.current = yEdgesMap
 
-      // Awareness: share this user's identity + cursor color, and later their
-      // live cursor position (ephemeral, never written to the Y.Doc).
+      // Awareness: ユーザー名とカーソル色を共有する(Y.Docには書き込まない一時データ)。
       provider.awareness.setLocalStateField('user', {
         name: user?.name || 'Anonymous',
         color: randomColor(),
@@ -110,8 +130,8 @@ export default function CollaborativeFlow({ roomId, user }) {
 
       const syncLocalStateFromYjs = () => {
         applyingRemoteRef.current = true
-        // 既存のローカルなノード情報（measured, selected, dragging など
-        // React Flow内部が使うフィールド）を保ったまま、Yjs側の最新値
+        // 既存のローカルなノード情報(measured, selected, dragging など
+        // React Flow内部が使うフィールド)を保ったまま、Yjs側の最新値
         // (position, data, type など)だけをマージする。配列をまるごと
         // 置き換えると measured が消えて永久に非表示になってしまう。
         setNodes((prevNodes) => {
@@ -136,7 +156,7 @@ export default function CollaborativeFlow({ roomId, user }) {
 
       provider.awareness.on('change', () => {
         const states = provider.awareness.getStates()
-        const next = {}
+        const next: Record<number, CursorInfo> = {}
         states.forEach((state, clientId) => {
           if (clientId === provider.awareness.clientID) return
           if (state.cursor && state.user) {
@@ -146,7 +166,7 @@ export default function CollaborativeFlow({ roomId, user }) {
         setCursors(next)
       })
 
-      provider.on('sync', (isSynced) => {
+      provider.on('sync', (isSynced: boolean) => {
         if (isSynced && !disposed) setReady(true)
       })
     }
@@ -161,20 +181,18 @@ export default function CollaborativeFlow({ roomId, user }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId])
 
-  // Local React Flow change handlers -> write durable fields into the Y.Doc.
-  // Yjs's own observers (above) will reconcile this back into React state,
-  // so we don't need to setNodes/setEdges directly here.
-  const onNodesChange = useCallback((changes) => {
+  // React Flow のローカル変更 -> Durable なフィールドを Y.Doc に書き込む。
+  const onNodesChange: OnNodesChange = useCallback((changes) => {
     if (applyingRemoteRef.current) return
     setNodes((prevNodes) => {
       const next = applyNodeChanges(changes, prevNodes)
       const yNodes = yNodesRef.current
       if (yNodes) {
-        ydocRef.current.transact(() => {
+        ydocRef.current?.transact(() => {
           for (const change of changes) {
             if (change.type === 'remove') {
               yNodes.delete(change.id)
-            } else {
+            } else if ('id' in change) {
               const updated = next.find((n) => n.id === change.id)
               if (updated) yNodes.set(updated.id, toDurableNode(updated))
             }
@@ -185,17 +203,17 @@ export default function CollaborativeFlow({ roomId, user }) {
     })
   }, [])
 
-  const onEdgesChange = useCallback((changes) => {
+  const onEdgesChange: OnEdgesChange = useCallback((changes) => {
     if (applyingRemoteRef.current) return
     setEdges((prevEdges) => {
       const next = applyEdgeChanges(changes, prevEdges)
       const yEdges = yEdgesRef.current
       if (yEdges) {
-        ydocRef.current.transact(() => {
+        ydocRef.current?.transact(() => {
           for (const change of changes) {
             if (change.type === 'remove') {
               yEdges.delete(change.id)
-            } else {
+            } else if ('id' in change) {
               const updated = next.find((e) => e.id === change.id)
               if (updated) yEdges.set(updated.id, toDurableEdge(updated))
             }
@@ -206,18 +224,18 @@ export default function CollaborativeFlow({ roomId, user }) {
     })
   }, [])
 
-  const onConnect = useCallback((connection) => {
+  const onConnect: OnConnect = useCallback((connection) => {
     setEdges((prevEdges) => {
       const next = addEdge(connection, prevEdges)
       const newEdge = next[next.length - 1]
-      yEdgesRef.current?.set(newEdge.id, toDurableEdge(newEdge))
+      if (newEdge) yEdgesRef.current?.set(newEdge.id, toDurableEdge(newEdge))
       return next
     })
   }, [])
 
   // 新規ノードを追加する。id は衝突しにくいようにタイムスタンプ+乱数で生成。
   const addNode = useCallback(() => {
-    const newNode = {
+    const newNode: Node = {
       id: `node_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       type: 'default',
       data: { label: '新しいノード' },
@@ -231,8 +249,8 @@ export default function CollaborativeFlow({ roomId, user }) {
     yNodesRef.current?.set(newNode.id, toDurableNode(newNode))
   }, [])
 
-  // Broadcast this user's live cursor position as ephemeral awareness state.
-  const onPaneMouseMove = useCallback((event) => {
+  // 自分のカーソル位置を Awareness(一時データ)としてブロードキャストする。
+  const onPaneMouseMove = useCallback((event: MouseEvent<HTMLDivElement>) => {
     const provider = providerRef.current
     if (!provider) return
     const bounds = event.currentTarget.getBoundingClientRect()
@@ -247,24 +265,17 @@ export default function CollaborativeFlow({ roomId, user }) {
       Object.entries(cursors).map(([clientId, c]) => (
         <div
           key={clientId}
-          style={{
-            position: 'absolute',
-            left: c.x,
-            top: c.y,
-            pointerEvents: 'none',
-            zIndex: 1000,
-            transform: 'translate(-2px, -2px)',
-          }}
+          className="pointer-events-none absolute z-[1000] -translate-x-0.5 -translate-y-0.5"
+          style={{ left: c.x, top: c.y }}
         >
           <div
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: '50%',
-              background: c.color,
-            }}
+            className="size-2.5 rounded-full"
+            style={{ background: c.color }}
           />
-          <div style={{ fontSize: 11, color: c.color, whiteSpace: 'nowrap' }}>
+          <div
+            className="text-[11px] whitespace-nowrap"
+            style={{ color: c.color }}
+          >
             {c.name}
           </div>
         </div>
@@ -273,27 +284,19 @@ export default function CollaborativeFlow({ roomId, user }) {
   )
 
   if (!ready) {
-    return <div>接続中...</div>
+    return <div className="text-muted-foreground p-4 text-sm">接続中...</div>
   }
 
   return (
-    <div
-      style={{ width: '100%', height: '100%', position: 'relative' }}
-      onMouseMove={onPaneMouseMove}
-    >
-      <button
+    <div className="relative h-full w-full" onMouseMove={onPaneMouseMove}>
+      <Button
+        size="sm"
+        variant="secondary"
+        className="absolute top-2.5 left-2.5 z-[1001]"
         onClick={addNode}
-        style={{
-          position: 'absolute',
-          top: 10,
-          left: 10,
-          zIndex: 1001,
-          padding: '6px 12px',
-          cursor: 'pointer',
-        }}
       >
         ＋ ノードを追加
-      </button>
+      </Button>
       <ReactFlow
         nodes={nodes}
         edges={edges}

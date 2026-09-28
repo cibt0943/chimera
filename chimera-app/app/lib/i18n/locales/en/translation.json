@@ -231,7 +231,16 @@
   },
   "network_diagram": {
     "menu_label": "Network Diagram",
-    "page_title": "Network Diagram"
+    "page_title": "Network Diagram",
+    "model": {
+      "title": "Title"
+    },
+    "message": {
+      "network_diagram_creation": "Network Diagram Creation",
+      "network_diagram_editing": "Network Diagram Editing",
+      "network_diagram_deletion": "Network Diagram Deletion",
+      "set_network_diagram_title": "Set the network diagram title"
+    }
   },
   "daily_note": {
     "menu_label": "Daily Note",

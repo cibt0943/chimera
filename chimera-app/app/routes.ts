@@ -48,9 +48,18 @@ export default [
 
     ...prefix('network-diagrams', [
       layout('./routes/network-diagrams/layout.tsx', [
-        index('./routes/network-diagrams/index.tsx'),
-        route('create', './routes/network-diagrams/network-diagram.create.tsx'),
-        route(':diagramId', './routes/network-diagrams/network-diagram.tsx'),
+        route('', './routes/network-diagrams/index.tsx', [
+          route(
+            'create',
+            './routes/network-diagrams/network-diagram.create.tsx',
+          ),
+        ]),
+        route(':diagramId', './routes/network-diagrams/network-diagram.tsx', [
+          route(
+            'edit-title',
+            './routes/network-diagrams/network-diagram.edit-title.tsx',
+          ),
+        ]),
         route(
           ':diagramId/delete',
           './routes/network-diagrams/network-diagram.delete.tsx',

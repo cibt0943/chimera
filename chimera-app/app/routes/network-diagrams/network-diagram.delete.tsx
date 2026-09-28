@@ -1,26 +1,19 @@
 // app/routes/network-diagrams/network-diagram.delete.tsx
 import { redirect } from 'react-router'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
-import { createSupabaseClientForUser } from '~/lib/supabase-client.server'
+import {
+  getNetworkDiagram,
+  deleteNetworkDiagram,
+} from '~/models/network-diagram.server'
+import type { Route } from './+types/network-diagram.delete'
 
-export async function action({
-  request,
-  params,
-}: {
-  request: Request
-  params: { diagramId: string }
-}) {
+export async function action({ params, request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
-  const supabase = createSupabaseClientForUser(loginInfo.account.id)
-
-  const { error } = await supabase
-    .from('network_diagrams')
-    .delete()
-    .eq('id', params.diagramId)
-
-  if (error) {
-    throw new Response(error.message, { status: 500 })
+  const diagram = await getNetworkDiagram(loginInfo.account.id, params.diagramId)
+  if (diagram.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
   }
 
+  await deleteNetworkDiagram(loginInfo.account.id, diagram.id)
   return redirect('/network-diagrams')
 }

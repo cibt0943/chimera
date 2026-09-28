@@ -1,14 +1,8 @@
 // app/routes/network-diagrams/api.collab-token.tsx
-//
-// Issues a short-lived JWT that the browser can use to authenticate its
-// WebSocket connection to the collab (y-websocket) server. The collab
-// server verifies this token using the same shared secret (HMAC),
-// so it never needs to talk to Auth0 directly.
-//
-// GET /api/collab-token?room=diagram:123
-
 import jwt from 'jsonwebtoken'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
+import { getNetworkDiagram } from '~/models/network-diagram.server'
+import type { Route } from './+types/api.collab-token'
 
 const COLLAB_JWT_SECRET = process.env.COLLAB_JWT_SECRET
 
@@ -16,8 +10,7 @@ if (!COLLAB_JWT_SECRET) {
   throw new Error('Missing COLLAB_JWT_SECRET environment variable')
 }
 
-export async function loader({ request }: { request: Request }) {
-  // Reuses the existing session check — redirects to /login if not authenticated.
+export async function loader({ request }: Route.LoaderArgs) {
   const loginInfo = await isAuthenticated(request)
 
   const url = new URL(request.url)
@@ -29,8 +22,13 @@ export async function loader({ request }: { request: Request }) {
     })
   }
 
-  // TODO: check here that loginInfo.account actually has access to `room`
-  // (the specific diagram), the same way you'd authorize any other resource.
+  // room は "diagram:<uuid>" 形式。実際にログイン中のaccountが
+  // その図の所有者かどうかをここで検証する。
+  const diagramId = room.replace(/^diagram:/, '')
+  const diagram = await getNetworkDiagram(loginInfo.account.id, diagramId)
+  if (diagram.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
+  }
 
   const token = jwt.sign(
     {

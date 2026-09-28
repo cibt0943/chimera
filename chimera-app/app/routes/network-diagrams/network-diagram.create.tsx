@@ -1,21 +1,47 @@
 // app/routes/network-diagrams/network-diagram.create.tsx
-import { redirect } from 'react-router'
+import * as React from 'react'
+import { redirect, useNavigate } from 'react-router'
+import { parseWithZod } from '@conform-to/zod/v4'
+import { sleep } from '~/lib/utils'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
-import { createSupabaseClientForUser } from '~/lib/supabase-client.server'
+import { createNetworkDiagram } from '~/models/network-diagram.server'
+import { NetworkDiagramFormDialog } from '~/components/network-diagrams/network-diagram-form-dialog'
+import { NetworkDiagramSchema } from '~/types/network-diagrams'
+import type { Route } from './+types/network-diagram.create'
 
-export async function action({ request }: { request: Request }) {
+export async function action({ request }: Route.ActionArgs) {
   const loginInfo = await isAuthenticated(request)
-  const supabase = createSupabaseClientForUser(loginInfo.account.id)
+  const formData = await request.formData()
 
-  const { data, error } = await supabase
-    .from('network_diagrams')
-    .insert({ account_id: loginInfo.account.id, title: '無題のネットワーク図' })
-    .select('id')
-    .single()
-
-  if (error) {
-    throw new Response(error.message, { status: 500 })
+  const submission = parseWithZod(formData, { schema: NetworkDiagramSchema })
+  if (submission.status !== 'success') {
+    throw new Response('Invalid submission data.', { status: 400 })
   }
 
-  return redirect(`/network-diagrams/${data.id}`)
+  const diagram = await createNetworkDiagram(
+    loginInfo.account.id,
+    submission.value.title,
+  )
+  return redirect(`/network-diagrams/${diagram.id}`)
+}
+
+export default function NetworkDiagramCreate() {
+  const [isOpenDialog, setIsOpenDialog] = React.useState(true)
+  const navigate = useNavigate()
+
+  const onOpenChange = async (open: boolean) => {
+    setIsOpenDialog(open)
+    if (open) return
+    await sleep(300) // ダイアログが閉じるアニメーションが終わるまで待機
+    navigate('/network-diagrams')
+  }
+
+  return (
+    <NetworkDiagramFormDialog
+      networkDiagram={undefined}
+      action="/network-diagrams/create"
+      isOpen={isOpenDialog}
+      onOpenChange={onOpenChange}
+    />
+  )
 }

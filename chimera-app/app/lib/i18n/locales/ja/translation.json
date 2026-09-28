@@ -230,12 +230,21 @@
       "deleted": "イベントを削除しました"
     }
   },
+  "network_diagram": {
+    "menu_label": "Network Diagram",
+    "page_title": "Network Diagram",
+    "model": {
+      "title": "タイトル"
+    },
+    "message": {
+      "network_diagram_creation": "ネットワーク図の作成",
+      "network_diagram_editing": "ネットワーク図の編集",
+      "network_diagram_deletion": "ネットワーク図の削除",
+      "set_network_diagram_title": "ネットワーク図のタイトルを設定してください"
+    }
+  },
   "daily_note": {
     "menu_label": "Daily Note",
     "page_title": "Daily Note"
-  },
-  "network_diagram": {
-    "menu_label": "Network Diagram",
-    "page_title": "Network Diagram"
   }
 }

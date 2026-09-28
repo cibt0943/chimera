@@ -1,50 +1,63 @@
 // app/routes/network-diagrams/network-diagram.tsx
-import { useLoaderData } from 'react-router'
+import { Outlet, useNavigate } from 'react-router'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
-import { createSupabaseClientForUser } from '~/lib/supabase-client.server'
+import { getNetworkDiagram } from '~/models/network-diagram.server'
+import { Button } from '~/components/ui/button-base'
 import CollaborativeFlow from '~/components/network-diagrams/CollaborativeFlow'
+import type { Route } from './+types/network-diagram'
 
-export async function loader({
-  request,
-  params,
-}: {
-  request: Request
-  params: { diagramId: string }
-}) {
+export function meta({ loaderData }: Route.MetaArgs) {
+  return [{ title: `${loaderData.diagram.title || '無題'} | IMA` }]
+}
+
+async function requireAuthorizedDiagram(request: Request, diagramId: string) {
   const loginInfo = await isAuthenticated(request)
-  const supabase = createSupabaseClientForUser(loginInfo.account.id)
-
-  // RLSにより、自分のaccount_id以外の行はそもそも返ってこない
-  // (他人のIDを直打ちされても maybeSingle() が null を返すだけ)。
-  const { data: diagram, error } = await supabase
-    .from('network_diagrams')
-    .select('id, title')
-    .eq('id', params.diagramId)
-    .maybeSingle()
-
-  if (error) {
-    throw new Response(error.message, { status: 500 })
+  const diagram = await getNetworkDiagram(loginInfo.account.id, diagramId)
+  if (diagram.accountId !== loginInfo.account.id) {
+    throw new Response('Forbidden', { status: 403 })
   }
-  if (!diagram) {
-    throw new Response('Not Found', { status: 404 })
-  }
+  return { loginInfo, diagram }
+}
+
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const { loginInfo, diagram } = await requireAuthorizedDiagram(
+    request,
+    params.diagramId,
+  )
 
   return {
+    diagram,
     roomId: `diagram:${diagram.id}`,
-    title: diagram.title,
     user: loginInfo.auth0User,
   }
 }
 
-export default function NetworkDiagramRoute() {
-  const { roomId, title, user } = useLoaderData<typeof loader>()
+export default function NetworkDiagramRoute({
+  loaderData,
+}: Route.ComponentProps) {
+  const { diagram, roomId, user } = loaderData
+  const navigate = useNavigate()
 
   return (
-    <div style={{ width: '100%', height: '100vh' }}>
-      <h1 style={{ padding: '8px 16px', margin: 0 }}>{title || '(無題)'}</h1>
-      <div style={{ width: '100%', height: 'calc(100% - 48px)' }}>
+    <div className="flex h-screen w-full flex-col">
+      <div className="flex items-center justify-between border-b px-4 py-2">
+        <h1 className="text-base font-medium">
+          {diagram.title || '(無題)'}
+        </h1>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate('edit-title')}
+        >
+          タイトルを編集
+        </Button>
+      </div>
+      <div className="flex-1">
         <CollaborativeFlow roomId={roomId} user={user} />
       </div>
+
+      {/* /network-diagrams/:diagramId/edit-title がここにダイアログとして重なる */}
+      <Outlet />
     </div>
   )
 }
