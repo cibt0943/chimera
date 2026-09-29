@@ -1,8 +1,20 @@
 // app/routes/network-diagrams/index.tsx
-import { Link, Outlet } from 'react-router'
+import React, { useCallback } from 'react'
+import { useDebounce } from '~/lib/hooks'
+import { Link, Outlet, useSearchParams } from 'react-router'
+import { useTranslation } from 'react-i18next'
+import { LuPlus } from 'react-icons/lu'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getNetworkDiagrams } from '~/models/network-diagram.server'
 import { Button } from '~/components/ui/button-base'
+import { Input } from '~/components/ui/input'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from '~/components/ui/card'
 import type { Route } from './+types/index'
 
 export function meta() {
@@ -18,37 +30,67 @@ export default function NetworkDiagramsIndex({
   loaderData,
 }: Route.ComponentProps) {
   const { diagrams } = loaderData
+  const { t } = useTranslation()
+
+  // 検索文字列
+  const [searchTerm, setSearchTerm] = React.useState('')
+
+  // フィルタリング後のネットワーク図一覧データ
+  const dispDiagrams = React.useMemo(() => {
+    if (!searchTerm) return diagrams
+    return diagrams.filter((diagram) =>
+      diagram.title.toLowerCase().includes(searchTerm),
+    )
+  }, [diagrams, searchTerm])
+
+  // 300ms操作が止まってから?q= を更新する。
+  // setSearchParams はクライアントサイドの遷移として扱われ、
+  // loaderが再実行される(フルページ遷移は発生しない)。
+  const searchDiagramsDebounce = useDebounce((searchTerm: string) => {
+    setSearchTerm(searchTerm.toLowerCase())
+  }, 300)
 
   return (
-    <div className="p-4 pt-1 md:pt-4">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">ネットワーク図</h1>
-        <Button asChild>
-          <Link to="create">＋ 新規作成</Link>
-        </Button>
+    <div className="space-y-6">
+      <div className="flex items-center gap-2">
+        <Link to="create">
+          <Button type="button" variant="secondary">
+            <LuPlus />
+            {t('common.message.add')}
+          </Button>
+        </Link>
+        <Input
+          type="search"
+          placeholder={t('network_diagram.message.title_search')}
+          onChange={(event) => searchDiagramsDebounce(event.target.value)}
+          id="network-diagrams-title-search"
+        />
       </div>
 
-      {diagrams.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          まだネットワーク図がありません。「＋ 新規作成」から作成してください。
-        </p>
+      {dispDiagrams.length === 0 ? (
+        <div className="text-sm">{t('common.message.no_data')}</div>
       ) : (
-        <ul className="divide-y">
-          {diagrams.map((diagram) => (
-            <li
-              key={diagram.id}
-              className="flex items-center justify-between py-2"
-            >
-              <Link to={diagram.id} className="hover:underline">
-                {diagram.title || '(無題のネットワーク図)'}
-              </Link>
-              <span className="text-muted-foreground text-xs">
-                ノード数: {diagram.nodes.length} / 更新:{' '}
-                {new Date(diagram.updatedAt).toLocaleString('ja-JP')}
-              </span>
-            </li>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {dispDiagrams.map((diagram) => (
+            <Link key={diagram.id} to={diagram.id}>
+              <Card className="h-full transition-shadow hover:shadow-md">
+                <CardHeader>
+                  <CardTitle className="truncate">
+                    {diagram.title || t('network_diagram.message.untitled')}
+                  </CardTitle>
+                  <CardDescription>
+                    {t('network_diagram.message.node_count')}:{' '}
+                    {diagram.nodes.length}
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter className="text-muted-foreground text-xs">
+                  {t('common.message.updated')}:{' '}
+                  {new Date(diagram.updatedAt).toLocaleString('ja-JP')}
+                </CardFooter>
+              </Card>
+            </Link>
           ))}
-        </ul>
+        </div>
       )}
 
       {/* /network-diagrams/create がここにダイアログとして重なって表示される */}

@@ -61,7 +61,15 @@
       "state_save_wait": "Waiting to Save...",
       "state_saved": "Saved",
       "state_saving": "Saving...",
-      "set_time": "Set Time"
+      "set_time": "Set Time",
+      "set_date": "Set Date",
+      "set_date_time": "Set Date and Time",
+      "created": "Created",
+      "updated": "Updated",
+      "deleted": "Deleted",
+      "created_at": "Created At",
+      "updated_at": "Updated At",
+      "deleted_at": "Deleted At"
     },
     "validation": {
       "required": "This field is required",
@@ -134,7 +142,7 @@
       "task_deletion": "Task Deletion",
       "set_task_info": "Set the task information",
       "select_task_status": "Select the task status",
-      "title_search": "Search tasks...",
+      "title_search": "Search by title",
       "status_filter": "Status",
       "to_new": "Set to New",
       "to_doing": "Set to In Progress",
@@ -185,7 +193,7 @@
       "memo_editing": "Memo Editing",
       "memo_deletion": "Memo Deletion",
       "set_memo_info": "Set the memo information",
-      "title_search": "Search memos...",
+      "title_search": "Search by title",
       "show_archived": "Show Archived",
       "first_line_is_title": "The first line is the title",
       "to_archive": "Archive",
@@ -239,7 +247,10 @@
       "network_diagram_creation": "Network Diagram Creation",
       "network_diagram_editing": "Network Diagram Editing",
       "network_diagram_deletion": "Network Diagram Deletion",
-      "set_network_diagram_title": "Set the network diagram title"
+      "set_network_diagram_title": "Set the network diagram title",
+      "title_search": "Search by title",
+      "node_count": "Nodes",
+      "untitled": "Untitled Network Diagram"
     }
   },
   "daily_note": {

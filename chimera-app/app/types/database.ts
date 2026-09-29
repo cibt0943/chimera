@@ -117,8 +117,8 @@ export type Database = {
           auto_save: boolean
           created_at: string
           id: string
-          list_display: Json
-          list_filter: Json
+          list_display: NonNullable<Json>
+          list_filter: NonNullable<Json>
           updated_at: string
         }
         Insert: {
@@ -126,8 +126,8 @@ export type Database = {
           auto_save?: boolean
           created_at?: string
           id?: string
-          list_display?: Json
-          list_filter?: Json
+          list_display?: NonNullable<Json>
+          list_filter?: NonNullable<Json>
           updated_at?: string
         }
         Update: {
@@ -135,8 +135,8 @@ export type Database = {
           auto_save?: boolean
           created_at?: string
           id?: string
-          list_display?: Json
-          list_filter?: Json
+          list_display?: NonNullable<Json>
+          list_filter?: NonNullable<Json>
           updated_at?: string
         }
         Relationships: [
@@ -189,6 +189,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: 'memos_account_id_fkey'
+            columns: ['account_id']
+            isOneToOne: false
+            referencedRelation: 'accounts'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      network_diagrams: {
+        Row: {
+          account_id: string
+          created_at: string
+          edges: NonNullable<Json>
+          id: string
+          nodes: NonNullable<Json>
+          title: string
+          updated_at: string
+          yjs_state: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          edges?: NonNullable<Json>
+          id?: string
+          nodes?: NonNullable<Json>
+          title?: string
+          updated_at?: string
+          yjs_state?: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          edges?: NonNullable<Json>
+          id?: string
+          nodes?: NonNullable<Json>
+          title?: string
+          updated_at?: string
+          yjs_state?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'network_diagrams_account_id_fkey'
             columns: ['account_id']
             isOneToOne: false
             referencedRelation: 'accounts'
@@ -351,19 +392,19 @@ export type Database = {
     Views: {
       view_todos: {
         Row: {
-          account_id: string
+          account_id: string | null
           bg_color: string | null
-          created_at: string
+          created_at: string | null
           due_date: string | null
           due_date_all_day: boolean | null
           memo: string | null
-          position: number
+          position: number | null
           status: number | null
           text_color: string | null
-          title: string
-          todo_id: string
+          title: string | null
+          todo_id: string | null
           type: number | null
-          updated_at: string
+          updated_at: string | null
         }
         Relationships: [
           {

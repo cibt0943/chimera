@@ -1,40 +1,31 @@
 // app/models/network-diagram.server.ts
+import { toDate } from 'date-fns'
 import { createSupabaseClientForUser } from '~/lib/supabase-client.server'
-import type { NetworkDiagram } from '~/types/network-diagrams'
+import type { Database } from '~/types/database'
+import type { NetworkDiagrams, NetworkDiagram } from '~/types/network-diagrams'
 
-function mapRow(row: {
-  id: string
-  account_id: string
-  title: string
-  nodes: unknown[]
-  edges: unknown[]
-  created_at: string
-  updated_at: string
-}): NetworkDiagram {
-  return {
-    id: row.id,
-    accountId: row.account_id,
-    title: row.title,
-    nodes: row.nodes,
-    edges: row.edges,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  }
-}
+export type NetworkDiagramModel =
+  Database['public']['Tables']['network_diagrams']['Row']
 
-const COLUMNS = 'id, account_id, title, nodes, edges, created_at, updated_at'
+export type InsertNetworkDiagramModel =
+  Database['public']['Tables']['network_diagrams']['Insert']
+export type UpdateNetworkDiagramModel =
+  Database['public']['Tables']['network_diagrams']['Update'] & {
+    id: string
+    account_id: string
+  } // idとaccount_idを必須で上書き
 
 export async function getNetworkDiagrams(
   accountId: string,
-): Promise<NetworkDiagram[]> {
+): Promise<NetworkDiagrams> {
   const supabase = createSupabaseClientForUser(accountId)
   const { data, error } = await supabase
     .from('network_diagrams')
-    .select(COLUMNS)
+    .select()
     .order('updated_at', { ascending: false })
 
   if (error) throw new Response(error.message, { status: 500 })
-  return (data ?? []).map(mapRow)
+  return (data ?? []).map(convertToNetworkDiagram)
 }
 
 export async function getNetworkDiagram(
@@ -44,60 +35,72 @@ export async function getNetworkDiagram(
   const supabase = createSupabaseClientForUser(accountId)
   const { data, error } = await supabase
     .from('network_diagrams')
-    .select(COLUMNS)
+    .select()
     .eq('id', id)
     .maybeSingle()
 
   if (error) throw new Response(error.message, { status: 500 })
   if (!data) throw new Response('Not Found', { status: 404 })
-  return mapRow(data)
+  return convertToNetworkDiagram(data)
 }
 
-export async function createNetworkDiagram(
-  accountId: string,
-  title: string,
+export async function addNetworkDiagram(
+  networkDiagram: InsertNetworkDiagramModel,
 ): Promise<NetworkDiagram> {
-  const supabase = createSupabaseClientForUser(accountId)
+  const supabase = createSupabaseClientForUser(networkDiagram.account_id)
   const { data, error } = await supabase
     .from('network_diagrams')
-    .insert({ account_id: accountId, title })
-    .select(COLUMNS)
+    .insert({ ...networkDiagram })
+    .select('id')
     .single()
 
   if (error) throw new Response(error.message, { status: 500 })
-  return mapRow(data)
-}
+  if (!data) throw new Response('Not Found', { status: 404 })
 
-export interface UpdateNetworkDiagramTitleModel {
-  id: string
-  account_id: string
-  title: string
+  return getNetworkDiagram(networkDiagram.account_id, data.id)
 }
 
 export async function updateNetworkDiagramTitle(
-  values: UpdateNetworkDiagramTitleModel,
+  networkDiagram: UpdateNetworkDiagramModel,
 ): Promise<NetworkDiagram> {
-  const supabase = createSupabaseClientForUser(values.account_id)
+  const supabase = createSupabaseClientForUser(networkDiagram.account_id)
   const { data, error } = await supabase
     .from('network_diagrams')
-    .update({ title: values.title, updated_at: new Date().toISOString() })
-    .eq('id', values.id)
-    .select(COLUMNS)
+    .update({ ...networkDiagram })
+    .eq('id', networkDiagram.id)
+    .select('id')
     .single()
 
   if (error) throw new Response(error.message, { status: 500 })
-  return mapRow(data)
+  if (!data) throw new Response('Not Found', { status: 404 })
+
+  return getNetworkDiagram(networkDiagram.account_id, data.id)
 }
 
 export async function deleteNetworkDiagram(
   accountId: string,
-  id: string,
+  networkDiagramId: string,
 ): Promise<void> {
   const supabase = createSupabaseClientForUser(accountId)
   const { error } = await supabase
     .from('network_diagrams')
     .delete()
-    .eq('id', id)
+    .eq('id', networkDiagramId)
 
   if (error) throw new Response(error.message, { status: 500 })
+}
+
+// MemoモデルをMemo型に変換
+function convertToNetworkDiagram(
+  networkDiagramModel: NetworkDiagramModel,
+): NetworkDiagram {
+  return {
+    id: networkDiagramModel.id,
+    createdAt: toDate(networkDiagramModel.created_at),
+    updatedAt: toDate(networkDiagramModel.updated_at),
+    accountId: networkDiagramModel.account_id,
+    title: networkDiagramModel.title,
+    nodes: networkDiagramModel.nodes,
+    edges: networkDiagramModel.edges,
+  }
 }

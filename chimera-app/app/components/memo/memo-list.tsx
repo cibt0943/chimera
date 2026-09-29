@@ -314,12 +314,7 @@ export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
       <div>
         <div className="bg-background sticky top-0 z-10 flex items-center gap-2 border-b p-4">
           <Form action={MEMO_URL} method="post">
-            <Button
-              type="submit"
-              variant="secondary"
-              className="h-8 px-3"
-              ref={addButtonRef}
-            >
+            <Button type="submit" variant="secondary" ref={addButtonRef}>
               <LuPlus />
               {t('common.message.add')}
               <p className="text-muted-foreground text-xs">
@@ -333,7 +328,6 @@ export function MemoList({ originalMemos, selectedMemo }: MemoListProps) {
             type="search"
             placeholder={t('memo.message.title_search')}
             onChange={(event) => searchMemosDebounce(event.target.value)}
-            className="h-8"
             id="memos-title-search"
           />
           <MemoSettingsForm />

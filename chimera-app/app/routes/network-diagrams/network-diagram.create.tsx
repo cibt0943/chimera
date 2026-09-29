@@ -4,7 +4,7 @@ import { redirect, useNavigate } from 'react-router'
 import { parseWithZod } from '@conform-to/zod/v4'
 import { sleep } from '~/lib/utils'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
-import { createNetworkDiagram } from '~/models/network-diagram.server'
+import { addNetworkDiagram } from '~/models/network-diagram.server'
 import { NetworkDiagramFormDialog } from '~/components/network-diagrams/network-diagram-form-dialog'
 import { NetworkDiagramSchema } from '~/types/network-diagrams'
 import type { Route } from './+types/network-diagram.create'
@@ -18,7 +18,7 @@ export async function action({ request }: Route.ActionArgs) {
     throw new Response('Invalid submission data.', { status: 400 })
   }
 
-  const diagram = await createNetworkDiagram(
+  const diagram = await addNetworkDiagram(
     loginInfo.account.id,
     submission.value.title,
   )

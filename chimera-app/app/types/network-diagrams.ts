@@ -1,5 +1,6 @@
 // app/types/network-diagrams.ts
 import * as zod from 'zod'
+import type { Json } from '~/types/database'
 
 export interface NetworkDiagram {
   id: string
@@ -7,9 +8,11 @@ export interface NetworkDiagram {
   updatedAt: Date
   accountId: string
   title: string
-  nodes: unknown[]
-  edges: unknown[]
+  nodes: NonNullable<Json>
+  edges: NonNullable<Json>
 }
+
+export type NetworkDiagrams = NetworkDiagram[]
 
 export const NetworkDiagramSchema = zod.object({
   title: zod
