@@ -250,7 +250,10 @@
       "set_network_diagram_title": "Set the network diagram title",
       "title_search": "Search by title",
       "node_count": "Nodes",
-      "untitled": "Untitled Network Diagram"
+      "add_node": "Add Node",
+      "new_node": "New Node",
+      "untitled": "Untitled Network Diagram",
+      "change_title": "Change Title"
     }
   },
   "daily_note": {

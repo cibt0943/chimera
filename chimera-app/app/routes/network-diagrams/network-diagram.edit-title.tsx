@@ -39,7 +39,7 @@ export async function action({ params, request }: Route.ActionArgs) {
     title: submission.value.title,
   })
 
-  return redirect(`/network-diagrams/${diagram.id}`)
+  return redirect('/network-diagrams')
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
@@ -58,7 +58,7 @@ export default function NetworkDiagramEditTitle({
     setIsOpenDialog(open)
     if (open) return
     await sleep(300)
-    navigate(`/network-diagrams/${diagram.id}`)
+    navigate('/network-diagrams')
   }
 
   return (

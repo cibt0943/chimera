@@ -1,8 +1,10 @@
 // app/routes/network-diagrams/index.tsx
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useDebounce } from '~/lib/hooks'
-import { Link, Outlet, useSearchParams } from 'react-router'
+import { Link, Outlet } from 'react-router'
+import { ClientOnly } from 'remix-utils/client-only'
 import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
 import { LuPlus } from 'react-icons/lu'
 import { isAuthenticated } from '~/lib/auth/auth-middleware'
 import { getNetworkDiagrams } from '~/models/network-diagram.server'
@@ -13,9 +15,13 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardAction,
   CardFooter,
 } from '~/components/ui/card'
 import type { Route } from './+types/index'
+import { NetworkDiagram } from '~/types/network-diagrams'
+import { NetworkDiagramActionMenu } from '~/components/network-diagrams/network-diagram-action-menu'
+import { NetworkDiagramDeleteConfirmDialog } from '~/components/network-diagrams/network-diagram-delete-confirm-dialog'
 
 export function meta() {
   return [{ title: 'Network Diagrams | IMA' }]
@@ -35,6 +41,12 @@ export default function NetworkDiagramsIndex({
   // 検索文字列
   const [searchTerm, setSearchTerm] = React.useState('')
 
+  // 削除確認ダイアログの対象(DropdownMenu内に直接AlertDialogを置くと
+  // フォーカス管理が競合しやすいため、一覧側で選択状態を持ち、
+  // ダイアログは1つだけ外側でレンダリングする)
+  const [deletingDiagram, setDeletingDiagram] =
+    React.useState<NetworkDiagram | null>(null)
+
   // フィルタリング後のネットワーク図一覧データ
   const dispDiagrams = React.useMemo(() => {
     if (!searchTerm) return diagrams
@@ -51,7 +63,7 @@ export default function NetworkDiagramsIndex({
   }, 300)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       <div className="flex items-center gap-2">
         <Link to="create">
           <Button type="button" variant="secondary">
@@ -82,16 +94,41 @@ export default function NetworkDiagramsIndex({
                     {t('network_diagram.message.node_count')}:{' '}
                     {diagram.nodes.length}
                   </CardDescription>
+                  <CardAction>
+                    <NetworkDiagramActionMenu
+                      networkDiagram={diagram}
+                      handleDeleteNetworkDiagram={setDeletingDiagram}
+                    />
+                  </CardAction>
                 </CardHeader>
                 <CardFooter className="text-muted-foreground text-xs">
-                  {t('common.message.updated')}:{' '}
-                  {new Date(diagram.updatedAt).toLocaleString('ja-JP')}
+                  <div className="flex items-center gap-2">
+                    <div>{t('common.message.updated')}: </div>
+                    <ClientOnly fallback={<>&nbsp;</>}>
+                      {() => (
+                        <div>
+                          {format(
+                            diagram.updatedAt,
+                            t('common.format.date_time_short_format'),
+                          )}
+                        </div>
+                      )}
+                    </ClientOnly>
+                  </div>
                 </CardFooter>
               </Card>
             </Link>
           ))}
         </div>
       )}
+
+      <NetworkDiagramDeleteConfirmDialog
+        networkDiagram={deletingDiagram ?? undefined}
+        isOpen={!!deletingDiagram}
+        onOpenChange={(open) => {
+          if (!open) setDeletingDiagram(null)
+        }}
+      />
 
       {/* /network-diagrams/create がここにダイアログとして重なって表示される */}
       <Outlet />

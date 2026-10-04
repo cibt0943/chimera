@@ -53,13 +53,12 @@ export default [
             'create',
             './routes/network-diagrams/network-diagram.create.tsx',
           ),
-        ]),
-        route(':diagramId', './routes/network-diagrams/network-diagram.tsx', [
           route(
-            'edit-title',
+            ':diagramId/edit-title',
             './routes/network-diagrams/network-diagram.edit-title.tsx',
           ),
         ]),
+        route(':diagramId', './routes/network-diagrams/network-diagram.tsx'),
         route(
           ':diagramId/delete',
           './routes/network-diagrams/network-diagram.delete.tsx',

@@ -18,10 +18,10 @@ export async function action({ request }: Route.ActionArgs) {
     throw new Response('Invalid submission data.', { status: 400 })
   }
 
-  const diagram = await addNetworkDiagram(
-    loginInfo.account.id,
-    submission.value.title,
-  )
+  const diagram = await addNetworkDiagram({
+    account_id: loginInfo.account.id,
+    title: submission.value.title,
+  })
   return redirect(`/network-diagrams/${diagram.id}`)
 }
 

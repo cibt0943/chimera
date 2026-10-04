@@ -8,6 +8,8 @@
 
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import type { MouseEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { LuPlus } from 'react-icons/lu'
 import {
   ReactFlow,
   Background,
@@ -82,6 +84,7 @@ export default function CollaborativeFlow({
   roomId,
   user,
 }: CollaborativeFlowProps) {
+  const { t } = useTranslation()
   const [ready, setReady] = useState(false)
   const [nodes, setNodes] = useState<Node[]>([])
   const [edges, setEdges] = useState<Edge[]>([])
@@ -238,7 +241,7 @@ export default function CollaborativeFlow({
     const newNode: Node = {
       id: `node_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       type: 'default',
-      data: { label: '新しいノード' },
+      data: { label: t('network_diagram.message.new_node') },
       position: {
         // 毎回同じ場所に重ならないよう、少しランダムにずらす
         x: 100 + Math.random() * 300,
@@ -265,7 +268,7 @@ export default function CollaborativeFlow({
       Object.entries(cursors).map(([clientId, c]) => (
         <div
           key={clientId}
-          className="pointer-events-none absolute z-[1000] -translate-x-0.5 -translate-y-0.5"
+          className="pointer-events-none absolute z-20 -translate-x-0.5 -translate-y-0.5"
           style={{ left: c.x, top: c.y }}
         >
           <div
@@ -292,10 +295,11 @@ export default function CollaborativeFlow({
       <Button
         size="sm"
         variant="secondary"
-        className="absolute top-2.5 left-2.5 z-[1001]"
+        className="absolute top-2.5 left-2.5 z-10"
         onClick={addNode}
       >
-        ＋ ノードを追加
+        <LuPlus />
+        {t('network_diagram.message.add_node')}
       </Button>
       <ReactFlow
         nodes={nodes}

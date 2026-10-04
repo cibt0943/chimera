@@ -251,7 +251,10 @@
       "set_network_diagram_title": "ネットワーク図のタイトルを設定してください",
       "title_search": "タイトルを検索",
       "node_count": "ノード数",
-      "untitled": "無題のネットワーク図"
+      "add_node": "ノードを追加",
+      "new_node": "新しいノード",
+      "untitled": "無題のネットワーク図",
+      "change_title": "タイトルを変更"
     }
   },
   "daily_note": {
