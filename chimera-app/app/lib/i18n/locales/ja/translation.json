@@ -253,6 +253,8 @@
       "node_count": "ノード数",
       "add_node": "ノードを追加",
       "new_node": "新しいノード",
+      "node_label": "ノード名",
+      "delete_node": "ノードを削除",
       "untitled": "無題のネットワーク図",
       "change_title": "タイトルを変更"
     }

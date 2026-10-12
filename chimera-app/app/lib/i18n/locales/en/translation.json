@@ -252,6 +252,8 @@
       "node_count": "Nodes",
       "add_node": "Add Node",
       "new_node": "New Node",
+      "node_label": "Node label",
+      "delete_node": "Delete node",
       "untitled": "Untitled Network Diagram",
       "change_title": "Change Title"
     }

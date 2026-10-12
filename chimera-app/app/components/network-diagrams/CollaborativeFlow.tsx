@@ -6,28 +6,41 @@
 //   /api/collab-token が発行する短命JWTを使う。
 // - Ephemeral なデータ(他ユーザーのカーソル)は Yjs Awareness で同期する。
 
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import {
+  createContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+  use,
+} from 'react'
 import type { MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { LuPlus } from 'react-icons/lu'
+import { LuPlus, LuTrash2 } from 'react-icons/lu'
 import {
   ReactFlow,
   Background,
   Controls,
   MiniMap,
+  NodeResizer,
+  NodeToolbar,
+  Handle,
+  Position,
   applyNodeChanges,
   applyEdgeChanges,
   addEdge,
   type Node,
   type Edge,
+  type NodeProps,
   type OnNodesChange,
   type OnEdgesChange,
   type OnConnect,
 } from '@xyflow/react'
-import '@xyflow/react/dist/style.css'
 import * as Y from 'yjs'
 import { WebsocketProvider } from 'y-websocket'
 import { Button } from '~/components/ui/button-base'
+import { Textarea } from '~/components/ui/textarea'
 import type { Auth0User } from '~/types/accounts'
 
 const COLLAB_SERVER_URL =
@@ -74,6 +87,83 @@ interface CursorInfo {
 }
 
 const randomColor = () => `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`
+
+interface DiagramNodeActions {
+  updateLabel: (id: string, label: string) => void
+  deleteNode: (id: string) => void
+}
+
+const DiagramNodeActionsContext = createContext<DiagramNodeActions | null>(null)
+
+function EditableDiagramNode({ id, data, selected }: NodeProps) {
+  const { t } = useTranslation()
+  const actions = use(DiagramNodeActionsContext)
+  const [isEditing, setIsEditing] = useState(false)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const label = String(data.label ?? '')
+
+  useEffect(() => {
+    if (!isEditing) return
+    textareaRef.current?.focus()
+    textareaRef.current?.select()
+  }, [isEditing])
+
+  return (
+    <>
+      <NodeResizer
+        color="#ff0071"
+        isVisible={selected}
+        // minWidth={140}
+        // minHeight={50}
+        lineClassName="border-0"
+        handleClassName="h-2 w-2"
+      />
+      <NodeToolbar isVisible={selected} position={Position.Top}>
+        <Button
+          type="button"
+          variant="destructive"
+          size="icon"
+          aria-label={t('network_diagram.message.delete_node')}
+          title={t('network_diagram.message.delete_node')}
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            actions?.deleteNode(id)
+          }}
+        >
+          <LuTrash2 />
+        </Button>
+      </NodeToolbar>
+      <Handle type="target" position={Position.Left} />
+      {isEditing ? (
+        <Textarea
+          ref={textareaRef}
+          aria-label={t('network_diagram.message.node_label')}
+          // className="hover:border-input focus:border-ring focus:ring-ring/50 box-border field-sizing-fixed h-full min-h-0 w-full resize-none overflow-hidden border-transparent bg-transparent px-2 py-1 shadow-none focus:ring-2 focus:outline-none"
+          className="h-full min-h-0 w-full resize-none"
+          value={label}
+          onChange={(event) => actions?.updateLabel(id, event.target.value)}
+          onBlur={() => setIsEditing(false)}
+          onKeyDown={(event) => event.stopPropagation()}
+        />
+      ) : (
+        <div
+          className="h-full w-full overflow-auto text-left whitespace-pre-wrap"
+          onDoubleClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            setIsEditing(true)
+          }}
+        >
+          {label}
+        </div>
+      )}
+      <Handle type="source" position={Position.Right} />
+    </>
+  )
+}
+
+const nodeTypes = { default: EditableDiagramNode }
 
 export interface CollaborativeFlowProps {
   roomId: string
@@ -236,6 +326,42 @@ export default function CollaborativeFlow({
     })
   }, [])
 
+  const updateNodeLabel = useCallback((id: string, label: string) => {
+    setNodes((prevNodes) => {
+      const nextNodes = prevNodes.map((node) =>
+        node.id === id ? { ...node, data: { ...node.data, label } } : node,
+      )
+      const updatedNode = nextNodes.find((node) => node.id === id)
+      if (updatedNode) {
+        yNodesRef.current?.set(id, toDurableNode(updatedNode))
+      }
+      return nextNodes
+    })
+  }, [])
+
+  const deleteNode = useCallback(
+    (id: string) => {
+      const connectedEdgeIds = edges
+        .filter((edge) => edge.source === id || edge.target === id)
+        .map((edge) => edge.id)
+
+      setNodes((prevNodes) => prevNodes.filter((node) => node.id !== id))
+      setEdges((prevEdges) =>
+        prevEdges.filter((edge) => edge.source !== id && edge.target !== id),
+      )
+      ydocRef.current?.transact(() => {
+        yNodesRef.current?.delete(id)
+        connectedEdgeIds.forEach((edgeId) => yEdgesRef.current?.delete(edgeId))
+      })
+    },
+    [edges],
+  )
+
+  const nodeActions = useMemo(
+    () => ({ updateLabel: updateNodeLabel, deleteNode }),
+    [updateNodeLabel, deleteNode],
+  )
+
   // 新規ノードを追加する。id は衝突しにくいようにタイムスタンプ+乱数で生成。
   const addNode = useCallback(() => {
     const newNode: Node = {
@@ -250,7 +376,7 @@ export default function CollaborativeFlow({
     }
     setNodes((prevNodes) => [...prevNodes, newNode])
     yNodesRef.current?.set(newNode.id, toDurableNode(newNode))
-  }, [])
+  }, [t])
 
   // 自分のカーソル位置を Awareness(一時データ)としてブロードキャストする。
   const onPaneMouseMove = useCallback((event: MouseEvent<HTMLDivElement>) => {
@@ -287,7 +413,9 @@ export default function CollaborativeFlow({
   )
 
   if (!ready) {
-    return <div className="text-muted-foreground p-4 text-sm">接続中...</div>
+    return (
+      <div className="text-muted-foreground p-4 text-sm">connecting...</div>
+    )
   }
 
   return (
@@ -301,18 +429,21 @@ export default function CollaborativeFlow({
         <LuPlus />
         {t('network_diagram.message.add_node')}
       </Button>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        fitView
-      >
-        <Background />
-        <Controls />
-        <MiniMap />
-      </ReactFlow>
+      <DiagramNodeActionsContext value={nodeActions}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          fitView
+        >
+          <Background />
+          <Controls />
+          <MiniMap />
+        </ReactFlow>
+      </DiagramNodeActionsContext>
       {cursorOverlays}
     </div>
   )

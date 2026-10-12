@@ -8,7 +8,7 @@ import {
 } from 'react-router'
 import { I18nextProvider } from 'react-i18next'
 import { getToast } from 'remix-toast'
-import styles from '~/styles/tailwind.css?url'
+import styles from '~/styles/index.css?url'
 import i18n, { useLanguage } from '~/lib/i18n/i18n'
 import { useTheme, useSonner } from '~/lib/hooks'
 import { getSession } from '~/lib/session.server'
