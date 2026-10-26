@@ -33,6 +33,7 @@ import {
   type Node,
   type Edge,
   type NodeProps,
+  type ReactFlowInstance,
   type OnNodesChange,
   type OnEdgesChange,
   type OnConnect,
@@ -94,6 +95,8 @@ interface DiagramNodeActions {
 }
 
 const DiagramNodeActionsContext = createContext<DiagramNodeActions | null>(null)
+const nodeLabelClassName =
+  'nowheel box-border h-full min-h-0 w-full overflow-auto break-all text-left text-xs! leading-normal text-current'
 
 function EditableDiagramNode({ id, data, selected }: NodeProps) {
   const { t } = useTranslation()
@@ -101,11 +104,13 @@ function EditableDiagramNode({ id, data, selected }: NodeProps) {
   const [isEditing, setIsEditing] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const label = String(data.label ?? '')
+  // 入力中の値はローカルで保持する。Yjs経由の再描画で value が差し替わると
+  // キャレットが末尾に飛ぶため。
+  const [draft, setDraft] = useState(label)
 
   useEffect(() => {
     if (!isEditing) return
     textareaRef.current?.focus()
-    textareaRef.current?.select()
   }, [isEditing])
 
   return (
@@ -139,19 +144,22 @@ function EditableDiagramNode({ id, data, selected }: NodeProps) {
         <Textarea
           ref={textareaRef}
           aria-label={t('network_diagram.message.node_label')}
-          // className="hover:border-input focus:border-ring focus:ring-ring/50 box-border field-sizing-fixed h-full min-h-0 w-full resize-none overflow-hidden border-transparent bg-transparent px-2 py-1 shadow-none focus:ring-2 focus:outline-none"
-          className="h-full min-h-0 w-full resize-none"
-          value={label}
-          onChange={(event) => actions?.updateLabel(id, event.target.value)}
+          className={`${nodeLabelClassName} block resize-none rounded-none border-0 bg-transparent p-0 shadow-none transition-none outline-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent`}
+          value={draft}
+          onChange={(event) => {
+            setDraft(event.target.value)
+            actions?.updateLabel(id, event.target.value)
+          }}
           onBlur={() => setIsEditing(false)}
           onKeyDown={(event) => event.stopPropagation()}
         />
       ) : (
         <div
-          className="h-full w-full overflow-auto text-left whitespace-pre-wrap"
+          className={nodeLabelClassName}
           onDoubleClick={(event) => {
             event.preventDefault()
             event.stopPropagation()
+            setDraft(label)
             setIsEditing(true)
           }}
         >
@@ -179,7 +187,10 @@ export default function CollaborativeFlow({
   const [nodes, setNodes] = useState<Node[]>([])
   const [edges, setEdges] = useState<Edge[]>([])
   const [cursors, setCursors] = useState<Record<number, CursorInfo>>({})
+  const [reactFlowInstance, setReactFlowInstance] =
+    useState<ReactFlowInstance | null>(null)
 
+  const addNodeButtonRef = useRef<HTMLButtonElement>(null)
   const ydocRef = useRef<Y.Doc | null>(null)
   const providerRef = useRef<WebsocketProvider | null>(null)
   const yNodesRef = useRef<Y.Map<DurableNode> | null>(null)
@@ -326,17 +337,12 @@ export default function CollaborativeFlow({
     })
   }, [])
 
+  // Y.Doc を更新すると observe 経由でローカル state にも反映される。
   const updateNodeLabel = useCallback((id: string, label: string) => {
-    setNodes((prevNodes) => {
-      const nextNodes = prevNodes.map((node) =>
-        node.id === id ? { ...node, data: { ...node.data, label } } : node,
-      )
-      const updatedNode = nextNodes.find((node) => node.id === id)
-      if (updatedNode) {
-        yNodesRef.current?.set(id, toDurableNode(updatedNode))
-      }
-      return nextNodes
-    })
+    const yNodes = yNodesRef.current
+    const current = yNodes?.get(id)
+    if (!yNodes || !current) return
+    yNodes.set(id, { ...current, data: { ...current.data, label } })
   }, [])
 
   const deleteNode = useCallback(
@@ -364,19 +370,24 @@ export default function CollaborativeFlow({
 
   // 新規ノードを追加する。id は衝突しにくいようにタイムスタンプ+乱数で生成。
   const addNode = useCallback(() => {
+    const buttonBounds = addNodeButtonRef.current?.getBoundingClientRect()
+    if (!buttonBounds || !reactFlowInstance) return
+
+    const positionIndex = nodes.length
+    const offsetX = (positionIndex % 4) * 24
+    const offsetY = (Math.floor(positionIndex / 4) % 4) * 24
     const newNode: Node = {
       id: `node_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       type: 'default',
       data: { label: t('network_diagram.message.new_node') },
-      position: {
-        // 毎回同じ場所に重ならないよう、少しランダムにずらす
-        x: 100 + Math.random() * 300,
-        y: 100 + Math.random() * 300,
-      },
+      position: reactFlowInstance.screenToFlowPosition({
+        x: buttonBounds.left + offsetX,
+        y: buttonBounds.bottom + 16 + offsetY,
+      }),
     }
     setNodes((prevNodes) => [...prevNodes, newNode])
     yNodesRef.current?.set(newNode.id, toDurableNode(newNode))
-  }, [t])
+  }, [nodes.length, reactFlowInstance, t])
 
   // 自分のカーソル位置を Awareness(一時データ)としてブロードキャストする。
   const onPaneMouseMove = useCallback((event: MouseEvent<HTMLDivElement>) => {
@@ -421,10 +432,12 @@ export default function CollaborativeFlow({
   return (
     <div className="relative h-full w-full" onMouseMove={onPaneMouseMove}>
       <Button
+        ref={addNodeButtonRef}
         size="sm"
         variant="secondary"
         className="absolute top-2.5 left-2.5 z-10"
         onClick={addNode}
+        disabled={!reactFlowInstance}
       >
         <LuPlus />
         {t('network_diagram.message.add_node')}
@@ -437,6 +450,7 @@ export default function CollaborativeFlow({
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onInit={setReactFlowInstance}
           fitView
         >
           <Background />

@@ -142,3 +142,7 @@
 .react-flow {
   --xy-node-border-radius-default: 6px;
 }
+
+.react-flow__node {
+  padding: 4px 6px;
+}
