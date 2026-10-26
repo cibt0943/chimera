@@ -61,7 +61,15 @@
       "state_save_wait": "保存待ち...",
       "state_saved": "保存済み",
       "state_saving": "保存中...",
-      "set_time": "時間を設定"
+      "set_time": "時間を設定",
+      "set_date": "日付を設定",
+      "set_date_time": "日時を設定",
+      "created": "作成",
+      "updated": "更新",
+      "deleted": "削除",
+      "created_at": "作成日時",
+      "updated_at": "更新日時",
+      "deleted_at": "削除日時"
     },
     "validation": {
       "required": "必須項目です",
@@ -230,12 +238,29 @@
       "deleted": "イベントを削除しました"
     }
   },
+  "network_diagram": {
+    "menu_label": "Network Diagram",
+    "page_title": "Network Diagram",
+    "model": {
+      "title": "タイトル"
+    },
+    "message": {
+      "network_diagram_creation": "ネットワーク図の作成",
+      "network_diagram_editing": "ネットワーク図の編集",
+      "network_diagram_deletion": "ネットワーク図の削除",
+      "set_network_diagram_title": "ネットワーク図のタイトルを設定してください",
+      "title_search": "タイトルを検索",
+      "node_count": "ノード数",
+      "add_node": "ノードを追加",
+      "new_node": "新しいノード",
+      "node_label": "ノード名",
+      "delete_node": "ノードを削除",
+      "untitled": "無題のネットワーク図",
+      "change_title": "タイトルを変更"
+    }
+  },
   "daily_note": {
     "menu_label": "Daily Note",
     "page_title": "Daily Note"
-  },
-  "network_diagram": {
-    "menu_label": "Network Diagram",
-    "page_title": "Network Diagram"
   }
 }

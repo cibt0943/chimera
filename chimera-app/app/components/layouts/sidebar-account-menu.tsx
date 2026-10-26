@@ -41,7 +41,7 @@ export function SidebarAccountMenu() {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger render={<SidebarMenuButton size="lg" />}>
-            <Avatar className="h-8 w-8">
+            <Avatar>
               <AvatarImage
                 src={loginInfo.auth0User.picture}
                 alt={loginInfo.auth0User.name}

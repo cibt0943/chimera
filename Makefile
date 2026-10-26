@@ -18,6 +18,10 @@ reset:
 
 	supabase db reset
 
-bash:
+bash-app:
 
 	docker compose exec app bash
+
+bash-collab:
+
+	docker compose exec collab bash

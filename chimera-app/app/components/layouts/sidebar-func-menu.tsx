@@ -5,7 +5,7 @@ import {
   LuFilePen,
   LuCalendarDays,
   LuBook,
-  LuAlarmClockCheck,
+  LuWorkflow,
 } from 'react-icons/lu'
 import {
   SidebarGroup,
@@ -29,7 +29,7 @@ export const FuncMenuList = [
   {
     title: 'network_diagram.menu_label',
     url: NETWORK_DIAGRAM_URL,
-    icon: LuAlarmClockCheck,
+    icon: LuWorkflow,
   },
   {
     title: 'daily_note.menu_label',

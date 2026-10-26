@@ -223,6 +223,8 @@ export function Calendar({ defaultEvents }: CalendarProps) {
           listDayAltFormat={() => ''}
           popoverCloseContent={() => <EventCalendarCloseIcon />}
           events={defaultEvents}
+          // eventColor="oklch(88.2% 0.059 254.128)"
+          // eventContrastColor="black"
           eventContent={renderEventContent}
           eventTimeFormat={{ hour: 'numeric', minute: '2-digit' }}
           displayEventEnd={true}

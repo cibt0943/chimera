@@ -48,7 +48,21 @@ export default [
 
     ...prefix('network-diagrams', [
       layout('./routes/network-diagrams/layout.tsx', [
-        index('./routes/network-diagrams/index.tsx'),
+        route('', './routes/network-diagrams/index.tsx', [
+          route(
+            'create',
+            './routes/network-diagrams/network-diagram.create.tsx',
+          ),
+          route(
+            ':diagramId/edit-title',
+            './routes/network-diagrams/network-diagram.edit-title.tsx',
+          ),
+        ]),
+        route(':diagramId', './routes/network-diagrams/network-diagram.tsx'),
+        route(
+          ':diagramId/delete',
+          './routes/network-diagrams/network-diagram.delete.tsx',
+        ),
       ]),
     ]),
 
@@ -68,6 +82,7 @@ export default [
         route(':memoId/position', './routes/memos/api.memo.position.tsx'),
       ]),
       ...prefix('events', [route(':eventId', './routes/events/api.event.tsx')]),
+      route('collab-token', './routes/network-diagrams/api.collab-token.tsx'),
     ]),
   ]),
 ] satisfies RouteConfig

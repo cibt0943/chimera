@@ -1,4 +1,5 @@
 /* stylelint-disable import-notation */
+@import '@xyflow/react/dist/style.css' layer(base);
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
@@ -135,4 +136,13 @@
   [role='button']:not(:disabled) {
     cursor: pointer;
   }
+}
+
+/* React Flow  */
+.react-flow {
+  --xy-node-border-radius-default: 6px;
+}
+
+.react-flow__node {
+  padding: 4px 6px;
 }

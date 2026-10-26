@@ -96,6 +96,10 @@ export function Event2Calendar(event: Event): CalendarEvent {
     type: CalendarEventType.EVENT,
     srcObj: event,
     durationEditable: true,
+
+    // カレンダー上での背景色と文字色
+    color: 'oklch(90.5% 0.093 164.15)',
+    contrastColor: 'black',
   }
 }
 
@@ -114,6 +118,10 @@ export function Task2Calendar(task: TaskWithNonNullableDueDate): CalendarEvent {
     type: CalendarEventType.TASK,
     srcObj: task,
     durationEditable: false,
+
+    // カレンダー上での背景色と文字色
+    color: 'oklch(88.2% 0.059 254.128)',
+    contrastColor: 'black',
   }
 }
 
@@ -134,5 +142,9 @@ export function Memo2Calendar(
     type: CalendarEventType.MEMO,
     srcObj: memo,
     durationEditable: false,
+
+    // カレンダー上での背景色と文字色
+    color: 'oklch(90.1% 0.076 70.697)',
+    contrastColor: 'black',
   }
 }

@@ -1,5 +1,6 @@
 {
   "name": "chimera-app",
+  "version": "0.1.0",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -7,7 +8,7 @@
     "build": "react-router build",
     "start:local": "cross-env NODE_ENV=development node --env-file-if-exists=.env.local ./server.js",
     "start:dev": "cross-env NODE_ENV=development node --env-file-if-exists=.env.development ./server.js",
-    "start": "cross-env NODE_ENV=production node ./server.js",
+    "start": "cross-env NODE_ENV=production node --env-file-if-exists=.env.production ./server.js",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "eslint-inspector": "npx @eslint/config-inspector@latest --host 0.0.0.0",
     "typecheck": "react-router typegen && tsc",
@@ -34,6 +35,7 @@
     "@supabase/supabase-js": "^2.106.2",
     "@tanstack/react-table": "^8.21.3",
     "@uiw/react-color-compact": "^2.10.3",
+    "@xyflow/react": "^12.11.6",
     "arctic": "^3.7.0",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
@@ -48,6 +50,7 @@
     "input-otp": "^1.4.2",
     "isbot": "^5.1.32",
     "jotai": "^3.0.0",
+    "jsonwebtoken": "^9.0.2",
     "lexical": "^0.50.0",
     "lucide-react": "^1.44.0",
     "morgan": "^1.10.1",
@@ -69,6 +72,8 @@
     "sonner": "^2.0.7",
     "temporal-polyfill": "^1.0.1",
     "vaul": "^1.1.2",
+    "y-websocket": "^3.1.0",
+    "yjs": "^13.6.32",
     "zod": "^4.6.1"
   },
   "devDependencies": {
@@ -80,6 +85,7 @@
     "@types/eslint-config-prettier": "^6.11.3",
     "@types/eslint-plugin-jsx-a11y": "~6.10.0",
     "@types/express": "~5.0.2",
+    "@types/jsonwebtoken": "~9.0.10",
     "@types/morgan": "~1.9.9",
     "@types/node": "^26.1.2",
     "@types/react": "~19.3.0",
